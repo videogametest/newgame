@@ -1,15 +1,18 @@
 import Phaser from 'phaser';
-import { PlaceholderScene } from './scenes/PlaceholderScene';
+import { TUNING } from './config/tuning';
+import { BattleScene } from './scenes/BattleScene';
+import { BootScene } from './scenes/BootScene';
+import { UIScene } from './scenes/UIScene';
 
 new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
-  width: 960,
-  height: 540,
+  width: TUNING.display.width,
+  height: TUNING.display.height,
   backgroundColor: '#0b0b14',
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [PlaceholderScene],
+  scene: [BootScene, BattleScene, UIScene],
 });

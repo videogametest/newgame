@@ -1,75 +1,85 @@
-// Decides what a non-hero fighter wants to do this step. Pure: returns a plan, changes nothing.
-import { UNIT_DEFS } from '../data/units';
+// Pure AI decisions for non-hero fighters. Each call returns an intent; battle.ts applies it.
+// Soldiers close in, wind up a telegraphed strike, and strike. Archers hold a preferred
+// distance and draw before firing.
+
 import { TUNING } from '../config/tuning';
-import { bodyGap, solveLaunch } from './combat';
-import { facingOf } from './math';
+import { launchVelocity, unitDir } from './combat';
 import type { BattleState, Fighter } from './types';
 
-export type UnitPlan = {
-  moveVx: number;
-  facing: 1 | -1;
-  /** Melee units: the foe to strike if in reach. */
-  strike?: Fighter;
-  /** Archers: the launch velocity for an arrow that lands on the foe. */
-  shot?: { x: number; y: number; vx: number; vy: number; damage: number; knockback: number };
-};
+export interface AiIntent {
+  /** Planned walking velocity (m/s) on the ground plane. */
+  vx: number;
+  vz: number;
+  /** Facing to turn toward, or null to keep the current yaw. */
+  yaw: number | null;
+  /** Ask battle.ts to start this fighter's action (windup or draw) now. */
+  startAction: boolean;
+}
 
-export function nearestFoe(f: Fighter, s: BattleState): Fighter | undefined {
+const STILL: AiIntent = { vx: 0, vz: 0, yaw: null, startAction: false };
+
+/** Nearest living fighter on the opposing team, or undefined. */
+export function nearestEnemy(state: BattleState, f: Fighter): Fighter | undefined {
   let best: Fighter | undefined;
-  let bestDist = Infinity;
-  for (const other of s.fighters) {
-    if (!other.alive || other.team === f.team) continue;
-    const dist = Math.abs(other.x - f.x);
-    if (dist < bestDist) {
-      best = other;
-      bestDist = dist;
+  let bestD = Infinity;
+  for (const o of state.fighters) {
+    if (!o.alive || o.team === f.team) continue;
+    const d = Math.hypot(o.x - f.x, o.z - f.z);
+    if (d < bestD) {
+      bestD = d;
+      best = o;
     }
   }
   return best;
 }
 
-export function planUnit(f: Fighter, s: BattleState): UnitPlan {
-  const foe = nearestFoe(f, s);
-  if (!foe) return { moveVx: 0, facing: f.facing };
+export function decideAI(state: BattleState, f: Fighter): AiIntent {
+  if (f.kind === 'soldier') return decideSoldier(state, f);
+  if (f.kind === 'archer') return decideArcher(state, f);
+  return STILL;
+}
 
-  const def = UNIT_DEFS[f.unitId];
-  const facing = facingOf(foe.x - f.x, f.facing);
+function decideSoldier(state: BattleState, f: Fighter): AiIntent {
+  const target = nearestEnemy(state, f);
+  if (!target) return STILL;
+  const dir = unitDir(f.x, f.z, target.x, target.z);
+  const yaw = Math.atan2(dir.x, dir.z);
+  const dist = Math.hypot(target.x - f.x, target.z - f.z);
+  const idle = f.action.phase === 'idle';
 
-  if (def.kind === 'melee') {
-    if (bodyGap(f, foe) <= def.stats.attackRange) {
-      return { moveVx: 0, facing, strike: foe };
-    }
-    return { moveVx: facing * def.stats.moveSpeed, facing };
+  if (!idle) return { vx: 0, vz: 0, yaw, startAction: false };
+  if (dist <= TUNING.soldier.attackRange) {
+    return { vx: 0, vz: 0, yaw, startAction: f.cooldown <= 0 };
+  }
+  const s = TUNING.soldier.moveSpeed;
+  return { vx: dir.x * s, vz: dir.z * s, yaw, startAction: false };
+}
+
+function decideArcher(state: BattleState, f: Fighter): AiIntent {
+  const target = nearestEnemy(state, f);
+  if (!target) return STILL;
+  const dir = unitDir(f.x, f.z, target.x, target.z);
+  const yaw = Math.atan2(dir.x, dir.z);
+  const dist = Math.hypot(target.x - f.x, target.z - f.z);
+  const idle = f.action.phase === 'idle';
+  const A = TUNING.archer;
+
+  if (!idle) return { vx: 0, vz: 0, yaw, startAction: false };
+
+  let vx = 0;
+  let vz = 0;
+  if (dist < A.preferredMin) {
+    vx = -dir.x * A.retreatSpeed;
+    vz = -dir.z * A.retreatSpeed;
+  } else if (dist > A.preferredMax) {
+    vx = dir.x * A.moveSpeed;
+    vz = dir.z * A.moveSpeed;
   }
 
-  if (def.kind === 'archer') {
-    const st = def.stats;
-    const dist = Math.abs(foe.x - f.x);
-    let moveVx = 0;
-    if (dist < st.preferredMin) moveVx = -facing * st.moveSpeed;
-    else if (dist > st.preferredMax) moveVx = facing * st.moveSpeed;
-
-    const plan: UnitPlan = { moveVx, facing };
-    if (dist <= st.maxRange) {
-      const sx = f.x + facing * (f.width / 2);
-      const sy = f.y - f.height * 0.6;
-      const tx = foe.x;
-      const ty = foe.y - foe.height * 0.6;
-      const v = solveLaunch(tx - sx, ty - sy, st.arrowSpeed, TUNING.physics.arrowGravity);
-      if (v) {
-        plan.shot = {
-          x: sx,
-          y: sy,
-          vx: v.vx,
-          vy: v.vy,
-          damage: st.arrowDamage,
-          knockback: st.arrowKnockback,
-        };
-      }
-    }
-    return plan;
-  }
-
-  // The hero is never planned by AI; the player drives it.
-  return { moveVx: 0, facing: f.facing };
+  const canShoot =
+    f.cooldown <= 0 &&
+    dist <= A.maxRange &&
+    launchVelocity(f.x, TUNING.bow.muzzleHeight, f.z, target.x, A.aimHeight, target.z,
+      A.arrowSpeed, TUNING.gravity) !== null;
+  return { vx, vz, yaw, startAction: canShoot };
 }

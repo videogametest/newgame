@@ -1,61 +1,126 @@
-// Every balance number lives here. Logic reads these values; nothing hard-codes them.
-import type { ArcherStats, BodyStats, MeleeStats } from '../core/types';
+// Every balance number lives here. Units are metres, seconds and radians.
+// Logic reads these values; nothing in src/core or src/render hard-codes them.
 
 export const TUNING = {
-  display: { width: 1280, height: 720 },
-  world: {
-    width: 2560,
-    /** Ground line: fighters' feet stand here. */
-    groundY: 620,
-    /** Knockback decay (px/s^2). */
-    friction: 1600,
+  /** Fixed simulation step in seconds. The render loop turns real time into steps of this size. */
+  fixedDt: 1 / 60,
+  /** Downward acceleration for arrows (m/s^2). */
+  gravity: 9.8,
+
+  camera: {
+    fov: 0.9,
+    zoomFov: 0.55,
+    distance: 4.6,
+    zoomDistance: 2.6,
+    /** Sideways offset of the camera from the hero (over-the-shoulder). */
+    shoulder: 0.9,
+    /** Height of the look-at point above the hero's feet. */
+    lookHeight: 1.5,
+    pitchMin: -0.75,
+    pitchMax: 0.45,
+    mouseSensitivity: 0.0022,
+    /** How fast the bow zoom eases in and out (per second, exponential). */
+    zoomRate: 8,
   },
-  physics: {
-    arrowGravity: 900,
+
+  combat: {
+    /** Seconds a fighter flashes red after taking damage. */
+    hitFlashTime: 0.14,
+    /** Seconds a fighter plays its hit reaction. */
+    hitReactTime: 0.45,
+    /** Knockback velocity decays by exp(-friction * dt). */
+    knockbackFriction: 9,
+    damageNumberLife: 0.9,
   },
-  feedback: {
-    hitFlashTime: 0.12,
-    swingTime: 0.2,
-    damageNumberLife: 0.8,
-    damageNumberRise: 50,
-    arrowRadius: 4,
+
+  hero: {
+    maxHp: 120,
+    radius: 0.45,
+    height: 1.8,
+    walkSpeed: 3.0,
+    sprintSpeed: 5.4,
+    /** Movement multiplier while the bow is drawn. */
+    drawMoveFactor: 0.45,
+    /** Movement multiplier during a sword swing. */
+    swingMoveFactor: 0.3,
+    dodgeSpeed: 8.5,
+    /** Total dodge roll length in seconds. */
+    dodgeTime: 0.5,
+    /** The first part of a roll in which the hero cannot be hit. */
+    dodgeIFrames: 0.3,
+    dodgeCooldown: 1.0,
   },
-  units: {
-    hero: { maxHp: 120, moveSpeed: 230, width: 40, height: 90 } satisfies BodyStats,
-    soldier: {
-      maxHp: 70,
-      moveSpeed: 150,
-      width: 40,
-      height: 90,
-      damage: 12,
-      attackRange: 70,
-      attackCooldown: 0.9,
-      knockback: 180,
-    } satisfies MeleeStats,
-    archer: {
-      maxHp: 50,
-      moveSpeed: 120,
-      width: 40,
-      height: 90,
-      arrowDamage: 10,
-      arrowSpeed: 760,
-      arrowKnockback: 60,
-      preferredMin: 320,
-      preferredMax: 520,
-      maxRange: 600,
-      fireCooldown: 1.8,
-    } satisfies ArcherStats,
+
+  soldier: {
+    maxHp: 70,
+    radius: 0.45,
+    height: 1.8,
+    moveSpeed: 2.6,
+    damage: 12,
+    /** Distance at which a soldier starts its wind-up. */
+    attackRange: 1.9,
+    /** Visible wind-up before the strike lands. The strike zone is shown during it. */
+    windupTime: 0.7,
+    /** Centre of the strike zone, in front of the attacker. */
+    strikeOffset: 1.0,
+    strikeRadius: 0.9,
+    swingTime: 0.4,
+    cooldown: 1.3,
+    knockback: 3.2,
   },
-  weapons: {
-    sword: { damage: 22, range: 95, cooldown: 0.5, knockback: 240 },
-    bow: {
-      minDamage: 8,
-      maxDamage: 34,
-      minSpeed: 420,
-      maxSpeed: 1000,
-      fullDrawTime: 0.9,
-      cooldown: 0.4,
-      arrowKnockback: 120,
-    },
+
+  archer: {
+    maxHp: 50,
+    radius: 0.4,
+    height: 1.8,
+    moveSpeed: 2.2,
+    retreatSpeed: 2.6,
+    arrowDamage: 10,
+    arrowSpeed: 24,
+    arrowKnockback: 1.2,
+    /** Seconds the archer visibly draws before firing. */
+    drawTime: 1.1,
+    releaseTime: 0.35,
+    cooldown: 2.2,
+    preferredMin: 8,
+    preferredMax: 13,
+    maxRange: 24,
+    /** Height the archer aims at on the target. */
+    aimHeight: 1.1,
   },
-};
+
+  sword: {
+    damage: 22,
+    range: 2.3,
+    /** Half-width of the swing arc in radians. */
+    arcHalfAngle: 1.15,
+    /** Seconds into the swing when the blade lands. */
+    hitTime: 0.2,
+    duration: 0.45,
+    cooldown: 0.5,
+    knockback: 4.0,
+  },
+
+  bow: {
+    minDamage: 8,
+    maxDamage: 34,
+    minSpeed: 18,
+    maxSpeed: 36,
+    /** Seconds of drawing for a full-power shot. */
+    fullDrawTime: 0.9,
+    releaseTime: 0.3,
+    cooldown: 0.35,
+    knockback: 1.6,
+    /** Where the arrow leaves the bow, relative to the hero. */
+    muzzleHeight: 1.45,
+    muzzleForward: 0.5,
+  },
+
+  arrow: {
+    radius: 0.15,
+    /** Arrows are removed after this many seconds of flight. */
+    maxLife: 6,
+  },
+} as const;
+
+export type Tuning = typeof TUNING;

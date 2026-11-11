@@ -7,6 +7,9 @@ import { nearestEnemy } from './ai';
 import { getHero, isDodgeInvulnerable } from './battle';
 import type { BattleInput, BattleState, Fighter } from './types';
 
+/** A soldier this close pulls the skilled bot onto the sword. */
+const CLOSE_RANGE = 3.5;
+
 const NEUTRAL: BattleInput = {
   moveX: 0,
   moveZ: 0,
@@ -43,12 +46,46 @@ function bowPitch(hero: Fighter, target: Fighter, drawTime: number): number {
   return Math.atan2(v.vy, Math.hypot(v.vx, v.vz));
 }
 
+export interface BotOptions {
+  /** Roll out of telegraphed enemy strikes. */
+  dodge: boolean;
+  /** Use the bow against archers and at range. When false the bot fights with the sword only. */
+  bow: boolean;
+}
+
+/** The bot used for the win-time and HP-left balance targets. */
+export const SKILLED_BOT: BotOptions = { dodge: true, bow: true };
+/** A bot that never dodges and never shoots: the floor the balance must still beat. */
+export const SWORD_ONLY_BOT: BotOptions = { dodge: false, bow: false };
+
+/** Nearest living enemy of a given kind, or undefined. */
+function nearestOfKind(state: BattleState, hero: Fighter, kind: Fighter['kind']): Fighter | undefined {
+  let best: Fighter | undefined;
+  let bestD = Infinity;
+  for (const o of state.fighters) {
+    if (!o.alive || o.team === hero.team || o.kind !== kind) continue;
+    const d = Math.hypot(o.x - hero.x, o.z - hero.z);
+    if (d < bestD) {
+      bestD = d;
+      best = o;
+    }
+  }
+  return best;
+}
+
 /** Chooses this step's input for the hero. Reads state only; never mutates it. */
-export function botInput(state: BattleState): BattleInput {
+export function botInput(state: BattleState, options: BotOptions = SKILLED_BOT): BattleInput {
   const hero = getHero(state);
   if (!hero.alive || state.status !== 'fighting') return { ...NEUTRAL };
 
-  const target = nearestEnemy(state, hero);
+  // Target choice: a soldier in close range gets the sword first; otherwise a bow user shoots the nearest
+  // archer, since dodging cannot stop arrows; otherwise the nearest enemy.
+  const closeSoldier = nearestOfKind(state, hero, 'soldier');
+  const closeSoldierNear = closeSoldier && Math.hypot(closeSoldier.x - hero.x, closeSoldier.z - hero.z) < CLOSE_RANGE ? closeSoldier : undefined;
+  const target =
+    closeSoldierNear ||
+    (options.bow && nearestOfKind(state, hero, 'archer')) ||
+    nearestEnemy(state, hero);
   if (!target) return { ...NEUTRAL };
 
   const dir = unitDir(hero.x, hero.z, target.x, target.z);
@@ -57,13 +94,13 @@ export function botInput(state: BattleState): BattleInput {
   const input: BattleInput = { ...NEUTRAL, camYaw };
 
   // Dodge a telegraphed strike instead of trading hits.
-  if (strikeIncoming(state, hero) && hero.dodgeTime <= 0 && hero.dodgeCooldown <= 0 && !isDodgeInvulnerable(hero)) {
+  if (options.dodge && strikeIncoming(state, hero) && hero.dodgeTime <= 0 && hero.dodgeCooldown <= 0 && !isDodgeInvulnerable(hero)) {
     input.dodgePressed = true;
     return input;
   }
 
   const meleeReach = TUNING.sword.range + target.radius;
-  const wantBow = target.kind === 'archer' || dist > meleeReach + 1.5;
+  const wantBow = options.bow && !closeSoldierNear && (target.kind === 'archer' || dist > meleeReach + 1.5);
   const desired = wantBow ? 'bow' : 'sword';
   input.weapon = desired;
   // Keep the same weapon in hand until it is free to change.

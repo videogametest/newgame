@@ -87,6 +87,8 @@ export interface Spawn {
   x: number;
   z: number;
   yaw: number;
+  /** Enemy waves: 0 (or unset) is present at the start; wave n joins once wave n-1 is cleared. */
+  wave?: number;
 }
 
 export interface ArenaDef {
@@ -97,6 +99,8 @@ export interface ArenaDef {
   halfDepth: number;
   obstacles: Obstacle[];
   spawns: Spawn[];
+  /** Seconds between the last enemy of a wave falling and the next wave arriving. */
+  waveGap: number;
 }
 
 export interface BattleState {
@@ -107,6 +111,10 @@ export interface BattleState {
   heroId: number;
   fighters: Fighter[];
   projectiles: Projectile[];
+  /** Highest wave that has arrived so far. */
+  wave: number;
+  /** Seconds the field has been clear of enemies while a later wave is pending. */
+  waveTimer: number;
 }
 
 /** One step of player intent. Edge flags (`*Pressed`, `*Released`, `dodgePressed`) are true for one step only. */

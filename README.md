@@ -26,6 +26,7 @@ npm run dev     # local dev server
 | Left mouse | Attack; hold with the bow to draw |
 | Right mouse | Zoom (bow) |
 | Esc | Pause |
+| `` ` `` (backtick) | Toggle the tuning panel (live sliders, Copy config, Reset). Opening it pauses the sim. |
 
 ## Layout
 

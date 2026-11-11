@@ -21,6 +21,16 @@ const DEFAULTS = {
     mouseSensitivity: 0.0022,
     /** How fast the bow zoom eases in and out (per second, exponential). */
     zoomRate: 8,
+    /** The camera never goes below this height above the ground (m). Stops it dipping under the ground plane. */
+    minHeight: 0.4,
+    /** A fighter this close to the camera (m, measured to its body centre) fades out. */
+    occludeNearDistance: 1.5,
+    /** Opacity of a fighter while it blocks the view. 1 is fully solid. */
+    occludeAlpha: 0.15,
+    /** How fast a fighter fades in and out (per second, exponential). */
+    occludeFadeRate: 10,
+    /** Extra width (m) beyond a fighter's radius that still counts as blocking the line to the hero. */
+    occludeMargin: 0.25,
   },
 
   combat: {

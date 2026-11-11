@@ -10,6 +10,7 @@ import { buildArena } from './arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
 import { BattleCamera } from './camera';
+import { blocksView } from './occlusion';
 import { ArrowViews, ImpactBursts } from './effects';
 import { PlayerInput } from './input';
 import { Hud, type Projector } from './hud';
@@ -111,6 +112,10 @@ class Game {
   /** Draws the current state. Visual only: no sim state is written here. */
   private syncVisuals(dt: number): void {
     const { state } = this;
+    const hero = getHero(state);
+    // The camera moves first so the occlusion test below uses this frame's camera position.
+    this.camera.update(hero, this.input.camYaw, this.input.aimPitch, this.input.isZooming, dt);
+    const camPos = this.camera.camera.position;
     for (const f of state.fighters) {
       let view = this.views.get(f.id);
       if (!view) {
@@ -118,12 +123,12 @@ class Game {
         this.views.set(f.id, view);
       }
       view.update(f);
+      // Non-hero fighters that block the view fade out. The hero is never faded.
+      if (f.id !== hero.id) view.fade(blocksView(camPos, hero, f), dt);
     }
     this.arrows.sync(state);
     this.bursts.update(dt);
 
-    const hero = getHero(state);
-    this.camera.update(hero, this.input.camYaw, this.input.aimPitch, this.input.isZooming, dt);
     this.hud.frame({
       state,
       hero,

@@ -1,6 +1,6 @@
 # Game Design
 
-Version 5 (open world). Supersedes version 4, which used a menu map and separate battle arenas.
+Version 6 (adds the story, section 9). Supersedes version 5.
 
 Working title: TBD. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -157,13 +157,36 @@ Exact XP curves, perk lists, and tier stats are tuning, not design. Keep them in
 Each milestone ends deployed to Pages and playable. Do not start the next one until the current one is approved, unless a build message says otherwise.
 
 1. **Combat prototype.** Done: third-person hero, sword and bow, telegraphed enemies, dodge, waves, tuning panel. Remaining: camera fade for blocking fighters, sound effects, showcase mode.
-2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village, two bandit camps, and one outpost placed in data. Fights in place with awareness ranges, squad following, pathfinding, capture with a visible change, chests and breakables, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
+2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned (see section 9), two bandit camps, and one outpost placed in data. Fights in place with awareness ranges, squad following, pathfinding, capture that raises the valley recovery level and visibly restores the village, chests and breakables with found notes, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
 3. **Progression.** Skills that level by use, perks, loot tables, inventory, equippable gear with tiers, local saves.
 4. **Conquest and towns.** Town services (crafting, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
 5. **Cloud saves.** Supabase auth and save sync.
 6. **More world.** A second region, more unit types, more secrets, more music.
 
-## 9. Deferred ideas
+## 9. Story
+
+Names in this section are placeholders and may change. Keep every name in data, never in code.
+
+Premise:
+
+- A generation ago the kingdom fell apart. The crown's soldiers left, the roads went unguarded, and the valley was taken over by bandits. Most families fled.
+- The hero grew up elsewhere on stories of the valley and has come home to a village that is half empty.
+- The hero takes the valley back one place at a time. Each place freed brings people home.
+- The abandoned castle on the horizon is where the old kingdom ended and where the story eventually leads. It is not reachable in the first valley.
+
+Tone: warm and hopeful, with a quiet sadness for what was lost. No gore, no grim cruelty. The enemies are bandits, many of them former soldiers with nowhere else to go, not monsters.
+
+**The world tells the story.** There is no quest log and no long dialogue. The story is carried by:
+
+- **Restoration.** Capturing a place changes the valley, not only that place. The village starts with boarded windows, empty fields, few people, and no lights at night. With each capture more villagers return, buildings are repaired, fields are worked, stalls open, and windows glow after dark. The village music gains an instrument with each capture.
+- **Villagers** who say one or two short lines that change as the valley recovers.
+- **Things found off the path:** a note in a chest, a ruined watchtower, an overgrown shrine, a soldier's grave. Each hints at how the kingdom fell. Text is short: three sentences at most.
+- **Recruits.** Each squad member is a named person with a home in the valley and a two-sentence reason for joining. Some become available only after a specific place is freed.
+- **Landmarks** on the horizon that the found notes refer to.
+
+Restoration is tracked as a single valley recovery level in the game state, raised by each capture. Scenery, villager count, lights, and music read from it.
+
+## 10. Deferred ideas
 
 Not in scope until the core game works. Do not build these unprompted.
 
@@ -172,5 +195,5 @@ Not in scope until the core game works. Do not build these unprompted.
 - Blocking and parrying
 - Mounts
 - Swimming and climbing
-- Story, quests, and dialogue beyond simple town services
+- Quests, a quest log, branching dialogue, and cutscenes
 - Weather

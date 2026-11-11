@@ -64,8 +64,11 @@ export function createBattle(arena: ArenaDef): BattleState {
     heroId: -1,
     fighters: [],
     projectiles: [],
+    wave: 0,
+    waveTimer: 0,
   };
   for (const s of arena.spawns) {
+    if (waveOf(s) !== 0) continue;
     const f = makeFighter(state, s);
     state.fighters.push(f);
     if (s.kind === 'hero') {
@@ -75,6 +78,31 @@ export function createBattle(arena: ArenaDef): BattleState {
   }
   if (state.heroId < 0) throw new Error(`arena ${arena.id} has no hero spawn`);
   return state;
+}
+
+function waveOf(s: Spawn): number {
+  return s.wave ?? 0;
+}
+
+/** The last wave in an arena. Victory needs this wave cleared. */
+export function lastWave(arena: ArenaDef): number {
+  return arena.spawns.reduce((m, s) => Math.max(m, waveOf(s)), 0);
+}
+
+/** Brings the next enemy wave in once the current one has been cleared for waveGap seconds. */
+function updateWaves(state: BattleState): void {
+  if (state.wave >= lastWave(state.arena)) return;
+  if (state.fighters.some((f) => f.alive && f.team === 'enemy')) {
+    state.waveTimer = 0;
+    return;
+  }
+  state.waveTimer += DT;
+  if (state.waveTimer < state.arena.waveGap) return;
+  state.waveTimer = 0;
+  state.wave += 1;
+  for (const s of state.arena.spawns) {
+    if (waveOf(s) === state.wave) state.fighters.push(makeFighter(state, s));
+  }
 }
 
 export function getFighter(state: BattleState, id: number): Fighter | undefined {
@@ -100,6 +128,7 @@ export function step(state: BattleState, input: BattleInput): BattleEvent[] {
   state.time += DT;
 
   for (const f of state.fighters) if (f.alive) tickTimers(f);
+  updateWaves(state);
 
   updateHero(state, input, events);
 
@@ -497,7 +526,9 @@ function checkOutcome(state: BattleState, events: BattleEvent[]): void {
   const hero = getHero(state);
   let status: BattleState['status'] | null = null;
   if (!hero.alive) status = 'defeat';
-  else if (!state.fighters.some((f) => f.alive && f.team === 'enemy')) status = 'victory';
+  else if (state.wave >= lastWave(state.arena) && !state.fighters.some((f) => f.alive && f.team === 'enemy')) {
+    status = 'victory';
+  }
   if (status) {
     state.status = status;
     events.push({ type: 'outcome', status });

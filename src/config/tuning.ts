@@ -1,7 +1,7 @@
 // Every balance number lives here. Units are metres, seconds and radians.
 // Logic reads these values; nothing in src/core or src/render hard-codes them.
 
-export const TUNING = {
+const DEFAULTS = {
   /** Fixed simulation step in seconds. The render loop turns real time into steps of this size. */
   fixedDt: 1 / 60,
   /** Downward acceleration for arrows (m/s^2). */
@@ -34,7 +34,7 @@ export const TUNING = {
   },
 
   hero: {
-    maxHp: 120,
+    maxHp: 140,
     radius: 0.45,
     height: 1.8,
     walkSpeed: 3.0,
@@ -123,4 +123,50 @@ export const TUNING = {
   },
 } as const;
 
-export type Tuning = typeof TUNING;
+/** A tuning object with every number widened to a plain, writable number. */
+type Widen<T> = {
+  -readonly [K in keyof T]: T[K] extends number ? number : T[K] extends object ? Widen<T[K]> : T[K];
+};
+
+export type Tuning = Widen<typeof DEFAULTS>;
+
+/** The shipped values. Never mutated; resetTuning() copies from here. */
+export const DEFAULT_TUNING: Tuning = DEFAULTS;
+
+/** Live values read by the simulation and renderer. The debug panel writes into this object. */
+export const TUNING: Tuning = structuredClone(DEFAULTS);
+
+function assignInPlace(target: Record<string, unknown>, source: Record<string, unknown>): void {
+  for (const key of Object.keys(source)) {
+    const v = source[key];
+    if (v !== null && typeof v === 'object') {
+      assignInPlace(target[key] as Record<string, unknown>, v as Record<string, unknown>);
+    } else {
+      target[key] = v;
+    }
+  }
+}
+
+/** Restores every value to its shipped default. Mutates TUNING in place so readers see it. */
+export function resetTuning(): void {
+  assignInPlace(TUNING as unknown as Record<string, unknown>, structuredClone(DEFAULTS) as unknown as Record<string, unknown>);
+}
+
+/** Sets one number by dotted path, e.g. "hero.walkSpeed". Throws on an unknown path. */
+export function setTuningValue(path: string, value: number): void {
+  const keys = path.split('.');
+  const last = keys.pop();
+  let node: Record<string, unknown> = TUNING as unknown as Record<string, unknown>;
+  for (const k of keys) {
+    const next = node[k];
+    if (next === null || typeof next !== 'object') throw new Error(`unknown tuning path ${path}`);
+    node = next as Record<string, unknown>;
+  }
+  if (last === undefined || typeof node[last] !== 'number') throw new Error(`unknown tuning path ${path}`);
+  node[last] = value;
+}
+
+/** The current values as pretty JSON, for the "Copy config" button. */
+export function tuningJson(): string {
+  return JSON.stringify(TUNING, null, 2);
+}

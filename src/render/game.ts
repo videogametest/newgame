@@ -13,10 +13,15 @@ import { BattleCamera } from './camera';
 import { ArrowViews, ImpactBursts } from './effects';
 import { PlayerInput } from './input';
 import { Hud, type Projector } from './hud';
+import { TuningPanel } from './tuning_panel';
 
 /** Entry point: builds the scene, loads every asset, then starts the battle. Errors go to the HUD. */
 export async function startGame(canvas: HTMLCanvasElement, uiRoot: HTMLElement): Promise<void> {
   const hud = new Hud(uiRoot);
+  // Backtick debug panel. Opening it releases the pointer, which pauses the sim until the player clicks back in.
+  new TuningPanel(uiRoot, (open) => {
+    if (open && document.pointerLockElement === canvas) document.exitPointerLock();
+  });
   try {
     const engine = new Engine(canvas, true, { stencil: true }, true);
     const scene = new Scene(engine);

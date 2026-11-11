@@ -13,7 +13,7 @@ const IDLE: BattleInput = {
 };
 
 function arenaWith(spawns: Spawn[]): ArenaDef {
-  return { id: 'test', name: 'Test', halfWidth: 14, halfDepth: 16, obstacles: [], spawns };
+  return { id: 'test', name: 'Test', halfWidth: 14, halfDepth: 16, obstacles: [], spawns, waveGap: 2 };
 }
 
 const hero = (x: number, z: number): Spawn => ({ unitId: 'hero', kind: 'hero', team: 'player', x, z, yaw: 0 });

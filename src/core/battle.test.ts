@@ -187,3 +187,40 @@ describe('headless run', () => {
     expect(s.status).not.toBe('fighting');
   });
 });
+
+describe('body collisions', () => {
+  it('an ally behind a stationary hero walks past it and attacks an enemy', () => {
+    const s = createBattle();
+    const h = hero(s);
+    const ally = s.fighters.find((f) => f.team === 'player' && f.unitId === 'soldier');
+    const foe = enemiesOf(s).find((f) => f.unitId === 'soldier');
+    expect(ally).toBeDefined();
+    expect(foe).toBeDefined();
+    s.fighters = [h, ally!, foe!];
+    h.x = 500;
+    ally!.x = 400; // spawned behind the hero
+    foe!.x = 900;
+    foe!.cooldown = 99; // the foe cannot strike back, so any damage is the ally's
+    let passed = false;
+    let steps = 0;
+    while (foe!.hp === foe!.maxHp && steps < 60 * 20) {
+      stepBattle(s, idle, FIXED_DT);
+      if (ally!.x > h.x) passed = true;
+      steps++;
+    }
+    expect(passed).toBe(true);
+    expect(foe!.hp).toBeLessThan(foe!.maxHp);
+  });
+
+  it('opposing fighters still push each other apart', () => {
+    const s = createBattle();
+    const h = hero(s);
+    const foe = enemiesOf(s).find((f) => f.unitId === 'soldier')!;
+    s.fighters = [h, foe];
+    h.x = 500;
+    foe.x = 510;
+    foe.cooldown = 99;
+    run(s, 1);
+    expect(Math.abs(foe.x - h.x)).toBeGreaterThanOrEqual((h.width + foe.width) / 2 - 1e-6);
+  });
+});

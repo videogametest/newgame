@@ -222,13 +222,14 @@ function integrateMovement(s: BattleState, dt: number): void {
   separateBodies(s);
 }
 
-/** Pushes overlapping living fighters apart so they do not stack. */
+/** Pushes overlapping living fighters of opposing teams apart. Teammates may overlap and pass each other. */
 function separateBodies(s: BattleState): void {
   const living = s.fighters.filter((f) => f.alive);
   for (let i = 0; i < living.length; i++) {
     for (let j = i + 1; j < living.length; j++) {
       const a = living[i];
       const b = living[j];
+      if (a.team === b.team) continue;
       const overlap = (a.width + b.width) / 2 - Math.abs(a.x - b.x);
       if (overlap <= 0) continue;
       const dir = a.x <= b.x ? -1 : 1;

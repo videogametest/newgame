@@ -1,41 +1,41 @@
 # newgame
 
-Browser game prototype: Phaser + TypeScript + Vite, deployed to GitHub Pages.
-Live: https://videogametest.github.io/newgame/
+A third-person 3D battle prototype, built with Babylon.js, TypeScript and Vite. Milestone 1 is the combat prototype described in `GAME_DESIGN.md` section 7.
 
-Design source of truth: [GAME_DESIGN.md](GAME_DESIGN.md).
+**Live build:** https://videogametest.github.io/newgame/
 
-## Milestone 1: combat prototype
+## Run
 
-One arena. Hero with sword and bow, two allied soldiers, one enemy soldier, one enemy archer.
-Victory and Defeat screens with restart.
-
-### Controls
-
-- `A` / `D`: move
-- `1` / `2`: sword / bow
-- Left mouse: sword swing (sword), hold to draw and release to fire at the cursor (bow)
-- `R`: restart after a battle ends
-
-## Commands
-
-```sh
-npm install
-npm run dev        # local dev server
-npm test           # unit tests (pure logic, no Phaser)
-npm run typecheck
-npm run build      # typecheck + production build into dist/
 ```
+npm ci
+npm test        # simulation tests, including the headless bot battle
+npm run build   # type check, then production build into dist/
+npm run dev     # local dev server
+```
+
+## Controls
+
+| Input | Action |
+| --- | --- |
+| Click the game | Take control (pointer lock) |
+| W A S D | Move, relative to the camera |
+| Mouse | Look and aim |
+| Shift | Sprint |
+| Space | Dodge roll |
+| 1 / 2 | Sword / bow |
+| Left mouse | Attack; hold with the bow to draw |
+| Right mouse | Zoom (bow) |
+| Esc | Pause |
 
 ## Layout
 
-- `src/config/tuning.ts`: every balance number.
-- `src/data/`: unit definitions and the arena layout (data, not logic).
-- `src/core/`: pure, serializable simulation (no Phaser). Covered by tests.
-- `src/scenes/`: Phaser rendering and input only. Reads state from `core`.
-- `src/lib/supabase.ts`: Supabase client. Not used in milestone 1; cloud saves come in milestone 4.
+- `src/core/`: the simulation. Pure TypeScript with no Babylon imports, so it runs headless in tests.
+- `src/config/`, `src/data/`: tuning values, unit definitions and the training field.
+- `src/render/`: Babylon rendering, camera, input, HUD and the game loop. Reads simulation state and draws it.
+- `public/assets/`: KayKit Adventurers and KayKit Character Animations (CC0, glTF). Licence files are in each folder.
 
-## Secrets
+## Deployment
 
-Only the Supabase publishable (anon) key is ever used in the client, supplied at build time
-from the `VITE_SUPABASE_ANON_KEY` Actions secret. The service-role key must never be in this repo.
+A GitHub Actions workflow (`.github/workflows/deploy.yml`) runs the tests and build on every push to `main`, then publishes `dist/` to GitHub Pages. Vite's `base` is `/newgame/`, which matches the Pages path. If the repo is renamed, change `base` in `vite.config.ts` too.
+
+Supabase is not used in milestone 1 (design section 7). Keys and the service-role key do not belong in this repo.

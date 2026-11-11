@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite';
 
-// GitHub Pages serves this repo at https://videogametest.github.io/newgame/,
-// so every built asset URL must start with /newgame/.
+// GitHub Pages serves the project at https://<user>.github.io/newgame/, so every asset URL needs that prefix.
 export default defineConfig({
   base: '/newgame/',
-  build: { outDir: 'dist', sourcemap: false },
+  build: {
+    outDir: 'dist',
+    target: 'es2022',
+    assetsInlineLimit: 0,
+  },
 });

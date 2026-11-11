@@ -1,92 +1,97 @@
-// Pure combat math. No Phaser, no state mutation. Screen coordinates: y points down.
-import { clamp, facingOf, lerp } from './math';
+// Pure combat rules: bow charge, arrow launch, sword arcs, damage and knockback.
+// No Babylon imports. Every number comes from TUNING.
+
+import { TUNING } from '../config/tuning';
+import { angleDelta, clamp, distance2, forwardOf, lerp } from './vec';
 import type { Fighter } from './types';
 
-export interface BowTuning {
-  minDamage: number;
-  maxDamage: number;
-  minSpeed: number;
-  maxSpeed: number;
-  fullDrawTime: number;
+/** Bow charge from 0 (just drawn) to 1 (full draw). */
+export function bowCharge(drawTime: number): number {
+  return clamp(drawTime / TUNING.bow.fullDrawTime, 0, 1);
 }
 
-export function drawRatio(drawTime: number, fullDrawTime: number): number {
-  return clamp(drawTime / fullDrawTime, 0, 1);
+export function bowDamage(drawTime: number): number {
+  return lerp(TUNING.bow.minDamage, TUNING.bow.maxDamage, bowCharge(drawTime));
 }
 
-/** Damage and launch speed for a bow shot at a given draw ratio (0..1). */
-export function bowShot(ratio: number, bow: BowTuning): { damage: number; speed: number } {
-  const t = clamp(ratio, 0, 1);
-  return {
-    damage: Math.round(lerp(bow.minDamage, bow.maxDamage, t)),
-    speed: lerp(bow.minSpeed, bow.maxSpeed, t),
-  };
-}
-
-/** Velocity that points from (fromX, fromY) at (toX, toY) with the given speed. */
-export function aimVelocity(
-  fromX: number,
-  fromY: number,
-  toX: number,
-  toY: number,
-  speed: number,
-): { vx: number; vy: number } {
-  const dx = toX - fromX;
-  const dy = toY - fromY;
-  const len = Math.hypot(dx, dy) || 1;
-  return { vx: (dx / len) * speed, vy: (dy / len) * speed };
+export function bowSpeed(drawTime: number): number {
+  return lerp(TUNING.bow.minSpeed, TUNING.bow.maxSpeed, bowCharge(drawTime));
 }
 
 /**
- * Low-arc launch velocity that lands on a target at (dx, dy) from the launch point,
- * for a fixed launch speed under gravity. dy is positive downward. Returns null when
+ * Velocity for an arrow fired along the camera aim: yaw sets the heading on
+ * the ground, pitch (positive = up) sets the elevation.
+ */
+export function aimedVelocity(yaw: number, pitch: number, speed: number) {
+  const f = forwardOf(yaw);
+  const c = Math.cos(pitch);
+  return { vx: speed * c * f.x, vy: speed * Math.sin(pitch), vz: speed * c * f.z };
+}
+
+/**
+ * Low-arc launch velocity that hits (targetX, targetY, targetZ) from
+ * (fromX, fromY, fromZ) at the given speed under gravity. Returns null when
  * the target is out of reach at that speed.
  */
-export function solveLaunch(
-  dx: number,
-  dy: number,
-  speed: number,
-  gravity: number,
-): { vx: number; vy: number } | null {
-  const ax = Math.abs(dx);
-  if (ax < 1e-6) return null;
-  const h = -dy; // height above the launch point, up positive
+export function launchVelocity(
+  fromX: number, fromY: number, fromZ: number,
+  toX: number, toY: number, toZ: number,
+  speed: number, gravity: number,
+): { vx: number; vy: number; vz: number } | null {
+  const d = distance2(fromX, fromZ, toX, toZ);
+  const h = toY - fromY;
+  if (d < 1e-6) return null;
   const v2 = speed * speed;
-  const disc = v2 * v2 - gravity * (gravity * ax * ax + 2 * h * v2);
+  const disc = v2 * v2 - gravity * (gravity * d * d + 2 * h * v2);
   if (disc < 0) return null;
-  const theta = Math.atan((v2 - Math.sqrt(disc)) / (gravity * ax));
-  const dir = facingOf(dx);
-  return { vx: dir * speed * Math.cos(theta), vy: -speed * Math.sin(theta) };
+  const theta = Math.atan2(v2 - Math.sqrt(disc), gravity * d);
+  const ux = (toX - fromX) / d;
+  const uz = (toZ - fromZ) / d;
+  const horiz = speed * Math.cos(theta);
+  return { vx: horiz * ux, vy: speed * Math.sin(theta), vz: horiz * uz };
 }
 
-/** Position of a projectile t seconds after launch. */
-export function arcPoint(
-  x0: number,
-  y0: number,
-  vx: number,
-  vy: number,
-  gravity: number,
-  t: number,
-): { x: number; y: number } {
-  return { x: x0 + vx * t, y: y0 + vy * t + 0.5 * gravity * t * t };
-}
-
-/** Horizontal knockback velocity pushing `to` away from `from`. */
-export function knockbackVx(fromX: number, toX: number, strength: number): number {
-  return facingOf(toX - fromX) * strength;
-}
-
-/** Empty space between two fighters' bodies (negative when overlapping). */
-export function bodyGap(a: Pick<Fighter, 'x' | 'width'>, b: Pick<Fighter, 'x' | 'width'>): number {
-  return Math.abs(a.x - b.x) - (a.width + b.width) / 2;
-}
-
-/** True when `target` is in front of the attacker and within sword reach. */
-export function inSwordArc(
-  attacker: Pick<Fighter, 'x' | 'facing' | 'width'>,
-  target: Pick<Fighter, 'x' | 'width'>,
-  range: number,
+/** True when a swing from (ax, az) facing `yaw` reaches a target centre. */
+export function inSwingArc(
+  ax: number, az: number, yaw: number,
+  tx: number, tz: number, targetRadius: number,
+  range: number, arcHalfAngle: number,
 ): boolean {
-  const ahead = (target.x - attacker.x) * attacker.facing;
-  return ahead > -target.width / 2 && bodyGap(attacker, target) <= range;
+  const d = distance2(ax, az, tx, tz);
+  if (d > range + targetRadius) return false;
+  if (d < 1e-6) return true;
+  const toTarget = Math.atan2(tx - ax, tz - az);
+  return Math.abs(angleDelta(yaw, toTarget)) <= arcHalfAngle;
+}
+
+/** Unit direction from (fx, fz) to (tx, tz); zero vector when they coincide. */
+export function unitDir(fx: number, fz: number, tx: number, tz: number): { x: number; z: number } {
+  const dx = tx - fx;
+  const dz = tz - fz;
+  const d = Math.hypot(dx, dz);
+  if (d < 1e-9) return { x: 0, z: 0 };
+  return { x: dx / d, z: dz / d };
+}
+
+/**
+ * Apply damage and a knockback impulse to a fighter. Returns true if the hit
+ * killed it. Does not check dodge invulnerability; callers do that first.
+ */
+export function applyHit(
+  target: Fighter,
+  amount: number,
+  dirX: number,
+  dirZ: number,
+  knockback: number,
+): boolean {
+  target.hp = Math.max(0, target.hp - amount);
+  target.flashTimer = TUNING.combat.hitFlashTime;
+  target.hitTimer = TUNING.combat.hitReactTime;
+  target.knockX = dirX * knockback;
+  target.knockZ = dirZ * knockback;
+  if (target.hp <= 0) {
+    target.alive = false;
+    return true;
+  }
+  return false;
 }

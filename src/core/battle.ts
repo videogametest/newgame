@@ -1,273 +1,505 @@
-// Battle simulation. Fixed-step, deterministic, no Phaser.
-import { ARENA } from '../data/arena';
-import { UNIT_DEFS } from '../data/units';
+// The battle simulation. Fixed step, deterministic, no Babylon imports.
+// Rules: only opposing fighters collide with each other (teammates may overlap);
+// every fighter collides with obstacles and the arena boundary.
+
 import { TUNING } from '../config/tuning';
-import { planUnit } from './ai';
-import {
-  aimVelocity,
-  bowShot,
-  drawRatio,
-  inSwordArc,
-  knockbackVx,
-} from './combat';
-import { clamp } from './math';
-import type { BattleInput, BattleState, Fighter, Team } from './types';
+import { decideAI } from './ai';
+import { aimedVelocity, applyHit, bowDamage, bowSpeed, inSwingArc, launchVelocity, unitDir } from './combat';
+import type {
+  Action, ArenaDef, BattleEvent, BattleInput, BattleState, Fighter, FighterKind, Projectile, Spawn,
+} from './types';
+import { forwardOf, rightOf } from './vec';
 
-export const FIXED_DT = 1 / 60;
+const DT = TUNING.fixedDt;
 
-export function createBattle(): BattleState {
-  const s: BattleState = {
-    time: 0,
-    status: 'fighting',
-    worldWidth: TUNING.world.width,
-    groundY: TUNING.world.groundY,
-    nextId: 1,
-    heroId: 0,
-    fighters: [],
-    projectiles: [],
-    damageNumbers: [],
-  };
-  s.heroId = spawn(s, ARENA.hero.unitId, 'player', ARENA.hero.x).id;
-  for (const a of ARENA.allies) spawn(s, a.unitId, 'player', a.x);
-  for (const e of ARENA.enemies) spawn(s, e.unitId, 'enemy', e.x);
-  return s;
+function idleAction(): Action {
+  return { phase: 'idle', t: 0, struck: false, zoneX: 0, zoneZ: 0 };
 }
 
-function spawn(s: BattleState, unitId: string, team: Team, x: number): Fighter {
-  const def = UNIT_DEFS[unitId];
-  const f: Fighter = {
-    id: s.nextId++,
-    unitId,
-    kind: def.kind,
-    team,
-    x,
-    y: s.groundY,
-    facing: team === 'player' ? 1 : -1,
-    width: def.stats.width,
-    height: def.stats.height,
-    maxHp: def.stats.maxHp,
-    hp: def.stats.maxHp,
+function statsFor(kind: FighterKind) {
+  if (kind === 'hero') return TUNING.hero;
+  if (kind === 'soldier') return TUNING.soldier;
+  return TUNING.archer;
+}
+
+function makeFighter(state: BattleState, s: Spawn): Fighter {
+  const st = statsFor(s.kind);
+  return {
+    id: state.nextId++,
+    unitId: s.unitId,
+    kind: s.kind,
+    team: s.team,
+    x: s.x,
+    z: s.z,
+    yaw: s.yaw,
+    radius: st.radius,
+    height: st.height,
+    maxHp: st.maxHp,
+    hp: st.maxHp,
     alive: true,
-    moveVx: 0,
-    knockVx: 0,
+    vx: 0,
+    vz: 0,
+    knockX: 0,
+    knockZ: 0,
     cooldown: 0,
-    swingTimer: 0,
+    hitTimer: 0,
     flashTimer: 0,
+    action: idleAction(),
     weapon: 'sword',
     drawTime: 0,
+    dodgeTime: 0,
+    dodgeCooldown: 0,
+    dodgeX: 0,
+    dodgeZ: 0,
   };
-  s.fighters.push(f);
-  return f;
 }
 
-export function hero(s: BattleState): Fighter {
-  const h = s.fighters.find((f) => f.id === s.heroId);
-  if (!h) throw new Error('battle has no hero');
-  return h;
+/** Builds a battle from an arena. The arena must contain exactly one hero spawn. */
+export function createBattle(arena: ArenaDef): BattleState {
+  const state: BattleState = {
+    time: 0,
+    status: 'fighting',
+    arena,
+    nextId: 1,
+    heroId: -1,
+    fighters: [],
+    projectiles: [],
+  };
+  for (const s of arena.spawns) {
+    const f = makeFighter(state, s);
+    state.fighters.push(f);
+    if (s.kind === 'hero') {
+      if (state.heroId >= 0) throw new Error(`arena ${arena.id} has more than one hero spawn`);
+      state.heroId = f.id;
+    }
+  }
+  if (state.heroId < 0) throw new Error(`arena ${arena.id} has no hero spawn`);
+  return state;
 }
 
-export function stepBattle(s: BattleState, input: BattleInput, dt: number): void {
-  s.time += dt;
-  tickTimers(s, dt);
-  if (s.status === 'fighting') {
-    stepHero(s, input, dt);
-    stepUnits(s);
-  }
-  integrateMovement(s, dt);
-  if (s.status === 'fighting') {
-    stepProjectiles(s, dt);
-    checkOutcome(s);
-  }
-  s.damageNumbers = s.damageNumbers.filter((d) => d.life > 0);
-  s.projectiles = s.projectiles.filter((p) => p.alive);
+export function getFighter(state: BattleState, id: number): Fighter | undefined {
+  return state.fighters.find((f) => f.id === id);
 }
 
-function tickTimers(s: BattleState, dt: number): void {
-  for (const f of s.fighters) {
-    f.cooldown = Math.max(0, f.cooldown - dt);
-    f.swingTimer = Math.max(0, f.swingTimer - dt);
-    f.flashTimer = Math.max(0, f.flashTimer - dt);
-  }
-  for (const d of s.damageNumbers) {
-    d.life -= dt;
-    d.y -= TUNING.feedback.damageNumberRise * dt;
-  }
+export function getHero(state: BattleState): Fighter {
+  const hero = getFighter(state, state.heroId);
+  if (!hero) throw new Error('hero missing from battle');
+  return hero;
 }
 
-function stepHero(s: BattleState, input: BattleInput, dt: number): void {
-  const h = hero(s);
-  if (!h.alive) return;
+/** True while the hero's dodge roll is in its invulnerable opening frames. */
+export function isDodgeInvulnerable(f: Fighter): boolean {
+  if (f.kind !== 'hero' || f.dodgeTime <= 0) return false;
+  return TUNING.hero.dodgeTime - f.dodgeTime < TUNING.hero.dodgeIFrames;
+}
 
-  if (input.weapon !== h.weapon) {
-    h.weapon = input.weapon;
-    h.drawTime = 0;
+/** Advances the simulation by one fixed step. Mutates state; returns what happened. */
+export function step(state: BattleState, input: BattleInput): BattleEvent[] {
+  const events: BattleEvent[] = [];
+  if (state.status !== 'fighting') return events;
+  state.time += DT;
+
+  for (const f of state.fighters) if (f.alive) tickTimers(f);
+
+  updateHero(state, input, events);
+
+  for (const f of state.fighters) {
+    if (!f.alive || f.kind === 'hero') continue;
+    updateNonHero(state, f, events);
   }
-  h.moveVx = input.moveDir * UNIT_DEFS.hero.stats.moveSpeed;
-  h.facing = input.aimX >= h.x ? 1 : -1;
 
-  if (h.weapon === 'sword') {
-    if (input.attackPressed && h.cooldown <= 0) swordSwing(s, h);
+  for (const f of state.fighters) if (f.alive) advanceAction(state, f, events);
+
+  integrate(state);
+  resolveCollisions(state);
+  updateProjectiles(state, events);
+  checkOutcome(state, events);
+  return events;
+}
+
+function tickTimers(f: Fighter): void {
+  f.cooldown = Math.max(0, f.cooldown - DT);
+  f.hitTimer = Math.max(0, f.hitTimer - DT);
+  f.flashTimer = Math.max(0, f.flashTimer - DT);
+  f.dodgeCooldown = Math.max(0, f.dodgeCooldown - DT);
+}
+
+// ---------- hero ----------
+
+function updateHero(state: BattleState, input: BattleInput, events: BattleEvent[]): void {
+  const hero = getHero(state);
+  if (!hero.alive) return;
+  const H = TUNING.hero;
+  hero.yaw = input.camYaw;
+  hero.dodgeTime = Math.max(0, hero.dodgeTime - DT);
+
+  const fwd = forwardOf(input.camYaw);
+  const right = rightOf(input.camYaw);
+  let dx = right.x * input.moveX + fwd.x * input.moveZ;
+  let dz = right.z * input.moveX + fwd.z * input.moveZ;
+  const len = Math.hypot(dx, dz);
+  if (len > 1) {
+    dx /= len;
+    dz /= len;
+  }
+
+  // Dodge roll. Starting one cancels any action; holding the hero still rolls backward.
+  if (hero.dodgeTime <= 0 && input.dodgePressed && hero.dodgeCooldown <= 0) {
+    const rx = len > 0 ? dx : -fwd.x;
+    const rz = len > 0 ? dz : -fwd.z;
+    hero.dodgeTime = H.dodgeTime;
+    hero.dodgeCooldown = H.dodgeCooldown;
+    hero.dodgeX = rx;
+    hero.dodgeZ = rz;
+    hero.action = idleAction();
+    hero.drawTime = 0;
+    events.push({ type: 'dodge', fighterId: hero.id, x: hero.x, z: hero.z });
+  }
+
+  if (hero.dodgeTime > 0) {
+    hero.vx = hero.dodgeX * H.dodgeSpeed;
+    hero.vz = hero.dodgeZ * H.dodgeSpeed;
     return;
   }
 
-  // Bow: hold to draw, release to fire toward the cursor.
-  const bow = TUNING.weapons.bow;
-  if ((input.attackHeld || input.attackPressed) && h.cooldown <= 0) {
-    h.drawTime = Math.min(bow.fullDrawTime, h.drawTime + dt);
-  }
-  if (input.attackReleased) {
-    if (h.drawTime > 0 && h.cooldown <= 0) fireHeroArrow(s, h, input);
-    h.drawTime = 0;
-  }
-}
+  // Weapon swap is only allowed between actions.
+  if (hero.action.phase === 'idle' && input.weapon !== hero.weapon) hero.weapon = input.weapon;
 
-/** Where a hero arrow leaves the bow. Used by the sim and the aim preview. */
-export function heroBowMuzzle(h: Pick<Fighter, 'x' | 'y' | 'facing'>): { x: number; y: number } {
-  return { x: h.x + h.facing * 14, y: h.y - 55 };
-}
-
-function swordSwing(s: BattleState, h: Fighter): void {
-  const sword = TUNING.weapons.sword;
-  h.cooldown = sword.cooldown;
-  h.swingTimer = TUNING.feedback.swingTime;
-  for (const f of s.fighters) {
-    if (!f.alive || f.team === h.team) continue;
-    if (inSwordArc(h, f, sword.range)) {
-      damageFighter(s, f, sword.damage, knockbackVx(h.x, f.x, sword.knockback));
+  if (hero.weapon === 'sword') {
+    if (input.attackPressed && hero.action.phase === 'idle' && hero.cooldown <= 0) {
+      hero.action = { phase: 'swing', t: 0, struck: false, zoneX: 0, zoneZ: 0 };
+      events.push({ type: 'swing', fighterId: hero.id });
     }
-  }
-}
-
-function fireHeroArrow(s: BattleState, h: Fighter, input: BattleInput): void {
-  const bow = TUNING.weapons.bow;
-  const ratio = drawRatio(h.drawTime, bow.fullDrawTime);
-  const shot = bowShot(ratio, bow);
-  const m = heroBowMuzzle(h);
-  const v = aimVelocity(m.x, m.y, input.aimX, input.aimY, shot.speed);
-  h.cooldown = bow.cooldown;
-  s.projectiles.push({
-    id: s.nextId++,
-    team: 'player',
-    x: m.x,
-    y: m.y,
-    vx: v.vx,
-    vy: v.vy,
-    damage: shot.damage,
-    knockback: bow.arrowKnockback,
-    alive: true,
-  });
-}
-
-function stepUnits(s: BattleState): void {
-  for (const f of s.fighters) {
-    if (!f.alive || f.kind === 'hero') continue;
-    const plan = planUnit(f, s);
-    f.facing = plan.facing;
-    f.moveVx = plan.moveVx;
-    if (f.cooldown > 0) continue;
-
-    if (plan.strike) {
-      const def = UNIT_DEFS[f.unitId];
-      if (def.kind !== 'melee') continue;
-      f.cooldown = def.stats.attackCooldown;
-      damageFighter(s, plan.strike, def.stats.damage, knockbackVx(f.x, plan.strike.x, def.stats.knockback));
-    } else if (plan.shot) {
-      const def = UNIT_DEFS[f.unitId];
-      if (def.kind !== 'archer') continue;
-      f.cooldown = def.stats.fireCooldown;
-      s.projectiles.push({
-        id: s.nextId++,
-        team: f.team,
-        x: plan.shot.x,
-        y: plan.shot.y,
-        vx: plan.shot.vx,
-        vy: plan.shot.vy,
-        damage: plan.shot.damage,
-        knockback: plan.shot.knockback,
-        alive: true,
-      });
+  } else {
+    if (input.attackPressed && hero.action.phase === 'idle' && hero.cooldown <= 0) {
+      hero.action = { phase: 'draw', t: 0, struck: false, zoneX: 0, zoneZ: 0 };
+      hero.drawTime = 0;
+      events.push({ type: 'draw', fighterId: hero.id });
     }
-  }
-}
-
-function damageFighter(s: BattleState, target: Fighter, amount: number, knockVx: number): void {
-  if (!target.alive) return;
-  target.hp = Math.max(0, target.hp - amount);
-  target.flashTimer = TUNING.feedback.hitFlashTime;
-  target.knockVx = clamp(knockVx, -600, 600);
-  s.damageNumbers.push({
-    id: s.nextId++,
-    x: target.x,
-    y: target.y - target.height,
-    amount,
-    onPlayer: target.team === 'player',
-    life: TUNING.feedback.damageNumberLife,
-  });
-  if (target.hp <= 0) {
-    target.alive = false;
-    target.moveVx = 0;
-    target.knockVx = 0;
-  }
-}
-
-function integrateMovement(s: BattleState, dt: number): void {
-  const friction = TUNING.world.friction * dt;
-  for (const f of s.fighters) {
-    if (!f.alive) continue;
-    f.x += (f.moveVx + f.knockVx) * dt;
-    const decay = Math.min(Math.abs(f.knockVx), friction);
-    f.knockVx -= Math.sign(f.knockVx) * decay;
-    f.x = clamp(f.x, f.width / 2, s.worldWidth - f.width / 2);
-  }
-  separateBodies(s);
-}
-
-/** Pushes overlapping living fighters of opposing teams apart. Teammates may overlap and pass each other. */
-function separateBodies(s: BattleState): void {
-  const living = s.fighters.filter((f) => f.alive);
-  for (let i = 0; i < living.length; i++) {
-    for (let j = i + 1; j < living.length; j++) {
-      const a = living[i];
-      const b = living[j];
-      if (a.team === b.team) continue;
-      const overlap = (a.width + b.width) / 2 - Math.abs(a.x - b.x);
-      if (overlap <= 0) continue;
-      const dir = a.x <= b.x ? -1 : 1;
-      a.x = clamp(a.x + (dir * overlap) / 2, a.width / 2, s.worldWidth - a.width / 2);
-      b.x = clamp(b.x - (dir * overlap) / 2, b.width / 2, s.worldWidth - b.width / 2);
-    }
-  }
-}
-
-function stepProjectiles(s: BattleState, dt: number): void {
-  const r = TUNING.feedback.arrowRadius;
-  for (const p of s.projectiles) {
-    if (!p.alive) continue;
-    p.vy += TUNING.physics.arrowGravity * dt;
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    if (p.x < 0 || p.x > s.worldWidth || p.y >= s.groundY) {
-      p.alive = false;
-      continue;
-    }
-    for (const f of s.fighters) {
-      if (!f.alive || f.team === p.team) continue;
-      const inX = Math.abs(p.x - f.x) <= f.width / 2 + r;
-      const inY = p.y <= f.y && p.y >= f.y - f.height;
-      if (inX && inY) {
-        damageFighter(s, f, p.damage, knockbackVx(0, p.vx, p.knockback));
-        p.alive = false;
-        break;
+    if (hero.action.phase === 'draw') {
+      if (input.attackHeld) hero.drawTime += DT;
+      if (input.attackReleased) {
+        fireHeroArrow(state, hero, input, events);
+        hero.action = { phase: 'release', t: 0, struck: false, zoneX: 0, zoneZ: 0 };
+        hero.drawTime = 0;
       }
     }
   }
+
+  let speed = input.sprint ? H.sprintSpeed : H.walkSpeed;
+  if (hero.action.phase === 'draw') speed *= H.drawMoveFactor;
+  if (hero.action.phase === 'swing') speed *= H.swingMoveFactor;
+  hero.vx = dx * speed;
+  hero.vz = dz * speed;
+  hero.yaw = input.camYaw;
 }
 
-function checkOutcome(s: BattleState): void {
-  if (!hero(s).alive) {
-    s.status = 'defeat';
+function fireHeroArrow(state: BattleState, hero: Fighter, input: BattleInput, events: BattleEvent[]): void {
+  const fwd = forwardOf(input.camYaw);
+  const v = aimedVelocity(input.camYaw, input.aimPitch, bowSpeed(hero.drawTime));
+  spawnProjectile(state, events, {
+    team: hero.team,
+    ownerId: hero.id,
+    x: hero.x + fwd.x * TUNING.bow.muzzleForward,
+    y: TUNING.bow.muzzleHeight,
+    z: hero.z + fwd.z * TUNING.bow.muzzleForward,
+    vx: v.vx,
+    vy: v.vy,
+    vz: v.vz,
+    damage: bowDamage(hero.drawTime),
+    knockback: TUNING.bow.knockback,
+  });
+  hero.cooldown = TUNING.bow.cooldown;
+}
+
+// ---------- soldiers and archers ----------
+
+function updateNonHero(state: BattleState, f: Fighter, events: BattleEvent[]): void {
+  if (f.hitTimer > 0) {
+    // Staggered by a hit: no movement of its own and no new action.
+    f.vx = 0;
+    f.vz = 0;
     return;
   }
-  const enemiesLeft = s.fighters.some((f) => f.alive && f.team === 'enemy');
-  if (!enemiesLeft) s.status = 'victory';
+  const intent = decideAI(state, f);
+  f.vx = intent.vx;
+  f.vz = intent.vz;
+  if (intent.yaw !== null) f.yaw = intent.yaw;
+  if (intent.startAction && f.action.phase === 'idle' && f.cooldown <= 0) {
+    startAction(f, events);
+  }
+}
+
+function startAction(f: Fighter, events: BattleEvent[]): void {
+  if (f.kind === 'soldier') {
+    const fwd = forwardOf(f.yaw);
+    f.action = {
+      phase: 'windup',
+      t: 0,
+      struck: false,
+      zoneX: f.x + fwd.x * TUNING.soldier.strikeOffset,
+      zoneZ: f.z + fwd.z * TUNING.soldier.strikeOffset,
+    };
+  } else if (f.kind === 'archer') {
+    f.action = { phase: 'draw', t: 0, struck: false, zoneX: 0, zoneZ: 0 };
+    events.push({ type: 'draw', fighterId: f.id });
+  }
+}
+
+/** Moves every living fighter's action forward one step and resolves its timed effects. */
+function advanceAction(state: BattleState, f: Fighter, events: BattleEvent[]): void {
+  const a = f.action;
+  if (a.phase === 'idle') return;
+  a.t += DT;
+
+  if (f.kind === 'soldier') {
+    if (a.phase === 'windup' && a.t >= TUNING.soldier.windupTime) {
+      a.phase = 'swing';
+      a.t = 0;
+      a.struck = true;
+      events.push({ type: 'swing', fighterId: f.id });
+      strikeZone(state, f, events);
+    } else if (a.phase === 'swing' && a.t >= TUNING.soldier.swingTime) {
+      endAction(f, TUNING.soldier.cooldown);
+    }
+    return;
+  }
+
+  if (f.kind === 'archer') {
+    if (a.phase === 'draw' && a.t >= TUNING.archer.drawTime) {
+      a.phase = 'release';
+      a.t = 0;
+      fireArcherArrow(state, f, events);
+    } else if (a.phase === 'release' && a.t >= TUNING.archer.releaseTime) {
+      endAction(f, TUNING.archer.cooldown);
+    }
+    return;
+  }
+
+  // Hero. The bow draw is driven by input in updateHero, not by time.
+  if (f.weapon === 'sword' && a.phase === 'swing') {
+    if (!a.struck && a.t >= TUNING.sword.hitTime) {
+      a.struck = true;
+      heroSwordStrike(state, f, events);
+    }
+    if (a.t >= TUNING.sword.duration) endAction(f, TUNING.sword.cooldown);
+  } else if (f.weapon === 'bow' && a.phase === 'release' && a.t >= TUNING.bow.releaseTime) {
+    endAction(f, TUNING.bow.cooldown);
+  }
+}
+
+function endAction(f: Fighter, cooldown: number): void {
+  f.action = idleAction();
+  f.cooldown = cooldown;
+}
+
+function cancelAction(f: Fighter): void {
+  f.action = idleAction();
+  f.drawTime = 0;
+}
+
+/** Soldier strike: every opposing fighter inside the telegraphed zone takes the hit. */
+function strikeZone(state: BattleState, f: Fighter, events: BattleEvent[]): void {
+  const S = TUNING.soldier;
+  for (const o of state.fighters) {
+    if (!o.alive || o.team === f.team) continue;
+    const d = Math.hypot(o.x - f.action.zoneX, o.z - f.action.zoneZ);
+    if (d > S.strikeRadius + o.radius) continue;
+    const dir = unitDir(f.x, f.z, o.x, o.z);
+    damageFighter(o, S.damage, dir.x, dir.z, S.knockback, events);
+  }
+  events.push({ type: 'strike', fighterId: f.id });
+}
+
+/** Hero sword: every opposing fighter inside the swing arc takes the hit. */
+function heroSwordStrike(state: BattleState, hero: Fighter, events: BattleEvent[]): void {
+  const W = TUNING.sword;
+  for (const o of state.fighters) {
+    if (!o.alive || o.team === hero.team) continue;
+    if (!inSwingArc(hero.x, hero.z, hero.yaw, o.x, o.z, o.radius, W.range, W.arcHalfAngle)) continue;
+    const dir = unitDir(hero.x, hero.z, o.x, o.z);
+    damageFighter(o, W.damage, dir.x, dir.z, W.knockback, events);
+  }
+  events.push({ type: 'strike', fighterId: hero.id });
+}
+
+/** Archer shot: a low-arc launch at the nearest enemy, fired from the archer's body. */
+function fireArcherArrow(state: BattleState, f: Fighter, events: BattleEvent[]): void {
+  const target = nearestOpposing(state, f);
+  if (!target) return;
+  const A = TUNING.archer;
+  const v = launchVelocity(
+    f.x, TUNING.bow.muzzleHeight, f.z,
+    target.x, A.aimHeight, target.z,
+    A.arrowSpeed, TUNING.gravity,
+  );
+  if (!v) return;
+  spawnProjectile(state, events, {
+    team: f.team,
+    ownerId: f.id,
+    x: f.x,
+    y: TUNING.bow.muzzleHeight,
+    z: f.z,
+    vx: v.vx,
+    vy: v.vy,
+    vz: v.vz,
+    damage: A.arrowDamage,
+    knockback: A.arrowKnockback,
+  });
+}
+
+function nearestOpposing(state: BattleState, f: Fighter): Fighter | undefined {
+  let best: Fighter | undefined;
+  let bestD = Infinity;
+  for (const o of state.fighters) {
+    if (!o.alive || o.team === f.team) continue;
+    const d = Math.hypot(o.x - f.x, o.z - f.z);
+    if (d < bestD) {
+      bestD = d;
+      best = o;
+    }
+  }
+  return best;
+}
+
+// ---------- damage ----------
+
+function damageFighter(
+  target: Fighter,
+  amount: number,
+  dirX: number,
+  dirZ: number,
+  knockback: number,
+  events: BattleEvent[],
+): void {
+  if (!target.alive || isDodgeInvulnerable(target)) return;
+  events.push({ type: 'damage', fighterId: target.id, amount, x: target.x, z: target.z });
+  const died = applyHit(target, amount, dirX, dirZ, knockback);
+  if (target.action.phase === 'windup' || target.action.phase === 'draw') cancelAction(target);
+  if (died) events.push({ type: 'death', fighterId: target.id });
+}
+
+// ---------- projectiles ----------
+
+type NewProjectile = Omit<Projectile, 'id' | 'age' | 'alive'>;
+
+function spawnProjectile(state: BattleState, events: BattleEvent[], p: NewProjectile): void {
+  const id = state.nextId++;
+  state.projectiles.push({ ...p, id, age: 0, alive: true });
+  events.push({ type: 'fire', fighterId: p.ownerId, projectileId: id });
+}
+
+function updateProjectiles(state: BattleState, events: BattleEvent[]): void {
+  const A = TUNING.arrow;
+  const { halfWidth, halfDepth, obstacles } = state.arena;
+  for (const p of state.projectiles) {
+    if (!p.alive) continue;
+    p.age += DT;
+    p.vy -= TUNING.gravity * DT;
+    p.x += p.vx * DT;
+    p.y += p.vy * DT;
+    p.z += p.vz * DT;
+
+    if (p.age > A.maxLife || p.y <= 0 || Math.abs(p.x) > halfWidth + 3 || Math.abs(p.z) > halfDepth + 3) {
+      stopArrow(p, events);
+      continue;
+    }
+
+    let stopped = false;
+    for (const o of obstacles) {
+      if (Math.hypot(p.x - o.x, p.z - o.z) < o.radius + A.radius && p.y < o.height) {
+        stopped = true;
+        break;
+      }
+    }
+    if (stopped) {
+      stopArrow(p, events);
+      continue;
+    }
+
+    for (const f of state.fighters) {
+      if (!f.alive || f.team === p.team) continue;
+      if (Math.hypot(p.x - f.x, p.z - f.z) < f.radius + A.radius && p.y <= f.height) {
+        const dir = unitDir(0, 0, p.vx, p.vz);
+        damageFighter(f, p.damage, dir.x, dir.z, p.knockback, events);
+        stopped = true;
+        break;
+      }
+    }
+    if (stopped) stopArrow(p, events);
+  }
+  state.projectiles = state.projectiles.filter((p) => p.alive);
+}
+
+function stopArrow(p: Projectile, events: BattleEvent[]): void {
+  p.alive = false;
+  events.push({ type: 'impact', x: p.x, y: Math.max(0, p.y), z: p.z });
+}
+
+// ---------- movement and collisions ----------
+
+function integrate(state: BattleState): void {
+  const decay = Math.exp(-TUNING.combat.knockbackFriction * DT);
+  for (const f of state.fighters) {
+    if (!f.alive) continue;
+    f.x += (f.vx + f.knockX) * DT;
+    f.z += (f.vz + f.knockZ) * DT;
+    f.knockX *= decay;
+    f.knockZ *= decay;
+  }
+}
+
+/** Pushes opposing fighters apart, pushes everyone out of obstacles, and keeps them in the arena. */
+function resolveCollisions(state: BattleState): void {
+  const { halfWidth, halfDepth, obstacles } = state.arena;
+  const alive = state.fighters.filter((f) => f.alive);
+  for (let iter = 0; iter < 3; iter++) {
+    for (let i = 0; i < alive.length; i++) {
+      for (let j = i + 1; j < alive.length; j++) {
+        const a = alive[i];
+        const b = alive[j];
+        if (a.team === b.team) continue;
+        const dx = b.x - a.x;
+        const dz = b.z - a.z;
+        const d = Math.hypot(dx, dz);
+        const minD = a.radius + b.radius;
+        if (d >= minD) continue;
+        const nx = d > 1e-6 ? dx / d : 1;
+        const nz = d > 1e-6 ? dz / d : 0;
+        const push = (minD - d) / 2;
+        a.x -= nx * push;
+        a.z -= nz * push;
+        b.x += nx * push;
+        b.z += nz * push;
+      }
+    }
+    for (const f of alive) {
+      for (const o of obstacles) {
+        const dx = f.x - o.x;
+        const dz = f.z - o.z;
+        const d = Math.hypot(dx, dz);
+        const minD = f.radius + o.radius;
+        if (d >= minD) continue;
+        const nx = d > 1e-6 ? dx / d : 1;
+        const nz = d > 1e-6 ? dz / d : 0;
+        f.x = o.x + nx * minD;
+        f.z = o.z + nz * minD;
+      }
+      f.x = Math.max(-halfWidth + f.radius, Math.min(halfWidth - f.radius, f.x));
+      f.z = Math.max(-halfDepth + f.radius, Math.min(halfDepth - f.radius, f.z));
+    }
+  }
+}
+
+// ---------- outcome ----------
+
+function checkOutcome(state: BattleState, events: BattleEvent[]): void {
+  const hero = getHero(state);
+  let status: BattleState['status'] | null = null;
+  if (!hero.alive) status = 'defeat';
+  else if (!state.fighters.some((f) => f.alive && f.team === 'enemy')) status = 'victory';
+  if (status) {
+    state.status = status;
+    events.push({ type: 'outcome', status });
+  }
 }

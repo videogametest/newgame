@@ -1,18 +1,13 @@
-import Phaser from 'phaser';
-import { TUNING } from './config/tuning';
-import { BattleScene } from './scenes/BattleScene';
-import { BootScene } from './scenes/BootScene';
-import { UIScene } from './scenes/UIScene';
+// Page entry: finds the canvas and HUD root, then starts the game.
 
-new Phaser.Game({
-  type: Phaser.AUTO,
-  parent: 'game',
-  width: TUNING.display.width,
-  height: TUNING.display.height,
-  backgroundColor: '#0b0b14',
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-  },
-  scene: [BootScene, BattleScene, UIScene],
+import { startGame } from './render/game';
+
+const canvas = document.getElementById('game');
+const ui = document.getElementById('ui');
+if (!(canvas instanceof HTMLCanvasElement) || !ui) {
+  throw new Error('index.html must contain <canvas id="game"> and <div id="ui">');
+}
+
+startGame(canvas, ui).catch((err: unknown) => {
+  console.error(err);
 });

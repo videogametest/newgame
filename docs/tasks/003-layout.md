@@ -118,4 +118,7 @@ Twenty-eight smaller things, in the data as `stops`, each with a kind and a note
 2. `isWalkableGround` follows the edge described above and the two rivers, with the three crossings open. Water is swum, not walked: keep it out of `isWalkableGround`, and measure the 100 m rule on ground only.
 3. If something here cannot be built as placed, say so in `docs/status.md` with the measurement, and move on to the next thing. Do not move a place yourself.
 
+4. **Added by review 018.** The slope limits, the banks and beds, the crossings, and the edge are now in `GAME_DESIGN.md` section 4 (version 34). To meet the path limit you may add or move the middle points of `hill_path` and `ridge_path` in `layout.json`, up to 40 m from the drawn line, and regenerate. Their end points, every other road, and every place, signpost, crossing, and stop stay where they are. Say in `docs/status.md` what you changed.
+5. **The sun** rises at bearing 90 (east), stands in the south at noon, and sets at bearing 270 (west). Bearing is measured clockwise from north, and north is `-z`.
+
 One correction to review 017: it called the patrol hut an enemy place. It is not; it is an empty hut and one of the ten places off the path. The rule for it is the secret's rule, hidden from the nearest path, which the ridge does.

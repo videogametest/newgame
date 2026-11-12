@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 33 (the hero swims). Supersedes version 32.
+Version 34 (slopes, banks, crossings, and the edge). Supersedes version 33.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -152,6 +152,10 @@ Layout of the first valley:
 - Paths lead out from Wick to the Mill, the Forge, and the Watch-house (section 9).
 - **The compass.** The castle is beyond the north-west rim. The ridge runs north to south on the east side, with the patrol hut beyond it, so from the hut the ridge fills the western sky and hides both the castle and the signal hill. The signal hill is in the north and is the highest ground the hero can stand on.
 - **Two rivers.** One comes over the west rim as the waterfall, turns the Mill's wheel, and feeds the lake. One leaves the lake eastward, crosses the east road at the ford, and leaves the valley through a gorge. The crossings are the ford, the mill bridge, and stepping stones below the falls; anywhere else the hero swims (see Swimming, below).
+- **Slopes.** Slope is rise over run. The hero walks at full pace up to 0.3, slows evenly to half pace by 0.7, and cannot climb anything steeper: the hero simply stops, with no slide and no fall. Roads are never steeper than 0.2 along their line, so a cart could use them. Paths are never steeper than 0.45. Both are tests.
+- **Banks and beds.** Away from the gorge and the falls the land comes down to the water, so every bank can be walked down and the hero wades before swimming. Rivers are 8 to 12 m wide and 1.5 to 2.5 m deep in mid-stream, and they hold water along their whole length, from the falls to the lake and from the lake out through the gorge.
+- **The crossings.** The ford is 0.4 m of water over stones, waded without slowing. The mill bridge is a deck above the water. The stepping stones are walked dry. Each is as wide as the road or path that uses it, not wider.
+- **The edge is the land.** The rim is steeper than the hero can climb everywhere except two openings, so no rule other than slope and water is needed to keep the hero in. The gorge is closed by white water. The patrol hut's hollow is closed by its own rim. The north-west pass runs between cliffs and ends at a barred timber gate across the soldiers' road, which opens with the next region.
 - **Where things stand.** Wick is on the south-east shore and the hero arrives from the south-east, so the first view holds Hesper's window, the village, the lake, and the castle on the horizon behind. The Mill is west, the Forge north at the end of the east road, the Watch-house north-west on the soldiers' road, which runs along the north shore in sight of Wick. Every coordinate is in `docs/tasks/003-layout.md` and its data file.
 - **The castle from afar.** Its outline is on the horizon from much of the valley. Only from the signal hill can the beacon itself be seen, and seen to be dark.
 - Hills, a forest area, open fields, and water, so different parts feel different.

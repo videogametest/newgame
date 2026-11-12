@@ -1,7 +1,7 @@
 // One character on screen. Reads a simulation fighter each frame and draws it; owns no game state.
 
 import {
-  AbstractMesh, Color3, Material, Mesh, MeshBuilder, PBRMaterial, Scene, ShadowGenerator,
+  AbstractMesh, Color3, Material, Mesh, MeshBuilder, Nullable, PBRMaterial, Scene, ShadowGenerator,
   StandardMaterial, TransformNode,
 } from '@babylonjs/core';
 import { TUNING } from '../config/tuning';
@@ -102,8 +102,14 @@ export class CharacterView {
   private readonly root: TransformNode;
   private readonly unit: UnitDef;
   private readonly player: ClipPlayer;
+  /** Body materials that flash red on a hit. */
   private readonly materials: Material[] = [];
+  /** Every material on the character, weapons included, for the occlusion fade. */
+  private readonly fadeMaterials: Material[] = [];
   private readonly casters: AbstractMesh[] = [];
+  /** Each fade material's transparency mode as the asset shipped it (glTF sets it to opaque). */
+  private readonly savedModes = new Map<Material, Nullable<number>>();
+  private opacity = 1;
   private readonly weapons = new Map<WeaponId, TransformNode>();
   private disc: Mesh | null = null;
   private discMaterial: StandardMaterial | null = null;
@@ -151,6 +157,11 @@ export class CharacterView {
 
     for (const m of this.casters) this.shadow.addShadowCaster(m);
 
+    for (const m of this.casters) {
+      if (m.material && !this.fadeMaterials.includes(m.material)) this.fadeMaterials.push(m.material);
+    }
+    for (const m of this.fadeMaterials) this.savedModes.set(m, m.transparencyMode);
+
     if (fighter.kind === 'soldier') {
       const mat = new StandardMaterial(`${tag}_telegraph_mat`, scene);
       mat.disableLighting = true;
@@ -193,6 +204,38 @@ export class CharacterView {
         this.discMaterial.alpha = 0.25 + 0.5 * p;
       }
     }
+  }
+
+  /**
+   * Fades the whole character toward occludeAlpha while it blocks the view, and back to solid after.
+   * Babylon ignores mesh.visibility on opaque materials, so while faded the materials switch to alpha
+   * blending with a depth pre-pass (inner faces stay hidden). They are restored once solid again.
+   */
+  fade(blocked: boolean, dt: number): void {
+    const C = TUNING.camera;
+    const target = blocked ? C.occludeAlpha : 1;
+    const k = 1 - Math.exp(-C.occludeFadeRate * dt);
+    this.opacity += (target - this.opacity) * k;
+    if (Math.abs(target - this.opacity) < 0.001) this.opacity = target;
+
+    if (this.opacity >= 1) {
+      for (const m of this.fadeMaterials) {
+        m.transparencyMode = this.savedModes.get(m) ?? null;
+        if (m instanceof PBRMaterial || m instanceof StandardMaterial) m.needDepthPrePass = false;
+      }
+      for (const c of this.casters) c.visibility = 1;
+      return;
+    }
+    for (const m of this.fadeMaterials) {
+      if (m instanceof PBRMaterial) {
+        m.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
+        m.needDepthPrePass = true;
+      } else if (m instanceof StandardMaterial) {
+        m.transparencyMode = Material.MATERIAL_ALPHABLEND;
+        m.needDepthPrePass = true;
+      }
+    }
+    for (const c of this.casters) c.visibility = this.opacity;
   }
 
   dispose(): void {

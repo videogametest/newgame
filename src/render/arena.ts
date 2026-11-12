@@ -1,13 +1,14 @@
 // Static arena geometry: ground, boundary walls, obstacles, lights and shadows.
 
 import {
-  Color3, DirectionalLight, HemisphericLight, MeshBuilder, Scene,
+  AbstractMesh, Color3, DirectionalLight, HemisphericLight, MeshBuilder, Scene,
   ShadowGenerator, StandardMaterial, Vector3,
 } from '@babylonjs/core';
 import type { ArenaDef } from '../core/types';
 
 export interface ArenaView {
   shadow: ShadowGenerator;
+  walls: AbstractMesh[];
 }
 
 export function buildArena(scene: Scene, arena: ArenaDef): ArenaView {
@@ -52,11 +53,12 @@ export function buildArena(scene: Scene, arena: ArenaDef): ArenaView {
     [arena.halfWidth + t / 2, 0, t, arena.halfDepth * 2],
     [-(arena.halfWidth + t / 2), 0, t, arena.halfDepth * 2],
   ];
-  walls.forEach(([x, z, w, d], i) => {
+  const wallMeshes = walls.map(([x, z, w, d], i) => {
     const box = MeshBuilder.CreateBox(`wall_${i}`, { width: w, depth: d, height: wallH }, scene);
     box.position.set(x, wallH / 2, z);
     box.material = wallMat;
     box.isPickable = false;
+    return box;
   });
 
   const stoneMat = new StandardMaterial('stone_mat', scene);
@@ -72,5 +74,5 @@ export function buildArena(scene: Scene, arena: ArenaDef): ArenaView {
     shadow.addShadowCaster(cyl);
   });
 
-  return { shadow };
+  return { shadow, walls: wallMeshes };
 }

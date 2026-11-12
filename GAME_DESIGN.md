@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 10 (the hero becomes an apprentice scout: mentor, trials and ranks, stealth and scouting, a warrior companion, campfires, and a horse later). Supersedes version 9.
+Version 11 (names, the answer behind the story, the valley's ten secret places, the six trials, alarm bells, and wildlife). Supersedes version 10.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -71,8 +71,41 @@ Things to find:
 
 - Chests with a short opening moment and a reward sound.
 - Breakable crates, barrels, and pots that drop small loot.
-- Tall grass the sword can cut, sometimes dropping items.
-- At least a few secrets off the paths in each region: a hidden grove, a ruin, a cave mouth, a lone chest on a hill.
+- Tall grass the short blade can cut, sometimes dropping items.
+- **Signs on the ground:** bent grass, a bootprint in mud, a snapped twig. Used in one trial (section 6) and readable anywhere.
+
+The ten places off the path in Tallowmere. Every secret tells part of the story, rewards the player, or is simply a good place to stand. All are defined in data.
+
+| Place | Kind | What is there |
+| --- | --- | --- |
+| The patrol hut beyond the ridge | Story | Where Hesper was the night the soldiers left. From here the ridge completely hides the castle. The game does not say so; the player sees it |
+| The signal hill | Story | The valley's highest point, with a cold relay brazier. The one spot with a clear view of the castle and its dark beacon |
+| The soldiers' road | Story | An overgrown track leading out toward the castle, with things dropped in haste: a helmet on a fencepost, a half-loaded cart, a single boot |
+| The supper table | Story | Inside the Watch-house, a table still set for a meal nobody finished |
+| The family markers | Story | Stones along the road into Wick, each carved with the name of a family that left. A lantern appears on a stone when that family returns. One reads Fairlow |
+| Wren's practice ground | Reward | A forest clearing with rotting archery targets and initials carved in a tree. Wren's old bow is hidden nearby: the hero's first real upgrade. Site of the first trial |
+| The cave behind the waterfall | Reward | A bandit stash |
+| The wild orchard | Reward | Overgrown fruit trees and old beehives. Fruit and honey for cooking at campfires |
+| The firefly grove | A place to be | A hidden spring where the fireflies gather thickest at night. Nothing to collect |
+| The fisher on the lake | A place to be | One stubborn old soul who never left and never paid the Captain. Sells fish and has a fragment of the story |
+
+Wildlife:
+
+Real animals only. There are no monsters; the only enemies who think are people. Use CC0 animated animal models (Quaternius first). If a species has no suitable model, log it in `docs/status.md` and leave it out rather than use a placeholder.
+
+- **Alive:** songbirds, rabbits, and deer that scatter as the hero approaches; owls and crickets at night; bees at the wild orchard; fish in the lake.
+- **Stealth:**
+  - *Startled birds.* Sprinting through a flock sends it into the air and makes nearby enemies suspicious. Crouching past does not. Birds lifting in the distance mean someone is moving there.
+  - *Crows* circle every enemy-held place, visible from far off. They leave when the place is freed.
+  - *The Mill's geese.* The bandits keep them because they are loud. Running near them sets them honking, which alerts the Mill. They can be crept past.
+  - *The fox* appears near secrets. Followed quietly, it leads toward one; if the hero sprints, it is gone.
+- **Dangerous:**
+  - *Boar* in the deep forest charge when the hero gets close. The charge is telegraphed and can be dodged.
+  - *Wolves* roam the far corners of the valley at night in packs of three. They fear fire and will not come near a lit lantern or campfire. Every lantern the hero lights pushes them back, so the valley becomes safer as it is freed.
+- **Recovery:** sheep, chickens, and a cat return to Wick as it recovers. The cat sits in lit windows.
+- **The wren.** A wren nests in the eaves of the Fairlow house. It sings when the hero lights the window in the finale.
+- **The white stag.** Seen rarely, at dawn, far off. It cannot be approached and is never explained.
+- **Hunting.** Deer and rabbits can be hunted for food, which trains Archery. The geese, the fox, the wren, the cat, and the stag cannot be harmed.
 
 Finding your way:
 
@@ -90,8 +123,10 @@ Campfires:
 
 Layout of the first valley:
 
-- The hero starts at the valley's edge at dusk, with the Lamplighter's single lit window visible in the distance, and walks to the village near the centre.
-- Paths lead out from the village to the Mill, the Forge, and the Watch-house (section 9).
+- The valley is Tallowmere, with a lake at its centre. The village is Wick, beside the lake.
+- The hero starts at the valley's edge at dusk, with Hesper's single lit window visible in the distance, and walks to Wick.
+- Paths lead out from Wick to the Mill, the Forge, and the Watch-house (section 9).
+- The ridge stands between the patrol hut and the castle; the signal hill is the highest point and sees over it.
 - Hills, a forest area, open fields, and water, so different parts feel different.
 - A natural boundary (cliffs, dense forest, water) at the edge. No invisible walls in open ground and no coloured barrier.
 
@@ -134,6 +169,7 @@ Rules:
   - The scout's cloak: a hero who is crouched and not moving is very hard to notice, even in the open.
   - **Marking.** Holding the bow zoom on an enemy for a moment marks them. Marked enemies stay outlined through scenery for a while, so the player can plan from a ridge before going in.
   - **The first arrow.** An arrow that hits an unaware enemy deals heavily increased damage. A short-blade strike on an unaware enemy from behind does too.
+  - **The alarm bell.** Every enemy-held place has one. An alert enemy may break off and run to ring it, which calls reinforcements from outside the place. The runner can be stopped. If nobody ever becomes alert, the bell is never rung.
   - A fight that goes loud is still winnable; stealth is rewarded, never required.
 - Squad members follow the hero when out of combat and target the nearest enemy when a fight starts. They stay back and out of sight while the hero is crouched.
 - **Squad orders.** "Follow me" is the default. "Hold here" keeps the squad where they stand: they defend themselves but do not advance, so the hero can scout or open a fight alone. The current order is shown on the HUD.
@@ -160,7 +196,20 @@ Starting unit types:
 | Leadership | Places captured with a squad | Squad size, recruit quality |
 | Stealth | Time spent unnoticed near enemies, hits on unaware enemies | Harder to notice, stronger first strike, longer marks |
 
-- **Apprenticeship.** The hero's rank is Apprentice, then Scout, then Warden of the valley. Rank is earned by passing trials the Lamplighter sets, not by experience points. Each trial is a small, self-contained challenge in the world: hit a distant target across the river, cross an occupied place and back without being noticed, follow a trail through the forest to what is at the end of it. The Lamplighter judges the result in a line. Each rank changes the colour of the hero's cloak, so progress is visible on the character, and unlocks a perk tier.
+- **Apprenticeship.** The hero's rank is Apprentice, then Scout, then Warden of the valley. Rank is earned by passing trials Hesper sets, not by experience points. Trials are optional: the valley can be finished as an Apprentice, but each rank unlocks a stronger tier of perks. Each trial teaches one part of the scout's craft and ends with a single dry line from Hesper, on failure as well as success.
+
+  | Trial | For rank | What the hero does | What it teaches |
+  | --- | --- | --- | --- |
+  | The Long Shot | Scout | At Wren's practice ground, hit the far target three times from the marked stone | The arc of the bow at range |
+  | The Trail | Scout | Hesper walks into the forest and says to find her. Follow the signs on the ground to the firefly grove, where she is waiting | Reading the ground |
+  | The Count | Scout | From the signal hill, mark every defender of an enemy-held place without being seen, then report. If one is missed, she says which | Looking before moving |
+  | The Quiet Lantern | Warden | Free a place without its alarm bell being rung | Controlling a fight |
+  | The Night Road | Warden | Cross the valley from the lake to Wick at night, past patrols, without being noticed once | Moving unseen |
+  | Hesper's Shoulder | Warden | Sneak up on Hesper and touch her shoulder. She has the sharpest senses of anyone in the game | Everything |
+
+  Hesper's Shoulder is meant to be failed many times, each with a different line ("I heard you at the gate."). On success she does not turn around. She says "Hm. That'll do," which is the highest praise she gives anywhere in the game, and the hero is a Warden.
+
+  Rank shows on the hero's cloak: plain grey for an Apprentice, forest green for a Scout, deep blue for a Warden. The Warden's cloak is Hesper's own, handed over.
 - **Perks:** one perk choice every 10 levels in a skill. Perks are where build identity comes from.
 - **Gear tiers** come from materials: bronze, iron, steel, then higher tiers. Gear is crafted or looted, and equipped gear is visible on the character model where the asset pack allows.
 - **Squad:** recruits have their own level and gear slots. Recruiting and developing them is the collecting layer.
@@ -188,37 +237,72 @@ Exact XP curves, perk lists, and tier stats are tuning, not design. Keep them in
 Each milestone ends deployed to Pages and playable. Do not start the next one until the current one is approved, unless a build message says otherwise.
 
 1. **Combat prototype.** Done: third-person hero, sword and bow, telegraphed enemies, dodge, waves, tuning panel. Remaining: camera fade for blocking fighters, sound effects, showcase mode.
-2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned with the Lamplighter and one lit window, plus the Mill, the Forge, and the Watch-house placed in data (section 9). Fights in place with awareness ranges, squad following, pathfinding, capture by lighting the lantern, with the growing melody, falling banners, and visible restoration of each place and of the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
+2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned with Hesper and her one lit window, plus the Mill, the Forge, and the Watch-house placed in data (section 9). Wildlife, the ten places off the path, alarm bells, fights in place with awareness ranges, squad following, pathfinding, capture by lighting the lantern, with the growing melody, falling banners, and visible restoration of each place and of the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
 3. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, the turn in which the Captain retakes the first freed place, the Captain fight at the Watch-house, and the valley finale ending at the hero's family house (section 9).
-4. **Progression.** Skills that level by use, including Stealth, perks, loot tables, inventory, equippable gear with tiers, and the apprenticeship: the Lamplighter's trials and the three ranks with their cloak colours.
+4. **Progression.** Skills that level by use, including Stealth, perks, loot tables, inventory, equippable gear with tiers, and the apprenticeship: Hesper's six trials and the three ranks with their cloak colours (section 6).
 5. **Conquest and towns.** Town services that come from the people who return (the smith's crafting, the miller's food, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
 6. **Cloud saves.** Supabase auth and save sync.
 7. **More world.** A second region, the hero's horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
 
 ## 9. Story
 
-Names in this section are placeholders and may change. Keep every name in data, never in code. "The Lamplighter" and "the Captain" are titles; each also has a personal name in data.
+Keep every name in data, never in code.
+
+### Names
+
+| Name | Who or what | Why |
+| --- | --- | --- |
+| Tallowmere | The valley | Tallow is what candles were made from; a mere is a lake |
+| Wick | The village | An old word for a small settlement, and the part of a candle that burns |
+| The Crown | The old kingdom | Never named; people only say "the Crown" |
+| Hesper | The Lamplighter. An old woman (she) | The old name for the evening star, the first light at dusk |
+| Captain Edric Stane | The Captain (he) | "Stane" is an old word for stone: the one who did not move |
+| Bram | The friend (he) | Short and sturdy, like him |
+| Wren | The hero's parent | A small bird that returns to the same nest. Never state whether Wren is the hero's mother or father; avoid pronouns for Wren entirely |
+| Fairlow | The hero's family name | On the marker stone and the house |
+| The hero | Unnamed and silent | Others call the hero "the apprentice" or "Wren's child" |
 
 ### Premise
 
-- A generation ago the kingdom fell apart. One night the crown's soldiers left the valley without a word. The roads went unguarded, bandits moved in, and most families fled.
-- The hero was carried out of the valley as a small child and grew up elsewhere on stories of it. Now grown, the hero has come home to a village that is half empty.
-- The hero's family house still stands in the village, dark and boarded up.
+- A generation ago the Crown fell apart. One night its soldiers left Tallowmere without a word. The roads went unguarded, bandits moved in, and most families fled.
+- The hero was carried out of the valley as a small child and grew up elsewhere on stories of it. Now grown, the hero has come home with a friend to a village that is half empty.
+- The Fairlow house still stands in Wick, dark and boarded up.
 - The hero takes the valley back one place at a time. Each place freed brings people home.
 
 Tone: warm and hopeful, with a quiet sadness for what was lost. No gore, no grim cruelty. The enemies are people, not monsters.
 
 ### The people
 
-- **The Lamplighter.** The hero's mentor. Once a scout of the old crown guard, one of the wardens who watched the valleys, they were away on patrol the night the soldiers left, and came back to find them gone. That is why they stayed, and why they hold fragments of the question without the answer. They never left. Every night for a generation they have kept one window lit so that anyone coming home could find the way. That single light is visible across the valley at night and is the first thing the hero walks toward. The Lamplighter greets the hero, knew the hero's family, and is the heart of the village. They take the hero on as an apprentice and teach the scout's craft: the bow, patience, and not being seen. They are terse and dry, they expect a great deal, they praise rarely and briefly, and when the hero fails they say something wry and tell them to do it again. They speak in short, plain lines that change as the valley recovers, and they are the one who teaches the lantern ritual.
-- **The Captain.** A former officer of the crown's guard who stayed when the army left and decided the valley was theirs to hold. They rule from the outpost and take a share of everything, and in their own eyes they are the only reason anyone here survived. They are not entirely wrong. Their banners fly over every place the hero has not freed, so their presence is visible everywhere. They and the Lamplighter served together before the kingdom fell, and each thinks the other chose wrongly. They are defeated, not killed.
-- **The hero** is silent and unnamed, so the player can be them. They arrive as nobody in particular and become the Lamplighter's apprentice.
-- **The friend.** The hero does not come home alone. A childhood friend from the town where the hero grew up comes with them: a sword-and-shield fighter, loyal, blunt, and quick with a joke, who holds the line while the hero shoots. They are the first squad member, present from the start, and the hero's opposite in every way that makes them a good pair. Their lines at campfires carry most of the game's humour.
+- **Hesper, the Lamplighter.** The hero's mentor. Once a scout of the Crown's guard, one of the wardens who watched the valleys. Every night for a generation she has kept one window lit so that anyone coming home could find the way. That light is visible across the valley at night and is the first thing the hero walks toward. She takes the hero on as an apprentice and teaches the scout's craft: the bow, patience, and not being seen. She also teaches the lantern ritual.
+  - Voice: dry, short, never wastes a word. She expects a great deal and praises rarely. "You were loud. Do it again." Her highest praise is "Hm. That'll do."
+- **Captain Edric Stane.** A former officer of the Crown's guard who stayed when the army left and decided the valley was his to hold. He rules from the Watch-house and takes a share of everything, and in his own eyes he is the only reason anyone here survived. He is not entirely wrong. His banners fly over every place the hero has not freed. He and Hesper served together, and each thinks the other chose wrongly. He is defeated, not killed.
+  - Voice: tired, certain, formal. "I kept them fed for twenty winters. What did your beacon ever do for them?"
+- **Bram, the friend.** A childhood friend from the town where the hero grew up, who would not let the hero go alone. A sword-and-shield fighter: loyal, blunt, and quick with a joke, who holds the line while the hero shoots. He is the first squad member, present from the start, and the hero's opposite in every way that makes them a good pair. His lines at campfires carry most of the game's humour.
+  - Voice: cheerful and plain. "You sneak about. I'll stand here and get hit. It's a good system."
+- **The hero** is silent and unnamed, so the player can be them. They arrive as nobody in particular and become Hesper's apprentice.
 - **The horse.** Arrives with the second region: small, shaggy, sturdy, and opinionated, with a name and a personality shown through how it behaves. It is for travel, not for fighting.
 
-### The question
+### The question, and what the first valley reveals
 
-Why did the soldiers leave overnight? Nobody in the valley knows. The first valley gives fragments: found notes, a ruined watchtower, a soldier's grave, a line from the Lamplighter, and finally what the Captain saw that night. The fragments point to the abandoned castle on the horizon, where the answer is. The castle is not reachable in the first valley. Never answer the question in the first valley.
+The question the player carries: why did the soldiers leave overnight, and what became of Wren?
+
+By the end of the first valley the player can have learned, in fragments and never in one speech:
+
+- The Crown had a beacon on the castle. When it was lit, every soldier in every valley was sworn to march to the castle at once.
+- It was lit that night. The valley's guard saw it and were gone by morning.
+- Hesper was on patrol beyond the ridge, where the beacon cannot be seen, and came home to an empty garrison. She has believed ever since that Stane deserted.
+- Stane saw the beacon and chose not to go, because someone had to stay with the people. He broke his oath to keep faith with the valley.
+- Wren was a soldier of that guard and Hesper's apprentice before the hero. Wren answered the beacon and never came back. Hesper says the window is lit for anyone coming home. It has been lit for one person.
+
+Sources of these fragments: the patrol hut, the signal hill, the soldiers' road, the supper table, the family markers, Wren's practice ground, the fisher, Hesper's lines as trust grows, and Stane's account when he yields.
+
+### The answer (never reveal in the first valley)
+
+This is for writers only, so every fragment points the same way. No character in the first valley knows it, and nothing the player finds may state it.
+
+- The Crown was bankrupt. The beacon was lit on the king's order to gather the whole army at the castle, not to fight, but to be marched away and handed to a foreign power as payment of the Crown's debt.
+- The soldiers were not killed. They were sold. Some may still be alive, far away. Wren may be among them.
+- The castle, in the second region, is where the player learns this. What lies beyond it is where the story can go next.
 
 ### Places with a past
 
@@ -226,9 +310,9 @@ Every enemy-held place used to be something, and freeing it brings that thing an
 
 | Place | Held as | What it was | Who returns | What the player gains |
 | --- | --- | --- | --- | --- |
-| The Mill | Bandit camp | The valley's mill | The miller | Food: sold in the village and found in the mill |
+| The Mill | Bandit camp, with geese | The valley's mill | The miller | Food: sold in Wick and found in the mill |
 | The Forge | Bandit camp | The valley's forge | The smith | Crafting and gear upgrades |
-| The Watch-house | The Captain's outpost | The crown guard's post | Nobody at first | The road toward the castle |
+| The Watch-house | Stane's outpost | The Crown guard's post | Nobody at first | The road toward the castle |
 
 Each place looks like what it was, under what the bandits have done to it: a mill with a stopped wheel, a cold forge. Once freed, the wheel turns and the forge is lit. More places follow the same pattern in later regions. Every place is defined in data with its past, its person, and its reward.
 
@@ -236,39 +320,39 @@ Each place looks like what it was, under what the bandits have done to it: a mil
 
 A place is not freed when the last defender falls. It is freed when the hero lights its lantern.
 
-- Each place has an unlit lantern. After the defenders are cleared, the hero interacts with it (`E`) to light it. The Captain's banner comes down and the place is captured.
+- Each place has an unlit lantern. After the defenders are cleared, the hero interacts with it (`E`) to light it. Stane's banner comes down, the crows leave, and the place is captured.
 - A short melody plays. It is the same melody every time, with one more instrument for each place freed, so it grows fuller across the game.
-- A lit lantern can be seen from a distance at night. As the valley is freed, the night fills with lights.
-- The Lamplighter lights the hero's first lantern alongside them, to teach it.
+- A lit lantern can be seen from a distance at night, and wolves will not come near it. As the valley is freed, the night fills with lights and becomes safer.
+- Hesper lights the hero's first lantern alongside them, to teach it.
 
 ### The turn
 
 The valley does not only get better.
 
-- After the hero frees the second place, the Captain strikes back. That night the first place the hero freed is retaken: its lantern goes dark, its person flees to the village, and what it gave the player is lost until it is freed again.
+- After the hero frees the second place, Stane strikes back. That night the first place the hero freed is retaken: its lantern goes dark, its person flees to Wick, and what it gave the player is lost until it is freed again.
 - The retaken place is held by stronger defenders than before.
-- The Lamplighter's line the next morning is the low point of the story.
+- Hesper's line the next morning is the low point of the story.
 - Retaking it relights the lantern and opens the way to the Watch-house.
 
 ### The world tells the story
 
 There is no quest log and no long dialogue. The story is carried by:
 
-- **Restoration.** The village starts with boarded windows, empty fields, few people, and one lit window. With each lantern lit, more villagers return, buildings are repaired, fields are worked, stalls open, and more windows glow after dark. The village music gains an instrument with each one.
-- **The Captain's banners**, which come down place by place.
+- **Restoration.** Wick starts with boarded windows, empty fields, few people, no animals, and one lit window. With each lantern lit, more villagers return, buildings are repaired, fields are worked, stalls open, animals come back, lanterns appear on the family markers, and more windows glow after dark. The village music gains an instrument with each one.
+- **Stane's banners and the crows**, which leave place by place.
 - **Villagers** who say one or two short lines that change as the valley recovers.
-- **Things found off the path**, each a fragment of the question. Text is three sentences at most.
-- **Recruits.** Each squad member is a named person with a home in the valley and a two-sentence reason for joining. Some become available only after a specific place is freed.
-- **Landmarks** on the horizon that the fragments refer to.
+- **The ten places off the path** (section 4), each a fragment. Text is three sentences at most.
+- **Recruits.** Each squad member after Bram is a named person with a home in the valley and a two-sentence reason for joining. Some become available only after a specific place is freed.
+- **Landmarks** on the horizon that the fragments refer to, above all the dark beacon on the castle.
 
-Restoration is tracked as a single valley recovery level in the game state. It rises with each lantern lit and falls when a place is retaken. Scenery, villager count, lights, banners, and music read from it.
+Restoration is tracked as a single valley recovery level in the game state. It rises with each lantern lit and falls when a place is retaken. Scenery, villager count, animals, lights, banners, and music read from it.
 
 ### The valley finale
 
-1. The hero takes the Watch-house and faces the Captain, who is the hardest fight in the valley. Beaten, the Captain yields and tells the hero what they saw the night the soldiers left. It deepens the question; it does not answer it.
-2. The hero lights the Watch-house lantern. Every place in the valley is free.
-3. That night the village holds a festival: lanterns, the full melody, every returned villager gathered.
-4. The Lamplighter leads the hero to the family house. The hero lights its window. It is the last dark window in the village, and the image the game is named for.
+1. The hero takes the Watch-house and faces Stane, who is the hardest fight in the valley. Beaten, he yields and tells the hero what he saw that night: the beacon, and his choice. It deepens the question; it does not answer it.
+2. The hero lights the Watch-house lantern. Every place in Tallowmere is free.
+3. That night Wick holds a festival: lanterns, the full melody, every returned villager gathered.
+4. Hesper leads the hero to the Fairlow house. The hero lights its window. It is the last dark window in the village, and the image the game is named for. The wren in the eaves sings.
 5. In the morning the road toward the castle is open and marked on the map.
 
 ## 10. Interface

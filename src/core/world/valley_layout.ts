@@ -13,6 +13,23 @@ export interface LayoutStop extends LayoutPoint {
   readonly note?: string;
 }
 
+/** A crossing: a strip of width from one end to the other, across its river (003-layout, "The crossings"). */
+export interface LayoutCrossing extends LayoutPoint {
+  readonly name: string;
+  readonly from: LayoutPoint;
+  readonly to: LayoutPoint;
+  readonly width: number;
+  readonly surface: string;
+  readonly walkable?: boolean;
+  readonly used_by?: string;
+  readonly note?: string;
+  readonly deck?: string;
+  readonly water_depth?: number;
+  readonly top_above_water?: number;
+  readonly stone_size?: number;
+  readonly gap_between_stones?: number;
+}
+
 export interface LayoutFeature extends LayoutPoint {
   readonly radius: number;
   readonly height: number;
@@ -314,8 +331,8 @@ export const VALLEY_PLACES = {
     z: -388
   },
   mill: {
-    x: -172,
-    z: 62
+    x: -176,
+    z: 50
   },
   forge: {
     x: 38,
@@ -359,21 +376,81 @@ export const VALLEY_PLACES = {
   }
 } as const;
 
-export const VALLEY_CROSSINGS: readonly { readonly name: string; readonly x: number; readonly z: number }[] = [
+export const VALLEY_CROSSINGS: readonly LayoutCrossing[] = [
   {
     name: "ford",
     x: 142,
-    z: -12
+    z: -12,
+    from: {
+      x: 141,
+      z: -21
+    },
+    to: {
+      x: 143,
+      z: -3
+    },
+    width: 3.6,
+    surface: "bed",
+    water_depth: 0.4,
+    used_by: "east_road",
+    note: "Stones under 0.4 m of water. Waded without slowing. No surface of its own."
+  },
+  {
+    name: "forge_bridge",
+    walkable: false,
+    x: 152,
+    z: -7,
+    from: {
+      x: 151,
+      z: -17
+    },
+    to: {
+      x: 153,
+      z: 3
+    },
+    width: 3.6,
+    surface: "deck",
+    used_by: "east_road",
+    note: "The project \"The bridge to the Forge\". Two planks and the posts until it is built: not walkable before then.",
+    deck: "Straight from the ground height at one end to the ground height at the other. Never less than 1.0 m above the water."
   },
   {
     name: "mill_bridge",
-    x: -178,
-    z: 40
+    x: -191,
+    z: 34,
+    from: {
+      x: -196,
+      z: 44
+    },
+    to: {
+      x: -186,
+      z: 24
+    },
+    width: 2.4,
+    surface: "deck",
+    used_by: "north_bank_path",
+    note: "Timber, with a rail on the upstream side. Each end meets the bank at the bank's own height.",
+    deck: "Straight from the ground height at one end to the ground height at the other. Never less than 1.0 m above the water."
   },
   {
     name: "stepping_stones",
     x: -250,
-    z: 0
+    z: 0,
+    from: {
+      x: -256,
+      z: 10
+    },
+    to: {
+      x: -244,
+      z: -10
+    },
+    width: 1.2,
+    surface: "stones",
+    top_above_water: 0.3,
+    stone_size: 1.2,
+    gap_between_stones: 0.5,
+    used_by: "stones_path",
+    note: "Flat-topped stones, walked without a jump. The walk surface is one unbroken strip at the stones' top height."
   }
 ];
 
@@ -418,8 +495,12 @@ export const VALLEY_ROADS: Readonly<Record<string, readonly LayoutPoint[]>> = {
       z: 104
     },
     {
-      x: -172,
-      z: 62
+      x: -166,
+      z: 66
+    },
+    {
+      x: -176,
+      z: 50
     }
   ],
   east_road: [
@@ -538,16 +619,76 @@ export const VALLEY_ROADS: Readonly<Record<string, readonly LayoutPoint[]>> = {
   ],
   falls_path: [
     {
-      x: -172,
-      z: 62
+      x: -176,
+      z: 50
     },
     {
       x: -230,
       z: 40
     },
     {
+      x: -246,
+      z: 32
+    },
+    {
       x: -282,
       z: 14
+    }
+  ],
+  north_bank_path: [
+    {
+      x: -176,
+      z: 50
+    },
+    {
+      x: -196,
+      z: 44
+    },
+    {
+      x: -191,
+      z: 34
+    },
+    {
+      x: -186,
+      z: 24
+    },
+    {
+      x: -190,
+      z: 0
+    },
+    {
+      x: -188,
+      z: -92
+    },
+    {
+      x: -104,
+      z: -168
+    }
+  ],
+  stones_path: [
+    {
+      x: -246,
+      z: 32
+    },
+    {
+      x: -256,
+      z: 10
+    },
+    {
+      x: -250,
+      z: 0
+    },
+    {
+      x: -244,
+      z: -10
+    },
+    {
+      x: -262,
+      z: -60
+    },
+    {
+      x: -288,
+      z: -144
     }
   ]
 };
@@ -689,8 +830,8 @@ export const VALLEY_STOPS: readonly LayoutStop[] = [
   {
     name: "mill",
     kind: "place",
-    x: -172,
-    z: 62
+    x: -176,
+    z: 50
   },
   {
     name: "forge",

@@ -11,7 +11,7 @@ import { forwardOf, rightOf } from '../core/vec';
 import { newGameState } from '../core/state';
 import type { GameState } from '../core/types';
 import { advanceClock } from '../core/world/clock';
-import { blocksWalking, insideValley, valleyHeightAt, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL, VALLEY_HALF_EXTENT } from '../core/world/valley';
+import { blocksWalking, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL, VALLEY_HALF_EXTENT } from '../core/world/valley';
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
 import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
 import { walkStep, type WalkRules } from '../core/world/walk';
@@ -33,7 +33,7 @@ const CAMERA_RIG: ValleyCameraRig = {
   clearance: 0.6,
 };
 const WALK_RULES: WalkRules = {
-  heightAt: valleyHeightAt,
+  heightAt: walkSurfaceAt,
   blocked: blocksWalking,
   inside: insideValley,
 };
@@ -153,7 +153,7 @@ class Valley {
     this.hero = getHero(createBattle(TRAINING_FIELD));
     this.placeHeroAtStart();
     this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
-    this.groundY = valleyHeightAt(this.hero.x, this.hero.z);
+    this.groundY = walkSurfaceAt(this.hero.x, this.hero.z);
 
     this.camera = new FreeCamera('valley_cam', new Vector3(0, 10, 0), scene);
     this.camera.minZ = 0.1;
@@ -243,7 +243,7 @@ class Valley {
     if (dirX === 0 && dirZ === 0) {
       this.hero.vx = 0;
       this.hero.vz = 0;
-      this.groundY = valleyHeightAt(from.x, from.z);
+      this.groundY = walkSurfaceAt(from.x, from.z);
       return;
     }
     const speed = sprint ? T.hero.sprintSpeed : T.hero.walkSpeed;
@@ -332,7 +332,7 @@ class Valley {
         this.game.hero.position = { x, z };
         this.hero.x = x;
         this.hero.z = z;
-        this.groundY = valleyHeightAt(x, z);
+        this.groundY = walkSurfaceAt(x, z);
       },
       lookAt: (x, z) => {
         const hp = this.game.hero.position;

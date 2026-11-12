@@ -29,6 +29,7 @@ Run at most four streams at once. Each stream is one sub-agent, one branch, and 
 | F2 | **Claude's stream since 12 Nov. Viktor does not edit these paths.** Items and money logic: items, quality, the carry limit, loot rules, stolen goods, recipes, crowns, prices, projects | 006 | `src/core/items/`, `src/core/economy/` |
 | G | People logic: households and their triggers, the derived recovery level, the window count, companions, traits, bond, wishes, the dialogue and Show data model | 004, 007 | `src/core/people/` |
 | H | **Claude's stream since 12 Nov, built. Viktor does not edit these paths; task 003 wires it in.** The music engine: a sequencer that plays note data through samples, layers, synchronised stems, and the score from `docs/writing/melody.md` | 003 | `src/audio/music/` |
+| V | **Claude's stream, built.** The valley learns (section 5): the hero's habits and the answers held places make | 005 | `src/core/valley/` |
 
 Start with A and B together. Add C, D, E, F2, G, and H as capacity allows, logic streams only, never more than four streams in total.
 

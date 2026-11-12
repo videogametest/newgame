@@ -11,8 +11,8 @@ A new player can start the game, learn it without being told, save their progres
 1. **Title screen** with Continue and New Game, over a slow view of the valley.
 2. **Local saves** in `localStorage` with a `version` field: autosave on capture, on resting, and every few minutes. Continue restores the hero, squad, captured places, opened chests, discovered places, and time of day.
 3. **Control prompts** that appear the first time each control is needed and never again once used.
-4. **A first nudge:** the Lamplighter greets the hero and the friend, takes the hero on as an apprentice, and sends them to watch the Mill before attacking it. The Mill shows as the unlabelled compass mark. The control prompts teach crouch, marking, and the first arrow there.
-5. **The turn** (section 9): after the second place is freed, the Captain retakes the first one that night. Its lantern goes dark, its person flees to the village, its reward is lost, and stronger defenders hold it. The recovery level falls. The Lamplighter has a line for the next morning.
+4. **A first nudge:** Hesper greets the hero and Bram, takes the hero on as an apprentice, and sends them to watch the Mill before attacking it. The Mill shows as the unlabelled compass mark. The control prompts teach crouch, marking, and the first arrow there.
+5. **The turn** (section 9): after the second place is freed, Stane retakes the first one that night. Its lantern goes dark, its person flees to the village, its reward is lost, and stronger defenders hold it. The recovery level falls. Hesper has a line for the next morning.
 6. **The Captain.** A named enemy at the Watch-house with more health, a heavier telegraphed attack, and a guard of soldiers and archers. The Watch-house cannot be taken until the retaken place is freed again. Beaten, the Captain yields and speaks, and is not killed.
 7. **The valley finale** in the five beats listed in section 9, ending with the hero lighting the window of the Fairlow house while the wren sings, then the road toward the castle opening on the map.
 

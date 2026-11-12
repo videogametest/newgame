@@ -17,6 +17,8 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 - Seeded terrain with a pure `heightAt(x, z)` in `src/core`, about 800 m across, shaped to give a central lake, a river with a waterfall, hills, a ridge, and the signal hill as the highest point.
 - **Land that hides things** (section 4). Shape and place hills, ridges, and tree stands so that Wick cannot be seen whole from the start, no enemy place is visible from Wick, and each of the ten secret places is hidden from the nearest path by a rise or by trees. Every rise between two places can be crossed or walked round. Tour mode captures one frame from each of five viewpoints showing something half-hidden ahead.
 - **Inside** (section 4; `docs/writing/interiors.md`). In this task: Hesper's cottage only, fully dressed, entered by `E` at the door with a half-second fade, in first person inside. Every other house in Wick is boarded: planks across the door and windows. Build the door and room system so a boarded house can be opened by data later.
+- **The start (review 016).** The hero starts 150 to 300 m from Hesper's window, on ground that looks down on Wick. From the start, at eye height, there is a clear line to Hesper's window and to the top of the castle's beacon tower, and both fit in one frame without turning. The haze never hides a landmark inside the valley: the window and the castle's outline are readable from the start at 18:00. The sun sets behind or beside this view, never so that the window is lost in its glare. Each of these is a test in `src/core/world`.
+- **Dusk is at eighteen** (section 5, "The clock"). The warm light is centred on 18:00, when the game begins, with an afterglow through 19:00, when the other windows light.
 - Chunked terrain around the hero, with no visible pop-in at walking speed.
 - Sky, a moving sun with shadows, the day-night cycle, a moon and stars, distance haze.
 - The hero walks, sprints, and crouches across the valley, standing on the terrain.
@@ -43,7 +45,7 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 
 **Buildings and scale (review 012).** Build Wick from the KayKit Medieval Hexagon buildings at `BUILDING_SCALE` (8), as in `src/styletest/houses.ts`, with props at 3.2 and trees at about 12. People use the proportions and outline from `src/styletest/upgrade.ts`, column B plus the outline. Evidence includes the hero and the brute standing at a house door in Wick, with the door a head taller than both.
 
-**Measured, not judged (review 009).** The capture script measures and fails on: at dusk the ground's average brightness is under a quarter of the sky's; any pool of window light where red is not at least a fifth stronger than blue; any window but Hesper's lit at 18:00, or a home household's window dark at 19:15; any door lower than the tallest character.
+**Measured, not judged (review 009).** The capture script measures and fails on: at dusk the ground's average brightness is under a quarter of the sky's; any pool of window light where red is not at least a fifth stronger than blue; any window but Hesper's lit at 18:00, or a home household's window dark at 19:15; any door lower than the tallest character. It also measures draw calls per frame (a count for one frame, not a running total; see review 016) and fails above 300.
 
 **Lighting, carried over from the style test (review 007).** These three failed there and are settled here, in the real world, before anything else in the bar is judged:
 

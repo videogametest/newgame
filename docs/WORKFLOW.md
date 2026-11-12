@@ -22,6 +22,10 @@ Greg decides direction and playtests. He tells Viktor to pull and continue, and 
 5. If a task conflicts with `GAME_DESIGN.md`, stop, write the conflict in `docs/status.md`, and tell Greg.
 6. Do not edit `GAME_DESIGN.md` or the task briefs beyond the `Status:` line. Put disagreements and suggestions in `docs/status.md`.
 
+## Who looks first
+
+Claude reviews every visual change from the screenshots before Greg looks at it. Greg is told a build is ready to view only when it clears the bar set in its task brief. Until then the build is deployed but described in `docs/status.md` as not ready for first look.
+
 ## For Claude
 
 1. Pull `main` and read `docs/status.md` before answering questions about the build.

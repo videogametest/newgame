@@ -67,3 +67,21 @@ export function isWater(x: number, z: number): boolean {
 export function insideValley(x: number, z: number): boolean {
   return Math.abs(x) <= VALLEY_HALF_EXTENT && Math.abs(z) <= VALLEY_HALF_EXTENT;
 }
+
+/** Ground the hero may stand on: inside the valley and not in the lake or river. */
+export function isWalkableGround(x: number, z: number): boolean {
+  return insideValley(x, z) && !isWater(x, z);
+}
+
+/**
+ * Points worth stopping for (GAME_DESIGN §4, review 015). Only places that exist in the data are listed
+ * here; secrets, chests, campfires, signs and road junctions join this list as they are placed.
+ * Excluded on purpose: lakeCentre (water) and castle (a horizon landmark on the valley edge, seen from afar).
+ */
+export const VALLEY_STOPS: ReadonlyArray<{ name: string; x: number; z: number }> = [
+  { name: 'wick', ...VALLEY_PLACES.wick },
+  { name: 'signalHill', ...VALLEY_PLACES.signalHill },
+  { name: 'ridgeCrest', ...VALLEY_PLACES.ridgeCrest },
+  { name: 'patrolHut', ...VALLEY_PLACES.patrolHut },
+  { name: 'start', ...VALLEY_PLACES.start },
+];

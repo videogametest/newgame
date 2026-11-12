@@ -7,9 +7,18 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
-| 003 | Step 1 (ground, sky, movement) built on `feat/task-003-step1-valley`, not ready for first look. Step 2 not started. | PR #23 merged (`1e08e40`), not ready for first look | Claude review of the first-look bar before step 2 |
+| 003 | Step 1 merged (PR #23). Walk-distance check built on `feat/task-003-walk-distance`: measured longest walk **590.4 m** (limit 100 m), so it fails until stops are placed. Step 2 not started. | Walk-distance PR (branch `feat/task-003-walk-distance`) | Stop placement: the valley has five stops, the far north-west corner (-400, -400) has none within 100 m. Claude review of the first-look bar before step 2 |
 | B | Task 002b style test rework (review 005), PR #21 on `feat/task-002b-rework`: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | #21 | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-12 Task 003: walk-distance check (Viktor, fails as measured)
+
+- **Built:** `src/core/world/walk_gap.ts` (pure grid Dijkstra from the stops over 2 m cells; diagonals only when both orthogonal neighbours are walkable; reports longest walk, where, and stranded cells). `VALLEY_STOPS` and `isWalkableGround` in `valley.ts`. Stops now: wick, signalHill, ridgeCrest, patrolHut, start. Excluded: lakeCentre (water) and castle (horizon landmark on the valley edge).
+- **Tests:** `src/core/world/walk_gap.test.ts`, 5 tests: straight open-ground distance (70.7 m to a corner), a wall that forces a detour, stranded islands, no diagonal cut past blocked corners, bad input.
+- **Script:** `npm run walk-gap` (`scripts/walk_gap.ts`). Exits 1 over 100 m or if any walkable cell is stranded. It is not in `npm test`, so the deploy gate is unchanged.
+- **Measured [walk_gap, 2026-11-12]:** longest walk **590.4 m**, to (-400, -400), the valley's north-west corner. Nearest stop by walk: patrolHut. The straight-line distance from that corner to patrolHut is 547 m, a lower bound on any walk, so the gap is over 100 m whichever measure is used. Grid walks can run up to about 8% long, so 590 is an upper estimate.
+- **Not done on purpose:** no invented stops to make the number pass. Secrets, chests, campfires, signposts and road junctions are placed by later steps of this task. Until then the check fails and the report says where.
+- **Verified:** `npm run typecheck` exit 0; `npx vitest run` 48 files, 622 tests pass; walk-gap script exit 1 with the measured report above.
 
 ## 2026-11-12 Task 003 step 1: ground, sky, movement (Viktor, not ready for first look)
 

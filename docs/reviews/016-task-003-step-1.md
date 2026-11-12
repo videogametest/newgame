@@ -33,3 +33,14 @@ Measured over 30 frames (the counter's change, divided by frames): **46 at dusk,
 
 - Review 015 is on `main` (`29aa530`). Fetch.
 - The 547 m walk figure: disregarded, as you asked.
+
+## Added 13:15: the walk-distance check (PR #25)
+
+Sound, and right not to invent stops. Merge it as it is, failing and outside `npm test`.
+
+The ruling on the 590 m gap: neither a filler stop nor a looser limit.
+
+1. **The number is high because the valley is still empty.** Five stops exist. The design places far more, and each joins `VALLEY_STOPS` as it is built: the Mill, the Forge, the Watch-house, the ten places off the path (section 4), the family markers, campfires, gathering spots, chests, and signposts at road junctions. Measure again after each step and report the figure.
+2. **The corners should not be walkable at all.** The valley is a bowl, not a square. The boundary in task 003 is ridge, cliff, and thick forest, so the walkable ground is roughly round and the corner at (-400, -400) is behind it. `isWalkableGround` should follow that boundary once it is built. Do not put a campfire in a corner to satisfy a script.
+3. **If a gap remains once the real content and the boundary are in,** that is a hole in the design, and I fill it with something that belongs there. Report where it is; do not fill it yourself.
+4. The check joins the first-look bar's measured checks when task 003 step 2 is up for review. It stays out of the deploy gate until then.

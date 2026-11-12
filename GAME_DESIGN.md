@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 13 (combat overhaul: a deeper bow, evasive close combat, lock-on, throwing knives, new enemy types, morale, squad play, and impact feel). Supersedes version 12.
+Version 14 (enemies can be killed; surrender and mercy come from morale). Supersedes version 13.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -213,8 +213,10 @@ Close combat is about not being where the blow lands. The hero cannot block.
 How enemies fight:
 
 - **They take turns.** At most two enemies attack the hero at once. The others circle, reposition, or go for a companion. A group fight stays readable.
-- **Morale.** Enemies are people and want to live. Each place has a morale level that falls when defenders are beaten, when their leader is beaten, when they are surprised, or when fire spreads, and rises when the bell brings reinforcements. Below a threshold, individual enemies break: they drop their weapons and run, and they count as beaten. A whole place can be won by breaking its nerve.
-- **Nobody dies on screen.** A beaten enemy falls, yields, or flees. This is tone as well as mechanics.
+- **Morale.** Enemies are people and want to live. Each place has a morale level that falls when defenders are beaten, when their leader is beaten, when they are surprised, or when fire spreads, and rises when the bell brings reinforcements. Below a threshold, individual enemies break: some drop their weapons and run, and some throw them down and surrender. Either way they are out of the fight. A whole place can be won by breaking its nerve.
+- **Enemies can be killed.** An enemy whose health reaches zero dies: they fall and stay down, with no blood and no gore. A strike on an unaware enemy is a silent kill.
+- **Surrender is real.** An enemy who has surrendered kneels with empty hands and can be left alone. Attacking one is possible and is never rewarded. After a place is freed, those who surrendered there may later appear in Wick, working and with a line to say, and one or two can be recruited. Mercy is the player's choice, not a rule.
+- **Stane is the exception.** At low health he yields instead of dying, because the story needs what he has to say.
 
 Unit types:
 
@@ -330,7 +332,7 @@ Keep every name in data, never in code.
 - The Fairlow house still stands in Wick, dark and boarded up.
 - The hero takes the valley back one place at a time. Each place freed brings people home.
 
-Tone: warm and hopeful, with a quiet sadness for what was lost. No gore, no grim cruelty. The enemies are people, not monsters.
+Tone: warm and hopeful, with a quiet sadness for what was lost. People die in fights, but there is no gore and no cruelty, and the game never celebrates a death. The enemies are people, not monsters.
 
 ### The people
 

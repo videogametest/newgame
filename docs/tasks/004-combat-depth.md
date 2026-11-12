@@ -11,7 +11,7 @@ Turn the thin prototype combat into the scout's combat described in `GAME_DESIGN
 Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 1. **The bow and the blade.** Weak points, the limited quiver with arrow recovery, standard, fire, and whistling arrows, perfect draw, the three-hit combo, throwing knives, perfect dodge with its critical strike, stagger by weight, and lock-on in both views. HUD additions from section 10.
-2. **Enemies.** Attack turns (at most two attackers on the hero), morale per place with breaking and fleeing, the rule that nobody dies on screen, and the shield-bearer, brute, and runner as data-defined unit types with their own models or clearly distinct looks. Fire spreading in dry grass.
+2. **Enemies.** Attack turns (at most two attackers on the hero), morale per place with breaking, fleeing, and surrendering, clean deaths with no gore, surrendered enemies who can be spared and may later appear in Wick, and the shield-bearer, brute, and runner as data-defined unit types with their own models or clearly distinct looks. Fire spreading in dry grass.
 3. **Bram and impact.** Marked targets as Bram's priority, his guard-breaking strike, his hold on enemy attention, hit-freeze, camera shake, the last-defender slow motion, the distinct hit sounds, and the settings to turn impact effects down.
 
 ## Rules

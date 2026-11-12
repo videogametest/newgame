@@ -12,6 +12,7 @@ import {
   VALLEY_RIVER_OUT,
   VALLEY_STOPS as LAYOUT_STOPS,
   VALLEY_TERRAIN_FEATURES,
+  type LayoutCrossing,
   type LayoutPoint,
 } from './valley_layout';
 
@@ -33,10 +34,12 @@ export const EDGE_RADIUS = 335;
 const PATROL_HUT_OPEN = { x: VALLEY_PLACES.patrolHut.x, z: VALLEY_PLACES.patrolHut.z, radius: 60 };
 /** The north-west pass, where the soldiers' road leaves the valley. */
 const NW_PASS_OPEN = { x: -250, z: -262, radius: 40 };
-/** Crossings open a walkable disc this wide, even where the river is water. */
-const CROSSING_RADIUS = 11;
 /** Steepest walkable slope (rise over run). */
 const MAX_WALK_SLOPE = 0.7;
+/** Stepping stones: their tops sit this far above the water (design section 4, "The crossings"). */
+const STONE_TOP = WATER_LEVEL + 0.3;
+/** A bridge deck is never lower than this above the water (design section 4, "The crossings"). */
+const DECK_MIN = WATER_LEVEL + 1.0;
 
 /** Height (m) of the river bed on its centre line. Mid-stream depth is WATER_LEVEL - RIVER_BED = 1.5 m. */
 const RIVER_BED = 0.5;
@@ -69,9 +72,48 @@ export function insideValley(x: number, z: number): boolean {
   return Math.abs(x) <= VALLEY_HALF_EXTENT && Math.abs(z) <= VALLEY_HALF_EXTENT;
 }
 
-/** True within a crossing's disc: the ford, the mill bridge and the stepping stones. */
+/**
+ * Where (x, z) falls on a crossing's strip: `t` is the place along it (0 at `from`, 1 at `to`) and `across` is the
+ * distance (m) from its centre line.
+ */
+function stripFrame(x: number, z: number, c: LayoutCrossing): { t: number; across: number } {
+  const dx = c.to.x - c.from.x;
+  const dz = c.to.z - c.from.z;
+  const len2 = dx * dx + dz * dz;
+  const t = ((x - c.from.x) * dx + (z - c.from.z) * dz) / len2;
+  const across = Math.abs((x - c.from.x) * dz - (z - c.from.z) * dx) / Math.sqrt(len2);
+  return { t, across };
+}
+
+/** The walkable crossing whose strip holds (x, z), if any. The forge bridge is listed but not walkable yet. */
+function crossingAt(x: number, z: number): LayoutCrossing | undefined {
+  return VALLEY_CROSSINGS.find((c) => {
+    if (c.walkable === false) return false;
+    const { t, across } = stripFrame(x, z, c);
+    return t >= 0 && t <= 1 && across <= c.width / 2;
+  });
+}
+
+/** True on a walkable crossing's strip: the ford, the mill bridge and the stepping stones. */
 export function isCrossing(x: number, z: number): boolean {
-  return VALLEY_CROSSINGS.some((c) => Math.hypot(x - c.x, z - c.z) < CROSSING_RADIUS);
+  return crossingAt(x, z) !== undefined;
+}
+
+/**
+ * Height (m) the hero stands on at (x, z). On a bridge deck it is the deck, never below DECK_MIN, rising linearly
+ * between the ground at the two ends. On stepping stones it is the stones' tops. Everywhere else, including the
+ * ford bed the hero wades, it is the ground.
+ */
+export function walkSurfaceAt(x: number, z: number): number {
+  const c = crossingAt(x, z);
+  if (!c) return valleyHeightAt(x, z);
+  if (c.surface === 'stones') return STONE_TOP;
+  if (c.surface === 'deck') {
+    const { t } = stripFrame(x, z, c);
+    const along = valleyHeightAt(c.from.x, c.from.z) * (1 - t) + valleyHeightAt(c.to.x, c.to.z) * t;
+    return Math.max(along, DECK_MIN);
+  }
+  return valleyHeightAt(x, z);
 }
 
 /** Water the hero cannot walk into: lake and river, except at a crossing. Swimming is a separate rule. */
@@ -126,7 +168,7 @@ function slopeAt(x: number, z: number): number {
 /**
  * Ground the hero may walk on. Water is not ground (it is swum), river banks are walkable down to the water,
  * the edge ring is closed except the patrol hut's zone and the north-west pass, and the walk must be gentle.
- * The three crossings are open.
+ * The walkable crossings' strips are open (walkSurfaceAt gives their height); the forge bridge's strip is not.
  */
 export function isWalkableGround(x: number, z: number): boolean {
   if (!insideValley(x, z)) return false;

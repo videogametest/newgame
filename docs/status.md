@@ -192,3 +192,22 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - Gate in the worker sandbox: typecheck 0, vitest 638 pass, build 0, smoke pass, capture pass. No PR CI exists, so this local gate is the check.
 - Viewed: the sun disc is at centre in `noon-sun-12.png`. The moon disc is at centre in `night-moon-2.png`.
 - Open question: at 00:00 the moon disc is not visible under `aimAt('moon')`, while at 02:00 it is. Not yet explained. The capture uses 02:00 for now.
+
+## 2026-11-12 Review 018 item 4: `walkSurfaceAt` is blocked on four design values (Viktor)
+
+Measured on `main` (`9b96912`) with `valleyHeightAt`. Water level is 2.00 m.
+
+- **Ford** (142, -12): bed 1.60 m at the centre, 0.4 m of water. Wading needs no surface, so `walkSurfaceAt` equals `heightAt` there. Its footprint width still needs the east road's width, which the data does not hold.
+- **Mill bridge** (-178, 40): bed 0.50 m at the centre, 1.5 m under the water. The bed walk puts the hero under water here now.
+- **Stepping stones** (-250, 0): bed 0.50 m at the centre, 1.5 m under the water. Same problem as the bridge.
+
+`GAME_DESIGN.md` v34 says the bridge is "a deck above the water" and the stones are "walked dry", and that each is "as wide as the road or path that uses it". It does not give the numbers. No road or path in `layout.json` crosses either one, so the rule has nothing to read.
+
+**Questions for Greg (answer in this file or in the design):**
+
+1. Mill bridge: what is the deck height above the 2.00 m water level?
+2. Stepping stones: what are the top heights above 2.00 m, and the size and spacing of the stones?
+3. Footprint width and direction for the bridge and the stones. Is the strip across the river (the crossing direction), or along it? Either way, what width? The design only says "as wide as the road or path that uses it", and nothing uses them.
+4. East road width, for the ford's strip. Its surface is the bed, so the width only matters for the footprint.
+
+Until these are answered, `walkSurfaceAt` is not written for the bridge or the stones: any deck or stone height now would be a guess. The ford needs only the width. Items 5 to 9 of review 018 do not depend on these answers, and work moves on to them.

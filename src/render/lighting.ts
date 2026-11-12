@@ -51,6 +51,9 @@ export interface Lighting {
   sky: Color3;
 }
 
+/** The sun's highest point above the horizon, in radians. Its midnight opposite, the moon, peaks at the same height. */
+const SUN_PEAK = (35 * Math.PI) / 180;
+
 /**
  * Hours 0..24, by the design's clock (section 5, "The clock"): dawn 6, dusk 18, windows lit from 19 to 1.
  * Pure: no scene access.
@@ -60,16 +63,18 @@ export interface Lighting {
  * windows are the brightest things, and by half past it is night. Golden warmth peaks at 18 and at 6.
  */
 export function lightingAt(tod: number): Lighting {
-  // The sun's path: theta is 0 at dawn (6), PI/2 at noon, PI at dusk (18). Below the horizon at night.
+  // The sun's path (review 018, item 1; review 019): a great circle through due east at dawn (6), due south and
+  // SUN_PEAK up at noon (12), and due west at dusk (18). Below the horizon at night. The moon is opposite, so it
+  // peaks at SUN_PEAK at midnight, where the player's camera can still look up at it.
   const theta = ((tod - 6) / 12) * Math.PI;
-  const elev = Math.sin(theta);
-  const along = -Math.cos(theta);
-  const sunSky = new Vector3(along * 0.8 + 0.5, elev, along * 0.6).normalize();
-  const horiz = new Vector3(along * 0.8 + 0.5, 0, along * 0.6).normalize();
-  // Daylight outlasts the sun by about an hour at each end of the day.
-  const dayness = clamp01((elev + 0.2) * 2.2);
+  const clock = Math.sin(theta);
+  const sunSky = new Vector3(Math.cos(theta), clock * Math.sin(SUN_PEAK), clock * Math.cos(SUN_PEAK)).normalize();
+  const horiz = new Vector3(sunSky.x, 0, sunSky.z).normalize();
+  const elev = sunSky.y;
+  // Daylight outlasts the sun by about an hour at each end of the day (the clock, not the tilted path).
+  const dayness = clamp01((clock + 0.2) * 2.2);
   const warm = Math.max(clamp01(1 - Math.abs(tod - 18) / 1.8), clamp01(1 - Math.abs(tod - 6) / 1.8));
-  const nightness = tod < 12 ? clamp01((0.1 - elev) * 3) : clamp01((tod - 18.4) / 1.0);
+  const nightness = tod < 12 ? clamp01((0.1 - clock) * 3) : clamp01((tod - 18.4) / 1.0);
   const zenith = mix(PALETTE.nightZenith, PALETTE.dayZenith, dayness);
   const horizon = mix(PALETTE.nightHorizon, PALETTE.dayHorizon, dayness);
   // The low sun is strong: grazing light needs the strength to colour flat ground, and it is what makes long shadows.

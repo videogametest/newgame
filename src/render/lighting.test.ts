@@ -47,13 +47,29 @@ describe('the sun and moon follow their paths (section 5, review 017)', () => {
     expect(lightingAt(12).sunSky.y).toBeGreaterThan(0.5);
     expect(lightingAt(0).sunSky.y).toBeLessThan(-0.5);
   });
-  it('the sun rises on one side and sets on the other', () => {
-    const dawnX = lightingAt(6).sunSky.x;
-    const duskX = lightingAt(18).sunSky.x;
-    const dawnZ = lightingAt(6).sunSky.z;
-    const duskZ = lightingAt(18).sunSky.z;
-    expect(Math.sign(dawnZ)).not.toBe(Math.sign(duskZ));
-    expect(dawnX * duskX).toBeLessThan(0.5);
+  // Compass bearing, clockwise from north. North is -z (layout, task 003).
+  const bearing = (v: { x: number; z: number }) => (((Math.atan2(v.x, -v.z) * 180) / Math.PI) + 360) % 360;
+  const angleBetween = (a: number, b: number) => Math.abs((((a - b) % 360) + 540) % 360 - 180);
+  const altitude = (v: { y: number }) => (Math.asin(v.y) * 180) / Math.PI;
+  it('the sun rises due east, stands due south at noon, and sets due west (review 018, item 1)', () => {
+    expect(angleBetween(bearing(lightingAt(6).sunSky), 90)).toBeLessThan(1);
+    expect(angleBetween(bearing(lightingAt(12).sunSky), 180)).toBeLessThan(1);
+    expect(angleBetween(bearing(lightingAt(18).sunSky), 270)).toBeLessThan(1);
+  });
+  it('the sun is in the southern half of the sky from dawn to dusk', () => {
+    for (let tod = 6.25; tod <= 17.75; tod += 0.25) {
+      const L = lightingAt(tod);
+      expect(L.sunSky.y, `altitude at ${tod}`).toBeGreaterThan(0);
+      expect(angleBetween(bearing(L.sunSky), 180), `bearing at ${tod}`).toBeLessThan(90.5);
+    }
+  });
+  it('the sun and the moon stay under 35 degrees, so the moon is in reach of an ordinary upward glance (review 019)', () => {
+    for (let tod = 0; tod < 24; tod += 0.25) {
+      expect(altitude(lightingAt(tod).sunSky), `sun at ${tod}`).toBeLessThanOrEqual(35.01);
+      expect(altitude(lightingAt(tod).moonSky), `moon at ${tod}`).toBeLessThanOrEqual(35.01);
+    }
+    expect(altitude(lightingAt(0).moonSky)).toBeGreaterThan(34.9);
+    expect(altitude(lightingAt(12).sunSky)).toBeGreaterThan(34.9);
   });
   it('the moon is up at 0 and 23 and has set by 6', () => {
     expect(lightingAt(0).moonSky.y).toBeGreaterThan(0.5);

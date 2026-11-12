@@ -25,11 +25,21 @@ Run at most four streams at once. Each stream is one sub-agent, one branch, and 
 | C | World logic: `heightAt` and the terrain shape, chunk bookkeeping, scatter rules, time of day, grid A* pathfinding | 003, 004 | `src/core/world/` |
 | D | Stealth and place logic: awareness states, the noticing rules, marking, the alarm bell, schedules and habits, reactions, the tax cart's route | 004 | `src/core/stealth/`, `src/core/places/` |
 | E | Combat logic: weak points, the quiver and recovery, arrow types, perfect draw and dodge windows, stagger, attack turns, morale, kill or knock out, winning bandits back, difficulty multipliers | 005 | `src/core/combat/` |
-| F | Progression logic: skills, experience rules, region caps, perks with slots, sets, mastery, and the ledger, items, the carry limit, loot rules, recipes, crowns, prices, projects | 006 | `src/core/progression/`, `src/core/items/`, `src/core/economy/` |
+| F | **Claude's stream. Viktor and his sub-agents do not edit these paths.** Progression logic: skills, experience rules, region caps, catch-up, overflow, perks with slots, saved sets, mastery, and the ledger, the 24 perks of Tallowmere as data, and the pacing bands | 006 | `src/core/progression/`, `src/data/perks/` |
+| F2 | Items and money logic: items, quality, the carry limit, loot rules, stolen goods, recipes, crowns, prices, projects | 006 | `src/core/items/`, `src/core/economy/` |
 | G | People logic: households and their triggers, the derived recovery level, the window count, companions, traits, bond, wishes, the dialogue and Show data model | 004, 007 | `src/core/people/` |
 | H | The music engine: a sequencer that plays note data through samples, layers, synchronised stems, and the score from `docs/writing/melody.md` | 003 | `src/audio/music/` |
 
-Start with A and B together. Add C, D, E, F, G, and H as capacity allows, logic streams only, never more than four streams in total.
+Start with A and B together. Add C, D, E, F2, G, and H as capacity allows, logic streams only, never more than four streams in total.
+
+## Claude's stream
+
+Claude builds stream F directly and pushes to `main` when its tests pass. It does not count toward the four-stream limit.
+
+- Claude builds against the shared types in `src/core/types/`. Viktor should write and merge those early, and include what progression needs: the skill names from `GAME_DESIGN.md` section 6, an experience event (what happened, to what target, how hard it was), the hero's rank, and the region.
+- Claude designs the 24 perks and writes them as data. Each perk names its skill, its primary source, its fallback source, and what its three mastery ranks do. Perks whose effect touches combat, stealth, items, or companions declare that effect as data; the stream that owns that system implements the effect when its task comes up.
+- If Viktor needs something changed in Claude's paths, he says so in `docs/status.md` and does not edit them.
+- Claude works only while in a session with Greg, so this stream moves in bursts. Nothing else should wait on it before task 006.
 
 ## Rules
 

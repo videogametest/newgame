@@ -9,6 +9,7 @@ How design, tasks, and status move between Greg, Claude, and Viktor. The repo is
 | `GAME_DESIGN.md` | Claude | Source of truth for design. The first line states the version. |
 | `docs/tasks/NNN-name.md` | Claude | One brief per job, numbered in the order to do them. |
 | `docs/writing/` | Claude | The story's lines and the music's score. Used exactly as written. |
+| `src/core/progression/`, `src/data/perks/` | Claude | The progression logic and the perks. See `docs/PARALLEL.md`. |
 | `docs/status.md` | Viktor | Current state of the work. Newest entry at the top. |
 | `docs/pr-media/` | Viktor | Screenshots and contact sheets referenced by status entries and PRs. |
 

@@ -196,6 +196,21 @@ describe('Tallowmere terrain (§4)', () => {
     }
   });
 
+  it('keeps every river at least 8 m wide under water from end to end, falls and crossings excepted', () => {
+    const widths: number[] = [];
+    for (const p of riverSamples()) {
+      if (nearCrossing(p.x, p.z)) continue;
+      const span = (sign: number) => {
+        let d = 0;
+        while (d < 40 && isWater(p.x + sign * p.px * d, p.z + sign * p.pz * d)) d += 0.2;
+        return d;
+      };
+      widths.push(span(1) + span(-1));
+    }
+    expect(widths.length).toBeGreaterThan(100);
+    expect(Math.min(...widths)).toBeGreaterThanOrEqual(8);
+  });
+
   it('lets the hero walk down each bank to the water, at a slope of 0.31 or less', () => {
     let banks = 0;
     for (const p of riverSamples()) {

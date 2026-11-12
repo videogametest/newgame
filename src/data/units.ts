@@ -19,8 +19,12 @@ export interface UnitDef {
     walk?: string;
     /** Clip played while a strike is telegraphed (soldier wind-up). */
     windup?: string;
+    /** Part of the windup clip to play, as 0..1 of its length (defaults to the whole clip). */
+    windupRange?: [number, number];
     /** Strike or shot clip. */
     attack: string;
+    /** Part of the attack clip that is the strike, as 0..1 of its length. */
+    attackRange?: [number, number];
     /** Bow draw and release (archers and the hero's bow). */
     draw?: string;
     release?: string;
@@ -64,8 +68,10 @@ export const UNITS: Record<string, UnitDef> = {
     clips: {
       idle: 'Idle_A',
       run: 'Running_A',
-      windup: 'Melee_Blocking',
+      windup: 'Melee_1H_Attack_Chop',
+      windupRange: [0, 0.4],
       attack: 'Melee_1H_Attack_Chop',
+      attackRange: [0.4, 0.8],
       hit: 'Hit_A',
       death: 'Death_A',
     },
@@ -78,8 +84,10 @@ export const UNITS: Record<string, UnitDef> = {
     clips: {
       idle: 'Idle_A',
       run: 'Running_A',
-      windup: 'Melee_Blocking',
+      windup: 'Melee_1H_Attack_Chop',
+      windupRange: [0, 0.4],
       attack: 'Melee_1H_Attack_Chop',
+      attackRange: [0.4, 0.8],
       hit: 'Hit_A',
       death: 'Death_A',
     },

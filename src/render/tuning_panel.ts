@@ -2,6 +2,7 @@
 // so the simulation and renderer pick changes up on the next frame. Owns no game state.
 
 import { DEFAULT_TUNING, TUNING, resetTuning, setTuningValue, tuningJson } from '../config/tuning';
+import type { AudioBank } from './audio';
 
 interface SliderSpec {
   path: string;
@@ -77,6 +78,7 @@ export class TuningPanel {
   private readonly root: HTMLDivElement;
   private readonly inputs = new Map<string, { input: HTMLInputElement; out: HTMLOutputElement; step: number }>();
   private readonly msg: HTMLDivElement;
+  private readonly audioInputs: { set: () => void }[] = [];
   private readonly onKey = (e: KeyboardEvent): void => {
     if (e.code !== 'Backquote' || e.repeat) return;
     e.preventDefault();
@@ -86,8 +88,13 @@ export class TuningPanel {
   /**
    * @param uiRoot overlay element the panel is added to.
    * @param onOpenChange called with true when the panel opens, so the game can release the pointer.
+   * @param audio the sound bank the Audio section controls.
    */
-  constructor(uiRoot: HTMLElement, private readonly onOpenChange: (open: boolean) => void) {
+  constructor(
+    uiRoot: HTMLElement,
+    private readonly onOpenChange: (open: boolean) => void,
+    private readonly audio: AudioBank,
+  ) {
     const style = document.createElement('style');
     style.textContent = STYLE;
     uiRoot.appendChild(style);
@@ -103,6 +110,8 @@ export class TuningPanel {
       this.root.appendChild(h);
       for (const spec of group.items) this.root.appendChild(this.slider(spec));
     }
+
+    this.root.appendChild(this.audioSection());
 
     const row = document.createElement('div');
     row.className = 'row';
@@ -149,6 +158,53 @@ export class TuningPanel {
     return label;
   }
 
+  /** Master, effects and music volume, plus mute. Saved in the browser through the audio bank. */
+  private audioSection(): HTMLDivElement {
+    const wrap = document.createElement('div');
+    const h = document.createElement('h3');
+    h.textContent = 'Audio';
+    wrap.appendChild(h);
+
+    const volume = (label: string, key: 'master' | 'effects' | 'music'): void => {
+      const row = document.createElement('label');
+      const name = document.createElement('span');
+      name.className = 'name';
+      name.textContent = label;
+      const input = document.createElement('input');
+      input.type = 'range';
+      input.min = '0';
+      input.max = '1';
+      input.step = '0.01';
+      const out = document.createElement('output');
+      input.addEventListener('input', () => {
+        const v = Number(input.value);
+        this.audio.set(key, v);
+        out.textContent = fmt(v, 0.01);
+      });
+      row.append(name, out, input);
+      wrap.appendChild(row);
+      this.audioInputs.push({
+        set: () => {
+          const v = this.audio.values[key];
+          input.value = String(v);
+          out.textContent = fmt(v, 0.01);
+        },
+      });
+    };
+    volume('Master volume', 'master');
+    volume('Effects volume', 'effects');
+    volume('Music volume (no music yet)', 'music');
+
+    const mute = document.createElement('label');
+    const muteBox = document.createElement('input');
+    muteBox.type = 'checkbox';
+    muteBox.addEventListener('change', () => this.audio.set('muted', muteBox.checked));
+    mute.append(muteBox, ' Mute all sound');
+    wrap.appendChild(mute);
+    this.audioInputs.push({ set: () => { muteBox.checked = this.audio.values.muted; } });
+    return wrap;
+  }
+
   private button(text: string, primary: boolean, onClick: () => void): HTMLButtonElement {
     const b = document.createElement('button');
     b.type = 'button';
@@ -165,10 +221,12 @@ export class TuningPanel {
       input.value = String(v);
       out.textContent = fmt(v, step);
     }
+    for (const a of this.audioInputs) a.set();
   }
 
   private reset(): void {
     resetTuning();
+    this.audio.reset();
     this.refresh();
     this.say('Reset to shipped values.');
   }

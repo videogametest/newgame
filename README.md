@@ -1,4 +1,4 @@
-# newgame
+# Every Lit Window
 
 A third-person 3D battle prototype, built with Babylon.js, TypeScript and Vite. Milestone 1 is the combat prototype described in `GAME_DESIGN.md` section 7.
 

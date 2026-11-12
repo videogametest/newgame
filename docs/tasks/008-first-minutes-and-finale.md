@@ -10,7 +10,7 @@ A new player can start the game, learn it without being told, save their progres
 
 1. **Title screen** with Continue and New Game, over a slow view of the valley.
 2. **Local saves** in `localStorage` with a `version` field: autosave on capture, on resting, and every few minutes. Continue restores everything in the game state: the hero, skills, perks and their mastery, inventory, storage, squad, freed places, bandits won back, opened chests, stolen goods returned, discovered places, and time of day.
-3. **Control prompts** that appear the first time each control is needed and never again once used.
+3. **Control prompts** exactly as listed in `docs/writing/interface.md`: each appears the first time it is relevant and never again once the player has done the thing. The title screen, the notices, and what is shown when the hero falls come from the same file.
 4. **A first nudge:** Hesper greets the hero and Bram, takes the hero on as an apprentice, and sends them to watch the Mill before attacking it. The Mill shows as the unlabelled compass mark. The control prompts teach crouch, marking, and the first arrow there.
 5. **The turn** (section 9): after the second place is freed, Stane retakes the first one that night. Its lantern goes dark, its person flees to the village, its reward is lost, and stronger defenders hold it. The recovery level falls. Hesper has a line for the next morning.
 6. **The Stane fight** exactly as specified in section 9: scouting and thinning beforehand, the three phases, the bell and who answers it, the yield, and resuming from the phase reached. His attacks, commands, and phase thresholds are data and tuning.

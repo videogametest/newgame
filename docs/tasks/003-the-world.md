@@ -53,7 +53,7 @@ Richness comes before breadth: if time is short, make a smaller area dense rathe
 - Build only from what the reviewed `docs/assets.md` lists, and keep it up to date. Follow section 7 (Assets): CC0 confirmed at the source, one shared palette, scale corrected to the characters, the fallback ladder for gaps, and a stop for any must-have.
 - Use only original or CC0 audio and art. Do not imitate characters, symbols, or melodies from any existing game.
 - Use the names in section 9 everywhere, and keep them in data.
-- Use everything in `docs/writing/` exactly as written. See `docs/writing/README.md`.
+- Use everything in `docs/writing/` exactly as written. See `docs/writing/README.md`. The pause menu, settings, and prompts use the words in `docs/writing/interface.md`.
 - Meet the performance budgets in section 7 and report the measured numbers after each step.
 
 ## Done when

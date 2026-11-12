@@ -21,16 +21,18 @@ const PALETTE = {
   wood: new Color3(0.36, 0.23, 0.13),
   windowLit: new Color3(1, 0.72, 0.36),
   windowDark: new Color3(0.12, 0.14, 0.2),
-  poolWarm: new Color3(1, 0.66, 0.3),
+  poolWarm: new Color3(1, 0.5, 0.16),
   nightZenith: new Color3(0.02, 0.03, 0.08),
   nightHorizon: new Color3(0.07, 0.09, 0.18),
   dayZenith: new Color3(0.3, 0.55, 0.9),
   dayHorizon: new Color3(0.74, 0.84, 0.94),
-  duskZenith: new Color3(0.22, 0.22, 0.42),
+  duskZenith: new Color3(0.42, 0.26, 0.4),
   duskHorizon: new Color3(0.98, 0.52, 0.3),
   moon: new Color3(0.42, 0.5, 0.82),
   dayLight: new Color3(1, 0.98, 0.94),
   sunWarm: new Color3(1, 0.93, 0.82),
+  sunGold: new Color3(1, 0.68, 0.36),
+  warmHemi: new Color3(1, 0.74, 0.55),
 };
 
 /** Shared character tint, same rule as the game: a multiplier on the model's own colours. */
@@ -57,55 +59,71 @@ export interface Lighting {
   sky: Color3;
 }
 
-/** Hours 0..24. Sunrise 6, noon 12, dusk 18, night 22. Pure: no scene access. */
+/**
+ * Hours 0..24. Sunrise 6, noon 12, dusk 19 (windows light), night 1..19 dark. Pure: no scene access.
+ * Golden-hour warmth peaks at dusk (19) and at dawn (6): gold sun, warm fill, orange horizon, rose zenith.
+ */
 export function lightingAt(tod: number): Lighting {
   const elev = Math.sin(((tod - 6) / 12) * Math.PI);
   const dayness = clamp01(elev * 2.5);
-  const duskness = clamp01(1 - Math.abs(elev) * 4);
-  const nightness = clamp01((0.2 - elev) * 3);
+  const warm = Math.max(clamp01(1 - Math.abs(tod - 19) / 2.5), clamp01(1 - Math.abs(tod - 6) / 2));
+  // Mornings follow the sun's elevation; evenings darken from just after dusk.
+  const nightness = tod < 12 ? clamp01((0.2 - elev) * 3) : clamp01((tod - 18.6) / 1.2);
   const zenith = mix(PALETTE.nightZenith, PALETTE.dayZenith, dayness);
   const horizon = mix(PALETTE.nightHorizon, PALETTE.dayHorizon, dayness);
   return {
-    sunDir: new Vector3(0.45, -Math.max(0.2, elev), 0.6).normalize(),
-    sunColor: mix(PALETTE.moon, PALETTE.sunWarm, dayness),
-    sunIntensity: 0.35 + 0.85 * dayness,
-    hemiColor: mix(PALETTE.moon, PALETTE.dayLight, dayness),
+    // Never higher than 0.12 below the horizon: low sun gives long shadows at dusk and dawn.
+    sunDir: new Vector3(0.45, -Math.max(0.12, elev), 0.6).normalize(),
+    sunColor: mix(mix(PALETTE.moon, PALETTE.sunWarm, dayness), PALETTE.sunGold, warm),
+    sunIntensity: 0.35 + 0.85 * dayness + 0.35 * warm,
+    hemiColor: mix(mix(PALETTE.moon, PALETTE.dayLight, dayness), PALETTE.warmHemi, warm * 0.5),
     hemiIntensity: 0.7 + 0.25 * dayness,
-    lit: elev < 0.35,
+    lit: tod >= 19 || tod < 1,
     nightness,
-    zenith: mix(zenith, PALETTE.duskZenith, duskness * 0.7),
-    sky: mix(horizon, PALETTE.duskHorizon, duskness * 0.9),
+    zenith: mix(zenith, PALETTE.duskZenith, warm * 0.7),
+    sky: mix(horizon, PALETTE.duskHorizon, warm * 0.9),
   };
 }
 
 // ---------- layout (metres; the row runs along x at z = 0; the camera looks along +z from -z) ----------
 
-export type View = 'row-front' | 'row-quarter' | 'people-front' | 'people-quarter' | `item:${string}`;
+export type View = 'row-front' | 'row-quarter' | 'people-front' | 'people-quarter' | 'villagers-front' | `item:${string}`;
 
 interface Item {
   id: string;
   label: string;
+  /** Short text for the board on the post. */
+  short: string;
   x: number;
-  /** Where the hero stands for scale: beside the item, at the side, facing away from the camera. */
+  /**
+   * Where the hero stands for scale: 4.6 m to one side of the item, at the edge of its frame, side on (yaw 90 degrees).
+   * The camera for the item is centred on the item, so the hero sits near the frame edge.
+   */
   heroX: number;
+  /** Hero depth override. Use where the default depth falls inside a walled yard. */
+  heroZ?: number;
 }
 
 const ITEMS: Item[] = [
-  { id: 'house-a', label: 'A  Stone town house (Fantasy Town kit)', x: -24, heroX: -20.9 },
-  { id: 'house-b', label: 'B  Timber house (Fantasy Town kit)', x: -18, heroX: -14.9 },
-  { id: 'house-c', label: 'C  Tall stone house (Fantasy Town kit)', x: -12, heroX: -8.9 },
-  { id: 'mill', label: 'Mill  Watermill kit, scaled x3.5', x: -4, heroX: 0.9 },
-  { id: 'forge', label: 'Forge  STAND-IN: stone block, chimney, bench', x: 4, heroX: 7.1 },
-  { id: 'well', label: 'Well-house  STAND-IN: timber block', x: 9, heroX: 12.1 },
-  { id: 'watch', label: 'Watch-house  STAND-IN: tall stone block', x: 16, heroX: 19.1 },
-  { id: 'scenery', label: 'Scenery  trees, hedge, rocks, fence, lantern', x: 25, heroX: 27.4 },
+  { id: 'house-a', label: 'A  Stone town house', short: 'A  Stone house', x: -24, heroX: -19.4 },
+  { id: 'house-b', label: 'B  Timber house', short: 'B  Timber house', x: -18, heroX: -13.4 },
+  { id: 'house-c', label: 'C  Tall stone house', short: 'C  Tall stone house', x: -12, heroX: -7.4 },
+  { id: 'mill', label: 'Mill  closed mill, watermill wheel on the east wall', short: 'Mill', x: -4, heroX: -7.6 },
+  { id: 'forge', label: 'Forge  stone smithy, open lean-to, anvil', short: 'Forge', x: 4, heroX: 8.6 },
+  { id: 'well', label: 'Well  stone ring, small roof on posts', short: 'Well', x: 9, heroX: 13.0, heroZ: -4.4 },
+  { id: 'watch', label: 'Watch-house  stone tower in a walled yard', short: 'Watch-house', x: 16, heroX: 20.6 },
+  { id: 'scenery', label: 'Scenery  trees, hedge, rocks, fence, lantern', short: 'Scenery', x: 25, heroX: 29.6 },
 ];
 
 const HERO_Z = -2.6;
 const PEOPLE_Z = 12;
-const VILLAGER_Z = 16;
 const PEOPLE_X0 = -20;
 const PEOPLE_STEP = 1.8;
+/** Villager pairs (front on, noon): adventurer at x, its villager at x + PAIR_GAP. */
+const PAIR_X0 = -6;
+const PAIR_STEP = 3.2;
+const PAIR_GAP = 1.4;
+const SIGN_Z = -6;
 
 /** Closed buildings from the Fantasy Town kit. Walls are 1 m modules; floors are 1 m tall. */
 interface BuildingSpec {
@@ -121,9 +139,9 @@ const BUILDINGS: Record<string, BuildingSpec> = {
   'house-a': { w: 3, d: 3, floors: 2, walls: 'stone', high: false },
   'house-b': { w: 3, d: 2, floors: 2, walls: 'wood', high: false },
   'house-c': { w: 3, d: 2, floors: 3, walls: 'stone', high: true },
+  mill: { w: 3, d: 2, floors: 2, walls: 'wood', high: false },
   forge: { w: 3, d: 2, floors: 1, walls: 'stone', high: false, chimney: true },
-  well: { w: 3, d: 2, floors: 1, walls: 'wood', high: false },
-  watch: { w: 3, d: 2, floors: 3, walls: 'stone', high: true },
+  watch: { w: 3, d: 3, floors: 4, walls: 'stone', high: true },
 };
 
 interface Person {
@@ -160,9 +178,17 @@ const VILLAGERS: Person[] = [
   { label: 'Villager (Rogue, plain blue)', model: `${KAY}Rogue.glb`, tint: [0.5, 0.6, 0.75], clip: 'Idle_A', hide: VILLAGER_HIDE },
 ];
 
+/** The four adventurers the villagers are made from, in the same order as VILLAGERS, in their default colours. */
+const PAIR_ADVENTURERS: Person[] = [
+  { label: 'Barbarian (KayKit original)', model: `${KAY}Barbarian.glb`, tint: [1, 1, 1], clip: 'Idle_A' },
+  { label: 'Rogue Hooded (KayKit original)', model: `${KAY}Rogue_Hooded.glb`, tint: [1, 1, 1], clip: 'Idle_A' },
+  { label: 'Mage (KayKit original)', model: `${KAY}Mage.glb`, tint: [1, 1, 1], clip: 'Idle_A' },
+  { label: 'Rogue (KayKit original)', model: `${KAY}Rogue.glb`, tint: [1, 1, 1], clip: 'Idle_A' },
+];
+
 const KENNEY_FILES = [
   'wall', 'wall-door', 'wall-window-small', 'wall-corner', 'wall-wood', 'wall-wood-door', 'wall-wood-window-small',
-  'roof-gable', 'watermill', 'wheel', 'chimney-base', 'stall-bench', 'tree', 'tree-high', 'tree-crooked',
+  'roof-gable', 'watermill', 'wheel', 'chimney-base', 'stall-bench', 'fountain-round', 'tree', 'tree-high', 'tree-crooked',
   'tree-high-crooked', 'hedge', 'rock-small', 'rock-large', 'fence',
 ];
 
@@ -175,7 +201,10 @@ interface Ctx {
   paneMat: StandardMaterial;
   glassMat: StandardMaterial;
   roofMat: Material;
+  woodMat: StandardMaterial;
+  /** Strong pool (in front of lit doors) and faint pool (under upper windows). */
   poolMat: StandardMaterial;
+  poolMatFaint: StandardMaterial;
   /** Meshes that glow at night (lit panes and lantern glass). */
   glowMeshes: Mesh[];
   /** Ground light pools: visible at night only. */
@@ -312,26 +341,109 @@ function buildBlock(ctx: Ctx, tag: string, cx: number, cz: number, spec: Buildin
   if (spec.chimney) {
     placeOn(ctx, 'chimney-base', `${tag}_chimney`, cx + 0.8, cz + 0.2, spec.floors + 0.1, { scale: 1.6 });
   }
-  addPool(ctx, cx, cz + frontZ - 1.4);
+  // Light falls from the lit door (strong) and from the front upper windows (faint) onto the ground in front.
+  addPool(ctx, cx, cz + frontZ - 0.9, ctx.poolMat);
+  if (spec.floors > 1) addPool(ctx, cx, cz + frontZ - 1.8, ctx.poolMatFaint);
 }
 
-/** Warm light pool on the ground in front of a door. Visible at night only; alpha follows nightness. */
-function addPool(ctx: Ctx, x: number, z: number): void {
-  const pool = MeshBuilder.CreatePlane(`pool_${ctx.n++}`, { size: 4.5 }, ctx.scene);
+/** Warm light pool on the ground. Visible at night only; alpha follows nightness in applyLighting. */
+function addPool(ctx: Ctx, x: number, z: number, mat: StandardMaterial): void {
+  const pool = MeshBuilder.CreatePlane(`pool_${ctx.n++}`, { size: 3.6 }, ctx.scene);
   pool.rotation.x = Math.PI / 2;
   pool.position.set(x, 0.03, z);
-  pool.material = ctx.poolMat;
+  pool.material = mat;
   pool.isPickable = false;
   ctx.pools.push(pool);
 }
 
-/** Mill: the watermill kit scaled up. The kit's own wheel is part of the model. */
-function buildMill(ctx: Ctx, cx: number, cz: number): void {
-  placeOn(ctx, 'watermill', 'mill', cx, cz, 0, { scale: 3.5 });
+/** A flat four-sided panel from four corners (two triangles), double sided: used for sloped roofs. */
+function quadPanel(ctx: Ctx, tag: string, a: number[], b: number[], c: number[], d: number[]): void {
+  const positions = [...a, ...b, ...c, ...a, ...c, ...d];
+  const indices = [0, 1, 2, 3, 4, 5];
+  const normals: number[] = [];
+  VertexData.ComputeNormals(positions, indices, normals);
+  const vd = new VertexData();
+  vd.positions = positions;
+  vd.indices = indices;
+  vd.normals = normals;
+  vd.uvs = [0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1];
+  const mesh = new Mesh(`${tag}_${ctx.n++}`, ctx.scene);
+  vd.applyToMesh(mesh);
+  mesh.material = ctx.roofMat;
+  mesh.receiveShadows = true;
+  ctx.shadow.addShadowCaster(mesh);
 }
 
-function buildForgeYard(ctx: Ctx, cx: number, cz: number): void {
-  placeOn(ctx, 'stall-bench', 'forge_bench', cx + 1.8, cz - 1.6, 0, { scale: 1.4 });
+/** A round wooden post, from the ground to height h. */
+function woodPost(ctx: Ctx, tag: string, x: number, z: number, h: number): void {
+  const post = MeshBuilder.CreateCylinder(`${tag}_${ctx.n++}`, { height: h, diameter: 0.14, tessellation: 8 }, ctx.scene);
+  post.position.set(x, h / 2, z);
+  post.material = ctx.woodMat;
+  post.receiveShadows = true;
+  ctx.shadow.addShadowCaster(post);
+}
+
+/**
+ * Mill: a closed wooden mill, two floors. The kit's watermill wheel hangs on the east wall at its own scale:
+ * the wheel's axle runs along x, so its disc is parallel to the wall, 1.8 m across, and its top stays below the wall top.
+ */
+function buildMill(ctx: Ctx, cx: number, cz: number): void {
+  buildBlock(ctx, 'mill', cx, cz, BUILDINGS.mill);
+  const wallEast = cx + BUILDINGS.mill.w / 2;
+  placeOn(ctx, 'watermill', 'mill_wheel', wallEast + 0.425, cz, 1.0, { anchor: 'centre' });
+}
+
+/**
+ * Forge: the closed smithy (built by buildBlock) plus an open-fronted lean-to on the east side, with a sloped roof
+ * on two outer posts and an anvil under it made from three boxes and a cone.
+ */
+function buildForge(ctx: Ctx, cx: number, cz: number): void {
+  const x0 = cx + 1.6;
+  const x1 = cx + 3.0;
+  const z0 = cz - 1.2;
+  const z1 = cz + 1.2;
+  quadPanel(ctx, 'forge_leanto', [x0, 1.25, z0], [x1, 0.95, z0], [x1, 0.95, z1], [x0, 1.25, z1]);
+  woodPost(ctx, 'forge_post', x1, cz - 1, 0.95);
+  woodPost(ctx, 'forge_post', x1, cz + 1, 0.95);
+  const iron = new StandardMaterial(`iron_${ctx.n++}`, ctx.scene);
+  iron.diffuseColor = new Color3(0.2, 0.2, 0.22);
+  iron.specularColor = Color3.Black();
+  const ax = cx + 2.1;
+  const stump = MeshBuilder.CreateBox(`anvil_stump_${ctx.n++}`, { width: 0.36, height: 0.45, depth: 0.28 }, ctx.scene);
+  stump.position.set(ax, 0.225, cz);
+  const top = MeshBuilder.CreateBox(`anvil_top_${ctx.n++}`, { width: 0.56, height: 0.12, depth: 0.26 }, ctx.scene);
+  top.position.set(ax, 0.51, cz);
+  const horn = MeshBuilder.CreateCylinder(`anvil_horn_${ctx.n++}`, { height: 0.3, diameterTop: 0.02, diameterBottom: 0.1, tessellation: 8 }, ctx.scene);
+  horn.rotation.z = -Math.PI / 2;
+  horn.position.set(ax + 0.43, 0.56, cz);
+  for (const m of [stump, top, horn]) {
+    m.material = iron;
+    m.receiveShadows = true;
+    ctx.shadow.addShadowCaster(m);
+  }
+}
+
+/** Well: a low stone ring (the kit's round fountain, 2 m across) with a small roof on two posts. */
+function buildWell(ctx: Ctx, cx: number, cz: number): void {
+  placeOn(ctx, 'fountain-round', 'well_ring', cx, cz, 0);
+  woodPost(ctx, 'well_post', cx - 0.85, cz, 1.9);
+  woodPost(ctx, 'well_post', cx + 0.85, cz, 1.9);
+  gableRoof(ctx, 'well_roof', cx, cz, 2.0, 1.4, 1.9, 0.4);
+}
+
+/** Watch-house: the stone tower (built by buildBlock) inside a walled yard, 2 m high, open at the front. */
+function buildWatchYard(ctx: Ctx, cx: number, cz: number): void {
+  const half = 3.5;
+  const offsets = [-3, -2, -1, 0, 1, 2, 3];
+  for (const f of [0, 1]) {
+    for (const o of offsets) {
+      // Front (-z) wall with a one metre gap at the centre; back wall whole.
+      if (o !== 0) placeOn(ctx, 'wall', 'yard_front', cx + o, cz - half, f, { yaw: Math.PI / 2 });
+      placeOn(ctx, 'wall', 'yard_back', cx + o, cz + half, f, { yaw: -Math.PI / 2 });
+      placeOn(ctx, 'wall', 'yard_west', cx - half, cz + o, f, { yaw: Math.PI });
+      placeOn(ctx, 'wall', 'yard_east', cx + half, cz + o, f, { yaw: 0 });
+    }
+  }
 }
 
 /** Scenery: trees, hedges, rocks, a fence, and a wooden lantern post with a hanging lamp. */
@@ -404,15 +516,18 @@ function spawnPerson(ctx: Ctx, containers: Map<string, AssetContainer>, clips: L
   return { root, player };
 }
 
-/** A labelled board on a post. The board faces -z, the way the camera views the row. */
+/**
+ * A short labelled board on a low post at knee height, facing -z (the camera's side). 1.2 m by 0.36 m, so it
+ * stays clear of the windows above it.
+ */
 function buildSign(ctx: Ctx, text: string, x: number, z: number): void {
-  const post = MeshBuilder.CreateBox(`sign_post_${ctx.n++}`, { width: 0.08, height: 1.3, depth: 0.08 }, ctx.scene);
-  post.position.set(x, 0.65, z);
-  const board = MeshBuilder.CreatePlane(`sign_${ctx.n++}`, { width: 3.6, height: 0.5 }, ctx.scene);
-  board.position.set(x, 1.45, z - 0.06);
-  const tex = new DynamicTexture(`sign_tex_${ctx.n++}`, { width: 1024, height: 144 }, ctx.scene, false);
+  const post = MeshBuilder.CreateBox(`sign_post_${ctx.n++}`, { width: 0.06, height: 0.52, depth: 0.06 }, ctx.scene);
+  post.position.set(x, 0.26, z);
+  const board = MeshBuilder.CreatePlane(`sign_${ctx.n++}`, { width: 1.2, height: 0.36 }, ctx.scene);
+  board.position.set(x, 0.7, z - 0.04);
+  const tex = new DynamicTexture(`sign_tex_${ctx.n++}`, { width: 512, height: 154 }, ctx.scene, false);
   tex.hasAlpha = false;
-  tex.drawText(text, null, 92, 'bold 46px sans-serif', '#1d1d1d', '#f1e6c8', true);
+  tex.drawText(text, null, 96, 'bold 44px sans-serif', '#1d1d1d', '#f1e6c8', true);
   const mat = new StandardMaterial(`sign_mat_${ctx.n++}`, ctx.scene);
   mat.diffuseTexture = tex;
   mat.emissiveTexture = tex;
@@ -549,6 +664,10 @@ export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
   poolMat.emissiveTexture = poolTex;
   poolMat.opacityTexture = poolTex;
   poolMat.backFaceCulling = false;
+  const poolMatFaint = poolMat.clone('pool_mat_faint') ?? poolMat;
+  const woodMat = new StandardMaterial('wood_mat', scene);
+  woodMat.diffuseColor = PALETTE.wood;
+  woodMat.specularColor = Color3.Black();
 
   const kit = await loadKit(scene, KENNEY_FILES);
   const roofSrc = kit.get('roof-gable')?.meshes.find((m) => m.material !== null)?.material;
@@ -570,40 +689,49 @@ export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
   const containers = await loadPeople(scene, [...PEOPLE, ...VILLAGERS]);
 
   const ctx: Ctx = {
-    scene, kit, shadow, paneMat, glassMat, roofMat, poolMat, glowMeshes: [], pools: [], n: 0,
+    scene, kit, shadow, paneMat, glassMat, roofMat, woodMat, poolMat, poolMatFaint, glowMeshes: [], pools: [], n: 0,
   };
 
   // Buildings. Each one is closed: corners, walls, a door on the front and windows above.
-  for (const id of ['house-a', 'house-b', 'house-c', 'forge', 'well', 'watch']) {
+  for (const id of ['house-a', 'house-b', 'house-c', 'forge', 'watch']) {
     const it = ITEMS.find((i) => i.id === id);
     const spec = BUILDINGS[id];
     if (!it || !spec) throw new Error(`Styletest: no building ${id}`);
     buildBlock(ctx, id, it.x, 0, spec);
   }
-  buildForgeYard(ctx, ITEMS[4].x, 0);
+  buildForge(ctx, ITEMS[4].x, 0);
   buildMill(ctx, ITEMS[3].x, 0);
+  buildWell(ctx, ITEMS[5].x, 0);
+  buildWatchYard(ctx, ITEMS[6].x, 0);
   const scenery = buildScenery(ctx, ITEMS[7].x, 0);
 
-  // Labels: one board per item, centred on the item, facing the camera.
-  for (const it of ITEMS) buildSign(ctx, it.label, it.x, -3.2);
+  // Labels: one short board per item, at knee height, in front of the item.
+  for (const it of ITEMS) buildSign(ctx, it.short, it.x, SIGN_Z);
 
   // The shared pose clips, re-applied on every frame so no character drops into a T-pose.
   const poses: ClipPlayer[] = [];
 
-  // One hero for scale in item views. Faces away from the camera, as in third person.
-  const hero = spawnPerson(ctx, containers, assets.clips, PEOPLE[0], 'hero_item', 0, HERO_Z, 0);
+  // One hero for scale in item views. Side on (yaw 90 degrees), at the edge of the frame.
+  const hero = spawnPerson(ctx, containers, assets.clips, PEOPLE[0], 'hero_item', 0, HERO_Z, Math.PI / 2);
   poses.push(hero.player);
   hero.root.setEnabled(false);
 
-  // The people row: ten characters facing the camera, idle.
-  PEOPLE.forEach((p, i) => {
-    poses.push(spawnPerson(ctx, containers, assets.clips, p, `person_${i}`, PEOPLE_X0 + i * PEOPLE_STEP, PEOPLE_Z, Math.PI).player);
+  // The people row: ten KayKit characters facing the camera, idle.
+  const peopleRoots = PEOPLE.map((p, i) => {
+    const s = spawnPerson(ctx, containers, assets.clips, p, `person_${i}`, PEOPLE_X0 + i * PEOPLE_STEP, PEOPLE_Z, Math.PI);
+    poses.push(s.player);
+    return s.root;
   });
-  // The villager row: the same bodies with armour, capes and weapons hidden and plain clothes.
-  VILLAGERS.forEach((p, i) => {
-    poses.push(spawnPerson(ctx, containers, assets.clips, p, `villager_${i}`, PEOPLE_X0 + i * PEOPLE_STEP, VILLAGER_Z, Math.PI).player);
+  // Villager pairs: each KayKit original beside the villager made from it (armour, capes and weapons hidden).
+  const pairRoots: TransformNode[] = [];
+  PAIR_ADVENTURERS.forEach((p, i) => {
+    const x = PAIR_X0 + i * PAIR_STEP;
+    const adv = spawnPerson(ctx, containers, assets.clips, p, `pair_adv_${i}`, x, PEOPLE_Z, Math.PI);
+    const vil = spawnPerson(ctx, containers, assets.clips, VILLAGERS[i], `pair_vil_${i}`, x + PAIR_GAP, PEOPLE_Z, Math.PI);
+    poses.push(adv.player, vil.player);
+    pairRoots.push(adv.root, vil.root);
   });
-  buildSign(ctx, 'People: 10 KayKit originals (row 1), 4 villagers with armour hidden (row 2)', -12, 19.5);
+  for (const r of pairRoots) r.setEnabled(false);
 
   // Camera.
   const camera = new FreeCamera('styletest_cam', new Vector3(0, 4, -30), scene);
@@ -633,6 +761,7 @@ export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
     glassMat.emissiveColor = lampColour;
     glow.intensity = 0.9 * L.nightness;
     poolMat.alpha = 0.85 * L.nightness;
+    poolMatFaint.alpha = 0.4 * L.nightness;
     for (const p of ctx.pools) p.setEnabled(L.nightness > 0.02);
     lantern.intensity = L.lit ? 1.2 : 0;
   };
@@ -647,19 +776,24 @@ export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
     else if (view === 'row-quarter') at(-36, 9, -24, -4, 2, 0, 0.62);
     else if (view === 'people-front') at(-12, 2.3, 3, -12, 1.3, PEOPLE_Z, 0.95);
     else if (view === 'people-quarter') at(-30, 2.8, 4, -12, 1.2, PEOPLE_Z, 0.85);
+    else if (view === 'villagers-front') at(-0.6, 2.3, 3, -0.6, 1.3, PEOPLE_Z, 0.95);
     else {
       const id = view.slice('item:'.length);
       const it = ITEMS.find((i) => i.id === id);
       if (!it) throw new Error(`Styletest: no item ${id}`);
-      const mx = (it.x + it.heroX) / 2;
-      at(mx, 2.2, -12, mx, 1.8, 0, 0.62);
+      // The mill is seen three-quarter so the wheel's face shows; every other item is seen straight on.
+      if (id === 'mill') at(it.x + 2.2, 2.2, -11, it.x + 0.3, 1.3, 0, 0.7);
+      else at(it.x, 2.2, -12, it.x, 1.8, 0, 0.62);
     }
     const inItem = view.startsWith('item:');
     hero.root.setEnabled(inItem);
     if (inItem) {
       const it = ITEMS.find((i) => i.id === view.slice('item:'.length));
-      if (it) hero.root.position.set(it.heroX, 0, HERO_Z);
+      if (it) hero.root.position.set(it.heroX, 0, it.heroZ ?? HERO_Z);
     }
+    const pairsOn = view === 'villagers-front';
+    for (const r of peopleRoots) r.setEnabled(!pairsOn);
+    for (const r of pairRoots) r.setEnabled(pairsOn);
   };
 
   let tod = 12;

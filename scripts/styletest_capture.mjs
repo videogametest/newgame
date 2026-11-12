@@ -16,6 +16,7 @@ const shots = [
   ...ITEM_IDS.flatMap((id) => [18.7, 23].map((t) => ({ name: `item-${id}-${t}`, tod: t, view: `item:${id}` }))),
   { name: 'people-front-12', tod: 12, view: 'people-front' },
   { name: 'people-quarter-23', tod: 23, view: 'people-quarter' },
+  { name: 'villagers-front-12', tod: 12, view: 'villagers-front' },
 ];
 
 const failures = [];

@@ -7,8 +7,22 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
-| B | Task 002b (style test) merged as PR #15 (`be9b543`, squash). Pages run `43146924761` succeeded. `?styletest=1` scene; captures in `docs/pr-media/styletest/`. Review-002 survey changes applied in `docs/assets.md`. | none | Greg's review of the style test; decisions on the people question and the seven gaps; villager-set search not yet done; task 003 waits on all of these |
+| B | Task 002b style test rework (review 005), PR #21 on `feat/task-002b-rework`: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | #21 | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-12 Review 005: style test rework (Viktor, PR #21)
+
+- **Done, items 1–7** (checklist with frames: `docs/pr-media/styletest/review005/CHECKLIST.md`):
+  1. Warm light pools in front of lit doors and lower floors.
+  2. Dusk: orange and rose sky, low gold light, windows just lit.
+  3. Mill closed, wheel on the east wall, no taller than that wall.
+  4. Forge (closed building, open lean-to, chimney, simple anvil), well (low stone ring, small roof on posts), watch-house (tower in a walled yard).
+  5. Hero at a frame edge, side on, in all 16 item frames (8 items × 18.7 and 23). The well hero moved to z −4.4 because the default depth fell inside the watch yard.
+  6. Four villager pairs beside their adventurers, front on, noon (`villagers-front-12`).
+  7. Horizon shown in row frames; no plane edge in any frame.
+- **Open question for Greg:** sign text is small and hard to read at 1280×720 from distance. Not changed in this PR. Do you want the sign texture enlarged?
+- **Verified:** `npx tsc --noEmit` exit 0; frames captured by `scripts/styletest_capture.mjs` (23 frames, exit 0) after a fresh `vite build` (exit 0).
+- **Tests:** `npm test` 29 files, 346 tests pass (exit 0). The smoke test was not re-run on this branch.
 
 ## 2026-11-12 Task 002b: style test (Viktor)
 

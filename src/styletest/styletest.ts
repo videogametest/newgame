@@ -19,6 +19,9 @@ const PALETTE = {
   ground: new Color3(0.42, 0.5, 0.3),
   path: new Color3(0.6, 0.52, 0.4),
   wood: new Color3(0.36, 0.23, 0.13),
+  floor: new Color3(0.46, 0.33, 0.2),
+  stone: new Color3(0.55, 0.52, 0.47),
+  water: new Color3(0.1, 0.18, 0.24),
   windowLit: new Color3(1, 0.72, 0.36),
   windowDark: new Color3(0.12, 0.14, 0.2),
   poolWarm: new Color3(1, 0.5, 0.16),
@@ -87,35 +90,45 @@ export function lightingAt(tod: number): Lighting {
 
 // ---------- layout (metres; the row runs along x at z = 0; the camera looks along +z from -z) ----------
 
-export type View = 'row-front' | 'row-quarter' | 'people-front' | 'people-quarter' | 'villagers-front' | `item:${string}`;
+export type View =
+  | 'row-west'
+  | 'row-east'
+  | 'row-quarter'
+  | 'people-front'
+  | 'people-quarter'
+  | 'villagers-front'
+  | 'doorway'
+  | `item:${string}`;
 
 interface Item {
   id: string;
   label: string;
   /** Short text for the board on the post. */
   short: string;
+  /** Centre of the item, in metres along the row. */
   x: number;
   /**
-   * Where the hero stands for scale: 4.6 m to one side of the item, at the edge of its frame, side on (yaw 90 degrees).
+   * Where the hero stands for scale: 6 m to one side of the item, side on (yaw 90 degrees), in front of it.
    * The camera for the item is centred on the item, so the hero sits near the frame edge.
    */
   heroX: number;
-  /** Hero depth override. Use where the default depth falls inside a walled yard. */
-  heroZ?: number;
 }
 
 const ITEMS: Item[] = [
-  { id: 'house-a', label: 'A  Stone town house', short: 'A  Stone house', x: -24, heroX: -19.4 },
-  { id: 'house-b', label: 'B  Timber house', short: 'B  Timber house', x: -18, heroX: -13.4 },
-  { id: 'house-c', label: 'C  Tall stone house', short: 'C  Tall stone house', x: -12, heroX: -7.4 },
-  { id: 'mill', label: 'Mill  closed mill, watermill wheel on the east wall', short: 'Mill', x: -4, heroX: -7.6 },
-  { id: 'forge', label: 'Forge  stone smithy, open lean-to, anvil', short: 'Forge', x: 4, heroX: 8.6 },
-  { id: 'well', label: 'Well  stone ring, small roof on posts', short: 'Well', x: 9, heroX: 13.0, heroZ: -4.4 },
-  { id: 'watch', label: 'Watch-house  stone tower in a walled yard', short: 'Watch-house', x: 16, heroX: 20.6 },
-  { id: 'scenery', label: 'Scenery  trees, hedge, rocks, fence, lantern', short: 'Scenery', x: 25, heroX: 29.6 },
+  { id: 'house-a', label: 'A  Stone town house', short: 'A  Stone house', x: -40, heroX: -46 },
+  { id: 'house-b', label: 'B  Timber house', short: 'B  Timber house', x: -27, heroX: -33 },
+  { id: 'house-c', label: 'C  Tall stone house', short: 'C  Tall stone house', x: -14, heroX: -20 },
+  { id: 'mill', label: 'Mill  closed mill, watermill wheel on the east wall', short: 'Mill', x: -1, heroX: -7 },
+  { id: 'forge', label: 'Forge  stone smithy, open lean-to, anvil', short: 'Forge', x: 13.5, heroX: 7.5 },
+  { id: 'well', label: 'Well  stone ring, small roof on posts', short: 'Well', x: 26, heroX: 20 },
+  { id: 'watch', label: 'Watch-house  stone tower in a walled yard', short: 'Watch-house', x: 41, heroX: 35 },
+  { id: 'scenery', label: 'Scenery  trees, hedge, rocks, fence, lantern', short: 'Scenery', x: 62, heroX: 56 },
 ];
 
-const HERO_Z = -2.6;
+/** Hero depth for item views: in front of every item, clear of the yard walls and the light pools. */
+const HERO_Z = -9;
+/** Doorway view: the front opening of house A (its door is centred on x = -40, on the front wall face). */
+const DOORWAY = { x: -40, z: -4.05, personIndex: 4 };
 const PEOPLE_Z = 12;
 const PEOPLE_X0 = -20;
 const PEOPLE_STEP = 1.8;
@@ -123,9 +136,15 @@ const PEOPLE_STEP = 1.8;
 const PAIR_X0 = -6;
 const PAIR_STEP = 3.2;
 const PAIR_GAP = 1.4;
-const SIGN_Z = -6;
+const SIGN_Z = -9.5;
 
-/** Closed buildings from the Fantasy Town kit. Walls are 1 m modules; floors are 1 m tall. */
+/**
+ * Kit scale (review 008): the Fantasy Town kit is built in 1 m modules, and a storey is 2.6 to 2.8 m, so every
+ * kit piece and every building cell is drawn at M metres per module. Positions in cell units are multiplied by M.
+ */
+const M = 2.7;
+
+/** Closed buildings from the Fantasy Town kit, in cell units (one cell is M metres). */
 interface BuildingSpec {
   w: number;
   d: number;
@@ -133,10 +152,12 @@ interface BuildingSpec {
   walls: 'stone' | 'wood';
   high: boolean;
   chimney?: boolean;
+  /** Open front: the ground-floor door is an open doorway, and the interior floor is drawn. */
+  open?: boolean;
 }
 
 const BUILDINGS: Record<string, BuildingSpec> = {
-  'house-a': { w: 3, d: 3, floors: 2, walls: 'stone', high: false },
+  'house-a': { w: 3, d: 3, floors: 2, walls: 'stone', high: false, open: true },
   'house-b': { w: 3, d: 2, floors: 2, walls: 'wood', high: false },
   'house-c': { w: 3, d: 2, floors: 3, walls: 'stone', high: true },
   mill: { w: 3, d: 2, floors: 2, walls: 'wood', high: false },
@@ -187,7 +208,7 @@ const PAIR_ADVENTURERS: Person[] = [
 ];
 
 const KENNEY_FILES = [
-  'wall', 'wall-door', 'wall-window-small', 'wall-corner', 'wall-wood', 'wall-wood-door', 'wall-wood-window-small',
+  'wall', 'wall-door', 'wall-doorway-square', 'wall-window-small', 'wall-corner', 'wall-wood', 'wall-wood-door', 'wall-wood-window-small',
   'roof-gable', 'watermill', 'wheel', 'chimney-base', 'stall-bench', 'fountain-round', 'tree', 'tree-high', 'tree-crooked',
   'tree-high-crooked', 'hedge', 'rock-small', 'rock-large', 'fence',
 ];
@@ -202,6 +223,7 @@ interface Ctx {
   glassMat: StandardMaterial;
   roofMat: Material;
   woodMat: StandardMaterial;
+  floorMat: StandardMaterial;
   /** Strong pool (in front of lit doors) and faint pool (under upper windows). */
   poolMat: StandardMaterial;
   poolMatFaint: StandardMaterial;
@@ -210,6 +232,8 @@ interface Ctx {
   /** Ground light pools: visible at night only. */
   pools: Mesh[];
   n: number;
+  /** Door modules as placed (scaled), for the door-height check. */
+  doors: { tag: string; height: number; width: number }[];
 }
 
 interface PlaceOpts {
@@ -296,6 +320,8 @@ function buildBlock(ctx: Ctx, tag: string, cx: number, cz: number, spec: Buildin
   const stone = spec.walls === 'stone';
   const wallK = stone ? 'wall' : 'wall-wood';
   const doorK = stone ? 'wall-door' : 'wall-wood-door';
+  // An open doorway has no door leaf, so the interior floor and the room behind it show through the opening.
+  const openK = 'wall-doorway-square';
   const winK = stone ? 'wall-window-small' : 'wall-wood-window-small';
   const xs = cellCentres(spec.w);
   const zs = cellCentres(spec.d);
@@ -305,8 +331,10 @@ function buildBlock(ctx: Ctx, tag: string, cx: number, cz: number, spec: Buildin
   const backZ = spec.d / 2;
   const westX = -spec.w / 2;
   const eastX = spec.w / 2;
+  // x, z, y are in cell units: each is multiplied by M, and the kit module is drawn at scale M.
   const put = (k: string, x: number, z: number, y: number, yaw: number): void => {
-    placeOn(ctx, k, tag, cx + x, cz + z, y, { yaw });
+    const placed = placeOn(ctx, k, tag, cx + x * M, cz + z * M, y * M, { yaw, scale: M });
+    if (k === doorK || k === openK) ctx.doors.push({ tag, height: placed.size.y, width: placed.size.x > placed.size.z ? placed.size.x : placed.size.z });
   };
   for (let f = 0; f < spec.floors; f += 1) {
     for (const x of [xs[0], xs[xs.length - 1]]) {
@@ -315,7 +343,7 @@ function buildBlock(ctx: Ctx, tag: string, cx: number, cz: number, spec: Buildin
     // Front (-z) faces the camera; back (+z) is the far side. Walls along x use yaw +-pi/2.
     for (const x of xMid) {
       const mid = Math.abs(x) < 1e-6;
-      if (mid && f === 0) put(doorK, x, frontZ, f, Math.PI / 2);
+      if (mid && f === 0) put(spec.open ? openK : doorK, x, frontZ, f, Math.PI / 2);
       else if (mid && f > 0) put(winK, x, frontZ, f, Math.PI / 2);
       else put(wallK, x, frontZ, f, Math.PI / 2);
       if (mid && f > 0) put(winK, x, backZ, f, -Math.PI / 2);
@@ -327,23 +355,32 @@ function buildBlock(ctx: Ctx, tag: string, cx: number, cz: number, spec: Buildin
     }
     // Lit panes: a glowing quad in each upper-floor window opening, front and back.
     if (f > 0) {
-      const front = MeshBuilder.CreatePlane(`${tag}_paneF_${ctx.n++}`, { width: 0.5, height: 0.5 }, ctx.scene);
-      front.position.set(cx, f + 0.45, cz + frontZ - 0.06);
+      const pane = 0.5 * M;
+      const front = MeshBuilder.CreatePlane(`${tag}_paneF_${ctx.n++}`, { width: pane, height: pane }, ctx.scene);
+      front.position.set(cx, (f + 0.45) * M, cz + frontZ * M - 0.06 * M);
       front.material = ctx.paneMat;
-      const back = MeshBuilder.CreatePlane(`${tag}_paneB_${ctx.n++}`, { width: 0.5, height: 0.5 }, ctx.scene);
-      back.position.set(cx, f + 0.45, cz + backZ + 0.06);
+      const back = MeshBuilder.CreatePlane(`${tag}_paneB_${ctx.n++}`, { width: pane, height: pane }, ctx.scene);
+      back.position.set(cx, (f + 0.45) * M, cz + backZ * M + 0.06 * M);
       back.rotation.y = Math.PI;
       back.material = ctx.paneMat;
       ctx.glowMeshes.push(front, back);
     }
   }
-  gableRoof(ctx, `${tag}_roof`, cx, cz, spec.w, spec.d, spec.floors, spec.high ? 1.3 : 0.9);
+  if (spec.open) {
+    // Interior floor across the whole footprint at ground level; the walls stand on its edges.
+    const floor = MeshBuilder.CreateGround(`${tag}_floor`, { width: spec.w * M, height: spec.d * M }, ctx.scene);
+    floor.position.set(cx, 0.04, cz);
+    floor.material = ctx.floorMat;
+    floor.receiveShadows = true;
+  }
+  gableRoof(ctx, `${tag}_roof`, cx, cz, spec.w * M, spec.d * M, spec.floors * M, (spec.high ? 1.3 : 0.9) * M);
   if (spec.chimney) {
-    placeOn(ctx, 'chimney-base', `${tag}_chimney`, cx + 0.8, cz + 0.2, spec.floors + 0.1, { scale: 1.6 });
+    // Stands about a metre proud of the ridge.
+    placeOn(ctx, 'chimney-base', `${tag}_chimney`, cx + 0.8 * M, cz + 0.2 * M, spec.floors * M, { scale: 1.1 * M });
   }
   // Light falls from the lit door (strong) and from the front upper windows (faint) onto the ground in front.
-  addPool(ctx, cx, cz + frontZ - 0.9, ctx.poolMat);
-  if (spec.floors > 1) addPool(ctx, cx, cz + frontZ - 1.8, ctx.poolMatFaint);
+  addPool(ctx, cx, cz + frontZ * M - 0.9, ctx.poolMat);
+  if (spec.floors > 1) addPool(ctx, cx, cz + frontZ * M - 1.8, ctx.poolMatFaint);
 }
 
 /** Warm light pool on the ground. Visible at night only; alpha follows nightness in applyLighting. */
@@ -384,13 +421,14 @@ function woodPost(ctx: Ctx, tag: string, x: number, z: number, h: number): void 
 }
 
 /**
- * Mill: a closed wooden mill, two floors. The kit's watermill wheel hangs on the east wall at its own scale:
- * the wheel's axle runs along x, so its disc is parallel to the wall, 1.8 m across, and its top stays below the wall top.
+ * Mill: a closed wooden mill, two floors. The kit's watermill wheel hangs on the east wall: its axle runs along x,
+ * so its disc is parallel to the wall, and its top stays below the wall top.
  */
 function buildMill(ctx: Ctx, cx: number, cz: number): void {
   buildBlock(ctx, 'mill', cx, cz, BUILDINGS.mill);
-  const wallEast = cx + BUILDINGS.mill.w / 2;
-  placeOn(ctx, 'watermill', 'mill_wheel', wallEast + 0.425, cz, 1.0, { anchor: 'centre' });
+  const wallEast = cx + (BUILDINGS.mill.w / 2) * M;
+  // 1.6 scale: the wheel is 2.9 m across, taller than the tallest character (2.66 m); its centre sits at 2.6 m.
+  placeOn(ctx, 'watermill', 'mill_wheel', wallEast + 0.8, cz, 2.6, { anchor: 'centre', scale: 1.6 });
 }
 
 /**
@@ -398,24 +436,29 @@ function buildMill(ctx: Ctx, cx: number, cz: number): void {
  * on two outer posts and an anvil under it made from three boxes and a cone.
  */
 function buildForge(ctx: Ctx, cx: number, cz: number): void {
-  const x0 = cx + 1.6;
-  const x1 = cx + 3.0;
-  const z0 = cz - 1.2;
-  const z1 = cz + 1.2;
-  quadPanel(ctx, 'forge_leanto', [x0, 1.25, z0], [x1, 0.95, z0], [x1, 0.95, z1], [x0, 1.25, z1]);
-  woodPost(ctx, 'forge_post', x1, cz - 1, 0.95);
-  woodPost(ctx, 'forge_post', x1, cz + 1, 0.95);
+  // The lean-to runs from the closed east wall one storey-deep module out: 2.7 m past the wall.
+  const eastWall = cx + (BUILDINGS.forge.w / 2) * M;
+  const x0 = eastWall - 0.1;
+  const x1 = eastWall + M;
+  const half = (BUILDINGS.forge.d / 2) * M + 0.3;
+  const z0 = cz - half;
+  const z1 = cz + half;
+  // Eave at 2.9 m against the wall, 2.6 m at the posts: the posts are a little over a person's height.
+  quadPanel(ctx, 'forge_leanto', [x0, 2.9, z0], [x1, 2.6, z0], [x1, 2.6, z1], [x0, 2.9, z1]);
+  woodPost(ctx, 'forge_post', x1, cz - half + 0.2, 2.6);
+  woodPost(ctx, 'forge_post', x1, cz + half - 0.2, 2.6);
   const iron = new StandardMaterial(`iron_${ctx.n++}`, ctx.scene);
   iron.diffuseColor = new Color3(0.2, 0.2, 0.22);
   iron.specularColor = Color3.Black();
-  const ax = cx + 2.1;
-  const stump = MeshBuilder.CreateBox(`anvil_stump_${ctx.n++}`, { width: 0.36, height: 0.45, depth: 0.28 }, ctx.scene);
-  stump.position.set(ax, 0.225, cz);
+  // The anvil is a prop at human scale: its top sits at hip height, about 0.98 m.
+  const ax = eastWall + 1.0;
+  const stump = MeshBuilder.CreateBox(`anvil_stump_${ctx.n++}`, { width: 0.36, height: 0.86, depth: 0.28 }, ctx.scene);
+  stump.position.set(ax, 0.43, cz);
   const top = MeshBuilder.CreateBox(`anvil_top_${ctx.n++}`, { width: 0.56, height: 0.12, depth: 0.26 }, ctx.scene);
-  top.position.set(ax, 0.51, cz);
+  top.position.set(ax, 0.92, cz);
   const horn = MeshBuilder.CreateCylinder(`anvil_horn_${ctx.n++}`, { height: 0.3, diameterTop: 0.02, diameterBottom: 0.1, tessellation: 8 }, ctx.scene);
   horn.rotation.z = -Math.PI / 2;
-  horn.position.set(ax + 0.43, 0.56, cz);
+  horn.position.set(ax + 0.43, 0.96, cz);
   for (const m of [stump, top, horn]) {
     m.material = iron;
     m.receiveShadows = true;
@@ -423,33 +466,50 @@ function buildForge(ctx: Ctx, cx: number, cz: number): void {
   }
 }
 
-/** Well: a low stone ring (the kit's round fountain, 2 m across) with a small roof on two posts. */
+/**
+ * Well: a stone drum 2 m across whose rim comes to hip height (1.0 m), with dark water at the top and a small roof
+ * on two posts. The kit's round fountain is only 0.28 m tall, so the drum is built here at the required height.
+ */
 function buildWell(ctx: Ctx, cx: number, cz: number): void {
-  placeOn(ctx, 'fountain-round', 'well_ring', cx, cz, 0);
-  woodPost(ctx, 'well_post', cx - 0.85, cz, 1.9);
-  woodPost(ctx, 'well_post', cx + 0.85, cz, 1.9);
-  gableRoof(ctx, 'well_roof', cx, cz, 2.0, 1.4, 1.9, 0.4);
+  const stone = new StandardMaterial(`well_stone_${ctx.n++}`, ctx.scene);
+  stone.diffuseColor = PALETTE.stone;
+  stone.specularColor = Color3.Black();
+  const water = new StandardMaterial(`well_water_${ctx.n++}`, ctx.scene);
+  water.diffuseColor = PALETTE.water;
+  water.specularColor = Color3.Black();
+  const drum = MeshBuilder.CreateCylinder(`well_drum_${ctx.n++}`, { height: 1.0, diameter: 2.0, tessellation: 24 }, ctx.scene);
+  drum.position.set(cx, 0.5, cz);
+  drum.material = stone;
+  const pool = MeshBuilder.CreateCylinder(`well_water_top_${ctx.n++}`, { height: 0.02, diameter: 1.4, tessellation: 24 }, ctx.scene);
+  pool.position.set(cx, 1.0, cz);
+  pool.material = water;
+  for (const m of [drum, pool]) {
+    m.receiveShadows = true;
+    ctx.shadow.addShadowCaster(m);
+  }
+  woodPost(ctx, 'well_post', cx - 1.0, cz, 2.3);
+  woodPost(ctx, 'well_post', cx + 1.0, cz, 2.3);
+  gableRoof(ctx, 'well_roof', cx, cz, 2.6, 2.0, 2.3, 0.5);
 }
 
-/** Watch-house: the stone tower (built by buildBlock) inside a walled yard, 2 m high, open at the front. */
+/** Watch-house: the stone tower (built by buildBlock) inside a one-storey walled yard, open at the front. */
 function buildWatchYard(ctx: Ctx, cx: number, cz: number): void {
-  const half = 3.5;
-  const offsets = [-3, -2, -1, 0, 1, 2, 3];
-  for (const f of [0, 1]) {
-    for (const o of offsets) {
-      // Front (-z) wall with a one metre gap at the centre; back wall whole.
-      if (o !== 0) placeOn(ctx, 'wall', 'yard_front', cx + o, cz - half, f, { yaw: Math.PI / 2 });
-      placeOn(ctx, 'wall', 'yard_back', cx + o, cz + half, f, { yaw: -Math.PI / 2 });
-      placeOn(ctx, 'wall', 'yard_west', cx - half, cz + o, f, { yaw: Math.PI });
-      placeOn(ctx, 'wall', 'yard_east', cx + half, cz + o, f, { yaw: 0 });
-    }
+  const half = 2.5 * M;
+  const offsets = [-2, -1, 0, 1, 2].map((k) => k * M);
+  // One storey of walls, every module at scale M. The front (-z) wall has a one-module gap at the centre.
+  for (const o of offsets) {
+    if (o !== 0) placeOn(ctx, 'wall', 'yard_front', cx + o, cz - half, 0, { yaw: Math.PI / 2, scale: M });
+    placeOn(ctx, 'wall', 'yard_back', cx + o, cz + half, 0, { yaw: -Math.PI / 2, scale: M });
+    placeOn(ctx, 'wall', 'yard_west', cx - half, cz + o, 0, { yaw: Math.PI, scale: M });
+    placeOn(ctx, 'wall', 'yard_east', cx + half, cz + o, 0, { yaw: 0, scale: M });
   }
 }
 
 /** Scenery: trees, hedges, rocks, a fence, and a wooden lantern post with a hanging lamp. */
 function buildScenery(ctx: Ctx, cx: number, cz: number): { lanternLight: TransformNode } {
+  // Offsets are in cell units (x M); kit pieces are drawn at scale M.
   const placeAt = (n: string, x: number, z: number, s = 1, yaw = 0): void => {
-    placeOn(ctx, n, `scn_${n}`, cx + x, cz + z, 0, { scale: s, yaw });
+    placeOn(ctx, n, `scn_${n}`, cx + x * M, cz + z * M, 0, { scale: s * M, yaw });
   };
   placeAt('tree', -3, 1.5);
   placeAt('tree-high', 0, 2, 1, 0.6);
@@ -459,8 +519,12 @@ function buildScenery(ctx: Ctx, cx: number, cz: number): { lanternLight: Transfo
   placeAt('hedge', -1, 4.5, 1, Math.PI / 2);
   placeAt('rock-small', -4, 3.6, 1, 0.4);
   placeAt('rock-large', 4.5, 3.8, 1, 1.1);
-  for (let i = 0; i < 4; i += 1) placeAt('fence', -4 + i, -1.5);
-  return buildLantern(ctx, cx + 0.5, cz - 1.2);
+  // A fence at chest height: the kit's fence panel is 0.38 m tall at scale 1, so it is drawn at 3.4 (1.3 m),
+  // run along x as a rail, four panels of 3.4 m each.
+  for (let i = 0; i < 4; i += 1) {
+    placeOn(ctx, 'fence', `scn_fence_${i}`, cx - 5.1 + i * 3.4, cz - 1.5 * M, 0, { scale: 3.4, yaw: Math.PI / 2 });
+  }
+  return buildLantern(ctx, cx + 0.5 * M, cz - 1.2 * M);
 }
 
 /** A wooden post with a crossbar and a hanging lantern cage. The glass glows at night. */
@@ -468,14 +532,15 @@ function buildLantern(ctx: Ctx, x: number, z: number): { lanternLight: Transform
   const wood = new StandardMaterial(`post_mat_${ctx.n++}`, ctx.scene);
   wood.diffuseColor = PALETTE.wood;
   wood.specularColor = Color3.Black();
-  const post = MeshBuilder.CreateCylinder(`post_${ctx.n++}`, { height: 3, diameter: 0.14, tessellation: 8 }, ctx.scene);
-  post.position.set(x, 1.5, z);
+  // The post is 3.6 m: twice a person's height (1.8 m, the review 008 basis).
+  const post = MeshBuilder.CreateCylinder(`post_${ctx.n++}`, { height: 3.6, diameter: 0.14, tessellation: 8 }, ctx.scene);
+  post.position.set(x, 1.8, z);
   post.material = wood;
   const arm = MeshBuilder.CreateBox(`arm_${ctx.n++}`, { width: 0.9, height: 0.08, depth: 0.08 }, ctx.scene);
-  arm.position.set(x + 0.4, 2.9, z);
+  arm.position.set(x + 0.4, 3.3, z);
   arm.material = wood;
   const cage = MeshBuilder.CreateBox(`lamp_${ctx.n++}`, { width: 0.26, height: 0.34, depth: 0.26 }, ctx.scene);
-  cage.position.set(x + 0.8, 2.3, z);
+  cage.position.set(x + 0.8, 2.8, z);
   cage.material = ctx.glassMat;
   ctx.glowMeshes.push(cage);
   for (const m of [post, arm, cage]) {
@@ -483,7 +548,7 @@ function buildLantern(ctx: Ctx, x: number, z: number): { lanternLight: Transform
     ctx.shadow.addShadowCaster(m);
   }
   const light = new TransformNode(`lantern_light_${ctx.n++}`, ctx.scene);
-  light.position.set(x + 0.8, 2.2, z);
+  light.position.set(x + 0.8, 2.7, z);
   return { lanternLight: light };
 }
 
@@ -567,6 +632,22 @@ async function loadPeople(scene: Scene, people: Person[]): Promise<Map<string, A
 export interface StyletestWindow {
   __styletestReady?: boolean;
   __styletestSet?: (state: { tod?: number; view?: View }) => void;
+  /** Real sizes in metres: kit pieces (unscaled), placed door modules, and every character's height. */
+  __styletestMeasure?: () => StyletestMeasure;
+}
+
+export interface StyletestMeasure {
+  kit: Record<string, [number, number, number]>;
+  doors: { tag: string; height: number; width: number }[];
+  people: { label: string; height: number }[];
+  tallest: { label: string; height: number };
+}
+
+/** Bounding size of a node and its children, in metres, after the world matrix is current. */
+function boundsSize(node: TransformNode): [number, number, number] {
+  node.computeWorldMatrix(true);
+  const { min, max } = node.getHierarchyBoundingVectors(true);
+  return [max.x - min.x, max.y - min.y, max.z - min.z];
 }
 
 export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
@@ -668,6 +749,9 @@ export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
   const woodMat = new StandardMaterial('wood_mat', scene);
   woodMat.diffuseColor = PALETTE.wood;
   woodMat.specularColor = Color3.Black();
+  const floorMat = new StandardMaterial('floor_mat', scene);
+  floorMat.diffuseColor = PALETTE.floor;
+  floorMat.specularColor = Color3.Black();
 
   const kit = await loadKit(scene, KENNEY_FILES);
   const roofSrc = kit.get('roof-gable')?.meshes.find((m) => m.material !== null)?.material;
@@ -689,7 +773,7 @@ export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
   const containers = await loadPeople(scene, [...PEOPLE, ...VILLAGERS]);
 
   const ctx: Ctx = {
-    scene, kit, shadow, paneMat, glassMat, roofMat, woodMat, poolMat, poolMatFaint, glowMeshes: [], pools: [], n: 0,
+    scene, kit, shadow, paneMat, glassMat, roofMat, woodMat, floorMat, poolMat, poolMatFaint, glowMeshes: [], pools: [], n: 0, doors: [],
   };
 
   // Buildings. Each one is closed: corners, walls, a door on the front and windows above.
@@ -772,32 +856,58 @@ export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
       camera.setTarget(new Vector3(tx, ty, tz));
       camera.fov = fov;
     };
-    if (view === 'row-front') at(-2, 6, -34, -2, 2.5, 0, 0.62);
-    else if (view === 'row-quarter') at(-36, 9, -24, -4, 2, 0, 0.62);
+    // The row runs from x -44 (house A) to x 71 (scenery): about 115 m. One frame from 100 m back is washed out
+    // by the fog (fog starts at 45 m), so the row is shot in two frames about 60 m back, each about 80 m wide.
+    if (view === 'row-west') at(-8, 10, -62, -8, 5, 0, 0.7);
+    else if (view === 'row-east') at(40, 10, -62, 40, 5, 0, 0.7);
+    else if (view === 'row-quarter') at(-52, 14, -36, 8, 3, 0, 0.75);
     else if (view === 'people-front') at(-12, 2.3, 3, -12, 1.3, PEOPLE_Z, 0.95);
     else if (view === 'people-quarter') at(-30, 2.8, 4, -12, 1.2, PEOPLE_Z, 0.85);
     else if (view === 'villagers-front') at(-0.6, 2.3, 3, -0.6, 1.3, PEOPLE_Z, 0.95);
+    // Doorway: the camera stands in front of house A, looking at the opening from just inside the yard.
+    else if (view === 'doorway') at(DOORWAY.x, 2.0, -12, DOORWAY.x, 2.4, DOORWAY.z, 0.62);
     else {
       const id = view.slice('item:'.length);
       const it = ITEMS.find((i) => i.id === id);
       if (!it) throw new Error(`Styletest: no item ${id}`);
       // The mill is seen three-quarter so the wheel's face shows; every other item is seen straight on.
-      if (id === 'mill') at(it.x + 2.2, 2.2, -11, it.x + 0.3, 1.3, 0, 0.7);
-      else at(it.x, 2.2, -12, it.x, 1.8, 0, 0.62);
+      if (id === 'mill') at(it.x + 4, 4.0, -24, it.x, 3.0, 0, 0.7);
+      else at(it.x, 4.0, -30, it.x, 6.5, 0, 0.66);
     }
     const inItem = view.startsWith('item:');
-    hero.root.setEnabled(inItem);
+    const inDoorway = view === 'doorway';
+    // The hero is shown for item views (for scale, side on) and for the doorway (front on, in the opening).
+    hero.root.setEnabled(inItem || inDoorway);
     if (inItem) {
       const it = ITEMS.find((i) => i.id === view.slice('item:'.length));
-      if (it) hero.root.position.set(it.heroX, 0, it.heroZ ?? HERO_Z);
+      if (it) hero.root.position.set(it.heroX, 0, HERO_Z);
+      hero.root.rotation.y = Math.PI / 2;
+    }
+    if (inDoorway) {
+      // House A's front wall face is at z = -1.5 M. The hero and the brute stand in the opening, front on,
+      // with the door centred at x = -40.
+      hero.root.position.set(DOORWAY.x - 0.6, 0, DOORWAY.z);
+      hero.root.rotation.y = Math.PI;
     }
     const pairsOn = view === 'villagers-front';
-    for (const r of peopleRoots) r.setEnabled(!pairsOn);
+    peopleRoots.forEach((r, i) => {
+      if (inDoorway) {
+        r.setEnabled(i === DOORWAY.personIndex);
+        if (i === DOORWAY.personIndex) {
+          r.position.set(DOORWAY.x + 0.6, 0, DOORWAY.z);
+          r.rotation.y = Math.PI;
+        }
+      } else {
+        r.setEnabled(!pairsOn);
+        r.position.set(PEOPLE_X0 + i * PEOPLE_STEP, 0, PEOPLE_Z);
+        r.rotation.y = Math.PI;
+      }
+    });
     for (const r of pairRoots) r.setEnabled(pairsOn);
   };
 
   let tod = 12;
-  let view: View = 'row-front';
+  let view: View = 'row-west';
   // One frame for the given state.
   const draw = (state: { tod?: number; view?: View }): void => {
     if (state.tod !== undefined) tod = state.tod;
@@ -811,7 +921,37 @@ export async function startStyletest(canvas: HTMLCanvasElement): Promise<void> {
   window.addEventListener('resize', () => engine.resize());
   const w = window as unknown as StyletestWindow;
   w.__styletestSet = draw;
-  draw({ tod: 12, view: 'row-front' });
+  w.__styletestMeasure = (): StyletestMeasure => {
+    // Kit pieces as the kit ships them (scale 1), each instantiated, measured, and disposed.
+    const kitSizes: Record<string, [number, number, number]> = {};
+    for (const n of KENNEY_FILES) {
+      const c = kit.get(n);
+      if (!c) continue;
+      const e = c.instantiateModelsToScene((x) => x, false);
+      const root = new TransformNode(`measure_${n}`, scene);
+      for (const r of e.rootNodes) r.parent = root;
+      kitSizes[n] = boundsSize(root).map((v) => Math.round(v * 1000) / 1000) as [number, number, number];
+      root.dispose();
+    }
+    const all = [...peopleRoots, ...pairRoots];
+    const was = all.map((r) => r.isEnabled());
+    all.forEach((r) => r.setEnabled(true));
+    const peopleOut = PEOPLE.map((p, i) => ({ label: p.label, height: boundsSize(peopleRoots[i])[1] }));
+    const villagersOut = PAIR_ADVENTURERS.flatMap((_, i) => [
+      { label: PAIR_ADVENTURERS[i].label, height: boundsSize(pairRoots[2 * i])[1] },
+      { label: VILLAGERS[i].label, height: boundsSize(pairRoots[2 * i + 1])[1] },
+    ]);
+    all.forEach((r, i) => r.setEnabled(was[i]));
+    const all2 = [...peopleOut, ...villagersOut];
+    const tallest = all2.reduce((a, b) => (b.height > a.height ? b : a));
+    return {
+      kit: kitSizes,
+      doors: ctx.doors.map((d) => ({ tag: d.tag, height: Math.round(d.height * 1000) / 1000, width: Math.round(d.width * 1000) / 1000 })),
+      people: all2.map((p) => ({ label: p.label, height: Math.round(p.height * 1000) / 1000 })),
+      tallest: { label: tallest.label, height: Math.round(tallest.height * 1000) / 1000 },
+    };
+  };
+  draw({ tod: 12, view: 'row-west' });
   w.__styletestReady = true;
   engine.runRenderLoop(() => draw({}));
 }

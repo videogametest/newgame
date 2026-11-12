@@ -1,15 +1,15 @@
-# 005: First five minutes and the valley finale (milestone 4)
+# 007: First five minutes and the valley finale (milestone 7)
 
 Status: open
 
 ## Goal
 
-A new player can start the game, learn it without being told, save their progress, and reach a real ending for the first valley. Scoped in `GAME_DESIGN.md` section 8, milestone 4. Follow section 10 for interface and section 9 for the finale.
+A new player can start the game, learn it without being told, save their progress, and reach a real ending for the first valley. Scoped in `GAME_DESIGN.md` section 8, milestone 7. It is built last so that the opening, the Stane fight, and the pacing are tuned once, against the finished systems. Follow section 10 for interface and section 9 for the finale.
 
 ## Do
 
 1. **Title screen** with Continue and New Game, over a slow view of the valley.
-2. **Local saves** in `localStorage` with a `version` field: autosave on capture, on resting, and every few minutes. Continue restores the hero, squad, captured places, opened chests, discovered places, and time of day.
+2. **Local saves** in `localStorage` with a `version` field: autosave on capture, on resting, and every few minutes. Continue restores everything in the game state: the hero, skills, perks and their mastery, inventory, storage, squad, freed places, bandits won back, opened chests, stolen goods returned, discovered places, and time of day.
 3. **Control prompts** that appear the first time each control is needed and never again once used.
 4. **A first nudge:** Hesper greets the hero and Bram, takes the hero on as an apprentice, and sends them to watch the Mill before attacking it. The Mill shows as the unlabelled compass mark. The control prompts teach crouch, marking, and the first arrow there.
 5. **The turn** (section 9): after the second place is freed, Stane retakes the first one that night. Its lantern goes dark, its person flees to the village, its reward is lost, and stronger defenders hold it. The recovery level falls. Hesper has a line for the next morning.
@@ -27,4 +27,5 @@ A new player can start the game, learn it without being told, save their progres
 
 - A fresh browser profile can go from title screen to finale with no instructions outside the game.
 - Tests, typecheck, and build pass. Merged, deployed, and logged in `docs/status.md`.
-- Stop after this task. Do not start milestone 5.
+- The pacing test from task 006 must still pass with the turn and the Stane fight in place.
+- Stop after this task. Do not start milestone 8.

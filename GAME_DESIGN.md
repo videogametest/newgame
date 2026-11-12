@@ -1,12 +1,12 @@
 # Every Lit Window: Game Design
 
-Version 18 (skills, perks, and pacing redesigned: region caps, perk slots, perk mastery, nothing missable, and a pacing test). Supersedes version 17.
+Version 19 (consistency pass: milestones reordered so progression comes before the finale, valley enlarged to 800 m, input and error-handling rules added, gaps closed). Supersedes version 18.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
 ## 1. Summary
 
-A single-player, medieval fantasy conquest RPG played in the browser in full 3D. The player is an apprentice scout: a cloaked archer who wins by watching, planning, and striking from hiding more than by brute force. The player explores one continuous open world on foot from a third-person camera, with an AI-controlled squad following. Enemy camps and outposts sit in the world; fights happen where the player meets them, with no loading into a separate arena. Clearing a place captures it. Between fights the player explores, loots, crafts gear, levels skills, and grows the squad.
+A single-player, medieval fantasy conquest RPG played in the browser in full 3D. The player is an apprentice scout: a cloaked archer who wins by watching, planning, and striking from hiding more than by brute force. The player explores one continuous open world on foot from a third-person camera, with an AI-controlled squad following. Enemy camps and outposts sit in the world; fights happen where the player meets them, with no loading into a separate arena. Clearing a place and lighting its lantern frees it. Between fights the player explores, loots, crafts gear, levels skills, and grows the squad.
 
 The world should feel like a place worth walking through: bright, alive, and full of small things to find. It is our own world. Do not use characters, names, symbols, music, or designs from any existing game.
 
@@ -32,7 +32,7 @@ These are expensive to change. Do not revisit without asking.
 - **Full 3D, third-person by default, with a first-person toggle.** The default is an over-the-shoulder camera that follows the hero; the player can switch to first-person at any time (section 5). Mouse controls the camera in both.
 - **One continuous open world.** No battle arenas, no menu map, no loading screens between places inside a region. Combat happens in the world.
 - **The world is generated from data and a seed, not hand-modelled.** Terrain comes from a seeded height function. Scenery (trees, rocks, grass, flowers) is scattered by seeded rules per biome. Points of interest (village, camps, outposts, chests, ruins, landmarks) are placed by hand in data files. The same seed always produces the same world.
-- **The world grows by regions.** Start with one valley about 500 m across. Later regions attach at its edges and are part of the same continuous world.
+- **The world grows by regions.** Start with one valley about 800 m across. Later regions attach at its edges and are part of the same continuous world.
 - **Engine:** Babylon.js with TypeScript and Vite.
 - **Art style:** stylized low-poly from CC0 asset packs. Characters come from KayKit Adventurers. The hero is the hooded, cloaked archer model, not the armoured knight; no enemy may use the same model and colours as the hero. Scenery comes from packs that match them (KayKit first; Quaternius or Kenney where KayKit has nothing suitable). Keep each pack's license file in the repo beside its assets.
 - **No physics engine.** The core simulation owns every position, velocity, and hit, including ground height. Babylon renders what the simulation says.
@@ -133,8 +133,8 @@ Layout of the first valley:
 Sound:
 
 - Ambient nature per area and time of day: birdsong, wind, water, crickets at night.
-- Sound effects for sword swing, sword hit, bow draw, bow release, arrow impact, footsteps by surface, dodge, taking damage, death, chest opening, item pickup, breaking objects, capture.
-- Music that responds: calm while exploring, building when enemies are aware of the hero, a short flourish on capture. Use CC0 music and audio (Kenney audio packs first). All music is original or CC0; never imitate a known melody.
+- Sound effects for blade swing and hit, knife throw, bow draw, bow release, arrow impact, footsteps by surface, dodge, taking damage, death, the alarm bell, geese, birds taking off, chest opening, item pickup, breaking objects, lighting a lantern, levelling up, and earning a perk.
+- Music that responds: calm while exploring, building when enemies are aware of the hero, and the lantern melody when a place is freed (section 9). Use CC0 music and audio (Kenney audio packs first). All music is original or CC0; never imitate a known melody.
 - Master, music, and effects volume in the settings panel. Audio starts on the first click, as browsers require.
 
 ## 5. Combat
@@ -177,7 +177,7 @@ Rules:
 
 - Every fighter has an HP bar above their head, shown when in combat or damaged. Hits apply knockback, flash the target, and show a damage number.
 - **Enemy attacks are telegraphed.** Every enemy melee attack has a visible wind-up before damage lands, long enough to dodge or step away. Enemy archers visibly draw before firing.
-- **Awareness.** Each enemy has an awareness range. Outside it they idle or patrol their camp. Inside it they attack, and they give up and return home if led too far away.
+- **Home ground.** Enemies idle or patrol at their place until they notice something (see Stealth and scouting). Once alert they pursue, and they give up and return home if led too far away.
 - **Stealth and scouting.** The intended way to take a place is to watch it first, then strike from hiding.
   - Each enemy is unaware, suspicious, or alert, shown by a small marker above their head. Suspicious enemies turn and investigate; alert enemies attack and alert others nearby.
   - How easily the hero is noticed depends on distance, whether the enemy is facing them, movement (still, crouched, walking, sprinting), cover (tall grass, scenery between them), and light (night hides the hero; standing near a lit fire or lantern does not).
@@ -196,7 +196,7 @@ The bow:
 The bow is the scout's main weapon and the deepest system in combat.
 
 - **Weak points.** A hit to the head deals heavily increased damage. Helmets on some enemies reduce the bonus; the brute's helmet removes it from the front.
-- **A limited quiver.** The hero carries a fixed number of arrows. Arrows that miss stick in the ground or scenery and can be picked up; arrows that hit can be recovered from fallen enemies, with a chance each one broke. Standard arrows are also sold in Wick and found in the world. Running dry is a real risk that the short blade and knives cover.
+- **A limited quiver.** The hero carries a fixed number of arrows. Arrows that miss stick in the ground or scenery and can be picked up; arrows that hit can be recovered from fallen enemies, with a chance each one broke. Standard arrows are also sold in Wick and found in the world. Until crafting exists for the player, blunt, fire, and whistling arrows come from chests, strongboxes, enemy archers, and Hesper, who hands over a few of each when she first explains them. Running dry is a real risk that the short blade and knives cover.
 - **Arrow types**, chosen with the mouse wheel and shown on the HUD:
   - *Standard.* The default.
   - *Fire.* Lights braziers, campfires, and dry grass, which spreads briefly and panics enemies caught in it. Reveals the hero's position when loosed at night. Scarce.
@@ -216,7 +216,7 @@ Close combat is about not being where the blow lands. The hero cannot block.
 How enemies fight:
 
 - **They take turns.** At most two enemies attack the hero at once. The others circle, reposition, or go for a companion. A group fight stays readable.
-- **Morale.** Enemies are people and want to live. Each place has a morale level that falls when defenders are beaten, when their leader is beaten, when they are surprised, or when fire spreads, and rises when the bell brings reinforcements. Below a threshold, individual enemies break: some drop their weapons and run, and some throw them down and surrender. Either way they are out of the fight. A whole place can be won by breaking its nerve.
+- **Morale.** Enemies are people and want to live. Each place has a named leader, a tougher version of one of its unit types, and a morale level that falls when defenders are beaten, when the leader is beaten, when they are surprised, or when fire spreads, and rises when the bell brings reinforcements. Below a threshold, individual enemies break: some drop their weapons and run, and some throw them down and surrender. Either way they are out of the fight. A whole place can be won by breaking its nerve.
 - **Kill or knock out.** Every bandit can be dealt with either way, and the choice is the player's each time.
   - *Killing:* standard and fire arrows, the short blade, and throwing knives are lethal. An enemy whose health reaches zero dies: they fall and stay down, with no blood and no gore.
   - *Knocking out:* blunt arrows (see The bow) and Bram's shield strike are not lethal. An enemy whose health reaches zero from one of these is knocked out. A stealth strike from behind offers both: `E` to knock out, attack to kill.
@@ -248,6 +248,7 @@ Fighting alongside Bram:
 - **Bram breaks guards.** His heavy strike staggers a shield-bearer and drops their shield for a moment, opening the shot.
 - **Bram holds attention.** Enemies near him prefer him as a target, which is what lets the hero stay at range.
 - Later recruits each bring one such trait of their own.
+- **Squad size.** The hero starts with Bram alone. In Tallowmere the squad can grow to three companions, as Leadership rises and people become available.
 
 Impact:
 
@@ -288,20 +289,24 @@ Rules:
 - **Overflow is never wasted.** Experience earned in a skill that is at the region cap goes into mastery of that skill's perks (see Perks).
 - **Reaching the region cap in a skill** earns a keepsake from someone in the valley: the smith's old hammer for Smithing, a fletcher's knife for Fletching. Keepsakes go on display in the house.
 
-- **Apprenticeship.** The hero's rank is Apprentice, then Scout, then Warden of the valley. Rank is earned by passing trials Hesper sets, not by experience points. Trials are optional: the valley can be finished as an Apprentice, but each trial teaches a perk and each rank gives more perk slots. Each trial teaches one part of the scout's craft and ends with a single dry line from Hesper, on failure as well as success.
+### Apprenticeship
 
-  | Trial | For rank | What the hero does | What it teaches |
-  | --- | --- | --- | --- |
-  | The Long Shot | Scout | At Wren's practice ground, hit the far target three times from the marked stone | The arc of the bow at range |
-  | The Trail | Scout | Hesper walks into the forest and says to find her. Follow the signs on the ground to the firefly grove, where she is waiting | Reading the ground |
-  | The Count | Scout | From the signal hill, mark every defender of an enemy-held place without being seen, then report. If one is missed, she says which | Looking before moving |
-  | The Quiet Lantern | Warden | Free a place without its alarm bell being rung | Controlling a fight |
-  | The Night Road | Warden | Cross the valley from the lake to Wick at night, past patrols, without being noticed once | Moving unseen |
-  | Hesper's Shoulder | Warden | Sneak up on Hesper and touch her shoulder. She has the sharpest senses of anyone in the game | Everything |
+The hero's rank is Apprentice, then Scout, then Warden of the valley. Rank is earned by passing trials Hesper sets, not by experience points. Trials are optional: the valley can be finished as an Apprentice, but each trial teaches a perk and each rank gives more perk slots. Each trial teaches one part of the scout's craft and ends with a single dry line from Hesper, on failure as well as success.
 
-  Hesper's Shoulder is meant to be failed many times, each with a different line ("I heard you at the gate."). On success she does not turn around. She says "Hm. That'll do," which is the highest praise she gives anywhere in the game, and the hero is a Warden.
+| Trial | For rank | What the hero does | What it teaches |
+| --- | --- | --- | --- |
+| The Long Shot | Scout | At Wren's practice ground, hit the far target three times from the marked stone | The arc of the bow at range |
+| The Trail | Scout | Hesper walks into the forest and says to find her. Follow the signs on the ground to the firefly grove, where she is waiting | Reading the ground |
+| The Count | Scout | From the signal hill, mark every defender of an enemy-held place without being seen, then report. If one is missed, she says which | Looking before moving |
+| The Quiet Lantern | Warden | Free a place without its alarm bell being rung | Controlling a fight |
+| The Night Road | Warden | Cross the valley from the lake to Wick at night, past patrols, without being noticed once | Moving unseen |
+| Hesper's Shoulder | Warden | Sneak up on Hesper and touch her shoulder. She has the sharpest senses of anyone in the game | Everything |
 
-  Rank shows on the hero's cloak: plain grey for an Apprentice, forest green for a Scout, deep blue for a Warden. The Warden's cloak is Hesper's own, handed over.
+Hesper's Shoulder is meant to be failed many times, each with a different line ("I heard you at the gate."). On success she does not turn around. She says "Hm. That'll do," which is the highest praise she gives anywhere in the game, and the hero is a Warden.
+
+Rank shows on the hero's cloak: plain grey for an Apprentice, forest green for a Scout, deep blue for a Warden. The Warden's cloak is Hesper's own, handed over.
+### Gear and squad
+
 - **Gear tiers** come from materials: bronze, iron, steel, then higher tiers. Gear is crafted or looted, and equipped gear is visible on the character model where the asset pack allows.
 - **Squad:** recruits have their own level, perks, and gear slots (see Companions). Recruiting and developing them is the collecting layer.
 
@@ -407,20 +412,29 @@ Exact XP curves, perk lists, recipes, weights, prices, and tier stats are tuning
 - **Game state is serializable.** A single game-state object holds everything about a save: hero, skills, inventory, squad, which places are captured, which chests are opened, time of day. Generated terrain and scenery are not saved; they come from the seed.
 - **Saves:** browser `localStorage` first, autosaving on capture, on town visits, and every few minutes. Supabase cloud saves come later using the same serialized shape. Include a `version` field in the save from day one.
 - **Motion and scenes are verifiable without a human.** A showcase mode (`?showcase=<clip>`) plays one animation on one character at a fixed camera, driven by simulation time. A tour mode (`?tour=1`) moves the camera through fixed viewpoints in the world at set times of day. Rendering PRs attach contact sheets from showcase mode and screenshots from tour mode.
+- **Input rules for the browser.** The game runs in a tab, and several keys belong to the browser first.
+  - `Esc` is consumed by the browser to release the mouse, and the game may never see it. Treat losing pointer lock as the pause signal, and resume by clicking.
+  - Suppress the browser default for `Tab`, right mouse, the mouse wheel, and the backtick while the game has focus.
+  - Never bind anything to `Ctrl`, `Alt`, or `Cmd` combinations: with `W` held, `Ctrl` closes the tab.
+  - Losing window focus pauses the game and releases all held keys.
+- **Errors are captured, not lost.** Uncaught errors and unhandled promise rejections are recorded with a timestamp and shown as a small notice, not a blank screen. A rolling in-memory log keeps the last few hundred events: errors, warnings, places entered, fights started and ended, captures, and frame-rate drops. A "Copy debug report" button in the pause menu and the tuning panel copies that log, the build commit, the browser, the save version, and current settings to the clipboard.
+- **The live page is tested.** The deploy workflow ends with a headless-browser smoke test that loads the built page, starts a game, runs for several seconds, and fails on any console error or failed request.
 - **Pure logic is testable.** Damage, hit detection, AI decisions, awareness, pathfinding, height, XP, loot, and income are pure functions with unit tests. Keep headless bot tests that clear a camp.
 
 ## 8. Milestones
 
 Each milestone ends deployed to Pages and playable. Do not start the next one until the current one is approved, unless a build message says otherwise.
 
-1. **Combat prototype.** Done: third-person hero, sword and bow, telegraphed enemies, dodge, waves, tuning panel. Remaining: camera fade for blocking fighters, sound effects, showcase mode.
-2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned with Hesper and her one lit window, plus the Mill, the Forge, and the Watch-house placed in data (section 9). Wildlife, the ten places off the path, alarm bells, fights in place with awareness ranges, squad following, pathfinding, capture by lighting the lantern, with the growing melody, falling banners, and visible restoration of each place and of the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
-3. **Combat depth.** Everything in section 5 under The bow, Close combat, How enemies fight, Unit types, Fighting alongside Bram, and Impact: weak points, the limited quiver, arrow types, perfect draw, the three-hit combo, perfect dodge, lock-on, throwing knives, stagger, attack turns, morale, the shield-bearer, brute, and runner, Bram's traits, and impact feel.
-4. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, the turn in which the Captain retakes the first freed place, the Captain fight at the Watch-house, and the valley finale ending at the hero's family house (section 9).
-5. **Progression and loot.** Everything in section 6: skills with the region cap, perks with slots, saved sets, mastery, and the ledger, the pacing targets and their test, the skills screen, everything in section 6 under Loot, Gathering, Crafting, and Carrying and keeping (smithing waits for milestone 6), and the apprenticeship: Hesper's six trials and the three ranks with their cloak colours (section 6).
-6. **Conquest and towns.** Town services that come from the people who return (smithing at the Forge, the miller's food, recruiting, healing), trade as in section 6, the Fairlow house as the hero's home with its displays, income from captured places, wounded squad members, camps that restock, harder places farther out.
-7. **Cloud saves.** Supabase auth and save sync.
-8. **More world.** A second region, the hero's horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
+1. **Combat prototype.** Done: a third-person hero with blade and bow, telegraphed enemies, dodge, waves, the tuning panel, and the camera fade.
+2. **Foundations.** The engine upgrade, the hooded scout as the hero, sound effects, showcase mode, error capture and the debug report, the smoke test, the input rules, and the game's name on the page. Task 002.
+3. **The world.** Tallowmere, about 800 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, water, the boundary, horizon landmarks, ambient wildlife, ambient sound, Wick in its abandoned state with Hesper's lit window, the first-person toggle, the pause menu and settings, and tour mode. No enemies. This milestone must clear the first-look bar in its task. Task 003.
+4. **Places and fights.** The Mill, the Forge, and the Watch-house; stealth, scouting, alarm bells, and the stealth animals; Bram, squad orders, and pathfinding; the lantern ritual and restoration; the ten places off the path; boar and wolves; campfires, healing, the compass, and the map. Items are simple counts at this stage. The prototype arena and waves are removed. Task 004.
+5. **Combat depth.** Everything in section 5 under The bow, Close combat, How enemies fight, Unit types, Fighting alongside Bram, and Impact. Task 005.
+6. **Progression, loot, and crafting.** Everything in section 6, including smithing and trade. Task 006.
+7. **First five minutes and the valley finale.** The title screen, onboarding prompts, saves, the turn, the Stane fight, and the finale at the Fairlow house (section 9). Built last so that it is tuned once, against the finished systems. Task 007.
+8. **Home and holdings.** The Fairlow house as the hero's home with its displays, income from freed places, more recruits, wounded companions, and places that restock.
+9. **Cloud saves.** Supabase auth and save sync.
+10. **More world.** A second region, the horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
 
 ## 9. Story
 
@@ -538,7 +552,7 @@ Restoration is tracked as a single valley recovery level in the game state. It r
 - **Title screen:** the game's name over a slow view of the valley, with Continue (when a save exists) and New Game. New Game asks for confirmation before replacing a save.
 - **Pause menu** (`Esc`): Resume, Settings, Controls, Quit to title. The simulation stops while it is open.
 - **Settings:** mouse sensitivity, invert vertical look, field of view for each camera view, camera shake and hit-freeze strength, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
-- **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, attack, switch weapon, dodge, eat, squad order, map) and never again once used. A villager at the start points the hero toward the nearest camp.
+- **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, crouch, mark, attack, switch weapon, change arrow, dodge, lock on, throw a knife, change view, eat, squad order, map, inventory, skills) and never again once used. Hesper points the hero toward the nearest camp.
 - **HUD:** hero health, equipped weapon, arrow count and type, knife count, food count, squad order, lock-on marker, compass strip. Keep it small; hide what is not needed outside combat.
 - **Inventory screen** (`I`). The world pauses and the mouse is freed while it is open.
   - *Left:* the scout as they currently look, with equipment slots for bow, blade, knives, cloak, and armour pieces. Clicking a slot shows what can go in it.

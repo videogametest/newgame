@@ -16,7 +16,7 @@ Greg decides direction and playtests. He tells Viktor to pull and continue, and 
 ## For Viktor
 
 1. Pull `main` before starting anything. Re-read `GAME_DESIGN.md` if its version line changed.
-2. Do the lowest-numbered task in `docs/tasks/` whose status is `open`. Do not skip ahead.
+2. Do the lowest-numbered task in `docs/tasks/` whose status is `open`. Do not skip ahead. Task files are sometimes renumbered or rewritten while still `open`; always read the current file, not a remembered one.
 3. When you start a task, set its `Status:` line to `in progress`. When it is merged and deployed, set it to `done`.
 4. After each deploy, and whenever you are blocked, add an entry to the top of `docs/status.md`: date and time, task number, what shipped (PR, commit, URL), what you verified, what you did not verify, and any question for Greg or Claude.
 5. If a task conflicts with `GAME_DESIGN.md`, stop, write the conflict in `docs/status.md`, and tell Greg.

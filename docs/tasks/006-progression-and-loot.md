@@ -1,10 +1,10 @@
-# 006: Progression and loot (milestone 5)
+# 006: Progression, loot, and crafting (milestone 6)
 
 Status: open
 
 ## Goal
 
-Give the player things to earn, find, make, carry, and keep, as described in `GAME_DESIGN.md` section 6. Scoped in section 8, milestone 5.
+Give the player things to earn, find, make, carry, and keep, as described in `GAME_DESIGN.md` section 6. Scoped in section 8, milestone 6. This replaces the simple item counts from task 004.
 
 ## Build in four steps
 
@@ -12,7 +12,7 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 1. **Skills, perks, and inventory.** All skills in the section 6 table with every rule under Skills (accomplishment-based experience, harder feats, diminishing repetition, catch-up, the region cap of 20, overflow into perk mastery, cap keepsakes). Perks as specified under Perks: sources, the fallback so nothing is missable, slots by rank, saved sets, three mastery ranks, and the ledger with hints. The skills screen on `K`. Design the 24 perks for Tallowmere yourself, each obeying the rule that a perk changes how the hero plays, and list them all with their sources, fallbacks, and three ranks in `docs/status.md` for review before building them. The inventory, loot window, and storage screen exactly as laid out in section 10, with an icon for every item, the carry limit, the storage chest at Hesper's, equippable gear with material tiers and quality, and gear visible on the character where the models allow.
 2. **Loot.** Enemies carrying what you see, strongboxes, stolen goods with their owners and the return flow, unique items starting with Wren's bow, and the pick-up rules. Every item, owner, and unique is a data entry.
-3. **Gathering and crafting.** Foraging, hunting yields, wood, ore, and fishing, with regrowth. Fletching and cooking at campfires, with recipes learned by doing, from notes, and from people. Do not build smithing; it belongs to milestone 6.
+3. **Gathering and crafting.** Foraging, hunting yields, wood, ore, and fishing, with regrowth. Fletching and cooking at campfires, and smithing at the Forge once the smith has returned, with recipes learned by doing, from notes, and from people. Trade as in section 6: the traders who return, and prices and stock that follow the valley recovery level.
 4. **The apprenticeship.** Hesper's six trials as specified in section 6, the perk each one teaches, the three ranks, the cloak colours, and the perk slots each rank gives. Hesper has several different failure lines for each trial.
 
 ## Rules
@@ -29,4 +29,4 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 ## Done when
 
 - All four steps are merged and deployed and the tests pass.
-- Stop after this task. Do not start milestone 6.
+- Then continue to task 007.

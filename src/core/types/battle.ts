@@ -135,8 +135,11 @@ export interface BattleInput {
   dodgePressed: boolean;
 }
 
+/** How a hit landed: the hero's sword, a soldier's strike zone, or an arrow. Sounds and VFX read it. */
+export type DamageSource = 'sword' | 'strike' | 'arrow';
+
 export type BattleEvent =
-  | { type: 'damage'; fighterId: number; amount: number; x: number; z: number }
+  | { type: 'damage'; fighterId: number; amount: number; x: number; z: number; source: DamageSource }
   | { type: 'dodge'; fighterId: number; x: number; z: number }
   | { type: 'swing'; fighterId: number }
   | { type: 'strike'; fighterId: number }

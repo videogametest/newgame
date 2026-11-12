@@ -5,6 +5,8 @@ import { AbstractMesh, Engine, Matrix, Scene, ShadowGenerator, Vector3 } from '@
 import { TUNING } from '../config/tuning';
 import { createBattle, getHero, step } from '../core/battle';
 import type { BattleEvent, BattleState } from '../core/types';
+import { advanceFootsteps, soundsForEvent } from '../core/sound_map';
+import { FOOTSTEP_STRIDE } from '../data/sounds';
 import { TRAINING_FIELD } from '../data/arena';
 import { buildArena } from './arena';
 import { loadAssets, type LoadedAssets } from './assets';
@@ -14,16 +16,27 @@ import { insideBounds, type ArenaBounds } from './camera_limits';
 import { blocksView } from './occlusion';
 import { ArrowViews, ImpactBursts } from './effects';
 import { PlayerInput } from './input';
+import { simRunning } from './input_rules';
+import { installErrorCapture, logEvent } from './debug_log';
 import { Hud, type Projector } from './hud';
 import { TuningPanel } from './tuning_panel';
+import { AudioBank } from './audio';
 
 /** Entry point: builds the scene, loads every asset, then starts the battle. Errors go to the HUD. */
 export async function startGame(canvas: HTMLCanvasElement, uiRoot: HTMLElement): Promise<void> {
+  // First, so an error during boot is captured too.
+  installErrorCapture();
+  logEvent('boot', 'start');
   const hud = new Hud(uiRoot);
+  const audio = new AudioBank();
+  // Browsers only allow audio after a user gesture, so the first click or key press starts it.
+  const unlockAudio = (): void => audio.unlock();
+  window.addEventListener('pointerdown', unlockAudio);
+  window.addEventListener('keydown', unlockAudio);
   // Backtick debug panel. Opening it releases the pointer, which pauses the sim until the player clicks back in.
   new TuningPanel(uiRoot, (open) => {
     if (open && document.pointerLockElement === canvas) document.exitPointerLock();
-  });
+  }, audio);
   try {
     const engine = new Engine(canvas, true, { stencil: true }, true);
     const scene = new Scene(engine);
@@ -31,10 +44,12 @@ export async function startGame(canvas: HTMLCanvasElement, uiRoot: HTMLElement):
     const assets = await loadAssets(scene, (done, total, label) => {
       hud.setBoot(label, total > 0 ? done / total : 0);
     });
-    const game = new Game(engine, scene, canvas, hud, assets, shadow, walls, TRAINING_FIELD);
+    const game = new Game(engine, scene, canvas, hud, assets, shadow, walls, TRAINING_FIELD, audio);
     game.start();
     hud.hideBoot();
+    logEvent('boot', 'ready');
   } catch (err) {
+    logEvent('boot', 'failed');
     hud.showError(err);
     throw err;
   }
@@ -48,7 +63,11 @@ class Game {
   private readonly input: PlayerInput;
   private readonly camera: BattleCamera;
   private accumulator = 0;
+  /** Metres the hero has walked since its last footstep. */
+  private stepDistance = 0;
   private readonly projector: Projector;
+  /** Last pause state logged, so the event log records transitions only. */
+  private wasPaused = false;
 
   constructor(
     private readonly engine: Engine,
@@ -59,12 +78,14 @@ class Game {
     private readonly shadow: ShadowGenerator,
     private readonly walls: AbstractMesh[],
     private readonly arena: ArenaBounds,
+    private readonly audio: AudioBank,
   ) {
     this.state = createBattle(TRAINING_FIELD);
     this.arrows = new ArrowViews(scene, assets.arrow, shadow);
     this.bursts = new ImpactBursts(scene);
-    this.input = new PlayerInput(canvas, () => {
-      // Pointer lock changes are read from input.isLocked each frame; nothing to do here.
+    this.input = new PlayerInput(canvas, (locked) => {
+      // The sim reads input.isLocked each frame; this callback only records the change.
+      logEvent('pointer_lock', locked ? 'locked' : 'released');
     });
     this.camera = new BattleCamera(scene);
     this.projector = (x, y, z) => this.project(x, y, z);
@@ -85,7 +106,13 @@ class Game {
 
   /** Runs whole fixed steps while the pointer is locked and the battle is live. */
   private runSim(dt: number): void {
-    if (!this.input.isLocked || this.state.status !== 'fighting') {
+    // Paused when the pointer is released or the window is in the background.
+    const paused = !simRunning(this.input.isLocked, this.input.isWindowFocused);
+    if (paused !== this.wasPaused) {
+      this.wasPaused = paused;
+      logEvent('sim', paused ? 'paused' : 'running');
+    }
+    if (paused || this.state.status !== 'fighting') {
       this.accumulator = 0;
       this.input.consumeEdges();
       return;
@@ -96,16 +123,29 @@ class Game {
       const sprint = this.input.isDown('ShiftLeft') || this.input.isDown('ShiftRight');
       const events = step(this.state, this.input.takeInput(sprint));
       this.handleEvents(events);
+      this.tickFootsteps();
     }
   }
 
+  /** Plays a footstep each stride the hero walks. Standing still resets the count. */
+  private tickFootsteps(): void {
+    const hero = getHero(this.state);
+    const speed = Math.hypot(hero.vx, hero.vz);
+    const r = advanceFootsteps(this.stepDistance, speed, TUNING.fixedDt, FOOTSTEP_STRIDE);
+    this.stepDistance = r.distance;
+    if (r.due) this.audio.play('footstep');
+  }
+
   private handleEvents(events: BattleEvent[]): void {
+    const heroId = getHero(this.state).id;
     for (const e of events) {
+      for (const id of soundsForEvent(e, heroId)) this.audio.play(id);
       if (e.type === 'damage') {
         this.hud.addDamage(e.x, e.z, e.amount);
       } else if (e.type === 'impact') {
         this.bursts.spawn(e.x, e.y, e.z);
       } else if (e.type === 'outcome') {
+        logEvent('outcome', e.status);
         this.input.releaseLock();
         this.hud.showOutcome(e.status);
       }
@@ -159,6 +199,7 @@ class Game {
   }
 
   private restart(): void {
+    logEvent('restart');
     for (const v of this.views.values()) v.dispose();
     this.views.clear();
     this.arrows.dispose();
@@ -167,6 +208,7 @@ class Game {
     this.state = createBattle(TRAINING_FIELD);
     this.input.reset();
     this.accumulator = 0;
+    this.stepDistance = 0;
     this.spawnViews();
     this.hud.hideOutcome();
     this.input.requestLock();

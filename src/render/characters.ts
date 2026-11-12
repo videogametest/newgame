@@ -28,8 +28,8 @@ function npcPose(f: Fighter, unit: UnitDef): Pose {
   const c = unit.clips;
   const a = f.action;
   if (f.kind === 'soldier') {
-    if (a.phase === 'windup' && c.windup) return scrub(c.windup, a.t / TUNING.soldier.windupTime);
-    if (a.phase === 'swing') return scrub(c.attack, a.t / TUNING.soldier.swingTime);
+    if (a.phase === 'windup' && c.windup) return scrub(c.windup, a.t / TUNING.soldier.windupTime, c.windupRange);
+    if (a.phase === 'swing') return scrub(c.attack, a.t / TUNING.soldier.swingTime, c.attackRange);
   } else {
     if (a.phase === 'draw' && c.draw) return scrub(c.draw, a.t / TUNING.archer.drawTime);
     if (a.phase === 'release' && c.release) return scrub(c.release, a.t / TUNING.archer.releaseTime);
@@ -78,10 +78,12 @@ function clamp(v: number, lo: number, hi: number): number {
 
 // ---------- the view ----------
 
-function clipNamesOf(unit: UnitDef): string[] {
+/** Every clip name a unit needs loaded. Skips the [start, end] ranges, which are not clip names. */
+export function clipNamesOf(unit: UnitDef): string[] {
   const names: string[] = [];
   for (const v of Object.values(unit.clips)) {
     if (typeof v === 'string') names.push(v);
+    else if (Array.isArray(v)) continue;
     else if (v) names.push(...Object.values(v));
   }
   return [...new Set(names)];
@@ -110,6 +112,8 @@ export class CharacterView {
   /** Each fade material's transparency mode as the asset shipped it (glTF sets it to opaque). */
   private readonly savedModes = new Map<Material, Nullable<number>>();
   private opacity = 1;
+  /** Showcase mode pins the pose here. When null, the pose comes from the simulation fighter. */
+  private poseOverride: Pose | null = null;
   private readonly weapons = new Map<WeaponId, TransformNode>();
   private disc: Mesh | null = null;
   private discMaterial: StandardMaterial | null = null;
@@ -151,6 +155,7 @@ export class CharacterView {
       const bone = boneNodes.get(WEAPON_MODELS[w].bone);
       if (!bone) throw new Error(`Bone ${WEAPON_MODELS[w].bone} missing on ${this.unit.model}`);
       holder.parent = bone;
+      if (w === 'sword' && this.unit.swordScale) holder.scaling.setAll(this.unit.swordScale);
       this.weapons.set(w, holder);
       this.casters.push(...holder.getChildMeshes(false));
     }
@@ -180,6 +185,11 @@ export class CharacterView {
     }
   }
 
+  /** Pins the pose (showcase mode). Pass null to go back to following the simulation. */
+  setPoseOverride(pose: Pose | null): void {
+    this.poseOverride = pose;
+  }
+
   update(f: Fighter): void {
     this.root.position.set(f.x, 0, f.z);
     this.root.rotation.y = f.yaw + MODEL_YAW_OFFSET;
@@ -188,7 +198,7 @@ export class CharacterView {
     const glow = new Color3(0.95, 0.12, 0.06).scale(clamp(flash, 0, 1) * 0.8);
     for (const m of this.materials) setEmissive(m, glow);
 
-    this.player.apply(poseFor(f, this.unit));
+    this.player.apply(this.poseOverride ?? poseFor(f, this.unit));
 
     for (const [w, node] of this.weapons) {
       node.setEnabled(f.kind === 'hero' ? f.weapon === w : true);

@@ -7,12 +7,16 @@ export type Pose =
   | { kind: 'loop'; clip: string; speed: number }
   | { kind: 'once'; clip: string }
   | { kind: 'hold'; clip: string }
-  | { kind: 'scrub'; clip: string; t: number };
+  | { kind: 'scrub'; clip: string; t: number; range: ClipRange };
+
+/** A slice of a clip, as fractions 0..1 of its length: [start, end]. */
+export type ClipRange = [number, number];
+const FULL: ClipRange = [0, 1];
 
 export const loop = (clip: string, speed = 1): Pose => ({ kind: 'loop', clip, speed });
 export const once = (clip: string): Pose => ({ kind: 'once', clip });
 export const hold = (clip: string): Pose => ({ kind: 'hold', clip });
-export const scrub = (clip: string, t: number): Pose => ({ kind: 'scrub', clip, t });
+export const scrub = (clip: string, t: number, range: ClipRange = FULL): Pose => ({ kind: 'scrub', clip, t, range });
 
 export class ClipPlayer {
   private activeClip: string | null = null;
@@ -32,7 +36,9 @@ export class ClipPlayer {
         group.pause();
       }
       const t = Math.min(1, Math.max(0, pose.t));
-      group.goToFrame(group.from + (group.to - group.from) * t);
+      const [r0, r1] = pose.range;
+      const f = r0 + (r1 - r0) * t;
+      group.goToFrame(group.from + (group.to - group.from) * f);
     } else if (pose.kind === 'loop') {
       if (!same) {
         this.stopAll();

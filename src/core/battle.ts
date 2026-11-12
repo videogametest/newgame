@@ -6,7 +6,7 @@ import { TUNING } from '../config/tuning';
 import { decideAI } from './ai';
 import { aimedVelocity, applyHit, bowDamage, bowSpeed, inSwingArc, launchVelocity, unitDir } from './combat';
 import type {
-  Action, ArenaDef, BattleEvent, BattleInput, BattleState, Fighter, FighterKind, Projectile, Spawn,
+  Action, ArenaDef, BattleEvent, BattleInput, BattleState, DamageSource, Fighter, FighterKind, Projectile, Spawn,
 } from './types';
 import { forwardOf, rightOf } from './vec';
 
@@ -22,7 +22,8 @@ function statsFor(kind: FighterKind) {
   return TUNING.archer;
 }
 
-function makeFighter(state: BattleState, s: Spawn): Fighter {
+/** Builds one fighter from a spawn. Exported for showcase mode, which needs a fighter from any wave. */
+export function makeFighter(state: BattleState, s: Spawn): Fighter {
   const st = statsFor(s.kind);
   return {
     id: state.nextId++,
@@ -335,7 +336,7 @@ function strikeZone(state: BattleState, f: Fighter, events: BattleEvent[]): void
     const d = Math.hypot(o.x - f.action.zoneX, o.z - f.action.zoneZ);
     if (d > S.strikeRadius + o.radius) continue;
     const dir = unitDir(f.x, f.z, o.x, o.z);
-    damageFighter(o, S.damage, dir.x, dir.z, S.knockback, events);
+    damageFighter(o, S.damage, dir.x, dir.z, S.knockback, 'strike', events);
   }
   events.push({ type: 'strike', fighterId: f.id });
 }
@@ -347,7 +348,7 @@ function heroSwordStrike(state: BattleState, hero: Fighter, events: BattleEvent[
     if (!o.alive || o.team === hero.team) continue;
     if (!inSwingArc(hero.x, hero.z, hero.yaw, o.x, o.z, o.radius, W.range, W.arcHalfAngle)) continue;
     const dir = unitDir(hero.x, hero.z, o.x, o.z);
-    damageFighter(o, W.damage, dir.x, dir.z, W.knockback, events);
+    damageFighter(o, W.damage, dir.x, dir.z, W.knockback, 'sword', events);
   }
   events.push({ type: 'strike', fighterId: hero.id });
 }
@@ -399,10 +400,11 @@ function damageFighter(
   dirX: number,
   dirZ: number,
   knockback: number,
+  source: DamageSource,
   events: BattleEvent[],
 ): void {
   if (!target.alive || isDodgeInvulnerable(target)) return;
-  events.push({ type: 'damage', fighterId: target.id, amount, x: target.x, z: target.z });
+  events.push({ type: 'damage', fighterId: target.id, amount, x: target.x, z: target.z, source });
   const died = applyHit(target, amount, dirX, dirZ, knockback);
   if (target.action.phase === 'windup' || target.action.phase === 'draw') cancelAction(target);
   if (died) events.push({ type: 'death', fighterId: target.id });
@@ -450,7 +452,7 @@ function updateProjectiles(state: BattleState, events: BattleEvent[]): void {
       if (!f.alive || f.team === p.team) continue;
       if (Math.hypot(p.x - f.x, p.z - f.z) < f.radius + A.radius && p.y <= f.height) {
         const dir = unitDir(0, 0, p.vx, p.vz);
-        damageFighter(f, p.damage, dir.x, dir.z, p.knockback, events);
+        damageFighter(f, p.damage, dir.x, dir.z, p.knockback, 'arrow', events);
         stopped = true;
         break;
       }

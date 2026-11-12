@@ -12,6 +12,8 @@ export interface UnitDef {
   tint: [number, number, number];
   /** Weapons the model carries. A weapon is shown only when the unit (or hero, for its equipped one) uses it. */
   weapons: WeaponId[];
+  /** Visual scale of the sword model on this unit (the pack has one blade; the hero's is shorter). */
+  swordScale?: number;
   clips: {
     idle: string;
     run: string;
@@ -19,8 +21,12 @@ export interface UnitDef {
     walk?: string;
     /** Clip played while a strike is telegraphed (soldier wind-up). */
     windup?: string;
+    /** Part of the windup clip to play, as 0..1 of its length (defaults to the whole clip). */
+    windupRange?: [number, number];
     /** Strike or shot clip. */
     attack: string;
+    /** Part of the attack clip that is the strike, as 0..1 of its length. */
+    attackRange?: [number, number];
     /** Bow draw and release (archers and the hero's bow). */
     draw?: string;
     release?: string;
@@ -35,9 +41,10 @@ export interface UnitDef {
 export const UNITS: Record<string, UnitDef> = {
   hero: {
     kind: 'hero',
-    model: 'assets/kaykit_adventurers/characters/Knight.glb',
+    model: 'assets/kaykit_adventurers/characters/Ranger.glb',
     tint: [1, 1, 1],
     weapons: ['sword', 'bow'],
+    swordScale: 0.7,
     clips: {
       idle: 'Idle_A',
       run: 'Running_A',
@@ -64,8 +71,10 @@ export const UNITS: Record<string, UnitDef> = {
     clips: {
       idle: 'Idle_A',
       run: 'Running_A',
-      windup: 'Melee_Blocking',
+      windup: 'Melee_1H_Attack_Chop',
+      windupRange: [0, 0.4],
       attack: 'Melee_1H_Attack_Chop',
+      attackRange: [0.4, 0.8],
       hit: 'Hit_A',
       death: 'Death_A',
     },
@@ -78,15 +87,18 @@ export const UNITS: Record<string, UnitDef> = {
     clips: {
       idle: 'Idle_A',
       run: 'Running_A',
-      windup: 'Melee_Blocking',
+      windup: 'Melee_1H_Attack_Chop',
+      windupRange: [0, 0.4],
       attack: 'Melee_1H_Attack_Chop',
+      attackRange: [0.4, 0.8],
       hit: 'Hit_A',
       death: 'Death_A',
     },
   },
   enemy_archer: {
     kind: 'archer',
-    model: 'assets/kaykit_adventurers/characters/Ranger.glb',
+    // Armoured Knight, so no enemy shares the hero's hooded Ranger silhouette.
+    model: 'assets/kaykit_adventurers/characters/Knight.glb',
     tint: [1.0, 0.85, 0.5],
     weapons: ['bow'],
     clips: {

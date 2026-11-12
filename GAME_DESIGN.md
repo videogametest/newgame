@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 8 (names the game). Supersedes version 7.
+Version 9 (deepens the story: the Lamplighter, the Captain, the hero's house, places with a past, the lantern ritual, and the turn). Supersedes version 8.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -43,7 +43,7 @@ These are expensive to change. Do not revisit without asking.
 
 1. **Explore.** Walk the world with the squad. Find camps, outposts, chests, and secrets.
 2. **Fight.** Enemies notice the hero inside their awareness range and attack. Fights happen in place.
-3. **Capture.** Clearing every defender of a camp or outpost captures it. A captured place visibly changes: the player's banner goes up and it becomes safe.
+3. **Capture.** After clearing every defender of a place, the hero lights its lantern (section 9). The Captain's banner comes down, the place becomes safe, and it starts turning back into what it used to be.
 4. **Reward.** XP for skills used, gold, materials, sometimes gear, from enemies, chests, and breakable objects.
 5. **Town.** In the village and in captured towns: craft and upgrade gear, recruit and equip squad members, heal the wounded.
 6. **Expand.** Captured places pay gold and materials over time. Push into harder territory.
@@ -54,7 +54,7 @@ Rules:
 - **Dying:** no permadeath. The player keeps XP earned, loses a portion of carried gold, and wakes at the nearest owned town. Squad members who fell are wounded: they stay behind until healed for gold or until the player rests at a town.
 - **Income** accrues per place captured and per in-game day, not real-world time.
 - **Healing.** Health does not regenerate on its own. Food, found in the world or bought in town, heals over a few seconds when eaten and can be interrupted by taking damage. Resting at an owned town heals the hero and squad fully and advances time to the next morning.
-- **Enemies stay dead** in captured places. Uncaptured camps restock their defenders after several in-game days.
+- **Enemies stay dead** in captured places, except when the story retakes one (section 9, The turn). Uncaptured camps restock their defenders after several in-game days.
 
 ## 4. The world
 
@@ -82,8 +82,8 @@ Finding your way:
 
 Layout of the first valley:
 
-- A friendly village near the centre, where the player starts.
-- Paths leading out to at least two bandit camps and one fortified outpost.
+- The hero starts at the valley's edge at dusk, with the Lamplighter's single lit window visible in the distance, and walks to the village near the centre.
+- Paths lead out from the village to the Mill, the Forge, and the Watch-house (section 9).
 - Hills, a forest area, open fields, and water, so different parts feel different.
 - A natural boundary (cliffs, dense forest, water) at the edge. No invisible walls in open ground and no coloured barrier.
 
@@ -170,37 +170,86 @@ Exact XP curves, perk lists, and tier stats are tuning, not design. Keep them in
 Each milestone ends deployed to Pages and playable. Do not start the next one until the current one is approved, unless a build message says otherwise.
 
 1. **Combat prototype.** Done: third-person hero, sword and bow, telegraphed enemies, dodge, waves, tuning panel. Remaining: camera fade for blocking fighters, sound effects, showcase mode.
-2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned (see section 9), two bandit camps, and one outpost placed in data. Fights in place with awareness ranges, squad following, pathfinding, capture that raises the valley recovery level and visibly restores the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
-3. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, and the finale when the last place in the valley is freed (section 9).
+2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned with the Lamplighter and one lit window, plus the Mill, the Forge, and the Watch-house placed in data (section 9). Fights in place with awareness ranges, squad following, pathfinding, capture by lighting the lantern, with the growing melody, falling banners, and visible restoration of each place and of the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
+3. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, the turn in which the Captain retakes the first freed place, the Captain fight at the Watch-house, and the valley finale ending at the hero's family house (section 9).
 4. **Progression.** Skills that level by use, perks, loot tables, inventory, equippable gear with tiers.
-5. **Conquest and towns.** Town services (crafting, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
+5. **Conquest and towns.** Town services that come from the people who return (the smith's crafting, the miller's food, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
 6. **Cloud saves.** Supabase auth and save sync.
 7. **More world.** A second region, fast travel between owned towns, more unit types, more secrets, more music.
 
 ## 9. Story
 
-Names in this section are placeholders and may change. Keep every name in data, never in code.
+Names in this section are placeholders and may change. Keep every name in data, never in code. "The Lamplighter" and "the Captain" are titles; each also has a personal name in data.
 
-Premise:
+### Premise
 
-- A generation ago the kingdom fell apart. The crown's soldiers left, the roads went unguarded, and the valley was taken over by bandits. Most families fled.
-- The hero grew up elsewhere on stories of the valley and has come home to a village that is half empty.
+- A generation ago the kingdom fell apart. One night the crown's soldiers left the valley without a word. The roads went unguarded, bandits moved in, and most families fled.
+- The hero was carried out of the valley as a small child and grew up elsewhere on stories of it. Now grown, the hero has come home to a village that is half empty.
+- The hero's family house still stands in the village, dark and boarded up.
 - The hero takes the valley back one place at a time. Each place freed brings people home.
-- The abandoned castle on the horizon is where the old kingdom ended and where the story eventually leads. It is not reachable in the first valley.
 
-Tone: warm and hopeful, with a quiet sadness for what was lost. No gore, no grim cruelty. The enemies are bandits, many of them former soldiers with nowhere else to go, not monsters.
+Tone: warm and hopeful, with a quiet sadness for what was lost. No gore, no grim cruelty. The enemies are people, not monsters.
 
-**The world tells the story.** There is no quest log and no long dialogue. The story is carried by:
+### The people
 
-- **Restoration.** Capturing a place changes the valley, not only that place. The village starts with boarded windows, empty fields, few people, and no lights at night. With each capture more villagers return, buildings are repaired, fields are worked, stalls open, and windows glow after dark. The village music gains an instrument with each capture.
+- **The Lamplighter.** An old villager who never left. Every night for a generation they have kept one window lit so that anyone coming home could find the way. That single light is visible across the valley at night and is the first thing the hero walks toward. The Lamplighter greets the hero, knew the hero's family, and is the heart of the village. They speak in short, plain lines that change as the valley recovers, and they are the one who teaches the lantern ritual.
+- **The Captain.** A former officer of the crown's guard who stayed when the army left and decided the valley was theirs to hold. They rule from the outpost and take a share of everything, and in their own eyes they are the only reason anyone here survived. They are not entirely wrong. Their banners fly over every place the hero has not freed, so their presence is visible everywhere. They are defeated, not killed.
+- **The hero** is silent and unnamed, so the player can be them.
+
+### The question
+
+Why did the soldiers leave overnight? Nobody in the valley knows. The first valley gives fragments: found notes, a ruined watchtower, a soldier's grave, a line from the Lamplighter, and finally what the Captain saw that night. The fragments point to the abandoned castle on the horizon, where the answer is. The castle is not reachable in the first valley. Never answer the question in the first valley.
+
+### Places with a past
+
+Every enemy-held place used to be something, and freeing it brings that thing and its person back. Story and progression are the same act.
+
+| Place | Held as | What it was | Who returns | What the player gains |
+| --- | --- | --- | --- | --- |
+| The Mill | Bandit camp | The valley's mill | The miller | Food: sold in the village and found in the mill |
+| The Forge | Bandit camp | The valley's forge | The smith | Crafting and gear upgrades |
+| The Watch-house | The Captain's outpost | The crown guard's post | Nobody at first | The road toward the castle |
+
+Each place looks like what it was, under what the bandits have done to it: a mill with a stopped wheel, a cold forge. Once freed, the wheel turns and the forge is lit. More places follow the same pattern in later regions. Every place is defined in data with its past, its person, and its reward.
+
+### The lantern ritual
+
+A place is not freed when the last defender falls. It is freed when the hero lights its lantern.
+
+- Each place has an unlit lantern. After the defenders are cleared, the hero interacts with it (`E`) to light it. The Captain's banner comes down and the place is captured.
+- A short melody plays. It is the same melody every time, with one more instrument for each place freed, so it grows fuller across the game.
+- A lit lantern can be seen from a distance at night. As the valley is freed, the night fills with lights.
+- The Lamplighter lights the hero's first lantern alongside them, to teach it.
+
+### The turn
+
+The valley does not only get better.
+
+- After the hero frees the second place, the Captain strikes back. That night the first place the hero freed is retaken: its lantern goes dark, its person flees to the village, and what it gave the player is lost until it is freed again.
+- The retaken place is held by stronger defenders than before.
+- The Lamplighter's line the next morning is the low point of the story.
+- Retaking it relights the lantern and opens the way to the Watch-house.
+
+### The world tells the story
+
+There is no quest log and no long dialogue. The story is carried by:
+
+- **Restoration.** The village starts with boarded windows, empty fields, few people, and one lit window. With each lantern lit, more villagers return, buildings are repaired, fields are worked, stalls open, and more windows glow after dark. The village music gains an instrument with each one.
+- **The Captain's banners**, which come down place by place.
 - **Villagers** who say one or two short lines that change as the valley recovers.
-- **Things found off the path:** a note in a chest, a ruined watchtower, an overgrown shrine, a soldier's grave. Each hints at how the kingdom fell. Text is short: three sentences at most.
+- **Things found off the path**, each a fragment of the question. Text is three sentences at most.
 - **Recruits.** Each squad member is a named person with a home in the valley and a two-sentence reason for joining. Some become available only after a specific place is freed.
-- **Landmarks** on the horizon that the found notes refer to.
+- **Landmarks** on the horizon that the fragments refer to.
 
-**The valley finale.** Freeing the last place in the valley completes its recovery. That night the village holds a festival: lanterns, the full village music, every returned villager gathered. In the morning the road toward the castle is open, marked on the map as the way onward. This is the end of the first valley and the hook for the next region.
+Restoration is tracked as a single valley recovery level in the game state. It rises with each lantern lit and falls when a place is retaken. Scenery, villager count, lights, banners, and music read from it.
 
-Restoration is tracked as a single valley recovery level in the game state, raised by each capture. Scenery, villager count, lights, and music read from it.
+### The valley finale
+
+1. The hero takes the Watch-house and faces the Captain, who is the hardest fight in the valley. Beaten, the Captain yields and tells the hero what they saw the night the soldiers left. It deepens the question; it does not answer it.
+2. The hero lights the Watch-house lantern. Every place in the valley is free.
+3. That night the village holds a festival: lanterns, the full melody, every returned villager gathered.
+4. The Lamplighter leads the hero to the family house. The hero lights its window. It is the last dark window in the village, and the image the game is named for.
+5. In the morning the road toward the castle is open and marked on the map.
 
 ## 10. Interface
 

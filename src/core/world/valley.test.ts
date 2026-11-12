@@ -6,19 +6,21 @@ import {
   VALLEY_SEED,
   VALLEY_STOPS,
   WATER_LEVEL,
+  blocksHero,
   blocksWalking,
   insideValley,
   isCrossing,
+  isGorge,
   isWalkableGround,
   isWater,
   sightMargin,
   valleyHeightAt,
+  walkSlopeAt,
   walkSurfaceAt,
 } from './valley';
 import { VALLEY_CROSSINGS, VALLEY_RIVER_IN, VALLEY_RIVER_OUT, type LayoutCrossing } from './valley_layout';
 import { walkStep, type WalkRules } from './walk';
 
-const STEP = 8;
 /** Eye heights (m) used for the sight-line checks; the same values the prototype and the spec table use. */
 const EYE = { person: 2, watchHouseYard: 3, signalHillTop: 4, mill: 9, watchHouse: 14, castleTop: 35 };
 
@@ -80,9 +82,43 @@ function alongCrossing(c: LayoutCrossing): { x: number; z: number }[] {
   return out;
 }
 
+/** The two openings in the rim (the patrol hut zone and the north-west pass), as the terrain defines them. */
+function inOpening(x: number, z: number): boolean {
+  return Math.hypot(x - VALLEY_PLACES.patrolHut.x, z - VALLEY_PLACES.patrolHut.z) < 60 || Math.hypot(x + 250, z + 262) < 40;
+}
+
 /** Slope (rise over run) from ±1 m central differences, as the walking rule measures it. */
 function slopeAt(x: number, z: number): number {
   return Math.hypot(valleyHeightAt(x + 1, z) - valleyHeightAt(x - 1, z), valleyHeightAt(x, z + 1) - valleyHeightAt(x, z - 1)) / 2;
+}
+
+/** Cells of a 4 m grid reached on foot from the start, with the two openings shut (the edge test's rule). */
+function reachableFromStart(): { x: number; z: number }[] {
+  const CELL = 4;
+  const n = Math.round((2 * VALLEY_HALF_EXTENT) / CELL) + 1;
+  const at = (i: number) => -VALLEY_HALF_EXTENT + i * CELL;
+  const shut = (x: number, z: number) =>
+    Math.hypot(x - VALLEY_PLACES.patrolHut.x, z - VALLEY_PLACES.patrolHut.z) < 60 || Math.hypot(x + 250, z + 262) < 40;
+  const ok = (i: number, j: number) => !shut(at(i), at(j)) && isWalkableGround(at(i), at(j));
+  const si = Math.round((VALLEY_PLACES.start.x + VALLEY_HALF_EXTENT) / CELL);
+  const sj = Math.round((VALLEY_PLACES.start.z + VALLEY_HALF_EXTENT) / CELL);
+  const seen = new Uint8Array(n * n);
+  const queue: number[] = [sj * n + si];
+  seen[sj * n + si] = 1;
+  for (let q = 0; q < queue.length; q++) {
+    const i = queue[q] % n;
+    const j = Math.floor(queue[q] / n);
+    for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const ii = i + di;
+      const jj = j + dj;
+      if (ii < 0 || jj < 0 || ii >= n || jj >= n) continue;
+      const k = jj * n + ii;
+      if (seen[k] || !ok(ii, jj)) continue;
+      seen[k] = 1;
+      queue.push(k);
+    }
+  }
+  return queue.map((k) => ({ x: at(k % n), z: at(Math.floor(k / n)) }));
 }
 
 describe('Tallowmere terrain (§4)', () => {
@@ -145,17 +181,27 @@ describe('Tallowmere terrain (§4)', () => {
     expect(checked).toBeGreaterThan(0);
   });
 
-  it('keeps ground beyond the edge ring unwalkable, except the patrol hut zone and the north-west pass', () => {
-    for (let a = 0; a < 360; a += 3) {
-      const r = EDGE_RADIUS + 15;
-      const x = r * Math.cos((a * Math.PI) / 180);
-      const z = r * Math.sin((a * Math.PI) / 180);
-      if (!insideValley(x, z)) continue;
-      if (Math.hypot(x - VALLEY_PLACES.patrolHut.x, z - VALLEY_PLACES.patrolHut.z) < 60) continue;
-      if (Math.hypot(x + 250, z + 262) < 40) continue;
-      expect(isWalkableGround(x, z), `edge point (${x.toFixed(0)}, ${z.toFixed(0)})`).toBe(false);
+  it('makes the rim a climb the hero cannot make: every bearing at r 331 to 337 is steeper than 0.7, outside the openings and water', () => {
+    let checked = 0;
+    for (const r of [331, 334, 337]) {
+      for (let a = 0; a < 360; a += 2) {
+        const rad = (a * Math.PI) / 180;
+        const x = r * Math.cos(rad);
+        const z = r * Math.sin(rad);
+        if (isWater(x, z) || inOpening(x, z)) continue;
+        checked++;
+        expect(walkSlopeAt(x, z), `rim point (${x.toFixed(0)}, ${z.toFixed(0)})`).toBeGreaterThanOrEqual(0.7);
+      }
     }
+    expect(checked).toBeGreaterThan(200);
   });
+
+  it('keeps the edge closed: with the two openings shut, no walkable ground beyond the edge ring is reachable from the start', () => {
+    const reached = reachableFromStart();
+    expect(reached.length).toBeGreaterThan(5000);
+    const beyond = reached.filter((p) => Math.hypot(p.x, p.z) > EDGE_RADIUS).length;
+    expect(beyond, 'walkable cells beyond the edge ring').toBe(0);
+  }, 60000);
 
   it('makes the sight lines in the layout: seen where it should be, hidden where it should not', () => {
     // Positive clearance = the line clears the ground. Values from the spec table, docs/tasks/003-layout.md.
@@ -171,14 +217,13 @@ describe('Tallowmere terrain (§4)', () => {
     expect(sight('wick', EYE.person, 'signalHill', EYE.signalHillTop)).toBeGreaterThan(0);
   });
 
-  it('makes the signal hill the highest point of the valley, close to its marked top', () => {
+  it('makes the signal hill the highest ground the hero can stand on, close to its marked top (the rim is higher, and not walkable)', () => {
+    // Highest cell reached on foot from the start (openings shut). The rim beyond it is higher but not reached.
     let max = -Infinity;
     let at2 = { x: 0, z: 0 };
-    for (let z = -VALLEY_HALF_EXTENT; z <= VALLEY_HALF_EXTENT; z += STEP) {
-      for (let x = -VALLEY_HALF_EXTENT; x <= VALLEY_HALF_EXTENT; x += STEP) {
-        const h = valleyHeightAt(x, z);
-        if (h > max) { max = h; at2 = { x, z }; }
-      }
+    for (const p of reachableFromStart()) {
+      const h = valleyHeightAt(p.x, p.z);
+      if (h > max) { max = h; at2 = p; }
     }
     const hill = VALLEY_PLACES.signalHill;
     expect(Math.hypot(at2.x - hill.x, at2.z - hill.z)).toBeLessThan(40);
@@ -260,8 +305,8 @@ describe('Tallowmere terrain (§4)', () => {
   it('lets the hero walk down each bank to the water, at a slope of 0.31 or less', () => {
     let banks = 0;
     for (const p of riverSamples()) {
-      // The gorge beyond the rim is the edge's business (task 003 item 3), so only the inside of the rim is checked here.
-      if (nearCrossing(p.x, p.z) || Math.hypot(p.x, p.z) < 140 || Math.hypot(p.x, p.z) > EDGE_RADIUS - 5) continue;
+      // The gorge has its own walls (checked below); the bank rule is for the river's own banks.
+      if (isGorge(p.x, p.z) || nearCrossing(p.x, p.z) || Math.hypot(p.x, p.z) < 140 || Math.hypot(p.x, p.z) > EDGE_RADIUS - 5) continue;
       for (const side of [1, -1]) {
         let d = 0;
         while (d < 40 && valleyHeightAt(p.x + side * p.px * d, p.z + side * p.pz * d) < WATER_LEVEL) d += 0.1;
@@ -273,6 +318,24 @@ describe('Tallowmere terrain (§4)', () => {
       }
     }
     expect(banks).toBeGreaterThan(50);
+  });
+
+  it('builds gorge walls along the last 100 m of the river out: 15 m high, a face steeper than 0.7, and no way down the bank', () => {
+    // The river out past the cut at about (304, 71) is the gorge; the samples here are its far part, inside the map.
+    const gorge = riverSamples().filter((p) => p.x >= 330 && Math.hypot(p.x, p.z) < 405);
+    expect(gorge.length).toBeGreaterThan(20);
+    for (const p of gorge) {
+      expect(isWater(p.x, p.z), `gorge centre (${p.x.toFixed(0)}, ${p.z.toFixed(0)})`).toBe(true);
+      for (const side of [1, -1]) {
+        const at = (d: number) => ({ x: p.x + side * p.px * d, z: p.z + side * p.pz * d });
+        const top = at(15);
+        expect(valleyHeightAt(top.x, top.z)).toBeGreaterThanOrEqual(WATER_LEVEL + 15 - 1e-6);
+        const face = at(8);
+        expect(walkSlopeAt(face.x, face.z), `wall face (${face.x.toFixed(0)}, ${face.z.toFixed(0)})`).toBeGreaterThanOrEqual(0.7);
+        const foot = at(5.5);
+        expect(blocksHero(foot.x, foot.z), `wall foot (${foot.x.toFixed(0)}, ${foot.z.toFixed(0)})`).toBe(true);
+      }
+    }
   });
 
   it('lists every placed stop once, by name', () => {

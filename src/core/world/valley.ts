@@ -36,6 +36,17 @@ const PATROL_HUT_OPEN = { x: VALLEY_PLACES.patrolHut.x, z: VALLEY_PLACES.patrolH
 const NW_PASS_OPEN = { x: -250, z: -262, radius: 40 };
 /** Steepest walkable slope (rise over run). */
 const MAX_WALK_SLOPE = 0.7;
+/** The rim: ground rises by RIM_RISE across the band RIM_START..RIM_FULL, a 1.25 slope, so the edge is land the hero cannot climb. */
+const RIM_START = EDGE_RADIUS - 5;
+const RIM_FULL = EDGE_RADIUS + 3;
+const RIM_RISE = 10;
+/** The gorge: the last GORGE_RUN m of river out. Channel within GORGE_CHANNEL of the centre line; walls rise to WALL_TOP. */
+const GORGE_RUN = 100;
+const GORGE_CHANNEL = 5;
+const GORGE_WALL_TOP_AT = 10;
+const GORGE_PLATEAU_END = 25;
+const GORGE_END = 35;
+const GORGE_WALL_TOP = WATER_LEVEL + 15;
 /** Stepping stones: their tops sit this far above the water (design section 4, "The crossings"). */
 const STONE_TOP = WATER_LEVEL + 0.3;
 /** A bridge deck is never lower than this above the water (design section 4, "The crossings"). */
@@ -61,7 +72,9 @@ const heightSampler = createHeightAt(VALLEY_SEED, VALLEY_SHAPE);
 
 /** Ground height (m) at a valley point. Same answer for the same (x, z) on every call. */
 export function valleyHeightAt(x: number, z: number): number {
-  return Math.min(heightSampler(x, z), riverBankHeight(x, z));
+  const d = riverDistance(x, z);
+  const bank = Math.min(heightSampler(x, z), riverBedAt(x, z) + RIVER_BANK_SLOPE * d);
+  return gorgeAdjust(bank, rimHold(bank, x, z, d), x, z);
 }
 
 export function isWater(x: number, z: number): boolean {
@@ -121,6 +134,14 @@ export function blocksWalking(x: number, z: number): boolean {
   return isWater(x, z) && !isCrossing(x, z);
 }
 
+/**
+ * What stops the hero in play: water (outside a crossing) and ground too steep to climb (MAX_WALK_SLOPE). The rim and
+ * the gorge walls are walls by slope, not by radius.
+ */
+export function blocksHero(x: number, z: number): boolean {
+  return blocksWalking(x, z) || (!isCrossing(x, z) && walkSlopeAt(x, z) >= MAX_WALK_SLOPE);
+}
+
 /** Distance from (x, z) to the segment a-b. */
 function distanceToSegment(x: number, z: number, a: LayoutPoint, b: LayoutPoint): number {
   const dx = b.x - a.x;
@@ -149,17 +170,93 @@ function riverBedAt(x: number, z: number): number {
   return RIVER_BED + (FORD_BED - RIVER_BED) * t * t * (3 - 2 * t);
 }
 
-/** The river's bank: the bed on the centre line, rising RIVER_BANK_SLOPE per metre. Cuts the land down near a river. */
-function riverBankHeight(x: number, z: number): number {
-  return riverBedAt(x, z) + RIVER_BANK_SLOPE * riverDistance(x, z);
-}
-
 function inOpenZone(x: number, z: number, zone: { x: number; z: number; radius: number }): boolean {
   return Math.hypot(x - zone.x, z - zone.z) < zone.radius;
 }
 
-/** Slope (rise over run) from ±1 m central differences. */
-function slopeAt(x: number, z: number): number {
+/** The openings in the rim: the patrol hut's zone and the north-west pass. The rim is not lifted inside them. */
+function inOpening(x: number, z: number): boolean {
+  return inOpenZone(x, z, PATROL_HUT_OPEN) || inOpenZone(x, z, NW_PASS_OPEN);
+}
+
+/** Rim height (m) at (x, z): the land's own height, lifted by RIM_RISE across the band RIM_START..RIM_FULL. */
+function rimHeightAt(x: number, z: number): number {
+  const t = Math.max(0, Math.min(1, (Math.hypot(x, z) - RIM_START) / (RIM_FULL - RIM_START)));
+  return heightSampler(x, z) + RIM_RISE * t;
+}
+
+/**
+ * The rim holds: beyond RIM_START the ground is never lower than the rim, so a river cut or a gorge wall cannot
+ * lower it into a walkable way out. Not applied in the river channel (the water runs through) or in the openings.
+ */
+function rimTopAt(x: number, z: number): number {
+  if (Math.hypot(x, z) < RIM_START || inOpening(x, z)) return -Infinity;
+  return rimHeightAt(x, z);
+}
+
+function rimHold(h: number, x: number, z: number, riverD: number): number {
+  if (Math.hypot(x, z) < RIM_START || riverD < GORGE_CHANNEL || inOpening(x, z)) return h;
+  return Math.max(h, rimHeightAt(x, z));
+}
+
+/** The gorge's centre line: the last GORGE_RUN m of the river out, cut at the right arc length. */
+function buildGorge(): { a: LayoutPoint; b: LayoutPoint }[] {
+  const pts = VALLEY_RIVER_OUT;
+  const lens: number[] = [];
+  for (let i = 0; i + 1 < pts.length; i++) lens.push(Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].z - pts[i].z));
+  const total = lens.reduce((s, v) => s + v, 0);
+  const start = Math.max(0, total - GORGE_RUN);
+  const out: { a: LayoutPoint; b: LayoutPoint }[] = [];
+  let acc = 0;
+  for (let i = 0; i < lens.length; i++) {
+    const s0 = acc;
+    acc += lens[i];
+    if (acc <= start) continue;
+    const t = Math.max(0, (start - s0) / lens[i]);
+    const a = { x: pts[i].x + (pts[i + 1].x - pts[i].x) * t, z: pts[i].z + (pts[i + 1].z - pts[i].z) * t };
+    out.push({ a, b: pts[i + 1] });
+  }
+  return out;
+}
+const GORGE_SEGMENTS = buildGorge();
+
+/** Distance (m) from (x, z) to the gorge's centre line. */
+function gorgeDistance(x: number, z: number): number {
+  let best = Infinity;
+  GORGE_SEGMENTS.forEach((s, i) => {
+    // Points upstream of the cut (before the first gorge segment's start) are not gorge: no cap-shaped walls.
+    const dx = s.b.x - s.a.x;
+    const dz = s.b.z - s.a.z;
+    const u = ((x - s.a.x) * dx + (z - s.a.z) * dz) / (dx * dx + dz * dz);
+    if (i === 0 && u < 0) return;
+    best = Math.min(best, distanceToSegment(x, z, s.a, s.b));
+  });
+  return best;
+}
+
+/**
+ * Gorge walls (GAME_DESIGN section 4): from the channel's bank the wall climbs to GORGE_WALL_TOP (a face steeper than
+ * 0.7), stands on a plateau, and falls back to the land by GORGE_END. Where the gorge meets the rim its top is the rim,
+ * so the walls there close the edge. `bank` is the channel's own bank; `land` is the ground off the gorge.
+ */
+function gorgeAdjust(bank: number, land: number, x: number, z: number): number {
+  const d = gorgeDistance(x, z);
+  if (d < GORGE_CHANNEL || d >= GORGE_END) return land;
+  const top = Math.max(GORGE_WALL_TOP, rimTopAt(x, z));
+  if (d < GORGE_WALL_TOP_AT) return bank + ((top - bank) * (d - GORGE_CHANNEL)) / (GORGE_WALL_TOP_AT - GORGE_CHANNEL);
+  if (d < GORGE_PLATEAU_END) return top;
+  const t = (d - GORGE_PLATEAU_END) / (GORGE_END - GORGE_PLATEAU_END);
+  const s = t * t * (3 - 2 * t);
+  return top + (land - top) * s;
+}
+
+/** True on the gorge: the walls and the channel between them (the last GORGE_RUN m of the river out). */
+export function isGorge(x: number, z: number): boolean {
+  return gorgeDistance(x, z) < GORGE_END;
+}
+
+/** Slope (rise over run) from ±1 m central differences: the walking rule's measure. */
+export function walkSlopeAt(x: number, z: number): number {
   const dx = valleyHeightAt(x + 1, z) - valleyHeightAt(x - 1, z);
   const dz = valleyHeightAt(x, z + 1) - valleyHeightAt(x, z - 1);
   return Math.hypot(dx, dz) / 2;
@@ -167,16 +264,14 @@ function slopeAt(x: number, z: number): number {
 
 /**
  * Ground the hero may walk on. Water is not ground (it is swum), river banks are walkable down to the water,
- * the edge ring is closed except the patrol hut's zone and the north-west pass, and the walk must be gentle.
+ * the rim is a climb too steep to make (its openings are the patrol hut's zone and the north-west pass), and the walk must be gentle.
  * The walkable crossings' strips are open (walkSurfaceAt gives their height); the forge bridge's strip is not.
  */
 export function isWalkableGround(x: number, z: number): boolean {
   if (!insideValley(x, z)) return false;
   if (isCrossing(x, z)) return true;
   if (isWater(x, z)) return false;
-  const r = Math.hypot(x, z);
-  if (r > EDGE_RADIUS && !inOpenZone(x, z, PATROL_HUT_OPEN) && !inOpenZone(x, z, NW_PASS_OPEN)) return false;
-  return slopeAt(x, z) < MAX_WALK_SLOPE;
+  return walkSlopeAt(x, z) < MAX_WALK_SLOPE;
 }
 
 /**

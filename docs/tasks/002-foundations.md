@@ -34,4 +34,4 @@ Put the groundwork in place before the open world is built: the current engine, 
 - Every contact sheet clearly shows its motion.
 - The smoke test runs in the deploy workflow and passes.
 - Tests, typecheck, and build pass. Merged, deployed, and logged in `docs/status.md`.
-- The asset survey is merged and logged. Wait for Claude's review of it, and Greg's decisions on any gaps, before starting task 003.
+- The asset survey is merged and logged. Then do task 002b, the style test, which the review of the survey asked for. Task 003 waits on it.

@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 19 (consistency pass: milestones reordered so progression comes before the finale, valley enlarged to 800 m, input and error-handling rules added, gaps closed). Supersedes version 18.
+Version 20 (the households of Wick, enemy routines, the company of six, how people speak, money, and the music). Supersedes version 19.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -134,8 +134,24 @@ Sound:
 
 - Ambient nature per area and time of day: birdsong, wind, water, crickets at night.
 - Sound effects for blade swing and hit, knife throw, bow draw, bow release, arrow impact, footsteps by surface, dodge, taking damage, death, the alarm bell, geese, birds taking off, chest opening, item pickup, breaking objects, lighting a lantern, levelling up, and earning a perk.
-- Music that responds: calm while exploring, building when enemies are aware of the hero, and the lantern melody when a place is freed (section 9). Use CC0 music and audio (Kenney audio packs first). All music is original or CC0; never imitate a known melody.
+- Music as described under Music below.
 - Master, music, and effects volume in the settings panel. Audio starts on the first click, as browsers require.
+
+Music:
+
+- **The game performs its music from notes.** Scores are stored as note data and played through recordings of real instruments, one note at a time (VSCO 2 Community Edition, CC0, is the first source for samples; keep its licence with the files). Nothing depends on finished music recordings.
+- **Stems are accepted too.** The same system can instead play a set of synchronised recordings, one per instrument, so a human musician's version can replace a score without code changes.
+- **One melody runs through the whole game.** Its score is in `docs/writing/melody.md`.
+  - *The lantern melody:* played when a place is freed, with one more instrument each time.
+  - *Wick's theme:* the same melody, with more instruments the more windows are lit.
+  - *Character tones:* the short tones that accompany dialogue are notes taken from it.
+  - *Hesper* hums its first phrase when she lights a lantern.
+  - *The wren* sings that phrase in the finale.
+  - *The castle's music* is the melody inverted, in a minor key.
+- **Sparse and quiet.** A few notes with room between them. Never busy, never loud.
+- **It responds:** calm while exploring, different by day and by night; a low pulse when an enemy is suspicious, building when one is alert; the melody on a lantern.
+- **Silence is allowed.** Long stretches of only wind and birds are intended.
+- All music is original or CC0. Never imitate a known melody.
 
 ## 5. Combat
 
@@ -158,6 +174,7 @@ Controls:
 - `E`: interact (open chest, talk, use a town service)
 - `F`: eat food to heal
 - `Q`: squad order, toggling between "follow me" and "hold here"
+- `T`: squad order "take them alive", on or off
 - `M`: map
 - `I`: inventory
 - `K`: skills and perks
@@ -230,6 +247,20 @@ How enemies fight:
 - **What killing costs.** Nothing directly: it is always easier. But the dead cannot come home, a place taken by killing leaves its survivors less willing to stay, and the valley recovers more slowly.
 - **Stane is the exception.** At low health he yields instead of dying, because the story needs what he has to say.
 
+A day at an enemy-held place:
+
+Every place runs on a schedule, so watching it first tells the player something and choosing when to strike is a real decision. Schedules, routes, and habits are data.
+
+- **By day:** patrols walk set routes; others work at what the place was (hauling grain at the Mill, hammering at the Forge).
+- **At midday and dusk:** most gather at the fire to eat. The edges are thin and the centre is crowded.
+- **Guard changes** happen at fixed times, leaving a post empty for a few seconds.
+- **At night:** most sleep. Two or three keep watch with torches. Torchlight shows where they are, and shows them the hero if the hero stands in it.
+- **Habits.** Each bandit has a name, a loyalty, and a former trade; two or three at each place also have a habit the player can use: one slips away alone to fish at the same hour, one dozes on night watch, one feeds the geese each morning, which is the only time they are quiet.
+- **Overheard lines.** While unnoticed and close, the hero hears short exchanges between bandits, shown as text near the speakers. They carry information (when the guard changes, where the strongbox key is kept, which fence has a gap), story (what they think of Stane, rumours of the beacon), and who can be won back (a bandit who mutters that he never wanted this is likelier to stay in Wick).
+- **They react.** A body or a knocked-out comrade that is found raises the alarm. A missing guard is noticed at the next change. After one place is freed, the others post an extra night watch.
+- **The tax cart.** Every few days a cart with a small escort travels from the Watch-house to Wick and back, taking a share from the villagers. It can be ambushed on the road for its strongbox, or left alone. It stops running when the Watch-house is freed.
+- Six to eight defenders at each place in Tallowmere, plus the leader.
+
 Unit types:
 
 | Unit | Weight | Behavior | How to beat them |
@@ -248,7 +279,8 @@ Fighting alongside Bram:
 - **Bram breaks guards.** His heavy strike staggers a shield-bearer and drops their shield for a moment, opening the shot.
 - **Bram holds attention.** Enemies near him prefer him as a target, which is what lets the hero stay at range.
 - Later recruits each bring one such trait of their own.
-- **Squad size.** The hero starts with Bram alone. In Tallowmere the squad can grow to three companions, as Leadership rises and people become available.
+- **Squad size.** The hero starts with Bram alone. In Tallowmere up to three companions travel with the hero, chosen from the company (section 6).
+- **Take them alive.** With this order on, companions use only strikes that knock out. With it off, they kill. It is off by default and shown on the HUD.
 
 Impact:
 
@@ -348,12 +380,31 @@ A player who rushes arrives at Stane under-levelled but able to win with skill; 
 
 ### Seeing it
 
-- **Skills screen** on `K`, with three tabs: Skills (a bar per skill, the current level, what the next level gives, and the region cap), Perks (slots, saved sets, each perk's mastery rank, and the perk ledger), and Recipes.
+- **Skills screen** on `K`, with four tabs: Skills (a bar per skill, the current level, what the next level gives, and the region cap), Perks (slots, saved sets, each perk's mastery rank, and the perk ledger), Recipes, and Notes (fragments found, and the important things people have said; a record to reread, never a list of tasks).
 - **Levelling up** plays a quiet chime and shows one line on screen. Nothing interrupts play. A new perk gets a slightly longer moment and its own sound.
 
 ### Companions
 
-Bram and later recruits level by fighting alongside the hero, under the same region cap. Each has three perks of their own, earned at fixed levels and always active, with no slots to manage.
+The company is the collecting layer of the game: a small roster of people gathered across the valley, each with a job in a fight, where choosing who to bring is part of the plan.
+
+- **Six companions can be found in Tallowmere.** Up to three travel with the hero. The others wait in Wick, and the travelling three are changed at Hesper's or at a campfire.
+- **Each has one signature trait** that changes how a fight goes, three perks of their own that are always active, and gear slots the player fills from the inventory.
+- **Companions are never killed.** One who falls is wounded: they are out of the fight and recover when the hero rests.
+- **Companions level** by travelling with the hero, under the same region cap.
+
+| Who | Where they come from | What they do |
+| --- | --- | --- |
+| Bram | Came with the hero | Shield and sword. Holds the line, breaks guards, draws enemies onto himself |
+| Tamsin Sedge | The shepherds' daughter, a poacher. Returns with her family | A second bow. Covers the hero from range and shoots whoever is marked |
+| Tobin Pike | A bandit won back (section 9, the Pikes) | Knows Stane's men. With him present, patrol routes at enemy places are shown once the place has been watched, and his former comrades lose morale faster |
+| Oona | The herbwife. Returns in the middle of the valley's recovery | Does not fight. Gets fallen companions back on their feet during a fight, and makes food heal more |
+| Garrick Aldric | The smith's apprentice. Returns with the smith | A two-handed hammer. The answer to brutes: his blows stagger heavy enemies |
+| Bracken | The Sedges' sheepdog | Growls when enemies are near, leads the hero toward secrets, and cannot be harmed. He takes one of the three places |
+
+- **Bond.** Each companion has three stages of bond with the hero, which grow by travelling, fighting, and sharing campfires together. Each stage unlocks one of their perks and a new set of lines.
+- **A wish.** Each companion wants one thing, mentioned in passing and never listed as a task. Tobin wants to face his parents. Tamsin wants her father's bow back from the Watch-house. Fulfilling it is what reaches the third stage of bond.
+- **Pairs.** Some companions have lines for each other at campfires, and a few act together in a fight without being told: Bram breaks a shield and Tamsin takes the shot.
+- **Nothing missable.** If Tobin was killed, another bandit who can be won back fills his role, with a different name and the same trait.
 
 ### Loot
 
@@ -390,11 +441,20 @@ What the player finds, and where:
 - **Storage:** a chest at Hesper's house from the start, unlimited.
 - **Home.** After the valley finale the Fairlow house is the hero's. It has the storage chest, a bed to rest in, and racks, shelves, and a mantel where weapons, unique items, and trophies can be placed and seen. The house fills up as the collection grows.
 
-### Trade
+### Money and trade
 
-- Traders are among the people who return: a general trader early, then others tied to places and trades.
-- Prices improve and stock widens as the valley recovery level rises.
-- Gold comes from strongboxes, selling, and the income from freed places.
+- **Crowns** are the currency: the old kingdom's coins, still in use and still stamped with a crown that no longer exists. Amounts are small, in tens and hundreds.
+- **Where crowns come from:** strongboxes at freed places, the tax cart, selling loot, game, and crafted things, and a small income each day from every place freed.
+- **Where crowns go:**
+  - *Early:* arrows, food, and tending wounded companions. The player should feel poor at first.
+  - *Midway:* the smith's upgrades, the largest personal purchase.
+  - *Throughout: rebuilding Wick.* Each project is paid for and then visible in the world: lanterns along the roads (which keep wolves off that road at night), the well, the bridge to the Forge, the market stalls, the inn (which brings travellers and new families), the village bell (which rings at dusk), and repairs and furnishings for the Fairlow house once it is the hero's. Projects are data.
+  - *Fallbacks:* a perk taught late by Hesper in place of its lost teacher costs crowns.
+- **People cannot be bought.** Nobody is recruited or brought home with crowns.
+- **Stane's tax.** While the Watch-house is held, the tax cart reduces the daily income and the stock and prices in Wick. Stopping the cart removes the reduction until the next one.
+- **Death** costs a share of the crowns the hero is carrying, so crowns can be left in storage.
+- **Traders** are among the people who return: a general trader early, then others tied to places and trades. Prices improve and stock widens as the valley recovers.
+- **The purse is tested.** The pacing test also checks the hero's crowns at each story beat against bands set in data: always enough for the essentials, never so much that nothing is left to want.
 
 Exact XP curves, perk lists, recipes, weights, prices, and tier stats are tuning, not design. Keep them in data.
 
@@ -427,14 +487,15 @@ Each milestone ends deployed to Pages and playable. Do not start the next one un
 
 1. **Combat prototype.** Done: a third-person hero with blade and bow, telegraphed enemies, dodge, waves, the tuning panel, and the camera fade.
 2. **Foundations.** The engine upgrade, the hooded scout as the hero, sound effects, showcase mode, error capture and the debug report, the smoke test, the input rules, and the game's name on the page. Task 002.
-3. **The world.** Tallowmere, about 800 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, water, the boundary, horizon landmarks, ambient wildlife, ambient sound, Wick in its abandoned state with Hesper's lit window, the first-person toggle, the pause menu and settings, and tour mode. No enemies. This milestone must clear the first-look bar in its task. Task 003.
-4. **Places and fights.** The Mill, the Forge, and the Watch-house; stealth, scouting, alarm bells, and the stealth animals; Bram, squad orders, and pathfinding; the lantern ritual and restoration; the ten places off the path; boar and wolves; campfires, healing, the compass, and the map. Items are simple counts at this stage. The prototype arena and waves are removed. Task 004.
-5. **Combat depth.** Everything in section 5 under The bow, Close combat, How enemies fight, Unit types, Fighting alongside Bram, and Impact. Task 005.
-6. **Progression, loot, and crafting.** Everything in section 6, including smithing and trade. Task 006.
-7. **First five minutes and the valley finale.** The title screen, onboarding prompts, saves, the turn, the Stane fight, and the finale at the Fairlow house (section 9). Built last so that it is tuned once, against the finished systems. Task 007.
-8. **Home and holdings.** The Fairlow house as the hero's home with its displays, income from freed places, more recruits, wounded companions, and places that restock.
-9. **Cloud saves.** Supabase auth and save sync.
-10. **More world.** A second region, the horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
+3. **The world.** Tallowmere, about 800 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, water, the boundary, horizon landmarks, ambient wildlife, ambient sound, the music system playing the melody, Wick in its abandoned state with Hesper's lit window, the first-person toggle, the pause menu and settings, and tour mode. No enemies. This milestone must clear the first-look bar in its task. Task 003.
+4. **Places and people.** The Mill, the Forge, and the Watch-house with their daily routines, overheard lines, and the tax cart; stealth, scouting, alarm bells, and the stealth animals; Bram, squad orders, and pathfinding; how people speak, including Show; the sixteen households and the window count; the lantern ritual and restoration; the ten places off the path; boar and wolves; campfires, healing, the compass, and the map. Items are simple counts at this stage. The prototype arena and waves are removed. Task 004.
+5. **Combat depth.** Everything in section 5 under The bow, Close combat, How enemies fight, Unit types, Fighting alongside Bram, and Impact, with the take-them-alive order. Task 005.
+6. **Progression, loot, and money.** Everything in section 6 except Companions: skills, perks, pacing, loot, gathering, crafting including smithing, carrying, and money and trade with the rebuilding projects. Task 006.
+7. **The company.** The six companions, the roster, bond, wishes, pairs, and campfire scenes (section 6, Companions). Task 007.
+8. **First five minutes and the valley finale.** The title screen, onboarding prompts, saves, the turn, the Stane fight, and the finale at the Fairlow house (section 9). Built last so that it is tuned once, against the finished systems. Task 008.
+9. **Home and holdings.** The Fairlow house as the hero's home with its displays, wounded companions needing care, and places that restock.
+10. **Cloud saves.** Supabase auth and save sync.
+11. **More world.** A second region, the horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
 
 ## 9. Story
 
@@ -452,6 +513,7 @@ Keep every name in data, never in code.
 | Bram | The friend (he) | Short and sturdy, like him |
 | Wren | The hero's parent | A small bird that returns to the same nest. Never state whether Wren is the hero's mother or father; avoid pronouns for Wren entirely |
 | Fairlow | The hero's family name | On the marker stone and the house |
+| Crowns | The currency | The fallen kingdom's coins, still spent |
 | The hero | Unnamed and silent | Others call the hero "the apprentice" or "Wren's child" |
 
 ### Premise
@@ -508,6 +570,34 @@ Every enemy-held place used to be something, and freeing it brings that thing an
 
 Each place looks like what it was, under what the bandits have done to it: a mill with a stopped wheel, a cold forge. Once freed, the wheel turns and the forge is lit. More places follow the same pattern in later regions. Every place is defined in data with its past, its person, and its reward.
 
+### The households of Wick
+
+Wick's recovery is not a number. It is a list of households, and every window in the game belongs to someone.
+
+- **Sixteen households** in and around Wick. Each has a family name on a marker stone, a house, a trade, a reason they left, and one specific thing that brings them home. All are data.
+- **What brings a household home varies:**
+  - a place freed (the millers return when the Mill is lit);
+  - a stolen thing returned (one family will not come back without it);
+  - a bandit won back who is one of their own;
+  - safety (a road no longer hunted by wolves);
+  - a project built (the inn brings a family who were never from here);
+  - or simply enough of their neighbours being home.
+- **A daily life.** Villagers wake at dawn, work at their trade by day, gather at the well at dusk, and go home at night, which is when their window lights. Hesper's window stays lit all night; the others go dark in the small hours.
+- **Each household gives something:** a service, a recipe, a perk, a fragment of the story, or only a greeting.
+- **Children and a dog** come back with certain families.
+- **The window count.** Entering Wick at night, and on the map, the game shows how many windows are lit out of sixteen. This is the game's true measure of progress. The Fairlow window is the seventeenth and is lit last.
+
+Six households are written in full; the other ten are lighter, with a name, a trade, a trigger, and two or three lines.
+
+| Household | Trade | What brings them home | What they bring |
+| --- | --- | --- | --- |
+| The Marrins | Millers | The Mill is freed | Bread and flour; food for sale |
+| The Aldrics | Smiths | The old smith's hammer, taken by Stane, is returned | The Forge's services, and Garrick as a companion |
+| The Sedges | Shepherds | The east road is safe from wolves | Sheep, wool, Tamsin, and Bracken |
+| The Pikes | Farmers | Their son Tobin, who ran off to join Stane at fifteen, is won back | Tobin as a companion; a fragment about the night the soldiers left |
+| Old Maren | None now | Never left | She remembers everyone, and tells the hero who lived where and what they lost |
+| The Wains | Carters | The inn is rebuilt | A young couple who were never from here: proof that word has spread that Tallowmere is safe |
+
 ### The lantern ritual
 
 A place is not freed when the last defender falls. It is freed when the hero lights its lantern.
@@ -537,7 +627,7 @@ There is no quest log and no long dialogue. The story is carried by:
 - **Recruits.** Each squad member after Bram is a named person with a home in the valley and a two-sentence reason for joining. Some become available only after a specific place is freed.
 - **Landmarks** on the horizon that the fragments refer to, above all the dark beacon on the castle.
 
-Restoration is tracked as a single valley recovery level in the game state. It rises with each lantern lit and falls when a place is retaken. Scenery, villager count, animals, lights, banners, and music read from it.
+The valley recovery level used elsewhere in this document is derived, not stored on its own: it is computed from the places freed, the households home, the bandits won back, the stolen things returned, and the projects built. It falls when a place is retaken. Scenery, animals, traders' stock, prices, banners, and music read from it.
 
 ### The valley finale
 
@@ -553,7 +643,14 @@ Restoration is tracked as a single valley recovery level in the game state. It r
 - **Pause menu** (`Esc`): Resume, Settings, Controls, Quit to title. The simulation stops while it is open.
 - **Settings:** mouse sensitivity, invert vertical look, field of view for each camera view, camera shake and hit-freeze strength, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
 - **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, crouch, mark, attack, switch weapon, change arrow, dodge, lock on, throw a knife, change view, eat, squad order, map, inventory, skills) and never again once used. Hesper points the hero toward the nearest camp.
-- **HUD:** hero health, equipped weapon, arrow count and type, knife count, food count, squad order, lock-on marker, compass strip. Keep it small; hide what is not needed outside combat.
+- **How people speak.** There is no recorded voice. Speech is text, in three forms:
+  - *Lines above heads:* a short line floating over a character for a few seconds. Used for villagers at their day, companions in the field, bandits overheard, and shouts in a fight. At most two sentences, and it never stops play.
+  - *Conversations:* `E` on Hesper, a trader, or anyone with more to say. The camera turns gently toward them and their name and line appear in a box at the bottom, stepped through with `E`. Services such as trade and rest are offered here.
+  - *Campfire scenes:* companions speak to each other in lines above their heads while the camera drifts around the fire.
+- **Show.** The hero never speaks, so there are no dialogue choices. Every conversation instead offers Show: the player picks something they have found, and the person responds to it if they have something to say. Fragments, stolen goods, and unique items can all be shown. This is how the player asks questions.
+- **Character tones.** Each main character has a short musical tone, taken from the melody, that plays as their text appears. It can be turned off in settings.
+- **Text settings:** size and speed.
+- **HUD:** hero health, equipped weapon, arrow count and type, knife count, food count, squad orders, lock-on marker, compass strip, and the window count while in Wick at night. Keep it small; hide what is not needed outside combat.
 - **Inventory screen** (`I`). The world pauses and the mouse is freed while it is open.
   - *Left:* the scout as they currently look, with equipment slots for bow, blade, knives, cloak, and armour pieces. Clicking a slot shows what can go in it.
   - *Top:* tabs, one per kind of thing: Weapons, Arrows, Armour, Food, Materials, Stolen Goods, Keepsakes (unique items).

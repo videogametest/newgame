@@ -32,7 +32,8 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 - Paths leading out of Wick toward where the Mill, the Forge, and the Watch-house will be. Leave those sites as recognisable buildings with no people.
 - Wind in grass and foliage, drifting clouds, butterflies by day, fireflies at dusk and night.
 - Ambient wildlife from section 4: songbirds, rabbits, and deer that scatter, owls at night, bees at the orchard site, fish in the lake.
-- Ambient sound by area and time of day, footsteps by surface, and the calm exploration music.
+- Ambient sound by area and time of day, and footsteps by surface.
+- The music system from section 4 (Music): scores as note data played through sampled instruments, with support for synchronised stems as an alternative. Play Wick's theme and the calm exploration music from `docs/writing/melody.md`, layer 1 only at this stage, sparse and quiet, with long silences. Add music volume to settings.
 - The hero starts at the valley's edge at dusk, facing the lit window.
 - Tour mode (`?tour=1`).
 
@@ -44,7 +45,7 @@ Richness comes before breadth: if time is short, make a smaller area dense rathe
 - **Lighting and image quality:** soft shadows, ambient occlusion, tone mapping, gentle bloom on lit windows and fires, distance haze, and a colour grade that keeps the image warm. Night is dark blue, not black, and lit things glow against it.
 - **Density:** no patch of bare ground larger than a few metres anywhere the player can walk.
 - **The village reads as a village** and as abandoned, at a glance.
-- **Sound** is present from the first second.
+- **Sound** is present from the first second, and the melody is heard, quietly, on the walk toward the lit window.
 - **Evidence:** tour-mode screenshots of the arrival view at dusk in both camera views, the village at noon and at night, a forest view, a field view, the lake, the waterfall, and the view from the signal hill, plus the measured frame rate and draw calls for each.
 
 ## Rules
@@ -52,6 +53,7 @@ Richness comes before breadth: if time is short, make a smaller area dense rathe
 - Scenery and animals come from CC0 packs that match the KayKit characters. Keep licence files with the assets. If a species has no suitable model, log it and leave it out.
 - Use only original or CC0 audio and art. Do not imitate characters, symbols, or melodies from any existing game.
 - Use the names in section 9 everywhere, and keep them in data.
+- Use everything in `docs/writing/` exactly as written. See `docs/writing/README.md`.
 - Meet the performance budgets in section 7 and report the measured numbers after each step.
 
 ## Done when

@@ -1,4 +1,4 @@
-# 004: Places and fights (milestone 4)
+# 004: Places and people (milestone 4)
 
 Status: open
 
@@ -6,7 +6,7 @@ Status: open
 
 Put people, danger, and purpose into Tallowmere: the three enemy-held places, the scout's way of taking them, and the lantern that frees them. Scoped in `GAME_DESIGN.md` section 8, milestone 4. Start only after task 003 has passed its review.
 
-## Build in four steps
+## Build in five steps
 
 Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
@@ -19,25 +19,34 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 ### Step 2: Places and stealth
 
-- The Mill, the Forge, and the Watch-house in data, each with its past, its person, its reward, a named leader, defenders, patrol routes, an alarm bell, an unlit lantern, and Stane's banners. Each looks like what it used to be.
+- The Mill, the Forge, and the Watch-house in data, each with its past, its person, its reward, a named leader, six to eight named defenders, an alarm bell, an unlit lantern, and Stane's banners. Each looks like what it used to be.
+- A day at an enemy-held place, from section 5: the schedule by time of day, patrol routes, meals, guard changes, sleeping and night watch with torches, two or three habits per place, the reactions (bodies found, missing guards, extra watch after a place falls), and the tax cart on the road. Schedules, routes, and habits are data, and the schedule logic is pure and tested.
 - Stealth and scouting from section 5: the unaware, suspicious, and alert states with markers, the noticing rules as pure tested functions, marking through the bow zoom, the bonus for striking an unaware enemy, and the alarm bell with reinforcements.
 - The stealth animals from section 4: crows over held places, startled birds, the Mill's geese, and the fox.
-- A few villagers in Wick with one or two short lines each, and Hesper with a first set of lines.
 
-### Step 3: The lantern and restoration
+### Step 3: Speech and the households
+
+- How people speak, from section 10: lines above heads, conversations with the bottom box, Show, character tones from the melody, and text settings. Overheard lines at enemy places use the lines-above-heads form and appear only while the hero is unnoticed.
+- The sixteen households of Wick from section 9, as data: the six written in full and ten lighter ones that you draft. Each household's trigger, house, trade, daily routine, lines by stage of recovery, and what it gives.
+- Daily life: villagers who are home wake, work, gather at the well at dusk, and go home at night, when their window lights.
+- The window count, shown on entering Wick at night and on the map.
+- Hesper and Old Maren present from the start, with conversations. Use `docs/writing/` for any character whose lines are written there; draft the rest and mark them as drafts.
+
+### Step 4: The lantern and restoration
 
 - The lantern ritual from section 9: `E` to light it once the defenders are cleared, the banner comes down, the crows leave, the melody plays with one more instrument per place freed, and the lantern is visible from a distance at night.
-- The valley recovery level, and what reads from it: each place restored (the mill wheel turns, the forge is lit), and Wick recovering (villagers, repairs, worked fields, lit windows, animals, lanterns on the family markers).
+- The lantern melody from `docs/writing/melody.md`, gaining a layer with each place freed, and Wick's theme gaining layers with lit windows.
+- Restoration: each place restored (the mill wheel turns, the forge is lit), households coming home when their trigger is met, and Wick changing with them (repairs, worked fields, lit windows, animals, lanterns on the family markers). The valley recovery level is derived as section 9 describes. Triggers that depend on later tasks (stolen goods, bandits won back, projects) are wired but will only fire once those systems exist.
 - Hesper lights the first lantern alongside the hero.
 - In this task the Watch-house is captured like the other places. Stane, the turn, and the finale are task 007.
 
-### Step 4: The valley's corners
+### Step 5: The valley's corners
 
 - The ten places off the path from section 4, each with its content and its fragment of the story as listed in section 9.
 - Boar in the deep forest, and wolves at night that will not approach a lit lantern or campfire.
 - Campfires: at least three, with resting and waiting until dusk or dawn. Cooking arrives in task 006.
 - Healing by food and by resting, hunting with the protected animals unharmable, chests, breakables, and cuttable grass.
-- The compass strip, the map on `M` with discovery, and responsive music.
+- The compass strip, the map on `M` with discovery, and the responsive music from section 4 (the pulse when enemies are suspicious or alert).
 - Extend tour mode to the three places and the ten secrets.
 
 ## Items at this stage
@@ -58,8 +67,10 @@ The full inventory, gear, and crafting are task 006. Until then keep items as si
 - A blade-only bot that never dodges loses at the Watch-house.
 - A stealth bot that marks, then strikes unaware enemies, frees the Mill taking less damage than the loud bot.
 - A bot that lets the bell ring faces reinforcements and takes longer.
+- A bot that attacks the Mill at night meets fewer waking defenders than one that attacks at midday.
 
 ## Done when
 
-- All four steps are merged and deployed and the balance tests pass.
+- All five steps are merged and deployed and the balance tests pass.
+- A test proves each of the six written households comes home when, and only when, its trigger is met (for triggers available in this task).
 - Then continue to task 005.

@@ -1,10 +1,10 @@
-# 007: First five minutes and the valley finale (milestone 7)
+# 008: First five minutes and the valley finale (milestone 8)
 
 Status: open
 
 ## Goal
 
-A new player can start the game, learn it without being told, save their progress, and reach a real ending for the first valley. Scoped in `GAME_DESIGN.md` section 8, milestone 7. It is built last so that the opening, the Stane fight, and the pacing are tuned once, against the finished systems. Follow section 10 for interface and section 9 for the finale.
+A new player can start the game, learn it without being told, save their progress, and reach a real ending for the first valley. Scoped in `GAME_DESIGN.md` section 8, milestone 8. It is built last so that the opening, the Stane fight, and the pacing are tuned once, against the finished systems. Follow section 10 for interface and section 9 for the finale.
 
 ## Do
 
@@ -20,7 +20,7 @@ A new player can start the game, learn it without being told, save their progres
 
 - The game is called "Every Lit Window". Show it on the title screen, read from the single title constant.
 - Add a headless test that plays from New Game to the finale using the bot, including the turn and the Captain, and one that saves, reloads, and checks the state matches.
-- Write Stane's, Hesper's, and Bram's lines yourself, short and plain, following their voices in section 9 and using the sample lines there as given, including at least six campfire exchanges, and list them all in `docs/status.md` so they can be reviewed and rewritten. Reveal only what section 9 says the first valley reveals; never state or imply "The answer". Never use a pronoun for Wren.
+- Use `docs/writing/hesper.md`, `stane.md`, and `bram.md` exactly as written. If one of them is still marked not yet written when you reach this task, stop and say so in `docs/status.md` rather than drafting the story's key lines yourself. For anything else you draft, including at least six campfire exchanges, and list them all in `docs/status.md` so they can be reviewed and rewritten. Reveal only what section 9 says the first valley reveals; never state or imply "The answer". Never use a pronoun for Wren.
 - Balance target for the Captain fight: the skilled bot wins with 15 to 50% HP left; a sword-only bot that never dodges loses.
 
 ## Done when
@@ -28,4 +28,4 @@ A new player can start the game, learn it without being told, save their progres
 - A fresh browser profile can go from title screen to finale with no instructions outside the game.
 - Tests, typecheck, and build pass. Merged, deployed, and logged in `docs/status.md`.
 - The pacing test from task 006 must still pass with the turn and the Stane fight in place.
-- Stop after this task. Do not start milestone 8.
+- Stop after this task. Do not start milestone 9.

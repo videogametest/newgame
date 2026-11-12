@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 21 (the Stane fight, difficulty settings, and the plan for sourcing models). Supersedes version 20.
+Version 22 (settled details for stealth, combat, companions, and the clock, answering the logic streams' questions; crowns named everywhere). Supersedes version 21.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -52,7 +52,7 @@ These are expensive to change. Do not revisit without asking.
 Rules:
 
 - **Difficulty is fixed by location.** Enemies do not scale with the player. Places farther from the starting village are harder. Early areas become easy; later areas are gated by strength, not locks.
-- **Dying:** no permadeath. The player keeps XP earned, loses a portion of carried gold, and wakes at the nearest owned town. Squad members who fell are wounded: they stay behind until healed for gold or until the player rests at a town.
+- **Dying:** no permadeath. The player keeps XP earned, loses a portion of carried crowns, and wakes at the nearest owned town. Squad members who fell are wounded: they stay behind until healed for crowns or until the player rests at a town.
 - **Income** accrues per place captured and per in-game day, not real-world time.
 - **Healing.** Health does not regenerate on its own. Food, found in the world or bought in town, heals over a few seconds when eaten and can be interrupted by taking damage. Resting at an owned town heals the hero and squad fully and advances time to the next morning. Resting at a campfire (section 4) heals the hero and squad to half and lets the player wait until dusk or dawn.
 - **Enemies stay dead** in captured places, except when the story retakes one (section 9, The turn). Uncaptured camps restock their defenders after several in-game days.
@@ -237,7 +237,7 @@ How enemies fight:
 - **Kill or knock out.** Every bandit can be dealt with either way, and the choice is the player's each time.
   - *Killing:* standard and fire arrows, the short blade, and throwing knives are lethal. An enemy whose health reaches zero dies: they fall and stay down, with no blood and no gore.
   - *Knocking out:* blunt arrows (see The bow) and Bram's shield strike are not lethal. An enemy whose health reaches zero from one of these is knocked out. A stealth strike from behind offers both: `E` to knock out, attack to kill.
-  - Knocking out is the harder path. Blunt arrows do less damage and gain nothing from weak points except against an unaware enemy, whom a blunt arrow to the head knocks out at once. A knocked-out enemy can be found and woken by an ally while the place is still held.
+  - Knocking out is the harder path. Blunt arrows do less damage and gain nothing from weak points except against an unaware enemy, whom a blunt arrow to the head knocks out at once. A knocked-out enemy can be found and woken by an ally while the place is still held. A woken enemy gets up after a few seconds at half health, alert.
 - **Surrender.** An enemy whose nerve breaks may throw down their weapons and kneel. They can be left alone, which counts as sparing them, or attacked, which is never rewarded.
 - **Winning them back.** When a place is freed, every bandit knocked out or spared there is taken to Wick. The next morning each one decides. The chance they stay rises with the valley recovery level (there is more to come home to), with how many of their fellows at that place were spared rather than killed, and with their own nature, set in data: each bandit has a name, a loyalty to Stane, and the trade they had before.
   - *They stay.* They become a villager, take up their old trade, and say a line about it. Each one adds to the valley recovery level, so another window is lit. A few are recruitable into the squad.
@@ -276,7 +276,7 @@ Each unit type is a data entry with its model, weight, attacks, and morale. Stan
 Fighting alongside Bram:
 
 - **Marked targets are Bram's priority.** Whoever the hero marks, Bram goes for first, so the player directs the fight by where they look.
-- **Bram breaks guards.** His heavy strike staggers a shield-bearer and drops their shield for a moment, opening the shot.
+- **Bram breaks guards.** His heavy strike staggers a shield-bearer and drops their shield for a moment, opening the shot. This is his Breaker perk, which he has from the second stage of bond.
 - **Bram holds attention.** Enemies near him prefer him as a target, which is what lets the hero stay at range.
 - Later recruits each bring one such trait of their own.
 - **Squad size.** The hero starts with Bram alone. In Tallowmere up to three companions travel with the hero, chosen from the company (section 6).
@@ -289,6 +289,22 @@ Impact:
 - A short slow-motion moment when the last defender of a place is beaten.
 - Distinct sounds for a normal hit, a weak-point hit, a critical strike, a blocked arrow, and a broken guard.
 - All of these are tunable and can be turned down in settings.
+
+### Settled details
+
+Rulings on questions the logic raised. Numbers named here as "tuning" live in data.
+
+- **Losing the hero.** An alert enemy who loses sight of the hero goes to the last place the hero was seen and searches for a set time (tuning), then drops to suspicious, then returns to routine. A suspicious enemy who finds nothing returns to routine after a shorter time. Notice drains while the hero is unseen. Nothing an enemy has found (a body, a missing guard) is forgotten.
+- **Hearing.** Every noise has a radius, set by what made it. Enemies inside the radius become suspicious and look toward it. Walls do not block sound.
+- **Knives and heavy enemies.** A throwing knife interrupts a light enemy's wind-up. It does not interrupt a heavy enemy.
+- **Breaking.** Each enemy breaks when the place's morale falls below their own threshold, set by their loyalty: low loyalty breaks first, high loyalty last. One who breaks surrenders if their loyalty is low, or if the hero or a companion is close; otherwise they run. Those who run are gone from the place and count as returned to Stane.
+- **Winning back, exactly.** Mercy is the share of that place's beaten defenders who were knocked out or spared rather than killed. Each bandit decides at the first dawn after the lantern is lit, once, whatever happens to the place afterwards.
+- **Stane yields** when his health falls to a quarter (tuning). No blow kills him.
+- **Bond never falls.**
+- **Ketch,** if he stands in for Tobin, has Tobin's trait and perks under the same names. His third stage of bond comes when the Sedges are home, since he was their shepherd's lad.
+- **Companions' gear and level.** Each companion has two gear slots: a weapon and armour. Companions have no experience of their own; their level follows the hero's Leadership.
+- **The clock.** Dawn is at six and dusk at eighteen. Windows light at nineteen and go dark at one, except Hesper's, which stays lit until dawn.
+- **Names in data.** Every id is lower case with underscores and uses the full name: `tobin_pike`, `watch_house`, `east_road_lanterns`.
 
 ## 6. Progression
 
@@ -388,7 +404,7 @@ A player who rushes arrives at Stane under-levelled but able to win with skill; 
 The company is the collecting layer of the game: a small roster of people gathered across the valley, each with a job in a fight, where choosing who to bring is part of the plan.
 
 - **Six companions can be found in Tallowmere.** Up to three travel with the hero. The others wait in Wick, and the travelling three are changed at Hesper's or at a campfire.
-- **Each has one signature trait** that changes how a fight goes, three perks of their own that are always active, and gear slots the player fills from the inventory.
+- **Each has one signature trait** that changes how a fight goes, three perks of their own (the first from joining, the second at the second stage of bond, the third at the third; once gained, always active), and gear slots the player fills from the inventory.
 - **Companions are never killed.** One who falls is wounded: they are out of the fight and recover when the hero rests.
 - **Companions level** by travelling with the hero, under the same region cap.
 
@@ -411,8 +427,8 @@ The company is the collecting layer of the game: a small roster of people gather
 What the player finds, and where:
 
 - **Enemies carry what you see.** Whatever a bandit visibly wears or holds can be taken from them once they are down: the brute's helmet, the shield-bearer's shield, an archer's quiver. A place's loot can be sized up from a ridge before going in. Knocked-out and spared bandits keep their personal things; only their weapons are taken.
-- **Each enemy-held place has a strongbox** holding the share Stane took from the valley: gold, materials, and stolen goods. It opens only once the place is freed.
-- **Stolen goods** belonged to someone: a family's candlesticks, the miller's tools, a wedding ring, a child's carved horse. Each is marked with whose it was. Returned to its owner, or to the family's house if they have not come home yet, it gives a reward, a line of thanks, and a rise in the valley recovery level; some families return only once their thing is back. It can instead be sold for gold. This is the link between looting and the story.
+- **Each enemy-held place has a strongbox** holding the share Stane took from the valley: crowns, materials, and stolen goods. It opens only once the place is freed.
+- **Stolen goods** belonged to someone: a family's candlesticks, the miller's tools, a wedding ring, a child's carved horse. Each is marked with whose it was. Returned to its owner, or to the family's house if they have not come home yet, it gives a reward, a line of thanks, and a rise in the valley recovery level; some families return only once their thing is back. It can instead be sold for crowns. This is the link between looting and the story.
 - **Unique items** are placed by hand, each with a name, one special property, and a line of history. Wren's bow is the first. There are few of them, and none are random.
 - **Chests, breakables, and cut grass** give small things: coins, arrows, food, common materials.
 - **Quality:** common, fine, or masterwork, on top of the material tier. Quality is a small set of fixed bonuses, not random number rolls.
@@ -436,7 +452,7 @@ What the player finds, and where:
 
 ### Carrying and keeping
 
-- **A carry limit**, counted in weight. Over the limit the hero cannot sprint. Arrows, food, and materials all weigh something; gold does not.
+- **A carry limit**, counted in weight. Over the limit the hero cannot sprint. Arrows, food, and materials all weigh something; crowns do not.
 - **Inventory** on `I`, laid out as in section 10.
 - **Storage:** a chest at Hesper's house from the start, unlimited.
 - **Home.** After the valley finale the Fairlow house is the hero's. It has the storage chest, a bed to rest in, and racks, shelves, and a mantel where weapons, unique items, and trophies can be placed and seen. The house fills up as the collection grows.

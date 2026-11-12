@@ -14,6 +14,13 @@ export const PROGRESSION_TUNING = {
   xpBase: 30,
   xpGrowth: 1.16,
 
+  /**
+   * The shared ExperienceEvent rates difficulty from 0 (trivial) to 1 (hardest). It is turned
+   * into a multiplier on this line: 0 gives the first value, 1 gives the second. An ordinary
+   * feat sits near 0.2, which gives a multiplier of 1.
+   */
+  sharedDifficultyRange: [0.5, 3] as [number, number],
+
   /** Difficulty multipliers on an event are clamped to this range. */
   difficultyMin: 0.25,
   difficultyMax: 4,

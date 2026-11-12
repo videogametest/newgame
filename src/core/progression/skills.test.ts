@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { ACTIONS, FORBIDDEN_ACTION_WORDS } from './actions';
 import {
-  addExperience, awardExperience, catchUpMultiplier, createProgression, mainSkillLevels,
-  raiseRegionCap, repeatMultiplier, xpToNext, xpToReach,
+  addExperience, awardExperience, awardSharedEvent, catchUpMultiplier, createProgression, mainSkillLevels,
+  multiplierFromShared, raiseRegionCap, repeatMultiplier, xpToNext, xpToReach,
 } from './skills';
 import { PROGRESSION_TUNING as T } from './tuning';
 import { SKILLS } from './types';
@@ -175,5 +175,46 @@ describe('the curve, provisionally', () => {
     expect(levelFor(1300)).toBeLessThanOrEqual(16);
     expect(levelFor(2700)).toBeGreaterThanOrEqual(18);
     expect(levelFor(2700)).toBeLessThanOrEqual(20);
+  });
+});
+
+describe('the shared event form', () => {
+  const event = { skill: 'archery', action: 'weak-point-hit', targetId: 'bandit-brute', difficulty: 0.2, regionId: 'tallowmere' } as const;
+
+  it('accepts hyphenated action ids and awards the same as the direct form', () => {
+    const a = createProgression();
+    const b = createProgression();
+    const [shared] = awardSharedEvent(a, event);
+    const [direct] = awardExperience(b, { action: 'weak_point_hit', difficulty: multiplierFromShared(0.2) });
+    expect(shared.gained).toBe(direct.gained);
+  });
+
+  it('treats a difficulty near 0.2 as ordinary and 1 as much harder', () => {
+    expect(multiplierFromShared(0.2)).toBeCloseTo(1);
+    expect(multiplierFromShared(1)).toBeGreaterThan(multiplierFromShared(0.2));
+    expect(multiplierFromShared(5)).toBe(multiplierFromShared(1));
+  });
+
+  it('refuses an event that names a skill the action does not teach', () => {
+    const s = createProgression();
+    expect(() => awardSharedEvent(s, { ...event, skill: 'cooking' })).toThrow();
+  });
+
+  it('refuses an unknown action', () => {
+    const s = createProgression();
+    expect(() => awardSharedEvent(s, { ...event, action: 'damage-taken' })).toThrow();
+  });
+
+  it('shrinks rewards only when the target is marked repeatable', () => {
+    const farmed = createProgression();
+    const fought = createProgression();
+    let lastFarmed = 0;
+    let lastFought = 0;
+    for (let i = 0; i < 10; i++) {
+      lastFarmed = awardSharedEvent(farmed, { ...event, action: 'arrow-hit', targetId: 'practice-target' }, true)[0].gained;
+      lastFought = awardSharedEvent(fought, { ...event, action: 'arrow-hit', targetId: 'practice-target' })[0].gained;
+    }
+    expect(lastFarmed).toBe(0);
+    expect(lastFought).toBeGreaterThan(0);
   });
 });

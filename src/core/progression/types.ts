@@ -1,20 +1,15 @@
 // Progression types. Pure data: nothing here may import the engine.
 // Owned by Claude's stream (docs/PARALLEL.md). See GAME_DESIGN.md section 6.
 
-export const SKILLS = [
-  'archery', 'melee', 'toughness', 'stealth', 'leadership',
-  'gathering', 'fletching', 'cooking', 'smithing',
-] as const;
-export type SkillId = (typeof SKILLS)[number];
+// Skill ids, skill state, and the hero's rank are shared with every stream; they live in
+// src/core/types (docs/PARALLEL.md rule 1) and are re-exported here under this module's names.
+import { SKILL_IDS } from '../types';
+import type { HeroRank, SkillId, SkillState } from '../types';
 
-export const RANKS = ['apprentice', 'scout', 'warden'] as const;
-export type Rank = (typeof RANKS)[number];
-
-export interface SkillState {
-  level: number;
-  /** Experience earned toward the next level. */
-  xp: number;
-}
+export const SKILLS = SKILL_IDS;
+export type { SkillId, SkillState };
+export type Rank = HeroRank;
+export const RANKS: readonly Rank[] = ['apprentice', 'scout', 'warden'];
 
 export type MasteryRank = 1 | 2 | 3;
 

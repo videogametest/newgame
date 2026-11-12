@@ -38,6 +38,17 @@ equipPerks(state, ids, true);
 recordPerkUse(state, 'pinning_shot');
 ```
 
+## The shared event form
+
+Other streams emit the shared `ExperienceEvent` from `src/core/types`. Pass those to `awardSharedEvent(state, event, repeatable)`:
+
+- Action ids may use hyphens or underscores; they are matched against `actions.ts`.
+- The event's `skill` must be one the action teaches, or the call throws.
+- `difficulty` is 0 to 1 as the shared type says. About 0.2 is an ordinary feat.
+- The third argument marks a target that can be farmed for free.
+
+**A request for the shared types** (Viktor owns them): add an optional `repeatable?: boolean` to `ExperienceEvent`, so the emitter can mark farmable targets on the event itself. Until then, use the third argument.
+
 ## What the other streams owe this one
 
 - **Call `awardExperience` only for things that happened**, using the ids in `actions.ts`. Pass `difficulty` above 1 for harder feats (range, a tougher target) and below 1 for trivial ones. Pass `repeatKey` only for targets that can be farmed for free: a practice target, a single gathering spot, a crafting recipe repeated in one sitting.

@@ -3,6 +3,7 @@
 import { ACTIONS } from './actions';
 import { PROGRESSION_TUNING as T } from './tuning';
 import { SKILLS } from './types';
+import type { ExperienceEvent as SharedExperienceEvent } from '../types';
 import type { ExperienceEvent, ProgressionState, Rank, SkillGain, SkillId } from './types';
 
 export function createProgression(regionCap: number = T.regionCaps.tallowmere, rank: Rank = 'apprentice'): ProgressionState {
@@ -76,6 +77,38 @@ export function awardExperience(state: ProgressionState, event: ExperienceEvent)
     gains.push(addExperience(state, award.skill, amount));
   }
   return gains;
+}
+
+/** Turns the shared event's 0-to-1 difficulty into this module's multiplier. */
+export function multiplierFromShared(difficulty: number): number {
+  const [lo, hi] = T.sharedDifficultyRange;
+  const d = Math.min(1, Math.max(0, Number.isNaN(difficulty) ? 0 : difficulty));
+  return lo + (hi - lo) * d;
+}
+
+/**
+ * Awards experience for a shared ExperienceEvent (src/core/types), the form the other streams emit.
+ * - The action id may be written with hyphens or underscores.
+ * - The event's skill must be one the action really teaches; a mismatch throws, so experience
+ *   cannot be sent to the wrong skill by mistake.
+ * - The event's region raises the cap if that region's cap is higher. It never lowers it.
+ * - Pass `repeatable` for targets that can be farmed for free (a practice target, one gathering
+ *   spot); rewards for the same action on the same target then shrink to nothing.
+ */
+export function awardSharedEvent(state: ProgressionState, event: SharedExperienceEvent, repeatable = false): SkillGain[] {
+  const action = event.action.replace(/-/g, '_');
+  const awards = ACTIONS[action];
+  if (!awards) throw new Error(`Unknown experience action "${event.action}"`);
+  if (!awards.some((a) => a.skill === event.skill)) {
+    throw new Error(`Action "${event.action}" does not teach ${event.skill}`);
+  }
+  const cap = T.regionCaps[event.regionId];
+  if (cap !== undefined) raiseRegionCap(state, cap);
+  return awardExperience(state, {
+    action,
+    difficulty: multiplierFromShared(event.difficulty),
+    repeatKey: repeatable ? `${action}:${event.targetId}` : undefined,
+  });
 }
 
 /** Adds raw experience to one skill, levelling up to the cap and reporting the rest as overflow. */

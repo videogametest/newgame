@@ -91,4 +91,4 @@ Review 007's lighting items were marked done when the frames showed otherwise. A
 ## What needs Greg
 
 1. Interiors: four rooms, or none.
-2. The people's look, still open from review 007.
+2. ~~The people's look.~~ **Approved by Greg, 12 Nov.** Task 003 may start once PR #22 is merged with the scale fix.

@@ -74,6 +74,8 @@ Read this before proposing to reverse something. Most of these were argued over 
 | The Mill is retaken once, seen coming, and costs only the place | Players resent a liberation being undone ("when I have conquered an outpost it should be mine") and stories that take control away | Places that can be retaken at any time; dropping the turn |
 | Terrain hides what is beyond it | Breath of the Wild's exploration, the most praised in the research, rests on hills that hide and offer over or around | An open valley visible from the first ridge |
 | Five longer household stories, and Hesper's loose threads | Side content was broad but one step deep, and with no log a returning player could lose every thread. The best-loved side content in the research was hand-built and several steps long | A quest log; more one-step errands; repeating tasks |
+| The people are the KayKit adventurers, as they are | Greg approved the chunky, large-headed look on 12 Nov after the style test. Villagers, old people, and children are made from the same models | A separate villager pack; a more realistic character set |
+| Buildings are scaled to the people | Greg saw from the style test that the people were bigger than the houses. Kit pieces are scaled about 2.7 times | Shrinking the people; raw kit sizes |
 
 ## How it is built
 

@@ -24,6 +24,29 @@ Six rooms, each one room on the ground floor, reused and dressed differently. Up
 - **The people are in.** After dusk the household is inside, at the places named. By day the room is usually empty and can be looked round.
 - Looking at an object gives its line, if it has one, as a small caption. Captions are in the voice of the screen: plain, no exclamation marks.
 
+## What can be used
+
+`GAME_DESIGN.md` section 4, "Inside". The prompt for each is in the voice of the screen.
+
+| Thing | Where | What it does | Prompt |
+| --- | --- | --- | --- |
+| A hearth | Every room that has one, where the hero is welcome | Rest, cook, wait for dusk or dawn, change perks | `E` to sit by the fire |
+| The storage chest | Hesper's, then the Fairlow house | Storage | `E` to open the chest |
+| The oven | The Marrins' | Bakes Marrin's Loaf and Honey Cake, which no open fire can | `E` to bake |
+| The fletching bench | The Tolleys' | Two more arrows from the same materials | `E` to fletch |
+| The cot | Oona's | A wounded companion left here is well by morning, for nothing | `E` to leave {name} with Oona |
+| The loom | The Loomises' | Mends the hero's cloak, and dyes it for a rank already earned | `E` to ask Edda |
+| The anvil | The Forge | Smithing | `E` to work the anvil |
+| The bar | The inn | Rumours from Bess, and a meal | `E` to sit at the bar |
+| The hero's bed | The Fairlow house | A full rest, to morning | `E` to sleep |
+| A candle | Any room | Lit or snuffed. Changes only the light | `E` to light / `E` to snuff |
+| Shutters | Any window | Opened or closed. Closed shutters hide a lit room from outside | `E` to open / `E` to close |
+| A chair or stool | Any room | The hero sits. Time does not pass | `E` to sit |
+
+A household's working thing can be used only when someone of that household is home, and never while the place is held by Stane's men.
+
+Closed shutters matter outside Wick too: a bandit inside a shuttered room cannot see out, and the hero cannot see in.
+
 ## Hesper's cottage
 
 Cottage. Open from the start.

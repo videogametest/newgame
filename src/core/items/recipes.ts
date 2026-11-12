@@ -6,7 +6,8 @@ import { ITEMS_TUNING } from './tuning';
 import type { InventoryState, ItemIndex, Quality, Stack, Tier } from './types';
 import { QUALITIES, TIERS } from './types';
 
-export type Station = 'campfire' | 'forge';
+/** A hearth in any home the hero is welcome in counts as a campfire. The oven is the Marrins'. */
+export type Station = 'campfire' | 'forge' | 'oven';
 export type LearnedBy = 'start' | 'doing' | 'note' | 'person' | 'perk';
 
 export interface Recipe {
@@ -44,7 +45,9 @@ export const RECIPES: readonly Recipe[] = [
   r('smoked_perch', 'cooking', 'campfire', [['perch', 1]], ['smoked_perch', 1], 0.1, 'start'),
   r('rabbit_stew', 'cooking', 'campfire', [['rabbit', 1], ['wild_garlic', 1]], ['rabbit_stew', 1], 0.3, 'doing'),
   r('venison_and_mushrooms', 'cooking', 'campfire', [['venison', 1], ['mushrooms', 2]], ['venison_and_mushrooms', 1], 0.5, 'doing'),
-  r('honey_cake', 'cooking', 'campfire', [['honey', 1], ['flour', 1]], ['honey_cake', 1], 0.5, 'person', 'ashbys'),
+  // Baking needs the Marrins' oven: bread and cake cannot be made over an open fire.
+  r('marrins_loaf', 'cooking', 'oven', [['flour', 2]], ['marrins_loaf', 2], 0.3, 'person', 'marrins'),
+  r('honey_cake', 'cooking', 'oven', [['honey', 1], ['flour', 1]], ['honey_cake', 1], 0.5, 'person', 'ashbys'),
   r('soft_foot_broth', 'cooking', 'campfire', [['eel', 1], ['wild_garlic', 1]], ['soft_foot_broth', 1], 0.7, 'perk', 'night_stew'),
   r('owls_supper', 'cooking', 'campfire', [['pike', 1], ['yarrow', 1]], ['owls_supper', 1], 0.7, 'perk', 'night_stew'),
   r('bitterleaf_pottage', 'cooking', 'campfire', [['venison', 1], ['comfrey', 1]], ['bitterleaf_pottage', 1], 0.7, 'perk', 'night_stew'),
@@ -113,6 +116,8 @@ export interface CraftContext {
   /** Mastery rank of each equipped perk, by id. Unequipped perks are absent. */
   perks: Readonly<Record<string, number>>;
   regionId: string;
+  /** At the Tolleys' fletching bench: a better jig, so more arrows from the same materials. */
+  atFletchersBench?: boolean;
 }
 
 export type CraftRefusal = 'unknown_recipe' | 'not_learned' | 'wrong_place' | 'in_fight' | 'missing_ingredients';
@@ -157,6 +162,7 @@ export function craft(inv: InventoryState, recipeId: string, ctx: CraftContext, 
   let count = recipe.output.count;
   if (recipe.action === 'arrows_made' && recipe.output.itemId === 'arrow_standard') {
     count += Math.floor(ctx.skillLevel / ITEMS_TUNING.fletchingLevelsPerExtraArrow);
+    if (ctx.atFletchersBench && atStation) count += ITEMS_TUNING.benchExtraArrows;
   }
   if (field === 'batch') count = Math.min(count, ITEMS_TUNING.fieldBatch);
   if (field === 'one') count = 1;

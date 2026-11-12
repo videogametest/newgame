@@ -19,6 +19,8 @@ export const ITEMS_TUNING = {
   craftQualityAt: { fine: 8, masterwork: 16 },
   /** One more arrow per batch for every this many Fletching levels. */
   fletchingLevelsPerExtraArrow: 5,
+  /** Extra arrows per batch at the Tolleys' bench. */
+  benchExtraArrows: 2,
   /** Arrows a Field Fletcher can make away from a fire in one go. */
   fieldBatch: 3,
   /** In-game days before a gathering spot refills. */

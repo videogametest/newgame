@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 28 (the people's proportions; KayKit buildings; how a door is entered). Supersedes version 27.
+Version 29 (what can be used indoors: hearths, one working thing per home). Supersedes version 28.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -69,6 +69,10 @@ Look and atmosphere:
   - Stepping through a door switches to the first-person view by itself, and back on leaving.
   - The buildings are whole models with closed doors, so a room is entered at the door: `E`, a half-second fade, and the hero is inside. The room is its own small space. From outside, its windows still glow when someone is home. Leaving is the same in reverse and returns the hero to the doorstep.
   - After dusk a household is at home inside, and its hearth is the light in its window.
+  - **A hearth is a campfire.** At any hearth where the hero is welcome (Hesper's, a household that is home, the inn, the hero's own) the hero can rest, cook, wait for dusk or dawn, and change perks, exactly as at a campfire.
+  - **Each home has one working thing,** tied to who lives there, usable once they are home and listed in `docs/writing/interiors.md`: the Marrins' oven bakes what no open fire can; the Tolleys' bench gives more arrows from the same materials; Oona's cot mends a wounded companion; the Loomises' loom mends and re-dyes a cloak; the hero's own bed gives a full rest.
+  - **Small things answer the hand:** a candle can be lit or snuffed, shutters opened or closed, a chair or stool sat on, food taken from the hero's own shelves.
+  - **Nothing is interactive for its own sake.** A thing can be used only if using it does something. Bowls, bottles, and books are scenery: looking at one gives its caption if it has one, and nothing can be picked up that is not loot, food, or a keepsake.
   - Enemies may be found inside the places they hold, eating or asleep. They come outside to fight; nobody fights in a doorway.
 - **Day-night cycle** of about 20 real minutes, with warm light at dawn and dusk, and a moon and stars at night.
 - Grass and foliage sway in the wind. Butterflies by day, fireflies at dusk and night. Clouds drift.

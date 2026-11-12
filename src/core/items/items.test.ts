@@ -202,6 +202,20 @@ describe('crafting', () => {
     const made = craft(inv, 'arrows_bronze', ctx({ skillLevel: 10 }), index);
     expect(made.ok && made.made.count).toBe(6);
   });
+  it('bread and cake need the oven; a hearth is a campfire and will not bake', () => {
+    const inv = carrying({ itemId: 'flour', count: 2 });
+    expect(craft(inv, 'marrins_loaf', ctx({ station: 'campfire' }), index)).toEqual({ ok: false, reason: 'wrong_place' });
+    const baked = craft(inv, 'marrins_loaf', ctx({ station: 'oven' }), index);
+    expect(baked.ok && baked.made).toEqual({ itemId: 'marrins_loaf', count: 2 });
+  });
+  it("the Tolleys' bench gives more arrows, and only at a proper station", () => {
+    const mats = () => carrying({ itemId: 'arrow_shaft', count: 4 }, { itemId: 'goose_quill', count: 4 }, { itemId: 'bronze', count: 1 });
+    const plain = craft(mats(), 'arrows_bronze', ctx(), index);
+    const bench = craft(mats(), 'arrows_bronze', ctx({ atFletchersBench: true }), index);
+    expect(bench.ok && plain.ok && bench.made.count - plain.made.count).toBe(2);
+    const field = craft(mats(), 'arrows_bronze', ctx({ station: null, atFletchersBench: true, perks: { field_fletcher: 1 } }), index);
+    expect(field.ok && field.made.count).toBe(3);
+  });
   it('refuses the wrong place, a fight, an unlearned recipe, and missing ingredients', () => {
     const inv = carrying({ itemId: 'perch', count: 1 });
     expect(craft(inv, 'smoked_perch', ctx({ station: null }), index)).toEqual({ ok: false, reason: 'wrong_place' });
@@ -280,7 +294,7 @@ describe('recipes cover what the writing names', () => {
   it('every food in the writing can be made, bought, or foraged', () => {
     const made = new Set(RECIPES.map(r => r.output.itemId));
     const foods = ITEMS.filter(i => i.kind === 'food').map(i => i.id);
-    expect(foods.filter(f => !made.has(f))).toEqual(['apple', 'marrins_loaf']);
+    expect(foods.filter(f => !made.has(f))).toEqual(['apple']);
   });
   it('indexes by id', () => {
     expect(indexRecipes().get('steel')!.station).toBe('forge');

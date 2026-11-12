@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 14 (enemies can be killed; surrender and mercy come from morale). Supersedes version 13.
+Version 15 (kill or knock out: knocked-out and surrendered bandits can be won back as villagers). Supersedes version 14.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -198,6 +198,7 @@ The bow is the scout's main weapon and the deepest system in combat.
 - **Arrow types**, chosen with the mouse wheel and shown on the HUD:
   - *Standard.* The default.
   - *Fire.* Lights braziers, campfires, and dry grass, which spreads briefly and panics enemies caught in it. Reveals the hero's position when loosed at night. Scarce.
+  - *Blunt.* A padded head. Lower damage, not lethal: it knocks out instead of killing. Made by the smith or by hand at a campfire from standard arrows.
   - *Whistling.* Does no damage. Where it lands, enemies within earshot become suspicious and go to look. The scout's tool for moving a guard. Scarce.
 - **Perfect draw.** There is a brief moment at full draw, marked by a subtle cue, when releasing gives bonus damage and a flatter flight. Holding past it loses the bonus and starts to tire the aim.
 
@@ -214,8 +215,17 @@ How enemies fight:
 
 - **They take turns.** At most two enemies attack the hero at once. The others circle, reposition, or go for a companion. A group fight stays readable.
 - **Morale.** Enemies are people and want to live. Each place has a morale level that falls when defenders are beaten, when their leader is beaten, when they are surprised, or when fire spreads, and rises when the bell brings reinforcements. Below a threshold, individual enemies break: some drop their weapons and run, and some throw them down and surrender. Either way they are out of the fight. A whole place can be won by breaking its nerve.
-- **Enemies can be killed.** An enemy whose health reaches zero dies: they fall and stay down, with no blood and no gore. A strike on an unaware enemy is a silent kill.
-- **Surrender is real.** An enemy who has surrendered kneels with empty hands and can be left alone. Attacking one is possible and is never rewarded. After a place is freed, those who surrendered there may later appear in Wick, working and with a line to say, and one or two can be recruited. Mercy is the player's choice, not a rule.
+- **Kill or knock out.** Every bandit can be dealt with either way, and the choice is the player's each time.
+  - *Killing:* standard and fire arrows, the short blade, and throwing knives are lethal. An enemy whose health reaches zero dies: they fall and stay down, with no blood and no gore.
+  - *Knocking out:* blunt arrows (see The bow) and Bram's shield strike are not lethal. An enemy whose health reaches zero from one of these is knocked out. A stealth strike from behind offers both: `E` to knock out, attack to kill.
+  - Knocking out is the harder path. Blunt arrows do less damage and gain nothing from weak points except against an unaware enemy, whom a blunt arrow to the head knocks out at once. A knocked-out enemy can be found and woken by an ally while the place is still held.
+- **Surrender.** An enemy whose nerve breaks may throw down their weapons and kneel. They can be left alone, which counts as sparing them, or attacked, which is never rewarded.
+- **Winning them back.** When a place is freed, every bandit knocked out or spared there is taken to Wick. The next morning each one decides. The chance they stay rises with the valley recovery level (there is more to come home to), with how many of their fellows at that place were spared rather than killed, and with their own nature, set in data: each bandit has a name, a loyalty to Stane, and the trade they had before.
+  - *They stay.* They become a villager, take up their old trade, and say a line about it. Each one adds to the valley recovery level, so another window is lit. A few are recruitable into the squad.
+  - *They leave.* They walk out of the valley and are not seen again.
+  - *They go back.* The most loyal return to Stane and are among the defenders at the Watch-house.
+  - Hesper tells the hero the outcome in a line. The player cannot see the odds, only learn from results what moves them.
+- **What killing costs.** Nothing directly: it is always easier. But the dead cannot come home, a place taken by killing leaves its survivors less willing to stay, and the valley recovers more slowly.
 - **Stane is the exception.** At low health he yields instead of dying, because the story needs what he has to say.
 
 Unit types:
@@ -332,7 +342,7 @@ Keep every name in data, never in code.
 - The Fairlow house still stands in Wick, dark and boarded up.
 - The hero takes the valley back one place at a time. Each place freed brings people home.
 
-Tone: warm and hopeful, with a quiet sadness for what was lost. People die in fights, but there is no gore and no cruelty, and the game never celebrates a death. The enemies are people, not monsters.
+Tone: warm and hopeful, with a quiet sadness for what was lost. People can die in fights, but there is no gore and no cruelty, and the game never celebrates a death. It does quietly reward bringing someone home. The enemies are people, not monsters.
 
 ### The people
 
@@ -401,7 +411,7 @@ The valley does not only get better.
 
 There is no quest log and no long dialogue. The story is carried by:
 
-- **Restoration.** Wick starts with boarded windows, empty fields, few people, no animals, and one lit window. With each lantern lit, more villagers return, buildings are repaired, fields are worked, stalls open, animals come back, lanterns appear on the family markers, and more windows glow after dark. The village music gains an instrument with each one.
+- **Restoration.** Wick starts with boarded windows, empty fields, few people, no animals, and one lit window. With each lantern lit, and with each bandit won back, more villagers return, buildings are repaired, fields are worked, stalls open, animals come back, lanterns appear on the family markers, and more windows glow after dark. The village music gains an instrument with each one.
 - **Stane's banners and the crows**, which leave place by place.
 - **Villagers** who say one or two short lines that change as the valley recovers.
 - **The ten places off the path** (section 4), each a fragment. Text is three sentences at most.

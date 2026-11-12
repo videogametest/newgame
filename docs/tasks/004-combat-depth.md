@@ -11,7 +11,7 @@ Turn the thin prototype combat into the scout's combat described in `GAME_DESIGN
 Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 1. **The bow and the blade.** Weak points, the limited quiver with arrow recovery, standard, fire, and whistling arrows, perfect draw, the three-hit combo, throwing knives, perfect dodge with its critical strike, stagger by weight, and lock-on in both views. HUD additions from section 10.
-2. **Enemies.** Attack turns (at most two attackers on the hero), morale per place with breaking, fleeing, and surrendering, clean deaths with no gore, surrendered enemies who can be spared and may later appear in Wick, and the shield-bearer, brute, and runner as data-defined unit types with their own models or clearly distinct looks. Fire spreading in dry grass.
+2. **Enemies.** Attack turns (at most two attackers on the hero), morale per place with breaking, fleeing, and surrendering, kill or knock out as specified in section 5 (lethal and non-lethal tools, blunt arrows, the two-way stealth strike, waking knocked-out allies), surrender, and winning bandits back: each bandit defined in data with a name, loyalty, and former trade, the next-morning decision with its three outcomes, converted bandits appearing in Wick and raising the recovery level, and Hesper's line reporting it. Keep the decision as a pure, seeded, tested function, and the shield-bearer, brute, and runner as data-defined unit types with their own models or clearly distinct looks. Fire spreading in dry grass.
 3. **Bram and impact.** Marked targets as Bram's priority, his guard-breaking strike, his hold on enemy attention, hit-freeze, camera shake, the last-defender slow motion, the distinct hit sounds, and the settings to turn impact effects down.
 
 ## Rules
@@ -24,6 +24,7 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
   - A sword-only bot that never dodges loses at the Forge.
   - A bot that fires every arrow without aiming for weak points runs out before the Forge is cleared.
   - At least one place can be won by morale alone, with fewer than half its defenders beaten.
+  - A bot that only knocks out can clear the Mill, takes longer than the lethal bot, and ends with more villagers in Wick.
 
 ## Done when
 

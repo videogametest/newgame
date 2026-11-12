@@ -40,6 +40,12 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 
 ## The first-look bar
 
+**Lighting, carried over from the style test (review 007).** These three failed there and are settled here, in the real world, before anything else in the bar is judged:
+
+- **Dusk lights things, not only the sky.** A low warm sun, long shadows, and walls, ground, and faces that take the colour. The ground is never near-black while the sky is bright.
+- **Window light is warm.** Pools of light under lit windows and doors are amber, never white or grey, and fall where the window faces.
+- **Windows are lit at the right hours.** Dark at 18, lit from 19, per section 5, "The clock". Hesper's is lit in every dusk and night frame.
+
 Richness comes before breadth: if time is short, make a smaller area dense rather than the whole valley thin.
 
 - **The arrival view is composed by hand, not left to chance.** Standing at the start at dusk, the player sees in one frame: the path ahead, Hesper's lit window as the brightest point, the village around it, tall grass moving in the foreground, trees framing the sides, and the castle on the horizon behind. Place terrain and scenery deliberately to make this view work, in both camera views.

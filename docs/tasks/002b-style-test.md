@@ -1,6 +1,6 @@
 # 002b: The style test
 
-Status: merged (PR #15), not passed. Rework listed in `docs/reviews/003-overnight-audit.md`.
+Status: done. Passed in `docs/reviews/007-style-test-passed.md`; the lighting items move to task 003.
 
 ## Goal
 

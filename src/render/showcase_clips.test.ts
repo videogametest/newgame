@@ -18,7 +18,12 @@ function allClipNames(unitId: string): string[] {
 
 describe('showcase clips', () => {
   it('covers every clip the design asks for', () => {
-    expect([...SHOWCASE_NAMES].sort()).toEqual([...REQUIRED].sort());
+    for (const name of REQUIRED) expect(SHOWCASE_NAMES).toContain(name);
+  });
+
+  it('lists only known clips, and archer clips are the extras', () => {
+    const extras = SHOWCASE_NAMES.filter((n) => !REQUIRED.includes(n));
+    expect(extras.sort()).toEqual(['archer_draw', 'archer_release']);
   });
 
   it('every entry names a real unit and a clip that unit has', () => {

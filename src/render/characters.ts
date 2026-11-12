@@ -155,6 +155,7 @@ export class CharacterView {
       const bone = boneNodes.get(WEAPON_MODELS[w].bone);
       if (!bone) throw new Error(`Bone ${WEAPON_MODELS[w].bone} missing on ${this.unit.model}`);
       holder.parent = bone;
+      if (w === 'sword' && this.unit.swordScale) holder.scaling.setAll(this.unit.swordScale);
       this.weapons.set(w, holder);
       this.casters.push(...holder.getChildMeshes(false));
     }

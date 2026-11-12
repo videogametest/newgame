@@ -16,12 +16,17 @@ import { insideBounds, type ArenaBounds } from './camera_limits';
 import { blocksView } from './occlusion';
 import { ArrowViews, ImpactBursts } from './effects';
 import { PlayerInput } from './input';
+import { simRunning } from './input_rules';
+import { installErrorCapture, logEvent } from './debug_log';
 import { Hud, type Projector } from './hud';
 import { TuningPanel } from './tuning_panel';
 import { AudioBank } from './audio';
 
 /** Entry point: builds the scene, loads every asset, then starts the battle. Errors go to the HUD. */
 export async function startGame(canvas: HTMLCanvasElement, uiRoot: HTMLElement): Promise<void> {
+  // First, so an error during boot is captured too.
+  installErrorCapture();
+  logEvent('boot', 'start');
   const hud = new Hud(uiRoot);
   const audio = new AudioBank();
   // Browsers only allow audio after a user gesture, so the first click or key press starts it.
@@ -42,7 +47,9 @@ export async function startGame(canvas: HTMLCanvasElement, uiRoot: HTMLElement):
     const game = new Game(engine, scene, canvas, hud, assets, shadow, walls, TRAINING_FIELD, audio);
     game.start();
     hud.hideBoot();
+    logEvent('boot', 'ready');
   } catch (err) {
+    logEvent('boot', 'failed');
     hud.showError(err);
     throw err;
   }
@@ -59,6 +66,8 @@ class Game {
   /** Metres the hero has walked since its last footstep. */
   private stepDistance = 0;
   private readonly projector: Projector;
+  /** Last pause state logged, so the event log records transitions only. */
+  private wasPaused = false;
 
   constructor(
     private readonly engine: Engine,
@@ -74,8 +83,9 @@ class Game {
     this.state = createBattle(TRAINING_FIELD);
     this.arrows = new ArrowViews(scene, assets.arrow, shadow);
     this.bursts = new ImpactBursts(scene);
-    this.input = new PlayerInput(canvas, () => {
-      // Pointer lock changes are read from input.isLocked each frame; nothing to do here.
+    this.input = new PlayerInput(canvas, (locked) => {
+      // The sim reads input.isLocked each frame; this callback only records the change.
+      logEvent('pointer_lock', locked ? 'locked' : 'released');
     });
     this.camera = new BattleCamera(scene);
     this.projector = (x, y, z) => this.project(x, y, z);
@@ -96,7 +106,13 @@ class Game {
 
   /** Runs whole fixed steps while the pointer is locked and the battle is live. */
   private runSim(dt: number): void {
-    if (!this.input.isLocked || this.state.status !== 'fighting') {
+    // Paused when the pointer is released or the window is in the background.
+    const paused = !simRunning(this.input.isLocked, this.input.isWindowFocused);
+    if (paused !== this.wasPaused) {
+      this.wasPaused = paused;
+      logEvent('sim', paused ? 'paused' : 'running');
+    }
+    if (paused || this.state.status !== 'fighting') {
       this.accumulator = 0;
       this.input.consumeEdges();
       return;
@@ -129,6 +145,7 @@ class Game {
       } else if (e.type === 'impact') {
         this.bursts.spawn(e.x, e.y, e.z);
       } else if (e.type === 'outcome') {
+        logEvent('outcome', e.status);
         this.input.releaseLock();
         this.hud.showOutcome(e.status);
       }
@@ -182,6 +199,7 @@ class Game {
   }
 
   private restart(): void {
+    logEvent('restart');
     for (const v of this.views.values()) v.dispose();
     this.views.clear();
     this.arrows.dispose();

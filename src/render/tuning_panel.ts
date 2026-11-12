@@ -3,6 +3,7 @@
 
 import { DEFAULT_TUNING, TUNING, resetTuning, setTuningValue, tuningJson } from '../config/tuning';
 import type { AudioBank } from './audio';
+import { buildDebugReport } from './debug_log';
 
 interface SliderSpec {
   path: string;
@@ -119,6 +120,11 @@ export class TuningPanel {
     row.appendChild(this.button('Reset', false, () => this.reset()));
     this.root.appendChild(row);
 
+    const reportRow = document.createElement('div');
+    reportRow.className = 'row';
+    reportRow.appendChild(this.button('Copy debug report', false, () => void this.copyDebugReport()));
+    this.root.appendChild(reportRow);
+
     this.msg = document.createElement('div');
     this.msg.className = 'msg';
     this.root.appendChild(this.msg);
@@ -232,14 +238,23 @@ export class TuningPanel {
   }
 
   private async copyConfig(): Promise<void> {
-    const json = tuningJson();
+    await this.copyText(tuningJson(), 'Config copied to the clipboard.');
+  }
+
+  /** Build, browser, settings, tuning and the recent event log, for a bug report. */
+  private async copyDebugReport(): Promise<void> {
+    const report = buildDebugReport({ audio: this.audio.values });
+    await this.copyText(report, 'Debug report copied to the clipboard. Paste it into the bug report.');
+  }
+
+  private async copyText(text: string, success: string): Promise<void> {
     try {
-      await navigator.clipboard.writeText(json);
-      this.say('Config copied to the clipboard.');
+      await navigator.clipboard.writeText(text);
+      this.say(success);
     } catch {
-      // Clipboard can be blocked outside a secure context or without permission; show the JSON instead.
-      this.say('Clipboard blocked. JSON printed to the console.');
-      console.log(json);
+      // Clipboard can be blocked outside a secure context or without permission; show the text in the console instead.
+      this.say('Clipboard blocked. Text printed to the console.');
+      console.log(text);
     }
   }
 

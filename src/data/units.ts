@@ -12,6 +12,8 @@ export interface UnitDef {
   tint: [number, number, number];
   /** Weapons the model carries. A weapon is shown only when the unit (or hero, for its equipped one) uses it. */
   weapons: WeaponId[];
+  /** Visual scale of the sword model on this unit (the pack has one blade; the hero's is shorter). */
+  swordScale?: number;
   clips: {
     idle: string;
     run: string;
@@ -39,9 +41,10 @@ export interface UnitDef {
 export const UNITS: Record<string, UnitDef> = {
   hero: {
     kind: 'hero',
-    model: 'assets/kaykit_adventurers/characters/Knight.glb',
+    model: 'assets/kaykit_adventurers/characters/Ranger.glb',
     tint: [1, 1, 1],
     weapons: ['sword', 'bow'],
+    swordScale: 0.7,
     clips: {
       idle: 'Idle_A',
       run: 'Running_A',
@@ -94,7 +97,8 @@ export const UNITS: Record<string, UnitDef> = {
   },
   enemy_archer: {
     kind: 'archer',
-    model: 'assets/kaykit_adventurers/characters/Ranger.glb',
+    // Armoured Knight, so no enemy shares the hero's hooded Ranger silhouette.
+    model: 'assets/kaykit_adventurers/characters/Knight.glb',
     tint: [1.0, 0.85, 0.5],
     weapons: ['bow'],
     clips: {

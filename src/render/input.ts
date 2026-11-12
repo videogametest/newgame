@@ -3,6 +3,7 @@
 import { TUNING } from '../config/tuning';
 import type { BattleInput, WeaponId } from '../core/types';
 import { clamp } from '../core/vec';
+import { hasModifier, isSuppressedKey, isSuppressedMouseButton } from './input_rules';
 
 export class PlayerInput {
   camYaw = 0;
@@ -15,7 +16,8 @@ export class PlayerInput {
   private pendingRelease = false;
   private pendingDodge = false;
   private locked = false;
-  private readonly listeners: [EventTarget, string, (e: Event) => void][] = [];
+  private windowFocused = document.hasFocus();
+  private readonly listeners: [EventTarget, string, (e: Event) => void, AddEventListenerOptions?][] = [];
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -23,10 +25,22 @@ export class PlayerInput {
   ) {
     this.on(window, 'keydown', (e) => this.onKeyDown(e as KeyboardEvent));
     this.on(window, 'keyup', (e) => this.keys.delete((e as KeyboardEvent).code));
-    this.on(window, 'blur', () => this.clearHeld());
+    this.on(window, 'blur', () => {
+      this.windowFocused = false;
+      this.clearHeld();
+    });
+    this.on(window, 'focus', () => {
+      this.windowFocused = true;
+    });
     this.on(canvas, 'mousedown', (e) => this.onMouseDown(e as MouseEvent));
     this.on(window, 'mouseup', (e) => this.onMouseUp(e as MouseEvent));
-    this.on(canvas, 'contextmenu', (e) => e.preventDefault());
+    // Right and middle mouse defaults (context menu, autoscroll) are cancelled across the whole page.
+    this.on(window, 'mousedown', (e) => {
+      if (isSuppressedMouseButton((e as MouseEvent).button)) e.preventDefault();
+    });
+    this.on(window, 'contextmenu', (e) => e.preventDefault());
+    // The wheel scrolls the page unless cancelled, so it needs a non-passive listener.
+    this.on(window, 'wheel', (e) => e.preventDefault(), { passive: false });
     this.on(document, 'mousemove', (e) => this.onMouseMove(e as MouseEvent));
     this.on(document, 'pointerlockchange', () => {
       this.locked = document.pointerLockElement === this.canvas;
@@ -35,13 +49,18 @@ export class PlayerInput {
     });
   }
 
-  private on(target: EventTarget, type: string, fn: (e: Event) => void): void {
-    target.addEventListener(type, fn);
-    this.listeners.push([target, type, fn]);
+  private on(target: EventTarget, type: string, fn: (e: Event) => void, options?: AddEventListenerOptions): void {
+    target.addEventListener(type, fn, options);
+    this.listeners.push([target, type, fn, options]);
   }
 
   get isLocked(): boolean {
     return this.locked;
+  }
+
+  /** False while the browser window is in the background; the sim pauses then. */
+  get isWindowFocused(): boolean {
+    return this.windowFocused;
   }
 
   /** True while the key with this KeyboardEvent.code is held. */
@@ -103,7 +122,9 @@ export class PlayerInput {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
-    if (e.code === 'Space') e.preventDefault();
+    if (isSuppressedKey(e.code)) e.preventDefault();
+    // Ctrl, Alt and Cmd chords belong to the browser or OS; they never reach the game.
+    if (hasModifier(e)) return;
     if (e.repeat) return;
     this.keys.add(e.code);
     if (e.code === 'Space') this.pendingDodge = true;
@@ -141,7 +162,7 @@ export class PlayerInput {
   }
 
   dispose(): void {
-    for (const [t, type, fn] of this.listeners) t.removeEventListener(type, fn);
+    for (const [t, type, fn, options] of this.listeners) t.removeEventListener(type, fn, options);
     this.listeners.length = 0;
   }
 }

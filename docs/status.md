@@ -2,6 +2,31 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## Streams
+
+| Stream | Doing | Open PR | Blocked |
+| --- | --- | --- | --- |
+| A | Task 002, steps 1–9, on `feat/task-002-foundations`. Not merged. | see PR list below | Its own review and merge |
+| B | Task 002 step 10: asset survey, `docs/assets.md` | `feat/task-002-asset-survey` | Claude's review; Greg's decision on the seven must-have gaps |
+| C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## Task 002, step 10: asset survey (stream B)
+
+- Branch `feat/task-002-asset-survey` from `main`, docs only. No code changed, so no tests were run for this PR. Not merged yet.
+- Survey: 86 rows, 43 found, 20 found but needs checking, 23 gaps. The full table, licences and fallbacks are in `docs/assets.md`, generated from the survey file.
+- Seven must-have gaps: `houses_16`, `lightable_windows`, `fairlow_house`, `hesper_cottage`, `forge_anvil`, `watch_house`, `lantern_hanging`. The survey recommends fallback rung 2 for most (author from CC0 modular kits, free but costs authoring time). Nothing selected yet; Greg decides.
+- Verified: licence wording for every pack, read from the pack's own licence file where one exists and from its page otherwise (table in `docs/assets.md`). Measured file sizes for the Kenney runtime set (8,686,129 bytes) plus the sheep and crow files. The survey estimates about 15.5 MB with wolves and deer added; the 25 MB first-load target is **not yet established**.
+- Not verified or not done:
+  - Scale screenshots beside the hero, which task 002 step 10 asks for: **not produced**. The survey did no rendering.
+  - Wolves, deer, fox, stag and horse: Google Drive quota blocked the downloads, so they are unmeasured and uninspected.
+  - Geese: rigged Blend file only; no animation clips confirmed.
+  - Crow: CC0 on the author's page, but the creation method is undisclosed. Needs a provenance check.
+  - Sheep: the original Quaternius Farm licence was read. The glTF the survey checked is a third-party threejs.org conversion.
+  - Coverage against the design doc's full asset list was not re-checked in this entry.
+- Nothing purchased. The five optional paid packs total USD 47.91 before tax; the survey says most are unnecessary on the free route.
+- Task 003 has not started. Waiting for Claude's review of the survey and Greg's decision on the seven gaps.
+- Stream A (task 002 steps 1–9) is on `feat/task-002-foundations`, five commits ahead of `main`, not merged. Its tests, typecheck, build and deploy were not re-run in this entry.
+
 ## 2026-11-11 19:30 ET (Viktor)
 
 - **Task 001 done.** PR #5 merged (`775949d`). Pages run `43124527769` succeeded. Shipped: camera fade for fighters blocking the hero, and the camera floor clamp. Teal tint root cause: the translucent boundary wall, not the camera dropping below ground. The wall is now hidden outside arena bounds (`insideBounds` in `src/render/camera_limits.ts`). Verified: 34 tests pass, `tsc` clean, build passes, before/after frames in `docs/pr-media/001-walkback-*.png`. Not verified: a live Pages frame showing the tint gone.

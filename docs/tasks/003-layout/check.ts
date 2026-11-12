@@ -89,6 +89,7 @@ export const ROADS: Record<string, [number, number][]> = {
 const SIGNPOSTS = [{ name: 'sign_wick_gate', x: 50, z: 86 }, { name: 'sign_split_oak', x: -40, z: 140 }, { name: 'sign_ford', x: 124, z: -68 }, { name: 'sign_hill_foot', x: -104, z: -168 }];
 const BOUND_R = Number(process.env.BOUND ?? 335);
 export const walkable = (x: number, z: number) => {
+  // Ground only: water is swum (design v33), and the 100 m rule is measured on ground.
   for (const c of CROSSINGS) if (Math.hypot(x - c.x, z - c.z) < 11) return true;
   if (isWater(x, z)) return false;
   for (const line of [INFLOW, OUTFLOW]) for (let i = 0; i + 1 < line.length; i++) if (segDist(x, z, line[i], line[i + 1]) < 6) return false;

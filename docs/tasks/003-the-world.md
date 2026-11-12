@@ -26,6 +26,7 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 - Chunked terrain around the hero, with no visible pop-in at walking speed.
 - Sky, a moving sun with shadows, the day-night cycle, a moon and stars, distance haze.
 - The hero walks, sprints, and crouches across the valley, standing on the terrain.
+- **The hero swims** (section 4, Swimming; design version 33). Wading to the knee, swimming beyond; slower than walking; nothing usable in the water; white water turns the swimmer back at the gorge and under the falls. The rule that the hero cannot enter water goes, and its test in `valley.test.ts` is replaced by tests for the swimming rules. KayKit has no swimming clip: hide the body below the surface, play a slowed existing clip, and draw a ring of ripples. Say in `docs/status.md` which clip you used. If that reads badly in a frame, report it; do not buy or generate an animation.
 - The first-person toggle on `V` as specified in section 5 (Views), including the visible bow and short blade and the sidestep.
 - The pause menu and settings from section 10, with "Copy debug report" in the pause menu.
 - The prototype arena stays reachable behind a URL flag until task 004 removes it, so combat is not lost in the meantime.

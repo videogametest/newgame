@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 32 (the valley's layout is fixed: the compass, the two rivers, where each place stands). Supersedes version 31.
+Version 33 (the hero swims). Supersedes version 32.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -81,6 +81,15 @@ Look and atmosphere:
 - Grass and foliage sway in the wind. Butterflies by day, fireflies at dusk and night. Clouds drift.
 - **Landmarks on the horizon** (a castle, a mountain, a tower) are visible from most of the valley. They mark future regions.
 - Water: a river or lake with a simple animated surface.
+- **Swimming.** Water is the quiet way, never the quick way.
+  - Walking into water wades to the knee and swims beyond that. There is no key for it, no breath, and no drowning. The lake and both rivers can be swum anywhere.
+  - Swimming is slower than walking, about two thirds of the pace (tuning), and there is no sprinting. A road and a crossing are always faster than the water between the same two points.
+  - Nothing can be used while swimming: no bow, no blade, no dodge, no eating. Hits land as usual. The hero is safe in water only by not being seen.
+  - A swimmer is low in the water, so is as hard to see as someone crouched, and is heard like someone walking. Holding crouch swims slowly and silently.
+  - Enemies do not swim. One who is chasing stops at the bank; archers shoot from it; then they search the bank and go home. Animals do not follow either.
+  - Companions swim beside the hero under the same rules. Carts, sheep, and villagers use the crossings, so the ford and the bridges matter as much as before.
+  - The water is still a boundary where the valley ends: white water in the gorge and under the falls pushes a swimmer back. The cave is entered through the falls from the pool.
+  - In third person the hero shows head and shoulders above the surface with a ring of ripples. In first person the camera sits just above the water.
 
 Things to find:
 
@@ -142,7 +151,7 @@ Layout of the first valley:
 - The hero starts at the valley's edge at dusk, with Hesper's single lit window visible in the distance, and walks to Wick.
 - Paths lead out from Wick to the Mill, the Forge, and the Watch-house (section 9).
 - **The compass.** The castle is beyond the north-west rim. The ridge runs north to south on the east side, with the patrol hut beyond it, so from the hut the ridge fills the western sky and hides both the castle and the signal hill. The signal hill is in the north and is the highest ground the hero can stand on.
-- **Two rivers.** One comes over the west rim as the waterfall, turns the Mill's wheel, and feeds the lake. One leaves the lake eastward, crosses the east road at the ford, and leaves the valley through a gorge. The hero cannot swim; the crossings are the ford, the mill bridge, and stepping stones below the falls.
+- **Two rivers.** One comes over the west rim as the waterfall, turns the Mill's wheel, and feeds the lake. One leaves the lake eastward, crosses the east road at the ford, and leaves the valley through a gorge. The crossings are the ford, the mill bridge, and stepping stones below the falls; anywhere else the hero swims (see Swimming, below).
 - **Where things stand.** Wick is on the south-east shore and the hero arrives from the south-east, so the first view holds Hesper's window, the village, the lake, and the castle on the horizon behind. The Mill is west, the Forge north at the end of the east road, the Watch-house north-west on the soldiers' road, which runs along the north shore in sight of Wick. Every coordinate is in `docs/tasks/003-layout.md` and its data file.
 - **The castle from afar.** Its outline is on the horizon from much of the valley. Only from the signal hill can the beacon itself be seen, and seen to be dark.
 - Hills, a forest area, open fields, and water, so different parts feel different.
@@ -802,6 +811,6 @@ Not in scope until the core game works. Do not build these unprompted.
 - Magic as a third combat style
 - Blocking and parrying with a shield
 - Mounted combat
-- Swimming and climbing
+- Climbing
 - Quests, a quest log, branching dialogue, and cutscenes
 - Weather

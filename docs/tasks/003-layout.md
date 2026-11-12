@@ -47,7 +47,7 @@ All ten places off the path from section 4 are here. The supper table shares the
 - **The river in** comes over the west rim as the waterfall, runs east past the Mill, and enters the lake on its west side. Its line is `river_in` in the data.
 - **The river out** leaves the lake on the east side, crosses the east road at the ford, and leaves the valley through a gorge in the south-east. Its line is `river_out`.
 - **Three crossings.** The ford at (142, -12), with the broken bridge beside it (the project "The bridge to the Forge" mends it). The mill bridge at (-178, 40). Stepping stones below the falls at (-250, 0).
-- The hero cannot swim, so the two rivers and the lake divide the valley into a south half and a north half. From Wick the north is reached by the ford, or the long way round by the Mill. That is intended: the ford is where the tax cart stops, and the Mill guards the other way.
+- The hero swims (design version 33), slowly and unarmed, so the lake and the rivers can be crossed anywhere. The three crossings are still the quick way and the only way for carts, sheep, and villagers: the ford is where the tax cart stops, and the Mill stands at the other bridge. The river also gives a quiet way in to the Mill, and the lake a quiet way to the north shore below the soldiers' road.
 - The prototype's rivers are about 25 m wide because they are carved with round hollows. Make them 8 to 12 m.
 
 ## Roads and paths
@@ -115,7 +115,7 @@ Twenty-eight smaller things, in the data as `stops`, each with a kind and a note
 ## For Viktor
 
 1. Replace `VALLEY_PLACES` and `VALLEY_STOPS` with this data, and reshape `VALLEY_SHAPE` to fit it. Keep the checks in the table above as tests.
-2. `isWalkableGround` follows the edge described above and the two rivers, with the three crossings open.
+2. `isWalkableGround` follows the edge described above and the two rivers, with the three crossings open. Water is swum, not walked: keep it out of `isWalkableGround`, and measure the 100 m rule on ground only.
 3. If something here cannot be built as placed, say so in `docs/status.md` with the measurement, and move on to the next thing. Do not move a place yourself.
 
 One correction to review 017: it called the patrol hut an enemy place. It is not; it is an empty hut and one of the ten places off the path. The rule for it is the secret's rule, hidden from the nearest path, which the ridge does.

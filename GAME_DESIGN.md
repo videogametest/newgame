@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 17 (specifies the inventory, looting, and storage screens). Supersedes version 16.
+Version 18 (skills, perks, and pacing redesigned: region caps, perk slots, perk mastery, nothing missable, and a pacing test). Supersedes version 17.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -160,6 +160,7 @@ Controls:
 - `Q`: squad order, toggling between "follow me" and "hold here"
 - `M`: map
 - `I`: inventory
+- `K`: skills and perks
 - `Esc`: pause menu (also releases the mouse)
 - Backtick: tuning panel
 
@@ -258,21 +259,36 @@ Impact:
 
 ## 6. Progression
 
-**Skills** level by use. No classes.
+Three aims govern this section. The player should never feel they missed a perk. The player should never run out of things growing. And growth should track the story, so that finishing the game and mastering the character happen together.
 
-| Skill | Levels from | Effect |
+### Skills
+
+Skills level by use. There are no classes and no overall character level; the hero's standing is their rank (see Apprenticeship).
+
+| Skill | Levels from | Each level gives |
 | --- | --- | --- |
-| Archery | Bow hits | Bow damage, draw speed |
-| Melee | Short-blade and knife hits | Blade damage, swing speed |
-| Defense | Damage taken and blocked | Max HP, damage reduction |
-| Smithing | Crafting gear | Unlocks higher gear tiers, better craft quality |
-| Leadership | Places captured with a squad | Squad size, recruit quality |
+| Archery | Arrow hits, more for range, weak points, and perfect draws | Bow damage, draw speed |
+| Melee | Short-blade and knife hits, more for criticals after a perfect dodge | Blade damage, swing speed |
+| Toughness | Perfect dodges, fights survived, places freed | Max HP, damage reduction |
+| Stealth | Passing an enemy unnoticed, marks, strikes on unaware enemies, knockouts | Harder to notice, stronger first strike, longer marks |
+| Leadership | Places freed with a squad, bandits won back, companions kept standing | Squad size, recruit quality |
 | Gathering | Foraging, hunting, cutting wood, mining ore, fishing | Better yield, rarer finds, faster gathering |
-| Fletching | Making arrows | More arrows per batch, better quality, unlocks special arrow types |
+| Fletching | Making arrows | More arrows per batch, better quality |
 | Cooking | Cooking at campfires | Food that heals more and adds short bonuses |
-| Stealth | Time spent unnoticed near enemies, hits on unaware enemies | Harder to notice, stronger first strike, longer marks |
+| Smithing | Crafting and upgrading gear at the Forge | Higher gear tiers, better craft quality |
 
-- **Apprenticeship.** The hero's rank is Apprentice, then Scout, then Warden of the valley. Rank is earned by passing trials Hesper sets, not by experience points. Trials are optional: the valley can be finished as an Apprentice, but each rank unlocks a stronger tier of perks. Each trial teaches one part of the scout's craft and ends with a single dry line from Hesper, on failure as well as success.
+Rules:
+
+- **Levels run 1 to 50 across the whole game.** Early levels come quickly and later ones slowly.
+- **Each region has a cap.** In Tallowmere no skill passes 20. The castle region raises the cap, and so on, with 50 reachable only in the last region. Nothing can be maxed early.
+- **Experience comes from accomplishments, never from time passing or from taking harm.** No skill levels from standing near enemies, from being hit, or from waiting.
+- **Harder feats teach more.** A long shot to a weak point is worth far more than a close body shot.
+- **Repetition pays less.** Doing the same trivial thing to the same target earns less each time, down to nothing.
+- **Catch-up.** A skill well below the hero's highest levels faster, so changing playstyle late is not a slog.
+- **Overflow is never wasted.** Experience earned in a skill that is at the region cap goes into mastery of that skill's perks (see Perks).
+- **Reaching the region cap in a skill** earns a keepsake from someone in the valley: the smith's old hammer for Smithing, a fletcher's knife for Fletching. Keepsakes go on display in the house.
+
+- **Apprenticeship.** The hero's rank is Apprentice, then Scout, then Warden of the valley. Rank is earned by passing trials Hesper sets, not by experience points. Trials are optional: the valley can be finished as an Apprentice, but each trial teaches a perk and each rank gives more perk slots. Each trial teaches one part of the scout's craft and ends with a single dry line from Hesper, on failure as well as success.
 
   | Trial | For rank | What the hero does | What it teaches |
   | --- | --- | --- | --- |
@@ -286,9 +302,53 @@ Impact:
   Hesper's Shoulder is meant to be failed many times, each with a different line ("I heard you at the gate."). On success she does not turn around. She says "Hm. That'll do," which is the highest praise she gives anywhere in the game, and the hero is a Warden.
 
   Rank shows on the hero's cloak: plain grey for an Apprentice, forest green for a Scout, deep blue for a Warden. The Warden's cloak is Hesper's own, handed over.
-- **Perks:** one perk choice every 10 levels in a skill. Perks are where build identity comes from.
 - **Gear tiers** come from materials: bronze, iron, steel, then higher tiers. Gear is crafted or looted, and equipped gear is visible on the character model where the asset pack allows.
-- **Squad:** recruits have their own level and gear slots. Recruiting and developing them is the collecting layer.
+- **Squad:** recruits have their own level, perks, and gear slots (see Companions). Recruiting and developing them is the collecting layer.
+
+### Perks
+
+- **Every perk changes how the hero plays.** A perk gives a new action or changes a rule. Plain number increases belong to skill levels and are never perks.
+- **Perks are earned from the story more than from levels.**
+  - *Levels:* a few basic perks at fixed levels in each skill.
+  - *Trials:* each of Hesper's trials teaches a perk tied to what it tested.
+  - *People:* those who come home teach theirs, including the smith, the fisher, and some bandits won back.
+  - *Story moments:* lighting the first lantern, surviving the turn, beating Stane.
+  - *Secrets:* a few are in notes found off the path.
+- **Nothing is missable.** Every perk has a fallback source. If the person who would have taught it is dead or gone, Hesper or a found note teaches it later at a higher cost. No choice the player makes can remove a perk from the game.
+- **Once earned, a perk is kept for good.** There are no either-or choices between perks.
+- **Slots.** Only equipped perks are active. An Apprentice has 3 slots, a Scout 5, a Warden 7. Perks are changed at a campfire, at Hesper's, or at home, never in the field.
+- **Saved sets.** Up to three named sets of perks can be saved and switched between in one action.
+- **Perk mastery.** Each perk has three ranks, earned by using it while equipped and by overflow experience from its skill. Each rank strengthens the perk or extends what it does. A perk the player has lived with is much stronger than one just slotted, so commitment is rewarded without anything being locked away.
+- **The perk ledger** lists every perk that exists in the current region. Earned perks show in full. Unearned ones show a name and a hint about where to look ("Someone by the lake knows more about patience"). The player always knows what is out there.
+- **About 24 perks in Tallowmere**, spread across the skills. Fewer and better is the rule. Capstone perks, the strongest in each skill, sit at level 50 and so arrive in the last region.
+- Examples of the kind of perk wanted:
+  - *Archery:* arrows pin a fleeing runner in place; at rank 3 a perfect-draw arrow passes through to a second enemy.
+  - *Stealth:* sprinting through tall grass makes no noise; standing still at night hides the hero beyond a few paces.
+  - *Fletching:* recovered arrows never break; a second quiver for one special arrow type.
+  - *Leadership:* Bram can be sent to a marked spot; a whistle calls the squad to the hero at once.
+
+### Pacing
+
+Growth must track the story. These targets are enforced by a test, not left to tuning by feel.
+
+| Story beat | The two skills the player uses most | Perks earned | Slots |
+| --- | --- | --- | --- |
+| First lantern lit (the Mill) | 4 to 7 | 3 to 5 | 3 |
+| The Forge freed | 8 to 12 | 7 to 10 | 3 to 5 |
+| After the turn, the Mill retaken | 13 to 16 | 11 to 15 | 5 |
+| Facing Stane | 18 to 20 | 16 to 20 | 5 to 7 |
+| Valley finished with every secret found | 20 | 24 | 7 |
+
+A player who rushes arrives at Stane under-levelled but able to win with skill; a player who explores arrives at the cap with mastery still growing. Neither should reach the cap in their main skills before the turn.
+
+### Seeing it
+
+- **Skills screen** on `K`, with three tabs: Skills (a bar per skill, the current level, what the next level gives, and the region cap), Perks (slots, saved sets, each perk's mastery rank, and the perk ledger), and Recipes.
+- **Levelling up** plays a quiet chime and shows one line on screen. Nothing interrupts play. A new perk gets a slightly longer moment and its own sound.
+
+### Companions
+
+Bram and later recruits level by fighting alongside the hero, under the same region cap. Each has three perks of their own, earned at fixed levels and always active, with no slots to manage.
 
 ### Loot
 
@@ -316,7 +376,7 @@ What the player finds, and where:
 - **Fletching** at any campfire: shafts, feathers, and heads become arrows. Standard arrows from wood, feathers, and bronze or iron heads; blunt arrows by padding a standard one; fire and whistling arrows from rarer materials. A scout who fletches rarely runs dry.
 - **Cooking** at any campfire: raw food and foraged ingredients become meals that heal more and give a short bonus.
 - **Smithing** at the Forge once the smith returns: blades, arrowheads, armour pieces, and upgrades from material to material and from common toward masterwork.
-- Recipes are learned by doing, by finding notes, and from the people who return. Known recipes are listed in the notebook.
+- Recipes are learned by doing, by finding notes, and from the people who return. Known recipes are listed on the skills screen.
 
 ### Carrying and keeping
 
@@ -357,7 +417,7 @@ Each milestone ends deployed to Pages and playable. Do not start the next one un
 2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned with Hesper and her one lit window, plus the Mill, the Forge, and the Watch-house placed in data (section 9). Wildlife, the ten places off the path, alarm bells, fights in place with awareness ranges, squad following, pathfinding, capture by lighting the lantern, with the growing melody, falling banners, and visible restoration of each place and of the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
 3. **Combat depth.** Everything in section 5 under The bow, Close combat, How enemies fight, Unit types, Fighting alongside Bram, and Impact: weak points, the limited quiver, arrow types, perfect draw, the three-hit combo, perfect dodge, lock-on, throwing knives, stagger, attack turns, morale, the shield-bearer, brute, and runner, Bram's traits, and impact feel.
 4. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, the turn in which the Captain retakes the first freed place, the Captain fight at the Watch-house, and the valley finale ending at the hero's family house (section 9).
-5. **Progression and loot.** Skills that level by use, including Stealth, Gathering, Fletching, and Cooking, perks, everything in section 6 under Loot, Gathering, Crafting, and Carrying and keeping (smithing waits for milestone 6), and the apprenticeship: Hesper's six trials and the three ranks with their cloak colours (section 6).
+5. **Progression and loot.** Everything in section 6: skills with the region cap, perks with slots, saved sets, mastery, and the ledger, the pacing targets and their test, the skills screen, everything in section 6 under Loot, Gathering, Crafting, and Carrying and keeping (smithing waits for milestone 6), and the apprenticeship: Hesper's six trials and the three ranks with their cloak colours (section 6).
 6. **Conquest and towns.** Town services that come from the people who return (smithing at the Forge, the miller's food, recruiting, healing), trade as in section 6, the Fairlow house as the hero's home with its displays, income from captured places, wounded squad members, camps that restock, harder places farther out.
 7. **Cloud saves.** Supabase auth and save sync.
 8. **More world.** A second region, the hero's horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.

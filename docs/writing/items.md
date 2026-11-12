@@ -91,7 +91,7 @@ From the household stories in `stories.md`. Each is found in the world and shown
 
 | Keepsake | Where | Description |
 | --- | --- | --- |
-| A Mill Bill | The Mill's loft, behind the meal bins | "A pick for dressing millstones. The handle is cut down to fit a small hand." |
+| A Mill Bill | Inside the Mill, behind the meal bins | "A pick for dressing millstones. The handle is cut down to fit a small hand." |
 | A Flawed Blade | The Forge's scrap heap | "One of Stane's. It broke at the tang, where somebody meant it to." |
 | A Tally Stick | Under the third post of the Forge's east fence | "Hazel, notched down both sides. Sixty-one. Some doors more than once." |
 | A Thatching Needle | Hew Pollard's boot, only if he was killed | "Iron, a hand long, polished by use. Not a weapon." |

@@ -29,7 +29,7 @@ Dob Finch dressed the Mill's stones as a boy and has stood beside them with a sp
 
 1. Dob: "I'll dig. I'll carry. I'll not go up there. I held a spear in her yard for nine years."
 
-**Step 2. The mill bill.** In the Mill's loft, behind the meal bins, is a stone-dresser's pick with a boy's initials burned into the handle: D.F. It is a keepsake, *A Mill Bill*: "A pick for dressing millstones. The handle is cut down to fit a small hand." Shown to Dob:
+**Step 2. The mill bill.** Inside the Mill, behind the meal bins, is a stone-dresser's pick with a boy's initials burned into the handle: D.F. It is a keepsake, *A Mill Bill*: "A pick for dressing millstones. The handle is cut down to fit a small hand." Shown to Dob:
 
 `story.miller.2.dob`
 

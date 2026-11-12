@@ -27,4 +27,4 @@ Three lighting items are not met in these frames, whatever the checklist says. T
 
 ## Task 003
 
-Unblocked on the asset side. It starts when Greg has confirmed the look of the people. Until then, continue with the review 004 fixes.
+Unblocked on the asset side. Greg has approved the look of the people (12 Nov). It starts once PR #22 is merged with the scale fix from review 008. Until then, continue with the review 004 fixes.

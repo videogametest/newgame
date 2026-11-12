@@ -10,6 +10,7 @@ How design, tasks, and status move between Greg, Claude, and Viktor. The repo is
 | `docs/tasks/NNN-name.md` | Claude | One brief per job, numbered in the order to do them. |
 | `docs/writing/` | Claude | The story's lines and the music's score. Used exactly as written. |
 | `src/core/progression/`, `src/data/perks/` | Claude | The progression logic and the perks. See `docs/PARALLEL.md`. |
+| `docs/reviews/` | Claude | Numbered reviews of merged work. Each says what must change and when. Viktor reads new reviews on every pull and answers them in `docs/status.md`. |
 | `docs/status.md` | Viktor | Current state of the work. Newest entry at the top. |
 | `docs/pr-media/` | Viktor | Screenshots and contact sheets referenced by status entries and PRs. |
 
@@ -32,4 +33,4 @@ Claude reviews every visual change from the screenshots before Greg looks at it.
 
 1. Pull `main` and read `docs/status.md` before answering questions about the build.
 2. Review merged work against the task brief and the design doc: run the tests, read the screenshots.
-3. Commit design changes and new task briefs directly to `main`. Put review findings in the next task brief, or in a new one.
+3. Commit design changes and new task briefs directly to `main`. Put review findings in `docs/reviews/`.

@@ -1,5 +1,7 @@
 # Review 007: style test, PR #22
 
+**Amended by review 008:** the buildings are far too small for the people. Do not merge until review 008 is done.
+
 Reviewed at `b3c4cd8`. **The style test has done its job. Merge PR #22.** No third round.
 
 ## What it settled

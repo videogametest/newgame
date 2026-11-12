@@ -1,6 +1,6 @@
 # 002b: The style test
 
-Status: done. Passed in `docs/reviews/007-style-test-passed.md`; the lighting items move to task 003.
+Status: in progress. One fix left: building scale, `docs/reviews/008-building-scale.md`.
 
 ## Goal
 

@@ -40,6 +40,8 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 
 ## The first-look bar
 
+**Scale (review 008).** Buildings are scaled to the people: a storey is 2.6 to 2.8 m, every door is at least 2.1 m high and 1.2 m wide, and the evidence includes the hero standing in a doorway in Wick. A world where people are bigger than their houses fails the bar outright.
+
 **Lighting, carried over from the style test (review 007).** These three failed there and are settled here, in the real world, before anything else in the bar is judged:
 
 - **Dusk lights things, not only the sky.** A low warm sun, long shadows, and walls, ground, and faces that take the colour. The ground is never near-black while the sky is bright.

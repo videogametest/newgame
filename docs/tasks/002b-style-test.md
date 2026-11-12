@@ -1,6 +1,6 @@
 # 002b: The style test
 
-Status: in progress. One fix left: building scale, `docs/reviews/008-building-scale.md`.
+Status: done. Closed by `docs/reviews/014-pr-22-merged.md`; the building scale rule was replaced in review 012.
 
 ## Goal
 

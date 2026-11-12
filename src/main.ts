@@ -4,6 +4,7 @@ import { startGame } from './render/game';
 import { startShowcase } from './render/showcase';
 import { startStyletest } from './styletest/styletest';
 import { startUpgradeTest } from './styletest/upgrade';
+import { startHouseTest } from './styletest/houses';
 import { parseShowcaseTime } from './render/showcase_clips';
 import { GAME_TITLE } from './data/title';
 
@@ -17,7 +18,7 @@ if (!(canvas instanceof HTMLCanvasElement) || !ui) {
 
 const params = new URLSearchParams(window.location.search);
 if (params.has('styletest')) {
-  (params.get('styletest') === 'upgrade' ? startUpgradeTest(canvas) : startStyletest(canvas)).catch((err: unknown) => {
+  (params.get('styletest') === 'upgrade' ? startUpgradeTest(canvas) : params.get('styletest') === 'houses' ? startHouseTest(canvas) : startStyletest(canvas)).catch((err: unknown) => {
     ui.textContent = err instanceof Error ? err.message : String(err);
     console.error(err);
   });

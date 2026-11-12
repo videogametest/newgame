@@ -1,6 +1,6 @@
 # 002b: The style test
 
-Status: open
+Status: merged (PR #15), not passed. Rework listed in `docs/reviews/003-overnight-audit.md`.
 
 ## Goal
 

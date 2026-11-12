@@ -1,7 +1,7 @@
 // Wires the simulation to Babylon: fixed-step sim, visual sync, camera, HUD and restart.
 // The sim (src/core) knows nothing of this file. Everything here reads sim state and draws it.
 
-import { Engine, Matrix, Scene, ShadowGenerator, Vector3 } from '@babylonjs/core';
+import { AbstractMesh, Engine, Matrix, Scene, ShadowGenerator, Vector3 } from '@babylonjs/core';
 import { TUNING } from '../config/tuning';
 import { createBattle, getHero, step } from '../core/battle';
 import type { BattleEvent, BattleState } from '../core/types';
@@ -10,6 +10,7 @@ import { buildArena } from './arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
 import { BattleCamera } from './camera';
+import { insideBounds, type ArenaBounds } from './camera_limits';
 import { blocksView } from './occlusion';
 import { ArrowViews, ImpactBursts } from './effects';
 import { PlayerInput } from './input';
@@ -26,11 +27,11 @@ export async function startGame(canvas: HTMLCanvasElement, uiRoot: HTMLElement):
   try {
     const engine = new Engine(canvas, true, { stencil: true }, true);
     const scene = new Scene(engine);
-    const { shadow } = buildArena(scene, TRAINING_FIELD);
+    const { shadow, walls } = buildArena(scene, TRAINING_FIELD);
     const assets = await loadAssets(scene, (done, total, label) => {
       hud.setBoot(label, total > 0 ? done / total : 0);
     });
-    const game = new Game(engine, scene, canvas, hud, assets, shadow);
+    const game = new Game(engine, scene, canvas, hud, assets, shadow, walls, TRAINING_FIELD);
     game.start();
     hud.hideBoot();
   } catch (err) {
@@ -56,6 +57,8 @@ class Game {
     private readonly hud: Hud,
     private readonly assets: LoadedAssets,
     private readonly shadow: ShadowGenerator,
+    private readonly walls: AbstractMesh[],
+    private readonly arena: ArenaBounds,
   ) {
     this.state = createBattle(TRAINING_FIELD);
     this.arrows = new ArrowViews(scene, assets.arrow, shadow);
@@ -116,6 +119,10 @@ class Game {
     // The camera moves first so the occlusion test below uses this frame's camera position.
     this.camera.update(hero, this.input.camYaw, this.input.aimPitch, this.input.isZooming, dt);
     const camPos = this.camera.camera.position;
+    // The boundary wall is a translucent barrier. It is hidden while the camera is outside the arena,
+    // so it never tints the view. Inside, it stays visible behind the camera.
+    const camInside = insideBounds(camPos.x, camPos.z, this.arena);
+    for (const w of this.walls) w.isVisible = camInside;
     for (const f of state.fighters) {
       let view = this.views.get(f.id);
       if (!view) {

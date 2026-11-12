@@ -41,8 +41,8 @@ export class BattleCamera {
     const fx = hero.x;
     const fy = C.lookHeight;
     const fz = hero.z;
-    const px = fx - vx * d + rx * C.shoulder;
     const py = clampCameraHeight(fy - vy * d, C.minHeight);
+    const px = fx - vx * d + rx * C.shoulder;
     const pz = fz - vz * d + rz * C.shoulder;
     this.camera.position.set(px, py, pz);
     this.camera.setTarget(new Vector3(px + vx, py + vy, pz + vz));

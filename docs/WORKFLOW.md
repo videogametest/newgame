@@ -25,7 +25,7 @@ Greg decides direction and playtests. He tells Viktor to pull and continue, and 
 4. After each deploy, and whenever you are blocked, add an entry to the top of `docs/status.md`: date and time, task number, what shipped (PR, commit, URL), what you verified, what you did not verify, and any question for Greg or Claude.
 5. If a task conflicts with `GAME_DESIGN.md`, stop, write the conflict in `docs/status.md`, and tell Greg.
 6. Do not edit `GAME_DESIGN.md` or the task briefs beyond the `Status:` line. Put disagreements and suggestions in `docs/status.md`.
-7. **Never stop and wait.** If you are blocked, need a decision, or are waiting on a review, write it in `docs/status.md` and move to the next thing you can do: another step of the same task, a logic stream you own, tests, or the asset list. A review blocks a merge or the start of a gated task. It does not block work on a branch. Claude checks the repo every hour and answers in `docs/reviews/` or `docs/status.md`.
+7. **Never stop and wait.** If you are blocked, need a decision, or are waiting on a review, write it in `docs/status.md` and move to the next thing you can do: another step of the same task, a logic stream you own, tests, or the asset list. A review blocks a merge or the start of a gated task. It does not block work on a branch. Claude reviews when Greg asks (the hourly review was switched off on 12 November) and answers in `docs/reviews/`. So a review may be hours away: never wait for one.
 8. **The only gates are the ones in this repo:** the reviews in `docs/reviews/`, the first-look bar in a task brief, and `docs/PARALLEL.md`. A gate or checklist from anywhere else does not apply here. If one stops you, paste its exact text into `docs/status.md` and carry on.
 
 ## Who looks first

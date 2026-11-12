@@ -42,7 +42,7 @@ Claude builds stream F directly and pushes to `main` when its tests pass. It doe
 - Claude builds against the shared types in `src/core/types/`. Viktor should write and merge those early, and include what progression needs: the skill names from `GAME_DESIGN.md` section 6, an experience event (what happened, to what target, how hard it was), the hero's rank, and the region.
 - Claude designs the 24 perks and writes them as data. Each perk names its skill, its primary source, its fallback source, and what its three mastery ranks do. Perks whose effect touches combat, stealth, items, or companions declare that effect as data; the stream that owns that system implements the effect when its task comes up.
 - If Viktor needs something changed in Claude's paths, he says so in `docs/status.md` and does not edit them.
-- Claude also builds stream F2 and reviews every merged logic stream. Claude checks the repo every hour.
+- Claude also builds stream F2 and reviews every merged logic stream. Claude reviews when Greg asks; there is no hourly check since 12 November.
 
 **12 Nov:** Claude reworked parts of streams D, E, and G to settle the questions they raised (`docs/reviews/014-core-fixes-merged.md`). Those paths are Viktor's again from that commit on.
 

@@ -8,7 +8,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
 | 003 | Step 1 merged (PR #23). Walk-distance check merged (PR #25); it now passes at 92.7 m with the layout's 46 stops. Review 016 items 1–3 merged (PR #26) and the sun and moon hook (PR #27). Layout PR (places, water, roads, stops) on `feat/task-003-layout`: the road-grade requirement is **not met** (see the layout entry below). Step 2 not started. | Layout PR (branch `feat/task-003-layout`) | Road grades on `hill_path`, `ridge_path` and `east_road` (measured, not reshaped). Claude review of the first-look bar before step 2 |
-| B | Task 002b style test rework (review 005), PR #21 on `feat/task-002b-rework`: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | #21 | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
+| B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
 ## 2026-11-12 Task 003 layout: places, water, roads, stops (Viktor, PR open, road grades not met)
@@ -42,6 +42,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - **Tests:** `src/core/world/valley.test.ts` (17 tests: determinism, lake, walkable places, crossings, water blocks walking, edge ring, sight lines, highest point, castle and start inside the valley, river widths, 46 stops, walking) and `walk_gap.test.ts`.
 - **Gate in the worker sandbox (`feat/task-003-layout`):** generator `--check` PASS; `npx vitest run` 50 files, 644 tests pass; `npm run typecheck` exit 0; `npm run build` exit 0; `scripts/smoke.mjs` PASS on localhost; walk gap PASS 92.7 m.
 - **Live check, earlier (commit `277e75b`, before this PR):** `https://everylitwindow.com/` returned HTTP 200, title "Every Lit Window", no failed requests and no console errors (headless Chromium). Pages run `43283887127` for `277e75b` succeeded. The live check on this PR's deploy is recorded after the merge.
+- **Live check, post-merge (`44d54e9`):** Pages run `43286633512` succeeded. `https://everylitwindow.com/` returned HTTP 200, title "Every Lit Window", no failed requests and no console errors (headless Chromium, 1280×720, 6 s after networkidle). The screenshot shows the valley at dusk with the placeholder hero seen from behind. **Still on screen:** the arena HUD (hero bar, "1 Sword / 2 Bow"). Review 016 item 3 is open for it. Screenshot: `/work/run_tmp_pr3/live/live_layout.png` (sandbox only).
 
 ## 2026-11-12 Review 016 items 1 to 3: sun path, moon, stars, draw calls (Viktor, PR (a))
 

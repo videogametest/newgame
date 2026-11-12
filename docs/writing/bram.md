@@ -103,9 +103,16 @@ One of, in the right situation, never the same twice running.
 
 - "You know what, I like that you didn't."
 
-`bram.fight.won.killing` (a place taken with nobody spared)
+`bram.fight.yield` (an enemy throws down their weapon to the hero's drawn bow)
 
-- "Did you have to? All right. All right."
+- "He just put it down. You didn't even let go of the string."
+- "That's the quietest fight I've ever been in."
+
+`bram.fight.pommel` (the hero knocks an enemy out after a perfect dodge)
+
+- "Did you just hit him with the handle? That's allowed?"
+
+Bram says nothing about a place taken by killing. Nobody in the game counts the dead aloud.
 
 ## The lanterns
 

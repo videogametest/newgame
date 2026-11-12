@@ -259,10 +259,12 @@ The morning after a place is freed, one line per bandit taken to Wick.
 
 1. "You brought {count} of them home. I didn't think you'd bring one."
 
-`hesper.mercy.none` (a place taken with nobody spared)
+`hesper.bandit.friend` (someone spared would not stay because a person they were close to was killed there; `{friend}` is that person)
 
-1. "Nobody to bring home from there, then."
-2. "They were ours once. Some of them."
+- "{name} wouldn't stay. {friend} was at that fire with them nine years. I didn't argue."
+- "{name} asked me where {friend} was buried. Then they went. I'd have gone too."
+
+She says nothing about a place where nobody was spared. The valley shows it: no new window that night.
 
 ## Show
 

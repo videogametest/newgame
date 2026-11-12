@@ -32,3 +32,9 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 - All four steps are merged and deployed and the tests pass.
 - Then continue to task 007.
+
+## From design version 30
+
+- **Teachers:** `src/core/progression/lessons.ts`, `GameState.lessonsTaken`. Offered in conversation with the household once they are home; lines in `docs/writing/households.md`, "Lessons".
+- **No grind, either way:** nothing may require a skill level. If a step seems to need one, stop and ask.
+- **Garrick's piece:** at the Forge with Garrick in the company and his wish open, pass `garrickMakes: true` to `craft`, then `fulfilWish` with `madeBy: 'garrick'`.

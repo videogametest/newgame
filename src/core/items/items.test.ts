@@ -300,3 +300,23 @@ describe('recipes cover what the writing names', () => {
     expect(indexRecipes().get('steel')!.station).toBe('forge');
   });
 });
+
+describe('nothing asks the player to grind (second research pass)', () => {
+  it("Garrick's piece comes out masterwork whatever the hero's Smithing, and only at the Forge", () => {
+    const mats = () => ({ ...carrying({ itemId: 'bronze', count: 3 }, { itemId: 'leather', count: 1 }), recipes: ['bronze_blade'] });
+    const his = craft(mats(), 'bronze_blade', ctx({ station: 'forge', skillLevel: 1, garrickMakes: true }), index);
+    expect(his.ok && his.made.quality).toBe('masterwork');
+    const mine = craft(mats(), 'bronze_blade', ctx({ station: 'forge', skillLevel: 1 }), index);
+    expect(mine.ok && mine.made.quality).toBeUndefined();
+  });
+  it('making the cheapest thing over and over stops teaching long before the cap', async () => {
+    const { createProgression, awardSharedEvent } = await import('../progression/skills');
+    const state = createProgression();
+    for (let i = 0; i < 2000; i++) awardSharedEvent(state, { skill: 'fletching', action: 'arrows_made', targetId: 'shafts', difficulty: 0.1, regionId: 'tallowmere' });
+    const cheap = state.skills.fletching.level;
+    const real = createProgression();
+    for (let i = 0; i < 2000; i++) awardSharedEvent(real, { skill: 'fletching', action: 'arrows_made', targetId: 'arrow_fire', difficulty: 0.5, regionId: 'tallowmere' });
+    expect(cheap).toBeLessThan(real.skills.fletching.level);
+    expect(cheap).toBeLessThan(state.regionCap);
+  });
+});

@@ -5,7 +5,8 @@ The defenders of the three places, the tax cart, and what the hero overhears. Us
 ## How to read this
 
 - **Type** is the unit type from section 5. Shield-bearers, brutes, and runners arrive with task 005; until then, treat a shield-bearer or brute as a soldier and a runner as a soldier who goes for the bell.
-- **Loyalty** is how firmly they are Stane's: low, middling, or high. It sets how likely they are to stay in Wick if won back, and how soon they break. Map the three words to numbers in tuning.
+- **Loyalty** is how firmly they are Stane's: low, middling, or high. It sets how much the valley must offer before they stay in Wick, and how soon they break. Map the three words to numbers in tuning.
+- **Who is close to whom.** People who are overheard talking together are close. A bandit whose friend was killed at their place is far less likely to stay, and one whose friends were all spared is far more likely. Three people share no exchange: Hob Tarn is close to Rafe Dunmore, Brock Tull to Maud Kerr, and Sim Hart to Col Ware.
 - **Was** is the trade they had before. It is what they take up again if they stay, and it fills `{trade}` in Hesper's line.
 - **Habit** is something they do every day that the player can use.
 - They are people, not villains. They joined because Stane's men ate, or because they were soldiers and he was the only officer left. Most have not hurt anyone in years. Write any further lines for them in that spirit.
@@ -195,6 +196,40 @@ Every few days, from the Watch-house to Wick and back. Gant leads; Rikke and Hew
 
 1. Gant: "We stop at the ford to water the horse. Every time. If I were robbing us, that's where I'd do it."
 2. Rikke: "Good thing nobody's robbing us."
+
+---
+
+## When they yield
+
+A bandit who throws down their weapon, or is taken alive on the road, says one useful thing about their place: the first of these the hero does not already know. Nobody says the one that is about themselves. It is kept in Notes, and it counts as having overheard the line it stands for.
+
+`yield.mill.1` (stands for `overheard.mill.5`; not said by Harl)
+
+1. "The strongbox key's on Gadd's belt. It never comes off. I didn't tell you."
+
+`yield.mill.2` (stands for `overheard.mill.1`; not said by Bran)
+
+1. "They change the watch at dusk and at the middle of the night. Oakes sleeps through his, by the woodpile."
+
+`yield.mill.retaken.1` (stands for `overheard.mill.retaken.2`)
+
+1. "The sergeant's done trusting the geese. It's eyes tonight. All of us, all night."
+
+`yield.forge.1` (stands for `overheard.forge.3`; not said by Hob)
+
+1. "Tarn sleeps across the strongroom step. There's a coal hatch round the back. He doesn't fit through it, so he's never thought about it."
+
+`yield.forge.2` (stands for `overheard.forge.2`; not said by Rafe)
+
+1. "Dunmore has the smith's hammer. He's at the anvil with it every midday. He thinks he's good."
+
+`yield.watch.1` (stands for `overheard.watch.2`; not said by Tom)
+
+1. "Back gate. Midnight. One man on it. The lieutenant asked for two and was told no."
+
+`yield.cart.1` (stands for `overheard.cart.2`)
+
+1. "We water the horse at the ford. Every run. Everybody looks at the horse."
 
 ---
 

@@ -182,7 +182,7 @@ describe('§6 company', () => {
     ['tamsin', { kind: 'bow_returned_to_hale' }],
     ['tobin_pike', { kind: 'pikes_door', pikesHome: true }],
     ['oona', { kind: 'firefly_grove' }],
-    ['garrick', { kind: 'forge_craft', quality: 'masterwork' }],
+    ['garrick', { kind: 'forge_craft', madeBy: 'garrick' }],
     ['bracken', { kind: 'campfire', sedgesHome: true, sheepVisible: true }],
   ];
   it.each(wishes)('fulfils %s wish only for its written event', (id, event) => {
@@ -194,7 +194,7 @@ describe('§6 company', () => {
   });
   it('does not invent a Ketch wish or fulfil under incomplete wish conditions', () => {
     expect(fulfilWish(member('ketch'), { kind: 'pikes_door', pikesHome: true }).wishFulfilled).toBe(false);
-    expect(fulfilWish(member('garrick'), { kind: 'forge_craft', quality: 'fine' }).wishFulfilled).toBe(false);
+    expect(fulfilWish(member('garrick'), { kind: 'forge_craft', madeBy: 'hero' }).wishFulfilled).toBe(false);
     expect(fulfilWish(member('bram'), { kind: 'inn_meal', innRebuilt: false }).wishFulfilled).toBe(false);
     expect(fulfilWish(member('bracken'), { kind: 'campfire', sedgesHome: true, sheepVisible: false }).wishFulfilled).toBe(false);
     expect(fulfilWish(member('tobin_pike'), { kind: 'pikes_door', pikesHome: false }).wishFulfilled).toBe(false);

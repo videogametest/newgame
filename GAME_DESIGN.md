@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 29 (what can be used indoors: hearths, one working thing per home). Supersedes version 28.
+Version 30 (what the second research pass taught: companions never in the way, mercy has its own tools and is judged by who, Notes as a record, no story breaks, nothing asks for a grind, something at every stop). Supersedes version 29.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -36,7 +36,8 @@ These are expensive to change. Do not revisit without asking.
 - **Engine:** Babylon.js with TypeScript and Vite.
 - **Art style:** stylized low-poly from CC0 asset packs. Characters come from KayKit Adventurers. The hero is the hooded, cloaked archer model, not the armoured knight; no enemy may use the same model and colours as the hero. Scenery comes from packs that match them (KayKit first; Quaternius or Kenney where KayKit has nothing suitable). Keep each pack's license file in the repo beside its assets. Sourcing follows the rules in section 7 (Assets).
 - **No physics engine.** The core simulation owns every position, velocity, and hit, including ground height. Babylon renders what the simulation says.
-- **Canvas** fills the browser window. Target 60 fps on a desktop.
+- **Canvas** fills the browser window. Target 60 fps on a desktop. In a quiet game a stutter is noticed more than anywhere, so frame rate comes before any visual feature: if a thing cannot be had at 60, it is cut or simplified.
+- **Honest about its size.** The title screen says what the game is in one small line: one valley, and about how many hours, from a timed playthrough.
 - **Progression:** use-based skills, no classes.
 - **Hosting:** GitHub Pages (static). Supabase for cloud saves later. Only the publishable key in the client; row-level security on every table; the service-role key never enters the repo.
 
@@ -62,6 +63,8 @@ Rules:
 Look and atmosphere:
 
 - Bright, saturated colour; soft lighting; light distance haze. A sun that moves, with shadows.
+- **Something at every stop.** The valley is small on purpose, and a small world is forgiven for its size but not for feeling empty. Wherever the hero can walk, something worth stopping for is within about a hundred metres: a place, a secret, a gathering spot, a chest, a campfire, a sign on the ground, an animal, or a view composed to be looked at. No walk between two such things takes more than about twenty seconds at a run. Running itself should feel good: grass parting, the cloak moving, the land rising and falling.
+- **Told in words.** Every place can be found from a sentence: people give directions by landmarks that can be seen from far off (the signal hill, the mill wheel, the split oak, the lake), and signposts stand where roads meet.
 - **Land that hides things.** Hills, ridges, and stands of trees are shaped and placed so that from any point something ahead is hidden and something is half-seen: a roof behind a rise, smoke past a ridge. Each rise offers a choice of going over or going round. Nothing worth finding stands in the open from far away except the landmarks meant to draw the eye: Hesper's window, the signal hill, the castle. Places are found by sight and by what people say, never revealed by a tower or a marker.
 - **Inside.** Buildings can be entered. Hesper's cottage is open from the start. Every other house in Wick is boarded shut while its family is gone, and opens when they come home: bringing a household back opens a room. The Mill, the Forge, the inn, and the Watch-house hall can be entered too, and the Fairlow house once it is the hero's. About twenty in all by the end.
   - Each is one room on the ground floor, built from six shared layouts and dressed with a few things that say who lives there (`docs/writing/interiors.md`). Upper floors are not entered.
@@ -183,7 +186,7 @@ Controls:
   - **Short blade:** a three-hit combo. Each press within a short window continues it; the third hit is slower and hits harder. The scout's backup weapon
   - **Bow:** hold to draw, release to fire along the crosshair. The arrow follows a gravity arc. Longer draw means more speed and damage. Releasing at the peak of the draw is a perfect draw (see The bow)
 - Right mouse (bow only): zoom the camera in for aiming. Holding the zoom on an enemy for a moment marks them
-- `E`: interact (open chest, talk, use a town service)
+- `E`: interact (open chest, talk, use a town service). In a fight: knock out an enemy from behind or one opened by a perfect dodge. Held on a knocked-out enemy: bind them
 - `F`: eat food to heal
 - `Q`: squad order, toggling between "follow me" and "hold here"
 - `T`: squad order "take them alive", on or off
@@ -215,7 +218,13 @@ Rules:
   - **The first arrow.** An arrow that hits an unaware enemy deals heavily increased damage. A short-blade strike on an unaware enemy from behind does too.
   - **The alarm bell.** Every enemy-held place has one. An alert enemy may break off and run to ring it, which calls reinforcements from outside the place. The runner can be stopped. If nobody ever becomes alert, the bell is never rung.
   - A fight that goes loud is still winnable; stealth is rewarded, never required.
-- Squad members follow the hero when out of combat and target the nearest enemy when a fight starts. They stay back and out of sight while the hero is crouched.
+- Squad members follow the hero when out of combat and join a fight once it has begun.
+- **Companions are never in the way.** These are rules, not behaviours to tune toward (`src/core/company`):
+  - *They never give the hero away.* Until some enemy is alert to the hero, no enemy sees, hears, or reacts to a companion, and companions make no noise and startle no birds or geese. While the hero is crouched they keep close, a few paces behind and visibly crouched too, so the hero is not alone; they are simply not there to the enemy's senses.
+  - *They never block.* A companion never stands in a doorway, a gate, a gap, on a narrow path, or between the hero's drawn bow and its mark. The hero walks through companions, who then step aside.
+  - *They never need rescuing.* One who falls is wounded and out of the fight until the next rest. Nothing is lost and nothing has to be done about it.
+  - *They never start a fight and never win one alone.* They attack only once an enemy is alert or the hero has struck. A companion's blow on an enemy the hero has neither marked nor struck does half its damage (tuning): they finish what the hero starts. Under "hold here" they only defend themselves.
+  - *Nothing the hero earns depends on bringing them.* No perk, trial, story, or household needs a particular companion in the party, or any companion at all. What companions beat teaches the hero's own skills nothing; only Leadership grows from leading.
 - **Squad orders.** "Follow me" is the default. "Hold here" keeps the squad where they stand: they defend themselves but do not advance, so the hero can scout or open a fight alone. The current order is shown on the HUD.
 - Fighters collide with the opposing team and with scenery. Teammates do not block each other. A fighter that comes between the camera and the hero fades out.
 - Arrows are blocked by terrain and scenery.
@@ -248,15 +257,24 @@ How enemies fight:
 - **Morale.** Enemies are people and want to live. Each place has a named leader, a tougher version of one of its unit types, and a morale level that falls when defenders are beaten, when the leader is beaten, when they are surprised, or when fire spreads, and rises when the bell brings reinforcements. Below a threshold, individual enemies break: some drop their weapons and run, and some throw them down and surrender. Either way they are out of the fight. A whole place can be won by breaking its nerve.
 - **Kill or knock out.** Every bandit can be dealt with either way, and the choice is the player's each time.
   - *Killing:* standard and fire arrows, the short blade, and throwing knives are lethal. An enemy whose health reaches zero dies: they fall and stay down, with no blood and no gore.
-  - *Knocking out:* blunt arrows (see The bow) and Bram's shield strike are not lethal. An enemy whose health reaches zero from one of these is knocked out. A stealth strike from behind offers both: `E` to knock out, attack to kill.
-  - Knocking out is the harder path. Blunt arrows do less damage and gain nothing from weak points except against an unaware enemy, whom a blunt arrow to the head knocks out at once. A knocked-out enemy can be found and woken by an ally while the place is still held. A woken enemy gets up after a few seconds at half health, alert.
+  - *Knocking out:* blunt arrows, the pommel, a strike from behind, and Bram's shield strike are not lethal. An enemy whose health reaches zero from one of these is knocked out.
+  - **Mercy has its own tools.** Sparing people must never be the duller way to play, so every situation that has a killing answer has a different, equally good answer that does not kill. There are at least as many ways to knock out as to kill, and a test holds that.
+    - *From hiding:* a strike from behind offers both, `E` to knock out and attack to kill. A blunt arrow to the head of an unaware enemy knocks them out at once.
+    - *At range:* a blunt arrow does less damage and gains nothing from the weak point, but it knocks a light enemy off their feet for a few seconds whatever they were doing, and a heavy enemy too from a perfect draw. It is the arrow that stops a runner, breaks up a group, and buys time. A standard arrow cannot do that.
+    - *Up close:* after a perfect dodge the opened enemy can be struck with the blade for a critical hit, or with the pommel on `E`. The pommel knocks a light enemy out at once and hits a heavy one harder than the blade would, without killing.
+    - *Without a blow:* an enemy who is alone, can see the hero, and has a full draw held on them for a moment may throw down their weapon (see Surrender).
+    - *Afterwards:* a knocked-out enemy can be found and woken by an ally while the place is still held, getting up after a few seconds at half health, alert. Holding `E` on a knocked-out enemy binds them. A bound enemy takes an ally three times as long to free and gets up unarmed and out of the fight, so a careful player's work is not undone.
 - **Surrender.** An enemy whose nerve breaks may throw down their weapons and kneel. They can be left alone, which counts as sparing them, or attacked, which is never rewarded.
-- **Winning them back.** When a place is freed, every bandit knocked out or spared there is taken to Wick. At the next dawn each one decides, and the decision is never a roll of dice: the same choices by the player always give the same result. A bandit whose tell the hero overheard (section 5, Overheard lines) and who was then spared always stays; scouting is how the player learns who can be brought home. For the rest, each has a bar set by their loyalty to Stane, and they stay if the valley clears it: the bar is met by the valley recovery level (there is more to come home to) and by how many of their fellows at that place were spared rather than killed. Those who fall short leave the valley, or, if their loyalty is high, go back to Stane. Each bandit has a name, a loyalty, and the trade they had before, set in data.
+  - *Called on to yield.* Holding a full draw for a moment on an enemy who is alone and can see it makes them yield, if their health is low enough for their loyalty. A low-loyalty bandit caught alone yields unhurt; a loyal one must be hurt first; leaders and Stane never do. It is decided, never rolled. The habits that put someone alone (fishing at dusk, standing at the east fence) are the openings for it.
+  - *They talk.* A bandit who yields says one useful thing about their place that the hero does not already know: where the key is, when the watch changes, the way in round the back. It is kept in Notes. Mercy pays at once, in play, not only later in the story.
+- **Winning them back.** When a place is freed, every bandit knocked out or spared there is taken to Wick. At the next dawn each one decides, and the decision is never a roll of dice: the same choices by the player always give the same result. A bandit whose tell the hero overheard (section 5, Overheard lines) and who was then spared always stays; scouting is how the player learns who can be brought home. For the rest, each has a bar set by their loyalty to Stane, and they stay if the valley clears it: the bar is met by the valley recovery level (there is more to come home to) and by whether the people they were close to were spared. Mercy is judged by who, never by a count of the dead: people who are overheard talking together are close, a bandit whose friend was killed is far less likely to stay, and how many others died makes no difference to them. Those who fall short leave the valley, or, if their loyalty is high, go back to Stane. Each bandit has a name, a loyalty, and the trade they had before, set in data.
   - *They stay.* They become a villager, take up their old trade, and say a line about it. Each one adds to the valley recovery level, so another window is lit. A few are recruitable into the squad.
   - *They leave.* They walk out of the valley and are not seen again.
   - *They go back.* The most loyal return to Stane and are among the defenders at the Watch-house.
   - Hesper tells the hero the outcome in a line. The player cannot see the odds, only learn from results what moves them.
-- **What killing costs.** Nothing directly: it is always easier. But the dead cannot come home, a place taken by killing leaves its survivors less willing to stay, and the valley recovers more slowly.
+- **What killing costs.** Nothing directly, and it is never the wrong way to play. The dead cannot come home, and their friends will not stay. That is all.
+- **Nobody keeps score.** No screen, number, or line of dialogue counts the dead or grades how a place was taken, and no threshold of kills changes anything. Hesper and Bram do not remark on killing. What the player sees is who is in Wick afterwards and who is not, and when someone would not stay because a friend was killed, Hesper says so by name.
+- **No kill is ever forced.** Every enemy, of every type, can be brought down without killing, and no fight, trial, or story step requires a death.
 - **Stane is the exception.** At low health he yields instead of dying, because the story needs what he has to say.
 
 A day at an enemy-held place:
@@ -311,7 +329,7 @@ Rulings on questions the logic raised. Numbers named here as "tuning" live in da
 - **Hearing.** Every noise has a radius, set by what made it. Enemies inside the radius become suspicious and look toward it. Walls do not block sound.
 - **Knives and heavy enemies.** A throwing knife interrupts a light enemy's wind-up. It does not interrupt a heavy enemy.
 - **Breaking.** Each enemy breaks when the place's morale falls below their own threshold, set by their loyalty: low loyalty breaks first, high loyalty last. One who breaks surrenders if their loyalty is low, or if the hero or a companion is close; otherwise they run. Those who run are gone from the place and count as returned to Stane.
-- **Winning back, exactly.** Mercy is the share of that place's beaten defenders who were knocked out or spared rather than killed. Each bandit decides at the first dawn after the lantern is lit, once, whatever happens to the place afterwards.
+- **Winning back, exactly.** For each bandit, mercy is the share of the people they are close to who were not killed. Who is close to whom comes from the overheard exchanges: everyone who speaks together, plus three ties named in the data for those who share none. Each bandit decides at the first dawn after the lantern is lit, once, whatever happens to the place afterwards. With today's tuning: a low-loyalty bandit stays if their friends lived; a middling one never stays once a friend is dead; a loyal one needs their friends alive and the valley nearly whole.
 - **Stane yields** when his health falls to a quarter (tuning). No blow kills him.
 - **Bond never falls.**
 - **Ketch,** if he stands in for Tobin, has Tobin's trait and perks under the same names. His third stage of bond comes when the Sedges are home, since he was their shepherd's lad.
@@ -348,6 +366,8 @@ Rules:
 - **Experience comes from accomplishments, never from time passing or from taking harm.** No skill levels from standing near enemies, from being hit, or from waiting.
 - **Harder feats teach more.** A long shot to a weak point is worth far more than a close body shot.
 - **Repetition pays less.** Doing the same trivial thing to the same target earns less each time, down to nothing.
+- **There is no grind, in either direction.** No repeated cheap action is ever the fastest way to raise a skill: making the simplest arrow or meal over and over stops teaching well below the cap, as easy targets do. And nothing in the game asks for a skill level: no story step, trial, household, companion's wish, or door needs a number in a skill. A skill level only ever makes the hero better at what they already can do.
+- **Teachers.** Catch-up is the legitimate short cut. On top of it, each tradesperson who comes home gives one lesson in their skill, once, free: it raises that skill by one level if it is below the hero's highest, and otherwise waits, unspent, until it would help. The smith teaches Smithing, the Marrins Cooking, the Tolleys Fletching, Oona Gathering, and Hale Sedge Archery. A player who is behind is never told to go and practise.
 - **Catch-up.** A skill well below the hero's highest levels faster, so changing playstyle late is not a slog.
 - **Overflow is never wasted.** Experience earned in a skill that is at the region cap goes into mastery of that skill's perks (see Perks).
 - **Reaching the region cap in a skill** earns a keepsake from someone in the valley: the smith's old hammer for Smithing, a fletcher's knife for Fletching. Keepsakes go on display in the house.
@@ -411,7 +431,9 @@ A player who rushes arrives at Stane under-levelled but able to win with skill; 
 
 ### Seeing it
 
-- **Skills screen** on `K`, with four tabs: Skills (a bar per skill, the current level, what the next level gives, and the region cap), Perks (slots, saved sets, each perk's mastery rank, and the perk ledger), Recipes, and Notes (fragments found, and the important things people have said; a record to reread, never a list of tasks).
+- **Skills screen** on `K`, with four tabs: Skills (a bar per skill, the current level, what the next level gives, and the region cap), Perks (slots, saved sets, each perk's mastery rank, and the perk ledger), Recipes, and Notes (fragments found, and what people have said; a record to reread, never a list of tasks).
+- **Notes is the record that stands in for a quest log.** It keeps everything said to the hero in a conversation or in answer to Show, every overheard exchange, every loose thread Hesper mentions, what a yielding bandit told, and where anyone went who has moved. Each entry shows who said it, where, and on which day, and the list can be read by person or by place. It never says what to do next. Passing lines above heads and shouts in a fight are not kept.
+- **Where you left off.** On Continue after a few days away, a card shows the window count and the last three things kept in Notes. It is always available under Notes.
 - **Levelling up** plays a quiet chime and shows one line on screen. Nothing interrupts play. A new perk gets a slightly longer moment and its own sound.
 
 ### Companions
@@ -433,7 +455,9 @@ The company is the collecting layer of the game: a small roster of people gather
 | Bracken | The Sedges' sheepdog | Growls when enemies are near, leads the hero toward secrets, and cannot be harmed. He takes one of the three places |
 
 - **Bond.** Each companion has three stages of bond with the hero, which grow by travelling, fighting, and sharing campfires together. Each stage unlocks one of their perks and a new set of lines.
-- **A wish.** Each companion wants one thing, mentioned in passing and never listed as a task. Tobin wants to face his parents. Tamsin wants her father's bow back from the Watch-house. Fulfilling it is what reaches the third stage of bond.
+- **A wish.** Each companion wants one thing, mentioned in passing and never listed as a task. Tobin wants to face his parents. Tamsin wants her father's bow back from the Watch-house. Fulfilling it is what reaches the third stage of bond. No wish asks for a skill level, crowns, or a gift: each is one thing done, and its reward is that person's own scene. Garrick's is to make one piece himself from what the hero brings to the Forge.
+- **Bond is never bought.** There are no gifts and no approval number that the player's choices move up and down. Bond only grows, and only from time together.
+- **They talk, and they do not repeat themselves.** What players love most in a company is hearing it talk to itself and answer what is happening. Each companion has lines for what they notice (a fine shot, someone spared, a place found, night, a place that matters to them), and pairs have short exchanges on the road as well as at campfires. Every line of a group is said once before any is said again; a group that has run out stays quiet for a day instead of repeating; one companion speaks at most once every couple of game hours outside a fight; and nobody talks over anybody. Which lines have been said is saved.
 - **Pairs.** Some companions have lines for each other at campfires, and a few act together in a fight without being told: Bram breaks a shield and Tamsin takes the shot.
 - **Nothing missable.** If Tobin was killed, another bandit who can be won back fills his role, with a different name and the same trait.
 
@@ -667,6 +691,8 @@ Rules for all of them:
 - **One decision each,** made by doing or by Show, never from a menu. Both ways are honourable and both cost something.
 - **Nothing is locked away.** No perk, companion, household, or ending depends on a decision. What changes is who is where, how soon a thing comes, and what people say.
 - **Mercy opens them.** Three of the five need a bandit who was spared and stayed. If that person was killed, the story has a shorter, sadder form that still ends.
+- **No story can be broken.** Whatever order the hero does things in, wherever they go first, and whoever lived or died, every story can still be finished. A test plays hundreds of shuffled orders to hold this. A story whose moment has passed closes quietly in a way that makes sense; it never hangs.
+- **Nobody moves without a trace.** When a story takes someone from where the player last saw them, a named neighbour says where they went, and it is kept in Notes.
 - **Loose threads.** When the hero rests in Wick, Hesper may say one line about one thing left open: a story, a stolen thing still carried, a trial set, a companion's wish, a place seen and not reached. At most one per rest, never an instruction. This is how a player who has been away finds the way back in.
 
 ### The turn

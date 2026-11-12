@@ -103,7 +103,8 @@ export type WishEvent =
   | { kind: 'bow_returned_to_hale' }
   | { kind: 'pikes_door'; pikesHome: boolean }
   | { kind: 'firefly_grove' }
-  | { kind: 'forge_craft'; quality: 'common' | 'fine' | 'masterwork' }
+  /** A piece of gear made at the Forge. Garrick's wish is one he makes himself, from what the hero brings: no Smithing level is asked of the hero. */
+  | { kind: 'forge_craft'; madeBy: 'garrick' | 'hero' }
   | { kind: 'campfire'; sedgesHome: boolean; sheepVisible: boolean };
 export interface WishDef {
   companion: CompanionId;
@@ -126,7 +127,7 @@ export function fulfilWish(c: CompanionState, event: WishEvent): CompanionState 
   const valid = event.kind === 'bow_returned_to_hale' ||
     (c.travelling && (event.kind === 'inn_meal' ? event.innRebuilt :
       event.kind === 'pikes_door' ? event.pikesHome :
-      event.kind === 'forge_craft' ? event.quality === 'masterwork' :
+      event.kind === 'forge_craft' ? event.madeBy === 'garrick' :
       event.kind === 'campfire' ? event.sedgesHome && event.sheepVisible : true));
   return { ...c, wishFulfilled: c.wishFulfilled || matching && valid };
 }

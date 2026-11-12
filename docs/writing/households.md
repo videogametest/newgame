@@ -333,3 +333,16 @@ Use the first when all sixteen households are home at the finale, and the second
 `rudds.festival.count` (replaces Amos's festival line when not all are home)
 
 - Otherwise: "I rang it once for every window that's lit. I'll ring the rest when they are."
+
+## Lessons
+
+Each of these gives the hero one lesson, once, when spoken to after they are home (`GAME_DESIGN.md` section 6, Teachers). If the hero has nothing to learn from them yet, they say the second line and the lesson waits.
+
+| Who | Teaches | The lesson | Not yet |
+| --- | --- | --- | --- |
+| Bertram Aldric | Smithing | "You're hitting it. Stop hitting it. Let the hammer fall and get out of its way." | "You don't need me. You need an anvil and a week." |
+| Ansa Marrin | Cooking | "Salt before, not after. And take it off the fire while it still looks wrong." | "I've nothing to tell you that you don't do already." |
+| Ada Tolley | Fletching | "Three feathers from the same wing. Mix wings and it'll fly like a thrown hen." | "Yours are straighter than mine. Don't tell Giles." |
+| Oona | Gathering | "Cut above the second leaf and it'll be there again next week. Pull it and it won't." | "You know where things grow. I've watched you." |
+| Hale Sedge | Archery | "You're aiming with your eye. Aim with your back. The eye only watches." | "I've nothing for you. Go and show Tamsin, she'll be furious." |
+

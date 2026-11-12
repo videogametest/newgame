@@ -270,6 +270,22 @@ export function effects(stories: Stories, facts: Facts): StoryEffects {
   };
 }
 
+// ---------- Where they went ----------
+
+/**
+ * Nobody in a story moves without a trace (design section 9). For everyone a story has taken from where the player
+ * last saw them, the line that says where they are, and who says it (docs/writing/stories.md, "Where they went").
+ */
+export function traces(stories: Stories, facts: Facts): { line: string; saidBy: string }[] {
+  const fx = effects(stories, facts);
+  const out: { line: string; saidBy: string }[] = [];
+  if (fx.dobHeld) out.push({ line: 'trace.dob', saidBy: 'ansa_marrin' });
+  if (fx.pegGone) out.push({ line: 'trace.peg', saidBy: 'bertram_aldric' });
+  if (fx.tobinAwayUntil !== null) out.push({ line: 'trace.tobin', saidBy: 'hesper' });
+  if (fx.backGateOpen) out.push({ line: 'trace.hew', saidBy: 'hesper' });
+  return out;
+}
+
 // ---------- Loose threads ----------
 
 /** Other things left open, which the caller knows and the stories do not. */

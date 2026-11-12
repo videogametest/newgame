@@ -15,6 +15,7 @@ Everything the game itself says: menus, prompts, notices. Use these exactly as w
 - The name: **Every Lit Window**
 - Continue
 - New game
+- Under the name, small: "One valley. About twelve hours." (Twelve is a placeholder until a whole playthrough has been timed in task 008. Never promise more than was measured.)
 - Settings
 - Under New game, when a save exists: "This will replace your saved game. Start again?" with **Start again** and **Keep my game**.
 
@@ -95,6 +96,11 @@ Each appears once, the first time it is relevant, and never again after the play
 | First time standing in the open for a while | `V` to see through your own eyes. |
 | First campfire | `E` to rest. You can cook, wait for dusk or dawn, and change your perks here. |
 | First conversation with something to show | You can show people what you've found. |
+| First overheard exchange ends | What you hear is kept. `K`, then Notes. |
+| First time a full draw is held on someone alone | Hold your aim. Some will put it down. |
+| First perfect dodge | They're open. Attack to hurt. `E` to put them down. |
+| First enemy knocked out, while others are still about | Hold `E` to bind them. It takes longer to free someone than to wake them. |
+| First rest in Wick with something left open | Hesper notices what's unfinished. She'll say it once. |
 
 ## Notices
 
@@ -175,7 +181,9 @@ No "You died." The screen dims and one line appears, then the hero wakes at the 
 - Empty perk slot: "Empty"
 - Changing perks away from a rest site: "You can change these at a campfire, at Hesper's, or at home."
 - Saved sets: "Save as…", "Use"
-- Notes headings: "Found" and "Told."
+- Notes headings: "Found" and "Told." Under "Told," the player can sort by "Who" or "Where." Each entry shows who said it, where, and the day: "Harl Gadd, to Nessa Roke. The Mill. Day 3."
+- Notes, when empty: "Nothing yet. What people tell you is kept here."
+- **Where you left off** (shown on Continue after a few days away, and always under Notes): the window count as "{lit} of 17 windows lit," then the last three things kept in Notes. Its one button: "Go on." 
 
 **Loot window:** "Take" and "Take all." For a spared or knocked-out bandit: "You leave them what's theirs."
 

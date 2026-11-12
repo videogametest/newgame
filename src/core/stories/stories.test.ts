@@ -4,7 +4,7 @@ import type { BanditState } from '../types';
 import { indexItems } from '../items';
 import { TALLOWMERE_PERKS } from '../../data/perks/tallowmere';
 import {
-  advance, effects, newStories, openThreads, STORY_IDS, threadForRest,
+  advance, effects, newStories, openThreads, STORY_IDS, threadForRest, traces,
   type Facts, type Happening, type OpenThings, type Stories, type StoryEffects,
 } from './stories';
 
@@ -306,5 +306,95 @@ describe('loose threads', () => {
   it('covers the things the stories do not know about', () => {
     const open = { ...nothing, carryingStolen: true, trialSet: true, wishOf: 'tamsin', placeSeenNotReached: true };
     expect(openThreads(newStories(), open)).toEqual(['thread.stolen', 'thread.trial', 'thread.wish', 'thread.place']);
+  });
+});
+
+describe('no story can be broken by where the hero went first', () => {
+  // A small seeded generator, so a failure can be replayed.
+  const rng = (seed: number) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const PEOPLE = ['dob_finch', 'ansa_marrin', 'bertram_aldric', 'ned_pike', 'tobin_pike', 'hesper', 'maren', 'peg_rudge'];
+  const ITEMS = ['mill_bill', 'flawed_blade', 'tally_stick', 'thatching_needle', 'guards_helmet', 'tallow', 'steel', 'dobs_spear'];
+  const ALPHABET: Happening[] = [
+    ...PEOPLE.flatMap(to => ITEMS.flatMap(item => [{ kind: 'show', item, to }, { kind: 'give', item, to }] as Happening[])),
+    { kind: 'overheard', line: 'overheard.cart.1' },
+    { kind: 'visit', where: 'forge', beforeDawn: true }, { kind: 'visit', where: 'forge' }, { kind: 'visit', where: 'maren' },
+    { kind: 'visit', where: 'watch_house_back_gate' },
+    { kind: 'campfire', with: ['tobin_pike'] }, { kind: 'campfire', with: [] },
+    { kind: 'spared', who: 'hew_pollard', where: 'tax_cart' },
+    { kind: 'walk', toward: 'wick' }, { kind: 'walk', toward: 'watch_house' }, { kind: 'walk', toward: 'valley_edge', with: 'peg_rudge' },
+    { kind: 'dusk' }, { kind: 'bell', place: 'mill' }, { kind: 'tick' },
+  ];
+  /** The valley's own order of events, each of which may come at any point among the hero's doings. */
+  const TIMELINE: ((f: Facts, fate: (id: string) => BanditState) => Facts)[] = [
+    f => ({ ...f, places: { ...f.places, mill: { status: 'freed', timesFreed: 1 } } }),
+    (f, fate) => ({ ...f, bandits: { ...f.bandits, dob_finch: fate('dob_finch') } }),
+    f => ({ ...f, home: [...f.home, 'marrins'] }),
+    f => ({ ...f, home: [...f.home, 'maren'] }),
+    f => ({ ...f, places: { ...f.places, forge: { status: 'freed', timesFreed: 1 } } }),
+    (f, fate) => ({ ...f, bandits: { ...f.bandits, peg_rudge: fate('peg_rudge'), tobin_pike: fate('tobin_pike') } }),
+    f => ({ ...f, places: { ...f.places, mill: { status: 'held', timesFreed: 1 } }, millDark: true }),
+    f => ({ ...f, home: [...f.home, 'aldrics'] }),
+    f => ({ ...f, home: [...f.home, 'pikes'] }),
+    f => ({ ...f, places: { ...f.places, mill: { status: 'freed', timesFreed: 2 } }, millDark: false }),
+    (f, fate) => ({ ...f, bandits: { ...f.bandits, hew_pollard: fate('hew_pollard') === 'stayed' ? 'alive' : fate('hew_pollard') } }),
+    f => ({ ...f, places: { ...f.places, watch_house: { status: 'freed', timesFreed: 1 } } }),
+    f => ({ ...f, bond: { tobin_pike: 2 } }),
+  ];
+  const START: Facts = {
+    places: { mill: { status: 'held', timesFreed: 0 }, forge: { status: 'held', timesFreed: 0 }, watch_house: { status: 'held', timesFreed: 0 } },
+    home: ['hesper'], bandits: { dob_finch: 'alive', peg_rudge: 'alive', tobin_pike: 'alive', hew_pollard: 'alive' },
+    millDark: false, bond: {}, day: 1,
+  };
+
+  it('whatever order things are done in, and whoever lived, every story can still be finished', () => {
+    const FATES: BanditState[] = ['stayed', 'dead', 'left', 'returned_to_stane'];
+    for (let seed = 1; seed <= 400; seed++) {
+      const next = rng(seed);
+      const fates: Record<string, BanditState> = {};
+      const fate = (id: string) => (fates[id] ??= FATES[Math.floor(next() * FATES.length)]);
+      let facts = START;
+      let stories = newStories();
+      let at = 0;
+      // The hero does things in any order, before and after each thing the valley does.
+      while (at < TIMELINE.length) {
+        if (next() < 0.25) facts = TIMELINE[at++](facts, fate);
+        if (next() < 0.3) facts = { ...facts, day: facts.day + 1 };
+        const happening = ALPHABET[Math.floor(next() * ALPHABET.length)];
+        const before = JSON.stringify(stories);
+        stories = advance(stories, facts, happening).stories;
+        for (const id of STORY_IDS) if (JSON.parse(before)[id].stage === 'done') expect(stories[id].stage).toBe('done');
+      }
+      // The valley is whole. Whatever is still open must be closable from here, with what is still in the world.
+      for (let round = 0; round < 12 && STORY_IDS.some(id => stories[id].stage !== 'done'); round++) {
+        facts = { ...facts, day: facts.day + 1 };
+        for (const happening of ALPHABET) stories = advance(stories, facts, happening).stories;
+      }
+      const open = STORY_IDS.filter(id => stories[id].stage !== 'done').map(id => `${id}:${stories[id].stage}`);
+      expect(open, `seed ${seed}, fates ${JSON.stringify(fates)}`).toEqual([]);
+    }
+  });
+});
+
+describe('nobody moves without a trace', () => {
+  const at = (over: Partial<Stories>): Stories => ({ ...newStories(), ...over });
+  it('everyone a story takes away has a line that says where they are, and it is in the writing', () => {
+    const cases: [Partial<Stories>, string, string][] = [
+      [{ miller: { stage: 'caught', since: 5, choice: 'sent' } }, 'trace.dob', 'ansa_marrin'],
+      [{ striker: { stage: 'done', since: 5, choice: 'road' } }, 'trace.peg', 'bertram_aldric'],
+      [{ tally: { stage: 'working', since: 5, choice: 'ned' } }, 'trace.tobin', 'hesper'],
+      [{ thatcher: { stage: 'inside', since: 5, choice: 'gate' } }, 'trace.hew', 'hesper'],
+    ];
+    for (const [over, line, saidBy] of cases) {
+      expect(traces(at(over), world())).toEqual([{ line, saidBy }]);
+      expect(writing, line).toContain(`\`${line}\``);
+    }
+    expect(traces(newStories(), world())).toEqual([]);
+  });
+  it('every way a story can move someone is covered: an effect that takes a person away has a trace', () => {
+    // If a new effect that moves a person is added, add its trace here and in the writing.
+    const moving: (keyof StoryEffects)[] = ['dobHeld', 'pegGone', 'tobinAwayUntil', 'backGateOpen'];
+    const fx = effects(newStories(), world());
+    for (const key of moving) expect(key in fx).toBe(true);
+    expect(moving).toHaveLength(4);
   });
 });

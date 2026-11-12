@@ -118,6 +118,11 @@ export interface CraftContext {
   regionId: string;
   /** At the Tolleys' fletching bench: a better jig, so more arrows from the same materials. */
   atFletchersBench?: boolean;
+  /**
+   * Garrick's piece (his wish): he is in the company, at the Forge, and has not yet made it. The hero brings the
+   * makings and he does the work, so it comes out masterwork whatever the hero's Smithing. No wish asks for a skill level.
+   */
+  garrickMakes?: boolean;
 }
 
 export type CraftRefusal = 'unknown_recipe' | 'not_learned' | 'wrong_place' | 'in_fight' | 'missing_ingredients';
@@ -169,7 +174,8 @@ export function craft(inv: InventoryState, recipeId: string, ctx: CraftContext, 
 
   const def = index.get(recipe.output.itemId);
   const isGear = def?.kind === 'weapon' || def?.kind === 'armour';
-  const quality = recipe.skill === 'smithing' && isGear ? craftQuality(ctx.skillLevel) : 'common';
+  const garricks = ctx.garrickMakes === true && atStation && recipe.station === 'forge' && isGear;
+  const quality = garricks ? 'masterwork' : recipe.skill === 'smithing' && isGear ? craftQuality(ctx.skillLevel) : 'common';
   const made: Stack = { itemId: recipe.output.itemId, count, ...(quality !== 'common' ? { quality } : {}) };
   return {
     ok: true,

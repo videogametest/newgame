@@ -28,3 +28,10 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 - All three steps are merged and deployed and the tests pass.
 - Then continue to task 008.
+
+## From design version 30
+
+- **Lines never repeat:** every line above a head goes through `nextLine` in `src/core/speech/said.ts`, with the log in `GameState.speech`. Shouts in a fight pass `urgent`.
+- **What they notice, and the road:** new groups in `docs/writing/companions.md` (`*.sees.*`, `*.at.*`, `road.*`). These come before a plain field line.
+- **Notes:** `src/core/notes/notes.ts`, `GameState.notes`. Use `isKept` to decide; show who, where, and the day; sort by person or by place.
+- **Traces:** `traces()` in `src/core/stories/stories.ts` gives the line and who says it while someone is away.

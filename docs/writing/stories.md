@@ -322,3 +322,14 @@ So that a player who has been away can find their way back in, without a list. W
 | A trial is set and not passed | `thread.trial` | "I set you something. I've not forgotten it. I'd hate to think you had." |
 | A companion's wish is known and not done | `thread.wish` | "{name}'s been quiet at the fire. People go quiet when they want something." |
 | A secret place was seen from far off and not reached | `thread.place` | "You were looking at something from the ridge yesterday. You didn't go. That's not like you." |
+
+## Where they went
+
+Nobody in a story moves without a trace. While someone is away from where the player last saw them, the person named here says where they are, when spoken to. It is kept in Notes. Ids are `trace.*`.
+
+| Who is away, and why | Id | Said by | Line |
+| --- | --- | --- | --- |
+| Dob, caught at the Mill and held | `trace.dob` | Ansa Marrin | "Finch? They took him up the hill when the bell went. He's in the Watch-house, if he's anywhere." |
+| Peg, seen to the road | `trace.peg` | Bertram Aldric | "The striker's gone. East road, past the last marker. The fire's mine to light again." |
+| Tobin, working off the tally | `trace.tobin` | Hesper | "The Pike boy's mending Hobb's wall. Then the Tolleys' gate. Three days, his father said. Don't fetch him." |
+| Hew, gone back to open the gate | `trace.hew` | Hesper | "Pollard went back up the hill on the cart. Back gate, he said. Midnight. I hope he can count." |

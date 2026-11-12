@@ -8,6 +8,8 @@ import type { InventoryState } from '../items/types';
 import type { Quiver, RecoverableArrow } from '../combat/quiver';
 import type { Stories } from '../stories/stories';
 import type { Taking } from '../valley/learns';
+import type { Note } from '../notes/notes';
+import type { SpeechLog } from '../speech/said';
 
 /** A point on the ground plane (metres). */
 export interface Vec2 {
@@ -163,7 +165,7 @@ export interface HeroState {
 }
 
 /** Save format version. Bump with a migration when the shape changes (design section 7). */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 /**
  * The single serialisable game state (design section 7). Terrain and scenery are NOT stored: they come from the seed.
@@ -203,6 +205,14 @@ export interface GameState {
   stories: Stories;
   /** The last loose thread Hesper mentioned, so she does not repeat it. */
   lastThread: string | null;
+  /** What was said and who said it: the Notes tab (src/core/notes). Added in save version 3. */
+  notes: Note[];
+  /** Which lines have been said and when, so nobody repeats themselves (src/core/speech). Added in save version 3. */
+  speech: SpeechLog;
+  /** Household ids whose one lesson has been taken (src/core/progression/lessons). Added in save version 3. */
+  lessonsTaken: string[];
+  /** Knocked-out bandits the hero has bound. Added in save version 3. */
+  boundBandits: string[];
   places: PlaceState[];
   households: Household[];
   /** Ids of chests already opened. */

@@ -8,7 +8,8 @@ The five companions besides Bram, and what all six want. Bram's lines are in `br
 - Each has a **wish**: one thing they want. It is never listed anywhere. The player learns it only from what the companion says, and fulfilling it is what reaches the third stage of bond.
 - Bond grows by travelling together, fighting together, and resting at campfires together. The second stage should come after a few hours in the company; the third needs the wish.
 - At a campfire, a companion says one line or short piece per rest, in order, as their bond allows.
-- Lines in the field and in fights are one of, never the same twice running.
+- Lines in the field and in fights are one of. Each line of a group is said once before any is said again, and a group that has run out stays quiet for a full day instead of repeating. One companion speaks at most once every couple of game hours outside a fight, and nobody talks over anybody (`src/core/speech`).
+- Lines under "What they notice" answer something that has just happened. They are what makes the company feel awake, so they take priority over the plain field lines.
 - Nobody uses a pronoun for Wren.
 
 ## Bram
@@ -186,7 +187,7 @@ The smith's apprentice. Returns with Bertram. Big, patient, and tired of being t
 - **Voice:** Slow and even. He thinks before he speaks and says less than he thought.
 - **In a fight:** A two-handed hammer. Slow, and nothing ignores it.
 - **Perks:** *Heavy Hand* (joining): his blows stagger heavy enemies. *Field Repair* (bond 2): at a campfire, he restores the edge on the hero's blade and the hero's arrows break less often until the next rest. *Unmade* (bond 3): his blows break shields and helmets for the rest of the fight.
-- **Wish:** To make one thing Bertram will call good. Bertram has never said it. Fulfilled by crafting a masterwork item at the Forge with Garrick in the company.
+- **Wish:** To make one thing Bertram will call good. Bertram has never said it. Fulfilled by bringing the makings of any one forged piece to the Forge with Garrick in the company and letting him make it. It is his work, not the hero's, so it asks no Smithing of the hero; it comes out masterwork, and the hero keeps it.
 
 `garrick.join`
 
@@ -298,6 +299,155 @@ Exchanges at campfires between companions who are both present. One per rest. Br
 1. Oona: "You've burned that hand again."
 2. Garrick: "It's a forge. It's hot."
 3. Oona: "Forty years I've been hearing that from Aldrics."
+
+## What they notice
+
+Said above their heads in answer to what the hero has just done or where the company has just come. One of, under the rules at the top. Bram's are in `bram.md`.
+
+`tamsin.sees.shot` (the hero lands a long shot or a perfect draw)
+
+- "All right. That one I'd have been pleased with."
+- "You held it. You never hold it."
+
+`tamsin.sees.spared` (the hero knocks someone out or takes a yield)
+
+- "He'll have a head like a dropped egg tomorrow. Better than the other thing."
+- "That's Wyll Carrow. He used to buy my ducks. Leave him his boots."
+
+`tamsin.sees.secret` (a place off the path is found)
+
+- "I've walked past this a hundred times. Don't tell my father."
+
+`tamsin.at.night`
+
+- "Step where I step. The dry leaves are on the left."
+
+`tamsin.at.watch_house` (first sight of it)
+
+- "There's a bow on the wall in there. Yew. Horn tips. It isn't theirs."
+
+`tobin.sees.shot`
+
+- "They'll talk about that at the fire. The ones who are left to talk."
+
+`tobin.sees.spared`
+
+- "He'll wake up and not know why he's alive. I can tell him. I remember."
+- "Thank you. You don't know him. I do."
+
+`tobin.sees.secret`
+
+- "We were told not to come up here. Nobody said why. Nobody asked."
+
+`tobin.at.night`
+
+- "The night watch looks at the fire. Then they can't see anything else. I never could."
+
+`tobin.at.forge` (first sight of it, in the company)
+
+- "I stood at that fence every evening. You can see our chimney from it. That's why."
+
+`oona.sees.shot`
+
+- "Well. I'd not want to be a rabbit round you."
+
+`oona.sees.spared`
+
+- "Lay him on his side. No, his other side. I'll look at him when it's quiet."
+- "That's one fewer I have to be sorry about."
+
+`oona.sees.secret`
+
+- "There's yarrow here. And comfrey. Somebody planted these. Somebody who knew."
+
+`oona.at.night`
+
+- "I've walked this valley in the dark for forty years. Nothing in it ever hurt me that wasn't a person."
+
+`oona.at.orchard` (the wild orchard)
+
+- "The Hollins' trees. They've gone to wood, but they're bearing. Stubborn family."
+
+`garrick.sees.shot`
+
+- "Good arrowhead, that. Whose is it?"
+
+`garrick.sees.spared`
+
+- "Flat of the blade. Good. Edges are for things that don't get up."
+
+`garrick.sees.secret`
+
+- "Somebody dressed this stone. Look at the corners. That's a day's work, each."
+
+`garrick.at.night`
+
+- "I can't see my feet. I can hear them. So can everyone."
+
+`garrick.at.forge` (first sight of it, in the company)
+
+- "He's let the roof go. He never lets the roof go."
+
+## On the road
+
+Short exchanges between two companions who are both travelling, said above their heads while walking and never near an enemy. One per day at most, each said once. Players love the company talking to each other more than to the hero, so these come before anyone's plain field line.
+
+`road.bram.tamsin`
+
+1. Bram: "Is that a rabbit run or a path?"
+2. Tamsin: "It's a path if you're a rabbit."
+
+`road.bram.tobin`
+
+1. Bram: "What did you eat, up there?"
+2. Tobin: "Whatever the cart brought back. Your village's bread, mostly."
+3. Bram: "Was it good?"
+4. Tobin: "I couldn't taste it."
+
+`road.bram.oona`
+
+1. Oona: "You're favouring the left knee."
+2. Bram: "I'm favouring both of them. I just can't do it at the same time."
+
+`road.bram.garrick`
+
+1. Bram: "That hammer weighs more than I do."
+2. Garrick: "No."
+3. Bram: "That's the nicest thing anyone's said to me this week."
+
+`road.tamsin.tobin`
+
+1. Tamsin: "East fence has a loose rail. Third from the gate. Did you know?"
+2. Tobin: "I loosened it."
+
+`road.tamsin.oona`
+
+1. Tamsin: "What's that one? The yellow."
+2. Oona: "Ragwort. Don't feed it to anything you like."
+
+`road.tamsin.garrick`
+
+1. Tamsin: "You walk like a cart."
+2. Garrick: "I get there like one too."
+
+`road.tobin.oona`
+
+1. Tobin: "Did people ask after me? Before."
+2. Oona: "Your mother did. Every week. I told her you'd looked well, last I saw."
+3. Tobin: "Had you seen me?"
+4. Oona: "No."
+
+`road.tobin.garrick`
+
+1. Tobin: "I can carry something."
+2. Garrick: "You are. I can see it from here."
+
+`road.oona.garrick`
+
+1. Oona: "When did you last eat a green thing?"
+2. Garrick: "There was an onion."
+3. Oona: "When?"
+4. Garrick: "Harvest."
 
 ## Pairs that act together in a fight
 

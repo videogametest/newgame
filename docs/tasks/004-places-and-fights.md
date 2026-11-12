@@ -76,3 +76,13 @@ The full inventory, gear, and crafting are task 006. Until then keep items as si
 - All five steps are merged and deployed and the balance tests pass.
 - A test proves each household comes home when, and only when, its trigger is met (for triggers available in this task), including the Pikes' return when Tobin was killed.
 - Then continue to task 005.
+
+## From design version 30
+
+Read section 5 again before starting: "Companions are never in the way", "Mercy has its own tools", "Surrender", "Nobody keeps score". The rules are already in core, tested; wire them, do not re-derive them.
+
+- `src/core/company/conduct.ts`: enemies do not sense companions until one is alert to the hero; where a companion may stand; when one may attack; follow distance while crouched.
+- `src/core/combat/enemies.ts`: `bluntKnockdownSeconds`, `pommelStrike` (`E` on the enemy a perfect dodge opened), `yieldsAtArrowPoint`, `companionDamageMultiplier`, and `wake(..., bound)` with `GameState.boundBandits`.
+- `src/data/overheard.ts`: `yieldTells` gives the one line a yielding bandit says (`docs/writing/bandits.md`, "When they yield"). Add its `sameAs` id to `heardLines` and keep it in Notes.
+- `decideWinBack` now takes `banditStates` and judges by friends (`closeTo`), not by a share of the garrison. Hesper's `hesper.bandit.friend` is said when `because` is `friend_killed`.
+- `hesper.mercy.none` and `bram.fight.won.killing` are gone. Do not write a replacement.

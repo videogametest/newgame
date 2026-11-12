@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { BANDITS } from './bandit-data';
-import { decideWinBack, mercyShare, pull, willStay } from './bandits';
+import { decideWinBack, friendsSpared, pull, willStay } from './bandits';
 import type { WinBackContext } from './bandits';
-import { OVERHEARD, tellsOf } from '../../data/overheard';
+import { closeTo, OVERHEARD, tellsOf, YIELDS, yieldTells } from '../../data/overheard';
 
 const who = (id: string) => BANDITS.find(b => b.id === id)!;
 const dob = who('dob_finch');
 const context: WinBackContext = {
-  placeId: 'mill', freedDay: 1, day: 2, isMorning: true, recovery: 0.1, garrison: ['spared', 'dead', 'dead', 'dead'], heard: [],
+  placeId: 'mill', freedDay: 1, day: 2, isMorning: true, recovery: 0.1, banditStates: { pim: 'dead', odo_varn: 'dead' }, heard: [],
 };
 
 describe('the bandits, as data', () => {
@@ -40,22 +40,35 @@ describe('the bandits, as data', () => {
   });
 });
 
-describe('winning bandits back: decided, never rolled', () => {
-  it('mercy is the share of beaten defenders who were not killed', () => {
-    expect(mercyShare(['dead', 'spared', 'knocked_out', 'alive'])).toBeCloseTo(2 / 3);
-    expect(mercyShare(['stayed', 'left', 'returned_to_stane', 'dead'])).toBeCloseTo(3 / 4);
-    expect(mercyShare([])).toBe(0);
-    expect(mercyShare(['alive', 'alive'])).toBe(0);
+describe('winning bandits back: decided, never rolled, and by who', () => {
+  it('everyone is close to someone at their own place, and the ties come from who talks with whom', () => {
+    for (const b of BANDITS) {
+      const ties = closeTo(b.id);
+      expect(ties.length, b.id).toBeGreaterThan(0);
+      for (const t of ties) expect(who(t)).toMatchObject({ placeId: b.placeId, garrison: b.garrison });
+      expect(ties).not.toContain(b.id);
+    }
+    expect(closeTo('dob_finch').sort()).toEqual(['odo_varn', 'pim']);
+    expect(closeTo('hob_tarn')).toEqual(['rafe_dunmore']);
+    expect(closeTo('corwin_vale')).toEqual(['tom_sable']);
   });
-  it('the pull of the valley rises with recovery and with mercy, and stays between 0 and 1', () => {
-    const base = pull(context);
-    expect(pull({ ...context, recovery: 0.9 })).toBeGreaterThan(base);
-    expect(pull({ ...context, garrison: ['spared', 'spared', 'knocked_out'] })).toBeGreaterThan(base);
-    expect(pull({ ...context, recovery: 99 })).toBeLessThanOrEqual(1);
-    expect(pull({ ...context, recovery: Number.NaN })).toBeGreaterThanOrEqual(0);
+  it('mercy is whether their friends lived, never a count of the dead', () => {
+    expect(friendsSpared('dob_finch', {})).toBe(1);
+    expect(friendsSpared('dob_finch', { pim: 'dead' })).toBe(0.5);
+    expect(friendsSpared('dob_finch', { pim: 'dead', odo_varn: 'dead' })).toBe(0);
+    expect(friendsSpared('dob_finch', { pim: 'knocked_out', odo_varn: 'returned_to_stane' })).toBe(1);
+    // Everyone else at the Mill dead, his two friends alive: it is as if nobody had been killed.
+    expect(friendsSpared('dob_finch', { harl_gadd: 'dead', nessa_roke: 'dead', wyll_carrow: 'dead', bran_oakes: 'dead' })).toBe(1);
+  });
+  it('the pull of the valley rises with recovery and with friends spared, and stays between 0 and 1', () => {
+    const base = pull('dob_finch', context);
+    expect(pull('dob_finch', { ...context, recovery: 0.9 })).toBeGreaterThan(base);
+    expect(pull('dob_finch', { ...context, banditStates: {} })).toBeGreaterThan(base);
+    expect(pull('dob_finch', { ...context, recovery: 99 })).toBeLessThanOrEqual(1);
+    expect(pull('dob_finch', { ...context, recovery: Number.NaN })).toBeGreaterThanOrEqual(0);
   });
   it('a tell that was heard, and mercy, guarantee a stay, however poor the valley', () => {
-    const bleak = { ...context, recovery: 0, garrison: ['spared', 'dead', 'dead', 'dead', 'dead', 'dead'] as const };
+    const bleak = { ...context, recovery: 0 };
     expect(decideWinBack(dob, 'spared', bleak).state).not.toBe('stayed');
     expect(decideWinBack(dob, 'spared', { ...bleak, heard: ['overheard.mill.3'] })).toMatchObject({ state: 'stayed', because: 'tell_heard' });
     expect(decideWinBack(dob, 'knocked_out', { ...bleak, heard: ['overheard.mill.3'] }).state).toBe('stayed');
@@ -65,18 +78,19 @@ describe('winning bandits back: decided, never rolled', () => {
     expect(decideWinBack(who('nessa_roke'), 'spared', { ...context, recovery: 0, heard }).state).toBe('returned_to_stane');
     expect(decideWinBack(dob, 'dead', { ...context, heard }).state).toBe('dead');
   });
-  it('without a tell, low loyalty stays sooner than middling, and high almost never', () => {
-    const kind = { ...context, recovery: 0.4, garrison: ['spared', 'spared', 'dead'] as const };
-    expect(willStay(dob, kind)).toBe(true);
-    expect(willStay(who('bran_oakes'), { ...context, recovery: 0.1 })).toBe(false);
-    expect(willStay(who('bran_oakes'), { ...context, recovery: 0.6, garrison: ['spared', 'spared'] })).toBe(true);
-    expect(willStay(who('nessa_roke'), { ...context, recovery: 0.6, garrison: ['spared', 'spared'] })).toBe(false);
-    expect(willStay(who('nessa_roke'), { ...context, recovery: 1, garrison: ['spared'] })).toBe(true);
+  it('low loyalty stays if their friends lived; middling never stays once a friend is killed; high needs the valley nearly whole', () => {
+    const spared = { banditStates: {}, heard: [] };
+    expect(willStay(dob, { ...spared, recovery: 0 })).toBe(true);
+    expect(willStay(who('bran_oakes'), { ...spared, recovery: 0 })).toBe(false);
+    expect(willStay(who('bran_oakes'), { ...spared, recovery: 0.1 })).toBe(true);
+    expect(willStay(who('bran_oakes'), { banditStates: { harl_gadd: 'dead' }, heard: [], recovery: 1 })).toBe(false);
+    expect(willStay(who('nessa_roke'), { ...spared, recovery: 0.6 })).toBe(false);
+    expect(willStay(who('nessa_roke'), { ...spared, recovery: 0.8 })).toBe(true);
   });
-  it('those who fall short leave, or go back to Stane if their loyalty is high', () => {
-    const bleak = { ...context, recovery: 0, garrison: ['spared', 'dead', 'dead', 'dead'] as const };
-    expect(decideWinBack(who('bran_oakes'), 'spared', bleak)).toMatchObject({ state: 'left', because: 'fell_short' });
-    expect(decideWinBack(who('nessa_roke'), 'spared', bleak).state).toBe('returned_to_stane');
+  it('those who fall short leave, or go back to Stane if their loyalty is high, and the reason names the friend', () => {
+    expect(decideWinBack(who('bran_oakes'), 'spared', { ...context, recovery: 0, banditStates: {} })).toMatchObject({ state: 'left', because: 'fell_short' });
+    expect(decideWinBack(who('bran_oakes'), 'spared', { ...context, recovery: 1, banditStates: { harl_gadd: 'dead' } })).toMatchObject({ state: 'left', because: 'friend_killed' });
+    expect(decideWinBack(who('nessa_roke'), 'spared', { ...context, recovery: 0 }).state).toBe('returned_to_stane');
   });
   it('is the same every time: there is no seed and no chance', () => {
     const a = decideWinBack(dob, 'spared', context);
@@ -93,9 +107,32 @@ describe('winning bandits back: decided, never rolled', () => {
     expect(decideWinBack(dob, state, { ...context, heard: ['overheard.mill.3'] }).state).toBe(state);
   });
   it('Tobin may be recruited; Ketch stands in only if Tobin was killed', () => {
-    const forge = { ...context, placeId: 'forge', recovery: 1, garrison: ['spared', 'spared'] as const };
+    const forge = { ...context, placeId: 'forge', recovery: 1, banditStates: {} };
     expect(decideWinBack(who('tobin_pike'), 'spared', forge).destination).toBe('recruit');
     expect(decideWinBack(who('ketch'), 'spared', forge).destination).toBe('resident');
+    // Tobin was Ketch's friend, so Ketch needs his tell or a kinder valley; here the valley is whole.
     expect(decideWinBack(who('ketch'), 'spared', { ...forge, banditStates: { tobin_pike: 'dead' } }).destination).toBe('recruit');
+  });
+});
+
+describe('a bandit who yields tells one useful thing', () => {
+  it('every yield line is in the writing and stands for an information line at the same place', () => {
+    const writing = readFileSync('docs/writing/bandits.md', 'utf8');
+    for (const y of YIELDS) {
+      expect(writing, y.id).toContain(`\`${y.id}\``);
+      const same = OVERHEARD.find(o => o.id === y.sameAs)!;
+      expect(same, y.sameAs).toMatchObject({ kind: 'information', place: y.place });
+      if (y.about) expect(who(y.about)).toBeDefined();
+    }
+  });
+  it('tells something the hero does not know, never about themselves, and nothing once it is all known', () => {
+    expect(yieldTells('dob_finch', 'mill', [])?.id).toBe('yield.mill.1');
+    expect(yieldTells('harl_gadd', 'mill', [])?.id).toBe('yield.mill.2');
+    expect(yieldTells('dob_finch', 'mill', ['overheard.mill.5'])?.id).toBe('yield.mill.2');
+    expect(yieldTells('bran_oakes', 'mill', ['overheard.mill.5'])).toBeNull();
+    expect(yieldTells('dob_finch', 'mill', ['overheard.mill.5', 'yield.mill.2'])).toBeNull();
+    expect(yieldTells('col_ware', 'mill', [])?.id).toBe('yield.mill.retaken.1');
+    expect(yieldTells('hew_pollard', 'tax_cart', [])?.id).toBe('yield.cart.1');
+    expect(yieldTells('nobody', 'mill', [])).toBeNull();
   });
 });

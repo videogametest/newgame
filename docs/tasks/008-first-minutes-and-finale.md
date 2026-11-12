@@ -30,3 +30,9 @@ A new player can start the game, learn it without being told, save their progres
 - Tests, typecheck, and build pass. Merged, deployed, and logged in `docs/status.md`.
 - The pacing test from task 006 must still pass with the turn and the Stane fight in place.
 - Stop after this task. Do not start milestone 9.
+
+## From design version 30
+
+- **Where you left off:** on Continue, `showCatchUp` and `whereYouLeftOff` (`src/core/notes/notes.ts`); words in `docs/writing/interface.md`. Store the last-played time with settings, not in the save.
+- **The title's small line:** time one whole playthrough and put the measured hours in it. Until then it stays out of the build.
+- **Five new first-time prompts** in `docs/writing/interface.md`: Notes, holding aim, the pommel, binding, Hesper's loose thread.

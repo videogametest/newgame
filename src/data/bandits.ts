@@ -31,6 +31,11 @@ export interface BanditDef {
   habit?: Habit;
   /** Rides with the tax cart. */
   cart?: boolean;
+  /**
+   * Someone at the same place they are close to, for those who share no overheard exchange. Everyone else's ties
+   * come from who they are overheard talking with (src/data/overheard.ts, `closeTo`).
+   */
+  closeTo?: string[];
   recruitRole?: 'comrade_knowledge';
   replaces?: string;
 }
@@ -49,16 +54,16 @@ export const BANDITS: readonly BanditDef[] = [
   b('odo_varn', 'Odo Varn', 'mill', 'soldier', 'middling', 'A drover', { habit: { when: 'midday', where: 'fire', note: 'Eats last, after the others have gone', alone: true } }),
   // The Mill, retaken
   b('maud_kerr', 'Sergeant Maud Kerr', 'mill', 'shield_bearer', 'high', 'A guardsman', { garrison: 'retaken', leader: true }),
-  b('brock_tull', 'Brock Tull', 'mill', 'brute', 'high', 'A quarryman', { garrison: 'retaken', habit: { when: 'always', where: 'mill_door', note: 'Stands at the door of the mill and does not move from it' } }),
+  b('brock_tull', 'Brock Tull', 'mill', 'brute', 'high', 'A quarryman', { garrison: 'retaken', closeTo: ['maud_kerr'], habit: { when: 'always', where: 'mill_door', note: 'Stands at the door of the mill and does not move from it' } }),
   b('annis_pell', 'Annis Pell', 'mill', 'archer', 'high', 'A guardsman', { garrison: 'retaken', habit: { when: 'always', where: 'loft_window', note: 'Keeps to the loft window' } }),
   b('col_ware', 'Col Ware', 'mill', 'soldier', 'middling', 'A tanner', { garrison: 'retaken' }),
-  b('sim_hart', 'Sim Hart', 'mill', 'runner', 'middling', 'A groom', { garrison: 'retaken' }),
+  b('sim_hart', 'Sim Hart', 'mill', 'runner', 'middling', 'A groom', { garrison: 'retaken', closeTo: ['col_ware'] }),
   b('jude_barrow', 'Jude Barrow', 'mill', 'shield_bearer', 'middling', 'A cooper', { garrison: 'retaken' }),
   // The Forge
   b('rafe_dunmore', 'Rafe Dunmore', 'forge', 'brute', 'high', "A drill sergeant's corporal", { leader: true, habit: { when: 'midday', where: 'anvil', note: "Works the anvil himself, badly, with Aldric's hammer" } }),
   b('tobin_pike', 'Tobin Pike', 'forge', 'soldier', 'low', "A farmer's son, from Wick", { recruitRole: 'comrade_knowledge', habit: { when: 'dusk', where: 'east_fence', note: 'Stands at the east fence, looking toward the village', alone: true } }),
   b('peg_rudge', 'Peg Rudge', 'forge', 'soldier', 'low', "A smith's striker, at this forge", { habit: { when: 'before_dawn', where: 'forge_fire', note: 'Tends the fire. Alone with it for an hour', alone: true } }),
-  b('hob_tarn', 'Hob Tarn', 'forge', 'brute', 'high', 'A quarryman', { habit: { when: 'night', where: 'store_door', note: 'Sleeps across the door of the store' } }),
+  b('hob_tarn', 'Hob Tarn', 'forge', 'brute', 'high', 'A quarryman', { closeTo: ['rafe_dunmore'], habit: { when: 'night', where: 'store_door', note: 'Sleeps across the door of the store' } }),
   b('sib_marlowe', 'Sib Marlowe', 'forge', 'shield_bearer', 'middling', 'A cooper', { habit: { when: 'always', where: 'circuit', note: 'Walks the same circuit, never varying it' } }),
   b('jory_flint', 'Jory Flint', 'forge', 'archer', 'middling', "A fletcher's boy", { habit: { when: 'afternoon', where: 'rabbit_run', note: 'Slips out to hunt rabbits', alone: true } }),
   b('alda_grice', 'Alda Grice', 'forge', 'archer', 'high', 'A guardsman', { habit: { when: 'always', where: 'roof', note: 'Watches the road from the roof' } }),

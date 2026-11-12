@@ -51,6 +51,8 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 - **Window light is warm.** Pools of light under lit windows and doors are amber, never white or grey, and fall where the window faces.
 - **Windows are lit at the right hours.** Dark at 18, lit from 19, per section 5, "The clock". Hesper's is lit in every dusk and night frame.
 
+**Something at every stop (design v30, measured).** The capture script reads the placed data and fails if any walkable point is more than 100 m from something worth stopping for (a place, a secret, a gathering spot, a chest, a campfire, a sign on the ground, or a named viewpoint), and reports the longest gap. Signposts stand where roads meet. Frame rate comes before features: anything that cannot hold 60 fps on the test machine is simplified or cut, and the report says which.
+
 Richness comes before breadth: if time is short, make a smaller area dense rather than the whole valley thin.
 
 - **The arrival view is composed by hand, not left to chance.** Standing at the start at dusk, the player sees in one frame: the path ahead, Hesper's lit window as the brightest point, the village around it, tall grass moving in the foreground, trees framing the sides, and the castle on the horizon behind. Place terrain and scenery deliberately to make this view work, in both camera views.

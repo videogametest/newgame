@@ -52,9 +52,55 @@ export function moraleResponse(morale: number, loyalty: Loyalty, heroOrCompanion
 }
 
 /** A knocked-out enemy found by an ally while the place is still held: up after a few seconds, at half health, alert. */
-export function wake(state: BanditState, placeStatus: PlaceStatus, allyPresent: boolean, maxHp: number): { state: BanditState; hp: number; afterSeconds: number; alert: boolean } | null {
+export function wake(state: BanditState, placeStatus: PlaceStatus, allyPresent: boolean, maxHp: number, bound = false): { state: BanditState; hp: number; afterSeconds: number; alert: boolean } | null {
   if (state !== 'knocked_out' || placeStatus !== 'held' || !allyPresent) return null;
+  // Bound by the hero: the ally who finds them is kept busy three times as long, and the one freed has no weapon
+  // and no fight left. They count as spared. The alarm is raised either way: a comrade was found.
+  if (bound) return { state: 'spared', hp: Math.max(1, Math.round(maxHp * DEPTH.wake.healthShare)), afterSeconds: DEPTH.bound.freeSeconds, alert: true };
   return { state: 'alive', hp: Math.max(1, Math.round(maxHp * DEPTH.wake.healthShare)), afterSeconds: DEPTH.wake.seconds, alert: true };
+}
+
+// ---------- Mercy has its own tools (design section 5) ----------
+
+/** How long a blunt arrow puts its target on the ground. Zero means it only hurts. */
+export function bluntKnockdownSeconds(weight: Weight, perfectDraw: boolean): number {
+  if (weight === 'light') return DEPTH.bluntKnockdown.lightSeconds;
+  return perfectDraw ? DEPTH.bluntKnockdown.heavyPerfectSeconds : 0;
+}
+
+/**
+ * The pommel: `E` on the enemy a perfect dodge has just opened. It uses up the opening, as a blade hit would.
+ * A light enemy is knocked out at once. A heavy one takes a heavy, non-lethal blow.
+ */
+export function pommelStrike(openTarget: string | null, targetId: string, weight: Weight, bladeDamage: number) {
+  if (openTarget !== targetId) return null;
+  return weight === 'light'
+    ? { tool: 'pommel' as const, damage: 0, instantKnockout: true, openTarget: null }
+    : { tool: 'pommel' as const, damage: Math.max(0, bladeDamage) * DEPTH.pommel.heavyMultiplier, instantKnockout: false, openTarget: null };
+}
+
+export interface ArrowPoint {
+  /** Seconds the hero has held a full draw on this enemy. */
+  heldSeconds: number;
+  /** The enemy can see the hero: no one yields to an arrow they do not know about. */
+  seesHero: boolean;
+  /** No ally who is still fighting is within sight of them. */
+  alone: boolean;
+  /** Health as a share of the maximum, 0 to 1. */
+  healthShare: number;
+  loyalty: Loyalty;
+  /** Leaders, and Stane. */
+  unbreakable?: boolean;
+}
+/** Whether an enemy held at arrow point throws down their weapon. Decided, never rolled. */
+export function yieldsAtArrowPoint(a: ArrowPoint): boolean {
+  const t = DEPTH.yieldAtArrowPoint;
+  return !a.unbreakable && a.seesHero && a.alone && a.heldSeconds >= t.holdSeconds && a.healthShare <= t.healthAtOrBelow[a.loyalty];
+}
+
+/** Companions finish what the hero starts: full damage on anyone the hero has marked or struck, less on anyone else. */
+export function companionDamageMultiplier(markedOrStruckByHero: boolean): number {
+  return markedOrStruckByHero ? 1 : DEPTH.companionUnledDamage;
 }
 
 /** Stane yields at a quarter health. No blow kills him. */
@@ -62,8 +108,9 @@ export function staneYieldBelow(maxHp: number): number {
   return maxHp * DEPTH.staneYieldsAt;
 }
 
-export type HitTool = 'standard' | 'fire' | 'blunt' | 'whistling' | 'blade' | 'knife' | 'shield' | 'stealth_knockout';
-const NONLETHAL: readonly HitTool[] = ['blunt', 'shield', 'stealth_knockout'];
+export type HitTool = 'standard' | 'fire' | 'blunt' | 'whistling' | 'blade' | 'knife' | 'shield' | 'stealth_knockout' | 'pommel';
+export const NONLETHAL: readonly HitTool[] = ['blunt', 'shield', 'stealth_knockout', 'pommel'];
+export const LETHAL: readonly HitTool[] = ['standard', 'fire', 'blade', 'knife'];
 export interface DamageTarget { hp: number; state: BanditState; alwaysYields?: boolean; yieldBelowHp?: number }
 export function resolveDefeat(target: DamageTarget, damage: number, tool: HitTool, instantKnockout = false) {
   if (target.state !== 'alive' && target.state !== 'spared') {

@@ -51,6 +51,22 @@ export const COMBAT_DEPTH_TUNING = {
   breakBelow: { low: 0.6, middling: 0.4, high: 0.2 }, // untuned placeholder
   /** A knocked-out enemy woken by an ally gets up after this long, at this share of health, alert. */
   wake: { seconds: 4, healthShare: 0.5 }, // untuned placeholder
+  /** A knocked-out enemy the hero has bound takes an ally this long to free instead, and gets up unarmed: out of the fight. */
+  bound: { bindSeconds: 2, freeSeconds: 12 }, // untuned placeholder
+  /**
+   * Blunt arrows knock people down (design section 5, "Mercy has its own tools"). A light enemy is on the ground
+   * for this long whatever they were doing; a heavy one only from a perfect draw, and for less.
+   */
+  bluntKnockdown: { lightSeconds: 2.5, heavyPerfectSeconds: 1.2 }, // untuned placeholder
+  /** The pommel: `E` on an enemy opened by a perfect dodge. Light enemies go down at once; heavy ones take this multiple of a blade hit, and it never kills. */
+  pommel: { heavyMultiplier: 3 }, // untuned placeholder
+  /**
+   * Called on to yield: a full draw held on an enemy who can see it, who is alone, and whose health is at or below
+   * this share, by loyalty. A low-loyalty bandit caught alone yields unhurt. Leaders and Stane never do.
+   */
+  yieldAtArrowPoint: { holdSeconds: 1.5, healthAtOrBelow: { low: 1, middling: 0.6, high: 0.3 } }, // untuned placeholder
+  /** A companion's blow on an enemy the hero has neither marked nor struck does this share of its damage: they finish what the hero starts. */
+  companionUnledDamage: 0.5, // untuned placeholder
   /** Stane yields when his health falls to this share. No blow kills him. */
   staneYieldsAt: 0.25, // untuned placeholder
 } as const;

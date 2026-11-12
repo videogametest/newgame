@@ -68,6 +68,11 @@ Read this before proposing to reverse something. Most of these were argued over 
 | No random stat rolls on gear | Loot should be collected, not gambled on | Randomised bonuses |
 | Crowns are spent on rebuilding Wick | To avoid gold piling up with nothing worth buying, the village itself is the thing to spend on | Ever-pricier gear as the only sink |
 | People cannot be bought | Bringing someone home should be something the player did, not paid for | Paying to recruit or to restore households |
+| Easy things stop teaching | A model of whole playthroughs showed a thorough player reaching the cap well before Stane. Each feat teaches only up to the level of its target | A steeper curve; hard caps per story beat |
+| The valley learns from how the hero plays | The most common complaint across the five closest games is one tactic with no answer, usually the silent ranged kill. Players saw through MGSV's version because it followed the story, so ours follows the hero's own counts | Fixed counters per place only; enemies that scale with level |
+| Winning a bandit back is decided, not rolled | MGSV's recruiting is loved because it is a choice made on scouted information. An overheard tell now guarantees the result | A chance each morning |
+| The Mill is retaken once, seen coming, and costs only the place | Players resent a liberation being undone ("when I have conquered an outpost it should be mine") and stories that take control away | Places that can be retaken at any time; dropping the turn |
+| Terrain hides what is beyond it | Breath of the Wild's exploration, the most praised in the research, rests on hills that hide and offer over or around | An open valley visible from the first ridge |
 
 ## How it is built
 

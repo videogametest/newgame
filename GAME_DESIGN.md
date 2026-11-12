@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 23 (easy things stop teaching; pacing bands checked against modelled playthroughs). Supersedes version 22.
+Version 24 (changes from the research into the five closest games: the valley learns, winning back is decided not rolled, the turn's limits, terrain that hides). Supersedes version 23.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -55,13 +55,14 @@ Rules:
 - **Dying:** no permadeath. The player keeps XP earned, loses a portion of carried crowns, and wakes at the nearest owned town. Squad members who fell are wounded: they stay behind until healed for crowns or until the player rests at a town.
 - **Income** accrues per place captured and per in-game day, not real-world time.
 - **Healing.** Health does not regenerate on its own. Food, found in the world or bought in town, heals over a few seconds when eaten and can be interrupted by taking damage. Resting at an owned town heals the hero and squad fully and advances time to the next morning. Resting at a campfire (section 4) heals the hero and squad to half and lets the player wait until dusk or dawn.
-- **Enemies stay dead** in captured places, except when the story retakes one (section 9, The turn). Uncaptured camps restock their defenders after several in-game days.
+- **Enemies stay dead** in captured places, except the one time the story retakes one (section 9, The turn). Uncaptured camps restock their defenders after several in-game days.
 
 ## 4. The world
 
 Look and atmosphere:
 
 - Bright, saturated colour; soft lighting; light distance haze. A sun that moves, with shadows.
+- **Land that hides things.** Hills, ridges, and stands of trees are shaped and placed so that from any point something ahead is hidden and something is half-seen: a roof behind a rise, smoke past a ridge. Each rise offers a choice of going over or going round. Nothing worth finding stands in the open from far away except the landmarks meant to draw the eye: Hesper's window, the signal hill, the castle. Places are found by sight and by what people say, never revealed by a tower or a marker.
 - **Day-night cycle** of about 20 real minutes, with warm light at dawn and dusk, and a moon and stars at night.
 - Grass and foliage sway in the wind. Butterflies by day, fireflies at dusk and night. Clouds drift.
 - **Landmarks on the horizon** (a castle, a mountain, a tower) are visible from most of the valley. They mark future regions.
@@ -239,7 +240,7 @@ How enemies fight:
   - *Knocking out:* blunt arrows (see The bow) and Bram's shield strike are not lethal. An enemy whose health reaches zero from one of these is knocked out. A stealth strike from behind offers both: `E` to knock out, attack to kill.
   - Knocking out is the harder path. Blunt arrows do less damage and gain nothing from weak points except against an unaware enemy, whom a blunt arrow to the head knocks out at once. A knocked-out enemy can be found and woken by an ally while the place is still held. A woken enemy gets up after a few seconds at half health, alert.
 - **Surrender.** An enemy whose nerve breaks may throw down their weapons and kneel. They can be left alone, which counts as sparing them, or attacked, which is never rewarded.
-- **Winning them back.** When a place is freed, every bandit knocked out or spared there is taken to Wick. The next morning each one decides. The chance they stay rises with the valley recovery level (there is more to come home to), with how many of their fellows at that place were spared rather than killed, and with their own nature, set in data: each bandit has a name, a loyalty to Stane, and the trade they had before.
+- **Winning them back.** When a place is freed, every bandit knocked out or spared there is taken to Wick. At the next dawn each one decides, and the decision is never a roll of dice: the same choices by the player always give the same result. A bandit whose tell the hero overheard (section 5, Overheard lines) and who was then spared always stays; scouting is how the player learns who can be brought home. For the rest, each has a bar set by their loyalty to Stane, and they stay if the valley clears it: the bar is met by the valley recovery level (there is more to come home to) and by how many of their fellows at that place were spared rather than killed. Those who fall short leave the valley, or, if their loyalty is high, go back to Stane. Each bandit has a name, a loyalty, and the trade they had before, set in data.
   - *They stay.* They become a villager, take up their old trade, and say a line about it. Each one adds to the valley recovery level, so another window is lit. A few are recruitable into the squad.
   - *They leave.* They walk out of the valley and are not seen again.
   - *They go back.* The most loyal return to Stane and are among the defenders at the Watch-house.
@@ -258,6 +259,7 @@ Every place runs on a schedule, so watching it first tells the player something 
 - **Habits.** Each bandit has a name, a loyalty, and a former trade; two or three at each place also have a habit the player can use: one slips away alone to fish at the same hour, one dozes on night watch, one feeds the geese each morning, which is the only time they are quiet.
 - **Overheard lines.** While unnoticed and close, the hero hears short exchanges between bandits, shown as text near the speakers. They carry information (when the guard changes, where the strongbox key is kept, which fence has a gap), story (what they think of Stane, rumours of the beacon), and who can be won back (a bandit who mutters that he never wanted this is likelier to stay in Wick).
 - **They react.** A body or a knocked-out comrade that is found raises the alarm. A missing guard is noticed at the next change. After one place is freed, the others post an extra night watch.
+- **The valley learns.** Stane's people hear how each place fell, and the places still held prepare for the way the hero actually plays. The game counts what the hero did at each place taken: head shots, attacks made at night, knockouts, bells silenced or stopped, fires started, defenders picked off alone. Whichever the hero leaned on most draws an answer at the next place, and a second answer at the one after: more helmets after head shots; more torches and a larger night watch after night attacks; guards who walk in pairs after knockouts or lone pickings; a second bell runner after a silenced bell; cleared grass and water buckets after fire. Every answer is something the player can see from a ridge and has a way round. The player hears it coming in an overheard line at the next place. Answers follow what the hero did, never how far the story has gone, and a player who varies their approach draws none. The answers are data.
 - **The tax cart.** Every few days a cart with a small escort travels from the Watch-house to Wick and back, taking a share from the villagers. It can be ambushed on the road for its strongbox, or left alone. It stops running when the Watch-house is freed.
 - Six to eight defenders at each place in Tallowmere, plus the leader.
 
@@ -636,8 +638,11 @@ A place is not freed when the last defender falls. It is freed when the hero lig
 
 The valley does not only get better.
 
-- After the hero frees the second place, Stane strikes back. That night the first place the hero freed is retaken: its lantern goes dark, its person flees to Wick, and what it gave the player is lost until it is freed again.
-- The retaken place is held by stronger defenders than before.
+- After the hero frees the second place, Stane strikes back. That night the first place the hero freed is retaken: its lantern goes dark, its people shelter in Wick, and its trade is closed until it is freed again.
+- **It happens once.** This is the only time in the game a freed place is lost. No other place is ever retaken, and it cannot happen twice.
+- **It is seen coming.** At the second place the hero can overhear that Stane means to answer, and Hesper says the night before that he will not sit still.
+- **It takes only the place.** The household stays home and its window stays lit. Nothing the hero carries, has stored, has built, or has learned is lost, and nobody who came home leaves.
+- The retaken place is held by stronger defenders than before, laid out differently, and it has learned from how the hero took it the first time.
 - Hesper's line the next morning is the low point of the story.
 - Retaking it relights the lantern and opens the way to the Watch-house.
 

@@ -15,6 +15,7 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 ### Step 1: Ground, sky, and movement
 
 - Seeded terrain with a pure `heightAt(x, z)` in `src/core`, about 800 m across, shaped to give a central lake, a river with a waterfall, hills, a ridge, and the signal hill as the highest point.
+- **Land that hides things** (section 4). Shape and place hills, ridges, and tree stands so that Wick cannot be seen whole from the start, no enemy place is visible from Wick, and each of the ten secret places is hidden from the nearest path by a rise or by trees. Every rise between two places can be crossed or walked round. Tour mode captures one frame from each of five viewpoints showing something half-hidden ahead.
 - Chunked terrain around the hero, with no visible pop-in at walking speed.
 - Sky, a moving sun with shadows, the day-night cycle, a moon and stars, distance haze.
 - The hero walks, sprints, and crouches across the valley, standing on the terrain.

@@ -83,6 +83,15 @@ One of these when the hero next speaks to her after a household returns. `{count
 - At twelve windows: "Twelve. I'll need more oil."
 - At sixteen windows: "Sixteen. There's one left. You know which."
 
+## The night before the turn
+
+The evening the second lantern is lit. So the player has been told.
+
+`hesper.turn.warning`
+
+1. "Two lanterns. He can count as well as I can."
+2. "He won't sit still for a third. Sleep light."
+
 ## The morning after the turn
 
 The Mill has been retaken in the night. This is the low point of the story. She is looking toward it, not at the hero.

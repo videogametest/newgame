@@ -125,6 +125,12 @@ The second place. Seven defenders and their leader. Tobin Pike is here.
 
 1. Peg, to the fire: "There you are. Thirty years I've lit you. I'd light you for him again, if he'd have me."
 
+`overheard.forge.6` — story (evening, in the yard: Rafe, Alda). So the turn is seen coming.
+
+1. Alda: "The Captain's had word about the Mill."
+2. Rafe: "And?"
+3. Alda: "And he's not a man who leaves a thing where it fell."
+
 ---
 
 ## The Watch-house
@@ -189,6 +195,43 @@ Every few days, from the Watch-house to Wick and back. Gant leads; Rikke and Hew
 
 1. Gant: "We stop at the ford to water the horse. Every time. If I were robbing us, that's where I'd do it."
 2. Rikke: "Good thing nobody's robbing us."
+
+---
+
+## The valley learns
+
+`GAME_DESIGN.md` section 5. When the hero has leaned on one way of taking a place, the next place still held prepares for it, and the player hears why. Each exchange is overheard once at that place, early, by any two defenders there who are not its leader. `{A}` and `{B}` are their names.
+
+`overheard.learns.helmets` — information (after many head shots)
+
+1. {A}: "Helmets on. Even at supper. Captain's order."
+2. {B}: "For one apprentice?"
+3. {A}: "For one apprentice who doesn't miss."
+
+`overheard.learns.night` — information (after attacks at night)
+
+1. {A}: "Twice the torches and twice the watch, from dusk."
+2. {B}: "We'll be seen for miles."
+3. {A}: "That's the idea. It's the dark that one likes."
+
+`overheard.learns.pairs` — information (after knockouts, or defenders picked off alone)
+
+1. {A}: "Nobody walks alone. Not to the woodpile, not to the privy."
+2. {B}: "And if I'd rather?"
+3. {A}: "Then you'd rather wake up in Wick with a sore head. In twos."
+
+`overheard.learns.bell` — information (after a bell was silenced or its runner stopped)
+
+1. {A}: "Two on the bell now. One runs, one follows."
+2. {B}: "And if the first one drops?"
+3. {A}: "That's what the second one's for."
+
+`overheard.learns.fire` — information (after fire was used)
+
+1. {A}: "Grass is cut back to the fence. Buckets by every door."
+2. {B}: "I joined up for the suppers. Nobody said burning."
+
+A player who varies their approach hears none of these.
 
 ---
 

@@ -77,6 +77,9 @@ Read this before proposing to reverse something. Most of these were argued over 
 | The people are the KayKit adventurers, as they are | Greg approved the chunky, large-headed look on 12 Nov after the style test. Villagers, old people, and children are made from the same models | A separate villager pack; a more realistic character set |
 | Buildings are scaled to the people | Greg saw from the style test that the people were bigger than the houses. Kit pieces are scaled about 2.7 times | Shrinking the people; raw kit sizes |
 | A home can be entered once its family returns | Greg wanted to go into many more buildings than the four the story strictly needs. Tying each room to a household's return makes interiors a reward and spreads the work | Four interiors only; none; every building open from the start |
+| The people are reshaped: smaller heads, longer legs, an outline | Greg found them too cartoonish and asked for a bit more lifelike. A four-column test showed proportions did the most, and the reshaped bodies still animate | A different character set; leaving them as modelled |
+| Buildings are KayKit's, not built from Kenney panels | Greg found the panel-built houses plain. KayKit's whole buildings have framing, tiled roofs, chimneys, and steps, and match the people | Detailing the Kenney kit by hand |
+| A room is entered through a short fade at the door | Whole building models are solid, so a walk-in doorway would mean rebuilding every house. The fade keeps the detailed exteriors and all twenty rooms | Hollow panel-built houses with no cut |
 
 ## How it is built
 

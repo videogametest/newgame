@@ -1,6 +1,6 @@
 # 002b: The style test
 
-Status: merged (PR #15), not passed. Rework listed in `docs/reviews/003-overnight-audit.md`.
+Status: in progress. One fix left: building scale, `docs/reviews/008-building-scale.md`.
 
 ## Goal
 

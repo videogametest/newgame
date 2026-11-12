@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
 
-// GitHub Pages serves the project at https://<user>.github.io/newgame/, so every asset URL needs that prefix.
+// The game is served from the root of its custom domain (https://everylitwindow.com/), so assets use base '/'.
 export default defineConfig({
-  base: '/newgame/',
+  base: '/',
   build: {
     outDir: 'dist',
     target: 'es2022',

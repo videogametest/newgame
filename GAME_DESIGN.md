@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 22 (settled details for stealth, combat, companions, and the clock, answering the logic streams' questions; crowns named everywhere). Supersedes version 21.
+Version 23 (easy things stop teaching; pacing bands checked against modelled playthroughs). Supersedes version 22.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -304,6 +304,7 @@ Rulings on questions the logic raised. Numbers named here as "tuning" live in da
 - **Ketch,** if he stands in for Tobin, has Tobin's trait and perks under the same names. His third stage of bond comes when the Sedges are home, since he was their shepherd's lad.
 - **Companions' gear and level.** Each companion has two gear slots: a weapon and armour. Companions have no experience of their own; their level follows the hero's Leadership.
 - **The clock.** Dawn is at six and dusk at eighteen. Windows light at nineteen and go dark at one, except Hesper's, which stays lit until dawn.
+- **Easy things stop teaching.** Every feat has a level it can teach up to, set by how hard its target is. A skill above that level learns less from it, and soon almost nothing. Shooting Mill bandits does not make a master archer. This holds each skill near the story however thorough the player is, so nothing is maxed early, and it makes the harder places the fastest way to grow.
 - **Names in data.** Every id is lower case with underscores and uses the full name: `tobin_pike`, `watch_house`, `east_road_lanterns`.
 
 ## 6. Progression

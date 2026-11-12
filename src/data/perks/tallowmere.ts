@@ -245,7 +245,7 @@ export const TALLOWMERE_PERKS: readonly PerkDef[] = [
       'The call reaches two enemies at once.',
       'The call works on any enemy whose place has low morale, leader or no.',
     ],
-    source: { kind: 'person', person: 'tobin' },
+    source: { kind: 'person', person: 'tobin_pike' },
     fallback: hesper,
     hint: 'One of Stane\'s men knows what it takes to make the others stop.',
     effect: { system: 'combat', key: 'stand_down' },

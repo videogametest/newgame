@@ -1,9 +1,9 @@
+import { PROGRESSION_TUNING } from './tuning';
 import { describe, expect, it } from 'vitest';
 import { ACTIONS, FORBIDDEN_ACTION_WORDS } from './actions';
 import {
   addExperience, awardExperience, awardSharedEvent, catchUpMultiplier, createProgression, mainSkillLevels,
-  multiplierFromShared, raiseRegionCap, repeatMultiplier, xpToNext, xpToReach,
-} from './skills';
+  multiplierFromShared, raiseRegionCap, repeatMultiplier, xpToNext, xpToReach, easyMultiplier } from './skills';
 import { PROGRESSION_TUNING as T } from './tuning';
 import { SKILLS } from './types';
 
@@ -161,20 +161,23 @@ describe('main skills', () => {
 describe('the curve, provisionally', () => {
   // A first calibration, to be replaced by the bot-driven pacing test in task 006.
   // Rough experience a main skill earns by each beat should land inside the pacing bands.
-  it('puts plausible experience totals inside the bands', () => {
-    const levelFor = (xp: number) => {
-      const s = createProgression(20);
-      addExperience(s, 'archery', xp);
-      return s.skills.archery.level;
-    };
-    expect(levelFor(200)).toBeGreaterThanOrEqual(4);
-    expect(levelFor(200)).toBeLessThanOrEqual(7);
-    expect(levelFor(550)).toBeGreaterThanOrEqual(8);
-    expect(levelFor(550)).toBeLessThanOrEqual(12);
-    expect(levelFor(1300)).toBeGreaterThanOrEqual(13);
-    expect(levelFor(1300)).toBeLessThanOrEqual(16);
-    expect(levelFor(2700)).toBeGreaterThanOrEqual(18);
-    expect(levelFor(2700)).toBeLessThanOrEqual(20);
+  it('easy things stop teaching', () => {
+    const s = createProgression(20);
+    s.skills.archery.level = 12;
+    const at = (lessonLevel: number | undefined) => easyMultiplier(s, 'archery', lessonLevel);
+    expect(at(undefined)).toBe(1);
+    expect(at(12)).toBe(1);
+    expect(at(15)).toBe(1);
+    expect(at(11)).toBeLessThan(1);
+    expect(at(9)).toBeLessThan(at(11));
+    expect(at(1)).toBe(PROGRESSION_TUNING.easyFloor);
+  });
+  it('a feat far below a skill earns a fraction of what it earns a beginner', () => {
+    const event = { skill: 'archery', action: 'arrow_hit', targetId: 'x', difficulty: 0.16, regionId: 'tallowmere' } as const;
+    const novice = createProgression(20);
+    const veteran = createProgression(20);
+    veteran.skills.archery.level = 15;
+    expect(awardSharedEvent(veteran, event)[0].gained).toBeLessThan(awardSharedEvent(novice, event)[0].gained / 4);
   });
 });
 

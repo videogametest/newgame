@@ -28,6 +28,11 @@ export interface ExperienceEvent {
    * Leave it unset for ordinary fights, where every enemy is a new target.
    */
   repeatKey?: string;
+  /**
+   * The level this feat can teach up to. A skill already above it learns less from it, and soon nothing much:
+   * easy things stop teaching. Leave unset for feats with no level of their own.
+   */
+  lessonLevel?: number;
 }
 
 export interface SkillGain {

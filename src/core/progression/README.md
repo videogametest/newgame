@@ -12,6 +12,7 @@ Claude's stream (see `docs/PARALLEL.md`). Pure logic for `GAME_DESIGN.md` sectio
 | `skills.ts` | Levels, awarding experience, the region cap, catch-up, overflow |
 | `perks.ts` | Earning perks, fallbacks, slots, saved sets, mastery, the ledger, and validation |
 | `pacing.ts` | The pacing bands per story beat and a check against them |
+| `playthrough.ts` | A model of whole playthroughs in five styles, run through the real rules. Its test is what holds the pacing: on pace at every beat, never capped before Stane, never locked out, nothing out of reach. The counts in it are estimates until task 006 replaces them with the bot's |
 | `../../data/perks/tallowmere.ts` | The 24 perks of Tallowmere |
 
 ## How to use it when wiring

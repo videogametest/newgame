@@ -11,8 +11,8 @@ export const PROGRESSION_TUNING = {
   regionCaps: { tallowmere: 20 } as Record<string, number>,
 
   /** Experience needed to go from level L to L+1 is base * growth^(L-1), rounded. */
-  xpBase: 30,
-  xpGrowth: 1.16,
+  xpBase: 35,
+  xpGrowth: 1.1,
 
   /**
    * The shared ExperienceEvent rates difficulty from 0 (trivial) to 1 (hardest). It is turned
@@ -20,6 +20,15 @@ export const PROGRESSION_TUNING = {
    * feat sits near 0.2, which gives a multiplier of 1.
    */
   sharedDifficultyRange: [0.5, 3] as [number, number],
+
+  /**
+   * Easy things stop teaching. The shared 0-to-1 difficulty is also read as a lesson level: difficulty times this
+   * number. A skill above the lesson level loses `easyPerLevel` of the reward for each level it is above, down to
+   * `easyFloor`. This is what keeps a skill from racing ahead of the story, however thorough the player is.
+   */
+  lessonLevelsPerDifficulty: 40,
+  easyPerLevel: 0.22,
+  easyFloor: 0.1,
 
   /** Difficulty multipliers on an event are clamped to this range. */
   difficultyMin: 0.25,

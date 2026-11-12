@@ -53,6 +53,13 @@ export function repeatMultiplier(state: ProgressionState, repeatKey: string | un
   return seen < T.repeatFalloff.length ? T.repeatFalloff[seen] : 0;
 }
 
+/** A skill above what a feat can teach learns less from it. */
+export function easyMultiplier(state: ProgressionState, skill: SkillId, lessonLevel: number | undefined): number {
+  if (lessonLevel === undefined) return 1;
+  const above = state.skills[skill].level - lessonLevel;
+  return above <= 0 ? 1 : Math.max(T.easyFloor, 1 - T.easyPerLevel * above);
+}
+
 function clampDifficulty(d: number | undefined): number {
   if (d === undefined || Number.isNaN(d)) return 1;
   return Math.min(T.difficultyMax, Math.max(T.difficultyMin, d));
@@ -73,7 +80,7 @@ export function awardExperience(state: ProgressionState, event: ExperienceEvent)
 
   const gains: SkillGain[] = [];
   for (const award of awards) {
-    const amount = Math.round(award.base * difficulty * repeat * catchUpMultiplier(state, award.skill));
+    const amount = Math.round(award.base * difficulty * repeat * catchUpMultiplier(state, award.skill) * easyMultiplier(state, award.skill, event.lessonLevel));
     gains.push(addExperience(state, award.skill, amount));
   }
   return gains;
@@ -108,6 +115,7 @@ export function awardSharedEvent(state: ProgressionState, event: SharedExperienc
     action,
     difficulty: multiplierFromShared(event.difficulty),
     repeatKey: event.repeatable ? `${action}:${event.targetId}` : undefined,
+    lessonLevel: Math.round(Math.min(1, Math.max(0, event.difficulty)) * T.lessonLevelsPerDifficulty),
   });
 }
 

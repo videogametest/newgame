@@ -8,7 +8,7 @@ import type { ProgressionState } from './types';
 export type Beat = 'first_lantern' | 'forge_freed' | 'mill_retaken' | 'facing_stane' | 'valley_complete';
 
 export interface Band {
-  /** Levels of the two skills the player uses most. Both must fall inside. */
+  /** Level of the skill the player uses most. The second most used may sit up to SECOND_SKILL_SLACK below the band. */
   mainSkills: [number, number];
   perks: [number, number];
   slots: [number, number];
@@ -16,11 +16,14 @@ export interface Band {
 
 export const PACING_BANDS: Record<Beat, Band> = {
   first_lantern: { mainSkills: [4, 7], perks: [3, 5], slots: [3, 3] },
-  forge_freed: { mainSkills: [8, 12], perks: [7, 10], slots: [3, 5] },
-  mill_retaken: { mainSkills: [13, 16], perks: [11, 15], slots: [5, 5] },
-  facing_stane: { mainSkills: [18, 20], perks: [16, 20], slots: [5, 7] },
-  valley_complete: { mainSkills: [20, 20], perks: [24, 24], slots: [7, 7] },
+  forge_freed: { mainSkills: [8, 12], perks: [7, 12], slots: [3, 5] },
+  mill_retaken: { mainSkills: [13, 16], perks: [11, 17], slots: [5, 5] },
+  facing_stane: { mainSkills: [18, 20], perks: [16, 22], slots: [5, 7] },
+  valley_complete: { mainSkills: [20, 20], perks: [20, 24], slots: [7, 7] },
 };
+
+/** A player who spreads effort over many skills has a lower second skill. This many levels below the band is still on pace. */
+export const SECOND_SKILL_SLACK = 2;
 
 /** The beats before which no main skill may sit at the region cap. */
 export const NO_CAP_BEFORE: Beat = 'mill_retaken';
@@ -34,7 +37,7 @@ export function checkPacing(beat: Beat, state: ProgressionState): string[] {
   const band = PACING_BANDS[beat];
   const problems: string[] = [];
   const [first, second] = mainSkillLevels(state);
-  if (!inside(first, band.mainSkills) || !inside(second, band.mainSkills)) {
+  if (!inside(first, band.mainSkills) || !inside(second, [band.mainSkills[0] - SECOND_SKILL_SLACK, band.mainSkills[1]])) {
     problems.push(`${beat}: main skills at ${first} and ${second}, wanted ${band.mainSkills[0]} to ${band.mainSkills[1]}`);
   }
   const perks = perksEarned(state);

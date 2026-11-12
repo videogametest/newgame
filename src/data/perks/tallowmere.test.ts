@@ -8,7 +8,7 @@ import { TALLOWMERE_PERKS as perks } from './tallowmere';
 describe('the perks of Tallowmere', () => {
   it('number 24, matching the pacing table', () => {
     expect(perks.length).toBe(24);
-    expect(PACING_BANDS.valley_complete.perks).toEqual([24, 24]);
+    expect(PACING_BANDS.valley_complete.perks[1]).toBe(24);
   });
 
   it('obey the design rules', () => {

@@ -10,8 +10,9 @@ export type NumericTuning<T> = { readonly [K in keyof T]: number };
 export const COMBAT_DEPTH_TUNING = {
   weakPoints: {
     body: 1,
-    head: 3, // untuned placeholder
-    helmetHead: 1.5, // untuned placeholder
+    // Heads are large on these models, so a head shot is worth half as much again, not several times (design, Settled details).
+    head: 1.5, // untuned placeholder
+    helmetHead: 1, // a helmet removes the bonus
     bruteFrontHead: 1,
     firstStrike: 3, // untuned placeholder
   },
@@ -39,13 +40,19 @@ export const COMBAT_DEPTH_TUNING = {
     middling: 0.5, // untuned placeholder
     high: 0.9, // untuned placeholder
   },
+  /** Winning back is decided, never rolled (design section 5). A bandit stays if the valley clears their bar. */
   winBack: {
-    baseStay: 0.2, // untuned placeholder
-    recoveryWeight: 0.3, // untuned placeholder
-    mercyWeight: 0.3, // untuned placeholder
-    loyaltyPenalty: 0.3, // untuned placeholder
-    returnLoyaltyThreshold: 0.8, // untuned placeholder
+    recoveryWeight: 0.5, // untuned placeholder
+    mercyWeight: 0.5, // untuned placeholder
+    /** What recovery and mercy together must reach, by loyalty. */
+    bar: { low: 0.3, middling: 0.55, high: 0.9 }, // untuned placeholder
   },
+  /** Each enemy breaks when the place's morale falls below their own threshold: low loyalty breaks first. */
+  breakBelow: { low: 0.6, middling: 0.4, high: 0.2 }, // untuned placeholder
+  /** A knocked-out enemy woken by an ally gets up after this long, at this share of health, alert. */
+  wake: { seconds: 4, healthShare: 0.5 }, // untuned placeholder
+  /** Stane yields when his health falls to this share. No blow kills him. */
+  staneYieldsAt: 0.25, // untuned placeholder
 } as const;
 
 export const ARROW_TYPES = {

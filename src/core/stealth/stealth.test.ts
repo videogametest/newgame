@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advanceAwareness, advanceMarks, noticingRate, reaction, type Observation } from './index';
+import { advanceAwareness, advanceMarks, isSearching, noticingRate, reaches, reaction, type Observation } from './index';
 import { STEALTH_TUNING as t } from './tuning';
 
 const observation: Observation = {
@@ -49,13 +49,58 @@ describe('§5 awareness and reactions', () => {
     expect(next.lastKnownPosition).toEqual({ x: 4, z: 3 });
     expect(reaction(next.awareness, false)).toBe('investigate');
   });
-  it.each(['nearby-alert', 'body-found', 'comrade-found', 'geese'] as const)('%s raises alert', kind => {
+  it.each(['nearby_alert', 'body_found', 'comrade_found', 'geese'] as const)('%s raises alert', kind => {
     expect(advanceAwareness(fresh, observation, 0, [{ kind, position: observation.target }]).awareness).toBe('alert');
   });
-  it('does not guess search timeouts or alert reset rules', () => {
-    const alert = { awareness: 'alert' as const, notice: t.alertAt };
-    expect(advanceAwareness(alert, { ...observation, lineOfSight: false }, 100).awareness).toBe('alert');
-    expect(advanceAwareness(fresh, observation, -1)).toEqual(fresh);
+  describe('losing the hero', () => {
+    const hidden = { ...observation, lineOfSight: false };
+    const alert = { awareness: 'alert' as const, notice: t.alertAt, lastKnownPosition: { x: 0, z: 6 } };
+    it('an alert enemy searches where the hero was last seen, then drops to suspicious, then returns to routine', () => {
+      const searching = advanceAwareness(alert, hidden, 1);
+      expect(searching.awareness).toBe('alert');
+      expect(isSearching(searching)).toBe(true);
+      expect(searching.lastKnownPosition).toEqual({ x: 0, z: 6 });
+      const gaveUp = advanceAwareness(alert, hidden, t.searchSeconds);
+      expect(gaveUp.awareness).toBe('suspicious');
+      const calm = advanceAwareness(gaveUp, hidden, t.suspiciousSeconds);
+      expect(calm).toMatchObject({ awareness: 'unaware', notice: 0 });
+      expect(calm.lastKnownPosition).toBeUndefined();
+    });
+    it('notice drains while unseen and builds again when seen', () => {
+      const half = { awareness: 'unaware' as const, notice: 0.8 };
+      expect(advanceAwareness(half, hidden, 1).notice).toBeLessThan(0.8);
+      expect(advanceAwareness(half, observation, 1).notice).toBeGreaterThan(0.8);
+      expect(advanceAwareness(half, hidden, 1000).notice).toBe(0);
+    });
+    it('being seen again resets the search', () => {
+      const searching = advanceAwareness(alert, hidden, t.searchSeconds - 1);
+      const seen = advanceAwareness(searching, observation, 0.1);
+      expect(seen.unseenSeconds).toBe(0);
+      expect(advanceAwareness(seen, hidden, t.searchSeconds - 1).awareness).toBe('alert');
+    });
+    it('Grass Ghost halves the search: a factor of one half gives up in half the time', () => {
+      expect(advanceAwareness(alert, hidden, t.searchSeconds / 2, [], t, 1).awareness).toBe('alert');
+      expect(advanceAwareness(alert, hidden, t.searchSeconds / 2, [], t, 0.5).awareness).toBe('suspicious');
+    });
+    it('nothing found is forgotten: an enemy who found a body never goes back to routine', () => {
+      const found = advanceAwareness(fresh, hidden, 0, [{ kind: 'body_found', position: { x: 1, z: 1 } }]);
+      expect(found.awareness).toBe('alert');
+      let s = found;
+      for (let i = 0; i < 50; i++) s = advanceAwareness(s, hidden, 5);
+      expect(s.awareness).toBe('suspicious');
+    });
+    it('a noise carries only as far as its radius, and walls do not stop it', () => {
+      const near = { kind: 'noise' as const, position: { x: 0, z: 5 }, radius: 8 };
+      const far = { kind: 'noise' as const, position: { x: 0, z: 30 }, radius: 8 };
+      expect(reaches(near, hidden.observer)).toBe(true);
+      expect(reaches(far, hidden.observer)).toBe(false);
+      expect(advanceAwareness(fresh, hidden, 0, [near]).awareness).toBe('suspicious');
+      expect(advanceAwareness(fresh, hidden, 0, [far]).awareness).toBe('unaware');
+      expect(advanceAwareness(fresh, hidden, 0, [{ kind: 'noise', position: { x: 0, z: 300 } }]).awareness).toBe('suspicious');
+    });
+    it('ignores negative time', () => {
+      expect(advanceAwareness(fresh, observation, -1)).toMatchObject(fresh);
+    });
   });
   it('is timestep invariant and does not mutate inputs', () => {
     const before = JSON.stringify([fresh, observation]);
@@ -67,8 +112,8 @@ describe('§5 awareness and reactions', () => {
   it('returns home beyond the caller-computed leash; suspicious turns to investigate', () => {
     expect(reaction('unaware', false)).toBe('routine');
     expect(reaction('suspicious', false)).toBe('investigate');
-    expect(reaction('alert', false)).toBe('attack-and-alert-nearby');
-    expect(reaction('alert', true)).toBe('return-home');
+    expect(reaction('alert', false)).toBe('attack_and_alert_nearby');
+    expect(reaction('alert', true)).toBe('return_home');
   });
 });
 describe('§5 marking', () => {

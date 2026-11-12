@@ -15,6 +15,12 @@ export const STEALTH_TUNING = {
     walking: 1, // untuned placeholder
     sprinting: 1.8, // untuned placeholder
   },
+  /** Notice drains at this rate while the hero is unseen. */
+  noticeDecayPerSecond: 0.25, // untuned placeholder
+  /** An alert enemy who has lost the hero searches the last place seen for this long, then drops to suspicious. */
+  searchSeconds: 12, // untuned placeholder
+  /** A suspicious enemy who finds nothing goes back to routine after this long. */
+  suspiciousSeconds: 6, // untuned placeholder
   markHoldSeconds: 1, // untuned placeholder
   markDurationSeconds: 20, // untuned placeholder
 };

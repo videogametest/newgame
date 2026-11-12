@@ -1,5 +1,5 @@
 import type { ActionPhase, BanditState, PlaceStatus } from '../types';
-import type { Weight } from './data';
+import type { Loyalty, Weight } from './data';
 import { COMBAT_DEPTH_TUNING as DEPTH } from './data';
 import { clamp } from '../vec';
 
@@ -34,6 +34,32 @@ export function changeMorale(morale: number, event: MoraleEvent, tuning: Readonl
 /** Caller supplies per-enemy threshold and flee/surrender choice from data. */
 export function moraleReaction(morale: number, threshold: number, reaction: 'flee' | 'surrender', unbreakable = false) {
   return !unbreakable && morale < threshold ? reaction : 'fight';
+}
+
+/** Section 5, "Breaking". Each enemy breaks when the place's morale falls below their own threshold, set by loyalty. */
+export function breaks(morale: number, loyalty: Loyalty, unbreakable = false): boolean {
+  return !unbreakable && morale < DEPTH.breakBelow[loyalty];
+}
+
+/** One who breaks surrenders if their loyalty is low or an enemy is close; otherwise they run. */
+export function breakReaction(loyalty: Loyalty, heroOrCompanionClose: boolean): 'surrender' | 'flee' {
+  return loyalty === 'low' || heroOrCompanionClose ? 'surrender' : 'flee';
+}
+
+/** What an enemy does now, from morale alone. Those who flee are gone from the place and count as returned to Stane. */
+export function moraleResponse(morale: number, loyalty: Loyalty, heroOrCompanionClose: boolean, unbreakable = false): 'fight' | 'surrender' | 'flee' {
+  return breaks(morale, loyalty, unbreakable) ? breakReaction(loyalty, heroOrCompanionClose) : 'fight';
+}
+
+/** A knocked-out enemy found by an ally while the place is still held: up after a few seconds, at half health, alert. */
+export function wake(state: BanditState, placeStatus: PlaceStatus, allyPresent: boolean, maxHp: number): { state: BanditState; hp: number; afterSeconds: number; alert: boolean } | null {
+  if (state !== 'knocked_out' || placeStatus !== 'held' || !allyPresent) return null;
+  return { state: 'alive', hp: Math.max(1, Math.round(maxHp * DEPTH.wake.healthShare)), afterSeconds: DEPTH.wake.seconds, alert: true };
+}
+
+/** Stane yields at a quarter health. No blow kills him. */
+export function staneYieldBelow(maxHp: number): number {
+  return maxHp * DEPTH.staneYieldsAt;
 }
 
 export type HitTool = 'standard' | 'fire' | 'blunt' | 'whistling' | 'blade' | 'knife' | 'shield' | 'stealth_knockout';

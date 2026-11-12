@@ -43,6 +43,8 @@ Claude builds stream F directly and pushes to `main` when its tests pass. It doe
 - If Viktor needs something changed in Claude's paths, he says so in `docs/status.md` and does not edit them.
 - Claude also builds stream F2 and reviews every merged logic stream. Claude checks the repo every hour.
 
+**12 Nov:** Claude reworked parts of streams D, E, and G to settle the questions they raised (`docs/reviews/014-core-fixes-merged.md`). Those paths are Viktor's again from that commit on.
+
 ## Rules
 
 1. **Agree the shared types first.** Before any logic stream starts, the coordinator writes the shared types and interfaces that streams will exchange (fighter, place, item, household, game state, tuning) in `src/core/types/`, merges them, and tells every sub-agent to build against them. A stream that needs a shared type changed asks the coordinator; it does not change it alone.

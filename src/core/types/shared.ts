@@ -2,6 +2,13 @@
 // Revised for review 001 (docs/reviews/001-shared-types.md). Each stream builds against these; a stream that needs one
 // changed asks the coordinator (docs/PARALLEL.md rule 1). Definitions (names, positions, trades) live in src/data, not here.
 
+import type { CompanionState } from '../people/companions';
+import type { Purse } from '../economy/purse';
+import type { InventoryState } from '../items/types';
+import type { Quiver, RecoverableArrow } from '../combat/quiver';
+import type { Stories } from '../stories/stories';
+import type { Taking } from '../valley/learns';
+
 /** A point on the ground plane (metres). */
 export interface Vec2 {
   x: number;
@@ -36,6 +43,8 @@ export interface PlaceState {
   bellSilenced: boolean;
   /** Morale of the defenders, 0 to 1. */
   morale: number;
+  /** The day its lantern was last lit. Bandits taken to Wick decide at the next dawn. */
+  freedDay?: number;
 }
 
 /** A household's saved state. Name, trade, house position, and trigger are definitions in data. */
@@ -131,22 +140,8 @@ export interface ExperienceEvent {
   repeatable?: boolean;
 }
 
-// ---------- Items and squad (fields are revised when their owning stream starts; review 001, items 5 to 7) ----------
-
-/** An item in data (src/data). Gear, materials, food, and arrows all weigh something; gold does not. Provisional. */
-export interface ItemDef {
-  id: string;
-  name: string;
-  /** Weight in kilograms against the carry limit (design section 6). */
-  weight: number;
-  /** Base value in gold. */
-  value: number;
-}
-
-export interface ItemStack {
-  itemId: string;
-  count: number;
-}
+// ---------- Squad ----------
+// Items are defined in src/core/items (ItemDef, Stack, InventoryState) and crowns in src/core/economy (Purse).
 
 /** A recruit in the squad. Wounded members sit out the next battle (design section 3). Provisional. */
 export interface SquadMember {
@@ -163,13 +158,12 @@ export interface HeroState {
   position: Vec2;
   hp: number;
   maxHp: number;
-  gold: number;
   /** The region the hero is in. Sets the skill caps and the enemies' fixed difficulty. */
   regionId: string;
 }
 
 /** Save format version. Bump with a migration when the shape changes (design section 7). */
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 /**
  * The single serialisable game state (design section 7). Terrain and scenery are NOT stored: they come from the seed.
@@ -186,8 +180,29 @@ export interface GameState {
   day: number;
   hero: HeroState;
   progression: ProgressionState;
-  inventory: ItemStack[];
-  squad: SquadMember[];
+  /** What the hero carries and has stored, recipes known, and stolen things sold (src/core/items). */
+  inventory: InventoryState;
+  /** Crowns carried and stored (src/core/economy). */
+  purse: Purse;
+  /** The last day whose income from freed places has been paid into the chest. */
+  incomePaidThrough: number;
+  /** Gathering spot id to the day it was last taken from. */
+  gatheredOn: Record<string, number>;
+  /** The tax cart's last run was stopped, so Stane's tax is lifted until the next one. */
+  lastCartStopped: boolean;
+  /** The arrows in the quiver, and those lying in the world that can be picked up. */
+  quiver: Quiver;
+  arrowsInWorld: RecoverableArrow[];
+  /** Everyone who can travel with the hero, and how things stand with each (src/core/people). */
+  company: CompanionState[];
+  /** Overheard line ids the hero has heard. A tell that was heard guarantees a spared bandit stays. */
+  heardLines: string[];
+  /** How the hero took each place, for the valley to learn from (src/core/valley). */
+  takings: Taking[];
+  /** The five household stories (src/core/stories). */
+  stories: Stories;
+  /** The last loose thread Hesper mentioned, so she does not repeat it. */
+  lastThread: string | null;
   places: PlaceState[];
   households: Household[];
   /** Ids of chests already opened. */

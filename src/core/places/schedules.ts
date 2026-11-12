@@ -1,6 +1,8 @@
+import { BANDITS, type BanditDef, type HabitTime } from '../../data/bandits';
+
 /** All time arguments are in-game hours, matching shared GameState.timeOfDay. */
 export interface Routine {
-  activity: 'wake' | 'work' | 'patrol' | 'eat' | 'sleep' | 'watch' | 'gather' | 'home' | 'habit' | 'guard-change';
+  activity: 'wake' | 'work' | 'patrol' | 'eat' | 'sleep' | 'watch' | 'gather' | 'home' | 'habit' | 'guard_change';
   locationId: string;
   routeId?: string;
   torch?: boolean;
@@ -64,7 +66,7 @@ export const VILLAGER: Schedule = {
 export const NIGHT_WATCH: Schedule = {
   fallback: { activity: 'sleep', locationId: 'bed' },
   entries: [
-    { start: c.night, end: c.dawn, routine: { activity: 'watch', locationId: 'watch-post', torch: true } },
+    { start: c.night, end: c.dawn, routine: { activity: 'watch', locationId: 'watch_post', torch: true } },
   ],
 };
 /** Fixed guard changes temporarily leave a post empty (§5). The outgoing and
@@ -74,17 +76,34 @@ export function withGuardChanges(schedule: Schedule, hours: readonly number[], g
     fallback: { ...schedule.fallback },
     entries: [...schedule.entries, ...(gapSeconds > 0 ? hours : []).map(start => ({
       start, end: start + Math.max(0, gapSeconds) / 3600,
-      routine: { activity: 'guard-change' as const, locationId: 'off-post' },
+      routine: { activity: 'guard_change' as const, locationId: 'off_post' },
     }))],
   };
 }
-/** Habit entries can be appended to each person's schedule; they are not AI code. */
-export const HABITS: Readonly<Record<string, readonly ScheduleEntry[]>> = {
-  'dob-finch': [{ start: c.dawn, end: c.work, routine: { activity: 'habit', locationId: 'geese' } }],
-  'wyll-carrow': [{ start: c.dusk, end: c.evening, routine: { activity: 'habit', locationId: 'mill-pond' } }],
-  'peg-rudge': [{ start: c.beforeDawn, end: c.dawn, routine: { activity: 'habit', locationId: 'forge-fire' } }],
-  'tobin-pike': [{ start: c.dusk, end: c.evening, routine: { activity: 'habit', locationId: 'east-fence' } }],
+/** When each time of day in the bandits' data falls, in hours. */
+export const HABIT_HOURS: Readonly<Record<Exclude<HabitTime, 'always' | 'guard_change'>, [number, number]>> = {
+  before_dawn: [c.beforeDawn, c.dawn],
+  dawn: [c.dawn, c.work],
+  midday: [c.midday, c.mealEnd],
+  afternoon: [14, 16], // untuned placeholder
+  dusk: [c.dusk, c.evening],
+  night: [c.night, c.dawn],
+  midnight: [0, 2], // untuned placeholder
 };
+
+/** A bandit's habit as schedule entries, to append to their base schedule. Guard-change habits are overlays. */
+export function habitEntries(bandit: Pick<BanditDef, 'habit'>): ScheduleEntry[] {
+  const h = bandit.habit;
+  if (!h || h.when === 'guard_change') return [];
+  const routine: Routine = { activity: 'habit', locationId: h.where };
+  if (h.when === 'always') return [{ start: 0, end: 0, routine }];
+  const [start, end] = HABIT_HOURS[h.when];
+  return [{ start, end, routine }];
+}
+
+/** Every habit in docs/writing/bandits.md, by bandit id. Built from src/data/bandits.ts. */
+export const HABITS: Readonly<Record<string, readonly ScheduleEntry[]>> =
+  Object.fromEntries(BANDITS.filter(b => b.habit).map(b => [b.id, habitEntries(b)]));
 
 /** §4 birds/§5 whistle cause suspicion, not an automatic bell. */
 export function birdsStartled(movement: 'crouched' | 'walking' | 'sprinting'): boolean {

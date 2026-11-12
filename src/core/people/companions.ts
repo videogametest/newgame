@@ -1,7 +1,7 @@
 import type { SquadMember } from '../types';
 import { homeCount, meetsTrigger, type PeopleWorld, type Trigger } from './households';
 
-export type CompanionId = 'bram' | 'tamsin' | 'tobin' | 'oona' | 'garrick' | 'bracken' | 'ketch';
+export type CompanionId = 'bram' | 'tamsin' | 'tobin_pike' | 'oona' | 'garrick' | 'bracken' | 'ketch';
 export type BondStage = 1 | 2 | 3;
 export interface CompanionDef {
   id: CompanionId;
@@ -25,19 +25,19 @@ const def = (id: CompanionId, name: string, trait: string, perks: [string, strin
   id, name, trait, perks, availability, source: 'docs/writing/companions.md',
 });
 export const COMPANIONS: readonly CompanionDef[] = [
-  def('bram', 'Bram', 'holds-the-line', ['Shieldwall', 'Breaker', 'Stubborn'], { kind: 'always' }),
-  def('tamsin', 'Tamsin Sedge', 'marked-target-bow', ['Second Bow', 'Covering Shot', "Her Father's Eye"], home('sedges')),
-  def('tobin', 'Tobin Pike', 'knows-stanes-men', ['He Knows the Drill', 'A Face They Know', 'Come Home'],
-    { kind: 'bandit', id: 'tobin', outcome: 'stayed' }),
-  def('oona', 'Oona', 'healer-not-fighter', ['On Your Feet', 'Proper Food', "I've Seen Worse"], home('oona')),
-  def('garrick', 'Garrick Aldric', 'staggers-heavy-enemies', ['Heavy Hand', 'Field Repair', 'Unmade'], home('aldrics')),
-  def('bracken', 'Bracken', 'unharmable-sheepdog', ['Nose', 'Finder', 'Herder'], home('sedges')),
-  { ...def('ketch', 'Ketch', 'knows-stanes-men', ['He Knows the Drill', 'A Face They Know', 'Come Home'], {
+  def('bram', 'Bram', 'holds_the_line', ['Shieldwall', 'Breaker', 'Stubborn'], { kind: 'always' }),
+  def('tamsin', 'Tamsin Sedge', 'marked_target_bow', ['Second Bow', 'Covering Shot', "Her Father's Eye"], home('sedges')),
+  def('tobin_pike', 'Tobin Pike', 'knows_stanes_men', ['He Knows the Drill', 'A Face They Know', 'Come Home'],
+    { kind: 'bandit', id: 'tobin_pike', outcome: 'stayed' }),
+  def('oona', 'Oona', 'healer_not_fighter', ['On Your Feet', 'Proper Food', "I've Seen Worse"], home('oona')),
+  def('garrick', 'Garrick Aldric', 'staggers_heavy_enemies', ['Heavy Hand', 'Field Repair', 'Unmade'], home('aldrics')),
+  def('bracken', 'Bracken', 'unharmable_sheepdog', ['Nose', 'Finder', 'Herder'], home('sedges')),
+  { ...def('ketch', 'Ketch', 'knows_stanes_men', ['He Knows the Drill', 'A Face They Know', 'Come Home'], {
     kind: 'all', conditions: [
-      { kind: 'bandit', id: 'tobin', outcome: 'dead' },
+      { kind: 'bandit', id: 'tobin_pike', outcome: 'dead' },
       { kind: 'bandit', id: 'ketch', outcome: 'stayed' },
     ],
-  }), perks: [], fallbackFor: 'tobin', source: 'docs/writing/bandits.md#in-place-of-tobin' },
+  }), perks: [], fallbackFor: 'tobin_pike', source: 'docs/writing/bandits.md#in-place-of-tobin' },
 ];
 export const PEOPLE_TUNING = {
   partyLimit: 3, // design §6
@@ -46,8 +46,11 @@ export const PEOPLE_TUNING = {
 };
 
 /** Garrick alone returns at ten windows if the hammer was sold (households.md).
- * soldHammer is supplied explicitly: GameState does not yet store sold stolen goods.
+ * Pass hammerSold(inventory.soldStolen).
  */
+/** Whether the smith's hammer was sold, from the inventory's record of sold stolen things. */
+export const hammerSold = (soldStolen: readonly string[]): boolean => soldStolen.includes('smiths_hammer');
+
 export function canRecruit(id: CompanionId, world: PeopleWorld, soldHammer = false): boolean {
   const d = COMPANIONS.find(x => x.id === id)!;
   return meetsTrigger(d.availability, world) ||
@@ -71,7 +74,7 @@ export function chooseParty(company: readonly CompanionState[], ids: readonly Co
   const valid = location !== 'field' && ids.length <= PEOPLE_TUNING.partyLimit &&
     new Set(ids).size === ids.length &&
     ids.every(id => company.some(c => c.id === id && c.joined)) &&
-    !(ids.includes('tobin') && ids.includes('ketch'));
+    !(ids.includes('tobin_pike') && ids.includes('ketch'));
   return { ok: valid, company: company.map(c => valid ? { ...c, travelling: ids.includes(c.id) } : { ...c }) };
 }
 
@@ -96,11 +99,11 @@ export function restCompany(company: readonly CompanionState[]): CompanionState[
 }
 
 export type WishEvent =
-  | { kind: 'inn-meal'; innRebuilt: boolean }
-  | { kind: 'bow-returned-to-hale' }
-  | { kind: 'pikes-door'; pikesHome: boolean }
-  | { kind: 'firefly-grove' }
-  | { kind: 'forge-craft'; quality: 'common' | 'fine' | 'masterwork' }
+  | { kind: 'inn_meal'; innRebuilt: boolean }
+  | { kind: 'bow_returned_to_hale' }
+  | { kind: 'pikes_door'; pikesHome: boolean }
+  | { kind: 'firefly_grove' }
+  | { kind: 'forge_craft'; quality: 'common' | 'fine' | 'masterwork' }
   | { kind: 'campfire'; sedgesHome: boolean; sheepVisible: boolean };
 export interface WishDef {
   companion: CompanionId;
@@ -109,8 +112,8 @@ export interface WishDef {
   source: string;
 }
 export const WISHES: readonly WishDef[] = [
-  ['bram', 'inn-meal'], ['tamsin', 'bow-returned-to-hale'], ['tobin', 'pikes-door'],
-  ['oona', 'firefly-grove'], ['garrick', 'forge-craft'], ['bracken', 'campfire'],
+  ['bram', 'inn_meal'], ['tamsin', 'bow_returned_to_hale'], ['tobin_pike', 'pikes_door'],
+  ['oona', 'firefly_grove'], ['garrick', 'forge_craft'], ['bracken', 'campfire'],
 ].map(([id, condition]) => ({
   companion: id as CompanionId, condition: condition as WishEvent['kind'],
   reward: { bondStage: 3, perk: COMPANIONS.find(d => d.id === id)!.perks[2] },
@@ -120,10 +123,10 @@ export const WISHES: readonly WishDef[] = [
 export function fulfilWish(c: CompanionState, event: WishEvent): CompanionState {
   if (!c.joined) return { ...c };
   const matching = WISHES.some(w => w.companion === c.id && w.condition === event.kind);
-  const valid = event.kind === 'bow-returned-to-hale' ||
-    (c.travelling && (event.kind === 'inn-meal' ? event.innRebuilt :
-      event.kind === 'pikes-door' ? event.pikesHome :
-      event.kind === 'forge-craft' ? event.quality === 'masterwork' :
+  const valid = event.kind === 'bow_returned_to_hale' ||
+    (c.travelling && (event.kind === 'inn_meal' ? event.innRebuilt :
+      event.kind === 'pikes_door' ? event.pikesHome :
+      event.kind === 'forge_craft' ? event.quality === 'masterwork' :
       event.kind === 'campfire' ? event.sedgesHome && event.sheepVisible : true));
   return { ...c, wishFulfilled: c.wishFulfilled || matching && valid };
 }

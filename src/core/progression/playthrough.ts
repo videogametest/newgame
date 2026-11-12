@@ -96,7 +96,7 @@ const PERK_TIMES: Record<string, { from: Beat; needs: number }> = {
   long_shot: { from: 'first_lantern', needs: 0.5 }, // trial
   practice_ground: { from: 'first_lantern', needs: 0.6 }, // secret
   the_trail: { from: 'forge_freed', needs: 0.5 }, // trial
-  marrins: { from: 'forge_freed', needs: 0.3 }, // the Marrins come home once the Mill is free
+  ansa_marrin: { from: 'forge_freed', needs: 0.3 }, // the Marrins come home once the Mill is free
   fisher: { from: 'forge_freed', needs: 0.6 },
   waterfall_cave: { from: 'forge_freed', needs: 0.7 }, // secret
   tobin_pike: { from: 'mill_retaken', needs: 0.4 }, // won back at the Forge
@@ -104,7 +104,7 @@ const PERK_TIMES: Record<string, { from: Beat; needs: number }> = {
   quiet_lantern: { from: 'mill_retaken', needs: 0.5 }, // trial
   the_turn_survived: { from: 'facing_stane', needs: 0 }, // story
   garrick: { from: 'facing_stane', needs: 0.5 }, // ten lit windows
-  old_aldric: { from: 'facing_stane', needs: 0.5 }, // the hammer returned
+  bertram_aldric: { from: 'facing_stane', needs: 0.5 }, // the hammer returned
   night_road: { from: 'facing_stane', needs: 0.5 }, // trial
   stane_yields: { from: 'valley_complete', needs: 0 }, // story
   hespers_shoulder: { from: 'valley_complete', needs: 0.5 }, // the last trial

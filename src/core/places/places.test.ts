@@ -68,22 +68,22 @@ describe('§5 schedules and §9 daily life', () => {
     expect(routineAt(NIGHT_WATCH, 10).activity).toBe('sleep');
   });
   it('habits override routines without mutating the base', () => {
-    expect(routineAt({ ...DAY_WORKER, entries: [...DAY_WORKER.entries, ...HABITS['wyll-carrow']] }, c.dusk))
-      .toMatchObject({ activity: 'habit', locationId: 'mill-pond' });
+    expect(routineAt({ ...DAY_WORKER, entries: [...DAY_WORKER.entries, ...HABITS['wyll_carrow']] }, c.dusk))
+      .toMatchObject({ activity: 'habit', locationId: 'mill_pond' });
     expect(routineAt(DAY_WORKER, c.dusk).activity).toBe('eat');
   });
   it('includes the written feeding, solitary fishing, pre-dawn fire, and fence habits', () => {
     for (const [id, hour, locationId] of [
-      ['dob-finch', c.dawn, 'geese'], ['wyll-carrow', c.dusk, 'mill-pond'],
-      ['peg-rudge', c.beforeDawn, 'forge-fire'], ['tobin-pike', c.dusk, 'east-fence'],
+      ['dob_finch', c.dawn, 'geese'], ['wyll_carrow', c.dusk, 'mill_pond'],
+      ['peg_rudge', c.beforeDawn, 'forge_fire'], ['tobin_pike', c.dusk, 'east_fence'],
     ] as const) {
       expect(routineAt({ ...DAY_WORKER, entries: HABITS[id] }, hour).locationId).toBe(locationId);
     }
   });
   it('leaves the post empty for an authored guard-change gap, including midnight', () => {
     const schedule = withGuardChanges(NIGHT_WATCH, [18, 0], 5);
-    expect(routineAt(schedule, 0).activity).toBe('guard-change');
-    expect(routineAt(schedule, 2 / 3600).activity).toBe('guard-change');
+    expect(routineAt(schedule, 0).activity).toBe('guard_change');
+    expect(routineAt(schedule, 2 / 3600).activity).toBe('guard_change');
     expect(routineAt(schedule, 6 / 3600).activity).toBe('watch');
     expect(routineAt(withGuardChanges(NIGHT_WATCH, [0], 0), 1).activity).toBe('watch');
   });

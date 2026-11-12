@@ -95,3 +95,35 @@ describe('kill or knock out (§5)', () => {
     expect(wakeBandit('spared', 'held', true)).toBe('spared');
   });
 });
+
+describe('breaking, waking, and Stane (design, Settled details)', () => {
+  it('low loyalty breaks first and high loyalty last', async () => {
+    const { breaks } = await import('./enemies');
+    expect(breaks(0.5, 'low')).toBe(true);
+    expect(breaks(0.5, 'middling')).toBe(false);
+    expect(breaks(0.3, 'middling')).toBe(true);
+    expect(breaks(0.3, 'high')).toBe(false);
+    expect(breaks(0.1, 'high')).toBe(true);
+    expect(breaks(0, 'low', true)).toBe(false);
+  });
+  it('one who breaks surrenders if their loyalty is low or an enemy is close, otherwise runs', async () => {
+    const { breakReaction, moraleResponse } = await import('./enemies');
+    expect(breakReaction('low', false)).toBe('surrender');
+    expect(breakReaction('middling', true)).toBe('surrender');
+    expect(breakReaction('middling', false)).toBe('flee');
+    expect(breakReaction('high', false)).toBe('flee');
+    expect(moraleResponse(1, 'low', true)).toBe('fight');
+    expect(moraleResponse(0.1, 'high', false)).toBe('flee');
+  });
+  it('a woken enemy gets up after a few seconds at half health, alert, and only while the place is held', async () => {
+    const { wake } = await import('./enemies');
+    expect(wake('knocked_out', 'held', true, 40)).toEqual({ state: 'alive', hp: 20, afterSeconds: 4, alert: true });
+    expect(wake('knocked_out', 'freed', true, 40)).toBeNull();
+    expect(wake('knocked_out', 'held', false, 40)).toBeNull();
+    expect(wake('dead', 'held', true, 40)).toBeNull();
+  });
+  it('Stane yields at a quarter health', async () => {
+    const { staneYieldBelow } = await import('./enemies');
+    expect(staneYieldBelow(200)).toBe(50);
+  });
+});

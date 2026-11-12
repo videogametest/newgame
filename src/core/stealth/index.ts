@@ -8,6 +8,10 @@ export interface AwarenessState {
   awareness: Awareness;
   notice: number;
   lastKnownPosition?: Vec2;
+  /** Seconds since the hero was last seen or heard. Drives searching and giving up. */
+  unseenSeconds?: number;
+  /** Things found are never forgotten: a body, a comrade down, a missing guard. This enemy stays at least suspicious. */
+  foundSomething?: boolean;
 }
 export interface Observation {
   observer: Vec2;
@@ -31,20 +35,41 @@ export function noticingRate(o: Observation, t = STEALTH_TUNING): number {
 }
 
 export type Stimulus =
-  | { kind: 'noise'; position: Vec2 }
-  | { kind: 'nearby-alert' | 'body-found' | 'comrade-found' | 'geese'; position: Vec2 };
+  | { kind: 'noise'; position: Vec2; /** How far it carries, set by what made it. Walls do not block sound. */ radius?: number }
+  | { kind: 'nearby_alert' | 'body_found' | 'comrade_found' | 'geese'; position: Vec2 };
 
-/** §5. No automatic decay/reset: search completion rules are not specified.
- * Home leash is a reaction intent below, not an invented awareness reset. */
+/** Whether a stimulus reaches this observer. A noise carries only as far as its radius. */
+export function reaches(stimulus: Stimulus, observer: Vec2): boolean {
+  if (stimulus.kind !== 'noise' || stimulus.radius === undefined) return true;
+  return distance2(observer.x, observer.z, stimulus.position.x, stimulus.position.z) <= stimulus.radius;
+}
+
+/**
+ * Section 5, "Losing the hero". Seen: notice builds. Unseen: notice drains; an alert enemy searches the last place
+ * the hero was seen, then drops to suspicious; a suspicious enemy who finds nothing returns to routine.
+ * `searchFactor` shortens both waits (Grass Ghost at its third rank passes 0.5 for a hero lost in tall grass).
+ */
 export function advanceAwareness(
   state: AwarenessState, observation: Observation, seconds: number,
-  stimuli: readonly Stimulus[] = [], t = STEALTH_TUNING,
+  stimuli: readonly Stimulus[] = [], t = STEALTH_TUNING, searchFactor = 1,
 ): AwarenessState {
-  let notice = clamp(state.notice + noticingRate(observation, t) * Math.max(0, seconds), 0, t.alertAt);
+  const dt = Math.max(0, seconds);
+  const rate = noticingRate(observation, t);
+  const heard = stimuli.filter(s => reaches(s, observation.observer));
+  const sensed = (rate > 0 && dt > 0) || heard.length > 0;
+  let notice = state.notice;
   let awareness = state.awareness;
   let lastKnownPosition = state.lastKnownPosition;
-  if (noticingRate(observation, t) > 0 && seconds > 0) lastKnownPosition = { ...observation.target };
-  for (const stimulus of stimuli) {
+  let foundSomething = state.foundSomething ?? false;
+  let unseenSeconds = sensed ? 0 : (state.unseenSeconds ?? 0) + dt;
+
+  if (rate > 0 && dt > 0) {
+    notice = clamp(notice + rate * dt, 0, t.alertAt);
+    lastKnownPosition = { ...observation.target };
+  } else if (heard.length === 0) {
+    notice = clamp(notice - t.noticeDecayPerSecond * dt, 0, t.alertAt);
+  }
+  for (const stimulus of heard) {
     lastKnownPosition = { ...stimulus.position };
     if (stimulus.kind === 'noise') {
       notice = Math.max(notice, t.suspiciousAt);
@@ -52,15 +77,39 @@ export function advanceAwareness(
     } else {
       awareness = 'alert';
       notice = t.alertAt;
+      if (stimulus.kind === 'body_found' || stimulus.kind === 'comrade_found') foundSomething = true;
     }
   }
   if (notice >= t.alertAt) awareness = 'alert';
   else if (notice >= t.suspiciousAt && awareness === 'unaware') awareness = 'suspicious';
-  return { awareness, notice, ...(lastKnownPosition ? { lastKnownPosition: { ...lastKnownPosition } } : {}) };
+
+  if (!sensed) {
+    const factor = Math.max(0, searchFactor);
+    if (awareness === 'alert' && unseenSeconds >= t.searchSeconds * factor) {
+      awareness = 'suspicious';
+      notice = Math.min(notice, t.suspiciousAt);
+      unseenSeconds = 0;
+    } else if (awareness === 'suspicious' && unseenSeconds >= t.suspiciousSeconds * factor && !foundSomething) {
+      awareness = 'unaware';
+      notice = 0;
+      unseenSeconds = 0;
+      lastKnownPosition = undefined;
+    }
+  }
+  return {
+    awareness, notice, unseenSeconds,
+    ...(foundSomething ? { foundSomething } : {}),
+    ...(lastKnownPosition ? { lastKnownPosition: { ...lastKnownPosition } } : {}),
+  };
 }
 
-export function reaction(awareness: Awareness, beyondHomeLeash: boolean): 'routine' | 'investigate' | 'attack-and-alert-nearby' | 'return-home' {
-  if (awareness === 'alert') return beyondHomeLeash ? 'return-home' : 'attack-and-alert-nearby';
+/** True while an alert enemy has lost the hero and is searching where the hero was last seen. */
+export function isSearching(state: AwarenessState): boolean {
+  return state.awareness === 'alert' && (state.unseenSeconds ?? 0) > 0 && state.lastKnownPosition !== undefined;
+}
+
+export function reaction(awareness: Awareness, beyondHomeLeash: boolean): 'routine' | 'investigate' | 'attack_and_alert_nearby' | 'return_home' {
+  if (awareness === 'alert') return beyondHomeLeash ? 'return_home' : 'attack_and_alert_nearby';
   return awareness === 'suspicious' ? 'investigate' : 'routine';
 }
 

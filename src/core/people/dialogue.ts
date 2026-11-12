@@ -12,7 +12,7 @@ export const WRITING = { households, companions, hesper, stane, bram, interface:
 export type WritingSource = keyof typeof WRITING;
 export interface SpokenLine { text: string; speaker?: string; label?: string }
 export interface DialogueRef { source: WritingSource; group: string }
-export type SpeechForm = 'above-head' | 'conversation' | 'campfire';
+export type SpeechForm = 'above_head' | 'conversation' | 'campfire';
 // Explicit speaker prefixes used in these source files. Other prefixes are conditions, not speakers.
 const SPEAKER_PREFIXES = new Set([
   'Ansa', 'Corin', 'Bertram', 'Garrick', 'Hale', 'Tamsin', 'Orla', 'Ned', 'Joss', 'Merry',
@@ -68,7 +68,7 @@ export function selectDialogue(rules: readonly DialogueRule[], world: PeopleWorl
 
 export interface ShowItem {
   id: string;
-  kind: 'fragment' | 'stolen-good' | 'unique-item';
+  kind: 'fragment' | 'stolen_good' | 'unique_item';
   /** Source label from the written character's Show group, not an invented response. */
   responses?: Partial<Record<'hesper' | 'stane', string>>;
 }

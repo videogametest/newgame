@@ -54,15 +54,15 @@ describe('§9 households', () => {
     expect(meetsTrigger(HOUSEHOLDS[2].trigger, w)).toBe(false);
   });
   it('permits lantern projects to make the east road safe independently of the Forge', () => {
-    const w = world(); w.projectsBuilt = ['east-road-lanterns'];
+    const w = world(); w.projectsBuilt = ['east_road_lanterns'];
     expect(meetsTrigger(HOUSEHOLDS[4].trigger, w)).toBe(true);
   });
   it('brings grieving Pikes home at fourteen windows only when Tobin is dead', () => {
-    const w = world(); w.households = homes(13); w.bandits.tobin = 'dead';
+    const w = world(); w.households = homes(13); w.bandits.tobin_pike = 'dead';
     expect(meetsTrigger(HOUSEHOLDS[5].trigger, w)).toBe(false);
     w.households = homes(14);
     expect(meetsTrigger(HOUSEHOLDS[5].trigger, w)).toBe(true);
-    w.bandits.tobin = 'left';
+    w.bandits.tobin_pike = 'left';
     expect(meetsTrigger(HOUSEHOLDS[5].trigger, w)).toBe(false);
   });
   it('checks thresholds without an order-dependent cascade; does not mutate or overwrite homeSince', () => {
@@ -108,7 +108,7 @@ describe('§9 windows and derived recovery', () => {
   });
   it('derives all five §9 inputs and loses freed-place contribution on retaking', () => {
     const w = world(); w.households = homes(3); w.places = [free('mill')];
-    w.bandits = { tobin: 'stayed', ketch: 'left' };
+    w.bandits = { tobin_pike: 'stayed', ketch: 'left' };
     w.stolenGoodsReturned = ['aldrics', 'aldrics']; w.projectsBuilt = ['inn', 'inn'];
     const weights = { places: 5, households: 2, bandits: 3, returned: 4, projects: 6 };
     expect(recoveryLevel(w, weights)).toBe(24);
@@ -138,13 +138,13 @@ describe('§6 company', () => {
     expect(canRecruit('garrick', w, true)).toBe(false);
   });
   it('requires Tobin won back; Ketch replaces dead Tobin only after being won back', () => {
-    const w = world(); w.bandits = { tobin: 'dead', ketch: 'spared' };
-    expect(canRecruit('tobin', w)).toBe(false);
+    const w = world(); w.bandits = { tobin_pike: 'dead', ketch: 'spared' };
+    expect(canRecruit('tobin_pike', w)).toBe(false);
     expect(canRecruit('ketch', w)).toBe(false);
     w.bandits.ketch = 'stayed';
     expect(canRecruit('ketch', w)).toBe(true);
-    w.bandits.tobin = 'stayed';
-    expect(canRecruit('tobin', w)).toBe(true);
+    w.bandits.tobin_pike = 'stayed';
+    expect(canRecruit('tobin_pike', w)).toBe(true);
     expect(canRecruit('ketch', w)).toBe(false);
   });
   it('never exceeds three places; Bracken uses one and rejects duplicates', () => {
@@ -152,7 +152,7 @@ describe('§6 company', () => {
     expect(chooseParty(company, ['bram', 'tamsin', 'bracken'], 'campfire').ok).toBe(true);
     expect(chooseParty(company, ['bram', 'tamsin', 'bracken', 'oona'], 'campfire').ok).toBe(false);
     expect(chooseParty(company, ['bram', 'bram'], 'hesper').ok).toBe(false);
-    expect(chooseParty(company, ['tobin', 'ketch'], 'hesper').ok).toBe(false);
+    expect(chooseParty(company, ['tobin_pike', 'ketch'], 'hesper').ok).toBe(false);
   });
   it('swaps at Hesper or a campfire only, and cannot choose an unjoined member', () => {
     expect(chooseParty(initialCompany(), ['bram'], 'field').ok).toBe(false);
@@ -175,14 +175,14 @@ describe('§6 company', () => {
     expect(bondStage(c)).toBe(2);
     expect(activePerks(c)).toEqual(['Shieldwall', 'Breaker']);
     expect(growBond(c, 'travel', -3).bond).toBe(c.bond);
-    expect(activePerks(fulfilWish(c, { kind: 'inn-meal', innRebuilt: true }))).toHaveLength(3);
+    expect(activePerks(fulfilWish(c, { kind: 'inn_meal', innRebuilt: true }))).toHaveLength(3);
   });
   const wishes: [CompanionId, WishEvent][] = [
-    ['bram', { kind: 'inn-meal', innRebuilt: true }],
-    ['tamsin', { kind: 'bow-returned-to-hale' }],
-    ['tobin', { kind: 'pikes-door', pikesHome: true }],
-    ['oona', { kind: 'firefly-grove' }],
-    ['garrick', { kind: 'forge-craft', quality: 'masterwork' }],
+    ['bram', { kind: 'inn_meal', innRebuilt: true }],
+    ['tamsin', { kind: 'bow_returned_to_hale' }],
+    ['tobin_pike', { kind: 'pikes_door', pikesHome: true }],
+    ['oona', { kind: 'firefly_grove' }],
+    ['garrick', { kind: 'forge_craft', quality: 'masterwork' }],
     ['bracken', { kind: 'campfire', sedgesHome: true, sheepVisible: true }],
   ];
   it.each(wishes)('fulfils %s wish only for its written event', (id, event) => {
@@ -193,11 +193,11 @@ describe('§6 company', () => {
     }
   });
   it('does not invent a Ketch wish or fulfil under incomplete wish conditions', () => {
-    expect(fulfilWish(member('ketch'), { kind: 'pikes-door', pikesHome: true }).wishFulfilled).toBe(false);
-    expect(fulfilWish(member('garrick'), { kind: 'forge-craft', quality: 'fine' }).wishFulfilled).toBe(false);
-    expect(fulfilWish(member('bram'), { kind: 'inn-meal', innRebuilt: false }).wishFulfilled).toBe(false);
+    expect(fulfilWish(member('ketch'), { kind: 'pikes_door', pikesHome: true }).wishFulfilled).toBe(false);
+    expect(fulfilWish(member('garrick'), { kind: 'forge_craft', quality: 'fine' }).wishFulfilled).toBe(false);
+    expect(fulfilWish(member('bram'), { kind: 'inn_meal', innRebuilt: false }).wishFulfilled).toBe(false);
     expect(fulfilWish(member('bracken'), { kind: 'campfire', sedgesHome: true, sheepVisible: false }).wishFulfilled).toBe(false);
-    expect(fulfilWish(member('tobin'), { kind: 'pikes-door', pikesHome: false }).wishFulfilled).toBe(false);
+    expect(fulfilWish(member('tobin_pike'), { kind: 'pikes_door', pikesHome: false }).wishFulfilled).toBe(false);
   });
 });
 
@@ -212,8 +212,8 @@ describe('§6 traits as pure intentions', () => {
     expect(traitIntent(member('tamsin'), { markedTarget: 'runner' }).target).toBe('runner');
   });
   it('Tobin reveals watched patrols and at bond two accelerates morale loss', () => {
-    expect(traitIntent(member('tobin'), {}).revealsPatrols).toBe(false);
-    expect(traitIntent({ ...member('tobin'), bond: 10000 }, { placeWatched: true }))
+    expect(traitIntent(member('tobin_pike'), {}).revealsPatrols).toBe(false);
+    expect(traitIntent({ ...member('tobin_pike'), bond: 10000 }, { placeWatched: true }))
       .toMatchObject({ revealsPatrols: true, fasterMoraleLoss: true });
   });
   it('Oona never attacks, revives Bram first, and improves food at bond two', () => {
@@ -245,7 +245,7 @@ describe('§10 exact writing and dialogue selection', () => {
   });
   it('household meetings advance in order, then repeat the last, without mutating history', () => {
     const rule = { ref: { source: 'households' as const, group: 'marrins.return' },
-      form: 'above-head' as const, mode: 'ordered' as const };
+      form: 'above_head' as const, mode: 'ordered' as const };
     const first = selectDialogue([rule], world())!;
     const second = selectDialogue([rule], world(), first.history)!;
     const third = selectDialogue([rule], world(), second.history)!;
@@ -280,7 +280,7 @@ describe('§10 exact writing and dialogue selection', () => {
     expect(selectDialogue([rule], w, second.history, c)).toBeUndefined();
   });
   it('uses exact Show responses for found items only, and authored fallback for unknown things', () => {
-    const item = { id: 'wrens-bow', kind: 'unique-item' as const, responses: { stane: "Wren's bow" } };
+    const item = { id: 'wrens_bow', kind: 'unique_item' as const, responses: { stane: "Wren's bow" } };
     expect(showOptions([item, item], [])).toEqual([]);
     expect(showOptions([item, item], [item.id])).toHaveLength(1);
     expect(showResponse('stane', item, [])).toBeUndefined();

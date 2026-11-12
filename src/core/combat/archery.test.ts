@@ -13,15 +13,22 @@ describe('weak points and arrow definitions (§5)', () => {
     expect(ARROW_TYPES.fire).toMatchObject({ ignites: true, revealsAtNight: true, scarce: true });
     expect(ARROW_TYPES.whistling).toMatchObject({ damageMultiplier: 0, distracts: true, scarce: true });
   });
-  it('head damage exceeds body damage, ordinary helmets reduce the bonus', () => {
+  it('a head shot is worth half as much again, not several times: heads are large on these models', () => {
     expect(weakPointMultiplier(hit)).toBe(D.weakPoints.head);
+    expect(weakPointMultiplier(hit)).toBeGreaterThan(1);
+    expect(weakPointMultiplier(hit)).toBeLessThanOrEqual(1.5);
     expect(weakPointMultiplier({ ...hit, zone: 'body' })).toBe(1);
-    expect(weakPointMultiplier({ ...hit, helmet: 'ordinary' })).toBeLessThan(weakPointMultiplier(hit));
-    expect(weakPointMultiplier({ ...hit, helmet: 'ordinary' })).toBeGreaterThan(1);
   });
-  it('a brute helmet removes the bonus only from the front', () => {
-    expect(weakPointMultiplier({ ...hit, helmet: 'brute' })).toBe(1);
-    expect(weakPointMultiplier({ ...hit, helmet: 'brute', fromFront: false })).toBeGreaterThan(1);
+  it('a helmet removes the bonus from the front, and not from behind', () => {
+    for (const helmet of ['ordinary', 'brute'] as const) {
+      expect(weakPointMultiplier({ ...hit, helmet, fromFront: true })).toBe(1);
+      expect(weakPointMultiplier({ ...hit, helmet, fromFront: false })).toBe(D.weakPoints.head);
+    }
+  });
+  it('one arrow kills from surprise, not from the head alone', () => {
+    const aware = resolveArrowDamage(10, hit).damage;
+    const unaware = resolveArrowDamage(10, { ...hit, unaware: true }).damage;
+    expect(unaware).toBeGreaterThan(aware * 2);
   });
   it('blunt arrows have lower damage and no ordinary head bonus', () => {
     const blunt = resolveArrowDamage(10, { ...hit, type: 'blunt' });

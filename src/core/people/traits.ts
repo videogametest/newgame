@@ -34,8 +34,8 @@ export function traitIntent(c: CompanionState, context: TraitContext) {
 }
 
 export const PAIR_BEHAVIOURS = [
-  { pair: ['bram', 'tamsin'], event: 'guard-broken', response: 'tamsin-shoots-target' },
-  { pair: ['garrick', 'tamsin'], event: 'helmet-broken', response: 'tamsin-aims-head' },
-  { pair: ['tobin', 'bracken'], event: 'tobin-reaches-held-enemy', response: 'enemy-surrenders' },
-  { pair: ['oona', 'bram'], event: 'bram-falls', response: 'oona-prioritises-bram' },
+  { pair: ['bram', 'tamsin'], event: 'guard_broken', response: 'tamsin_shoots_target' },
+  { pair: ['garrick', 'tamsin'], event: 'helmet_broken', response: 'tamsin_aims_head' },
+  { pair: ['tobin_pike', 'bracken'], event: 'tobin_reaches_held_enemy', response: 'enemy_surrenders' },
+  { pair: ['oona', 'bram'], event: 'bram_falls', response: 'oona_prioritises_bram' },
 ] as const;

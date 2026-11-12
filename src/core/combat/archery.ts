@@ -18,8 +18,10 @@ export interface ArrowHit {
 export function weakPointMultiplier(hit: ArrowHit, tuning: NumericTuning<typeof DEPTH.weakPoints> = DEPTH.weakPoints): number {
   if (hit.type === 'blunt' || hit.type === 'whistling') return tuning.body;
   if (hit.zone === 'body') return tuning.body;
+  // A helmet removes the bonus from the front and above. From behind, the head is still the weak point.
   if (hit.helmet === 'brute' && hit.fromFront) return tuning.bruteFrontHead;
-  return hit.helmet === 'none' ? tuning.head : tuning.helmetHead;
+  if (hit.helmet !== 'none' && hit.fromFront) return tuning.helmetHead;
+  return tuning.head;
 }
 
 export function resolveArrowDamage(baseDamage: number, hit: ArrowHit, tuning: NumericTuning<typeof DEPTH.weakPoints> = DEPTH.weakPoints) {

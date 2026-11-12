@@ -1,6 +1,6 @@
 # 001: Camera fade and ground clamp
 
-Status: in progress
+Status: done
 
 ## Goal
 

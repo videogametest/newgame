@@ -28,6 +28,13 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Install Chromium for smoke test
+        run: npx playwright install --with-deps chromium
+      - name: Smoke test the built game
+        run: |
+          npx vite preview --port 4173 --strictPort > preview.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:4173/ > /dev/null && break; sleep 1; done
+          node scripts/smoke.mjs http://localhost:4173/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -3,7 +3,7 @@
 // contact sheets are repeatable. Used for the PR visual checks and for Greg's review.
 
 import { Engine, FreeCamera, Scene, Vector3 } from '@babylonjs/core';
-import { createBattle } from '../core/battle';
+import { createBattle, makeFighter } from '../core/battle';
 import { TRAINING_FIELD } from '../data/arena';
 import { UNITS } from '../data/units';
 import { buildArena } from './arena';
@@ -27,9 +27,12 @@ export async function startShowcase(canvas: HTMLCanvasElement, clipName: string,
   const assets = await loadAssets(scene, () => undefined);
 
   // The fighter comes from the training field setup, then is moved to the origin facing +z (sim yaw 0).
+  // Archers only spawn in later waves, so take the first matching spawn from the arena data.
   const state = createBattle(TRAINING_FIELD);
-  const fighter = state.fighters.find((f) => f.unitId === spec.unitId);
-  if (!fighter) throw new Error(`Showcase: no ${spec.unitId} in the training field`);
+  const spawn = TRAINING_FIELD.spawns.find((s) => s.unitId === spec.unitId);
+  if (!spawn) throw new Error(`Showcase: no ${spec.unitId} in the training field`);
+  const fighter = state.fighters.find((f) => f.unitId === spec.unitId) ?? makeFighter(state, spawn);
+  if (!state.fighters.includes(fighter)) state.fighters.push(fighter);
   fighter.x = 0;
   fighter.z = 0;
   fighter.yaw = 0;

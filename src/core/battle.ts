@@ -22,7 +22,8 @@ function statsFor(kind: FighterKind) {
   return TUNING.archer;
 }
 
-function makeFighter(state: BattleState, s: Spawn): Fighter {
+/** Builds one fighter from a spawn. Exported for showcase mode, which needs a fighter from any wave. */
+export function makeFighter(state: BattleState, s: Spawn): Fighter {
   const st = statsFor(s.kind);
   return {
     id: state.nextId++,

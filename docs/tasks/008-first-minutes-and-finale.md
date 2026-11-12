@@ -13,15 +13,16 @@ A new player can start the game, learn it without being told, save their progres
 3. **Control prompts** that appear the first time each control is needed and never again once used.
 4. **A first nudge:** Hesper greets the hero and Bram, takes the hero on as an apprentice, and sends them to watch the Mill before attacking it. The Mill shows as the unlabelled compass mark. The control prompts teach crouch, marking, and the first arrow there.
 5. **The turn** (section 9): after the second place is freed, Stane retakes the first one that night. Its lantern goes dark, its person flees to the village, its reward is lost, and stronger defenders hold it. The recovery level falls. Hesper has a line for the next morning.
-6. **The Captain.** Stane is a heavy enemy at the Watch-house with more health, two or three distinct telegraphed attacks, and a guard drawn from every unit type. He cannot be broken by morale and is not staggered by ordinary hits; a perfect dodge opens him. The Watch-house cannot be taken until the retaken place is freed again. Beaten, the Captain yields and speaks, and is not killed.
-7. **The valley finale** in the five beats listed in section 9, ending with the hero lighting the window of the Fairlow house while the wren sings, then the road toward the castle opening on the map.
+6. **The Stane fight** exactly as specified in section 9: scouting and thinning beforehand, the three phases, the bell and who answers it, the yield, and resuming from the phase reached. His attacks, commands, and phase thresholds are data and tuning.
+7. **The valley finale** in the eight beats listed in section 9, from Hesper's arrival through Stane leaving for the castle, the festival, the Fairlow window with the wren singing the first phrase of the melody, and the road opening on the map.
 
 ## Rules
 
 - The game is called "Every Lit Window". Show it on the title screen, read from the single title constant.
 - Add a headless test that plays from New Game to the finale using the bot, including the turn and the Captain, and one that saves, reloads, and checks the state matches.
 - Use `docs/writing/hesper.md`, `stane.md`, and `bram.md` exactly as written. If one of them is still marked not yet written when you reach this task, stop and say so in `docs/status.md` rather than drafting the story's key lines yourself. For anything else you draft, including at least six campfire exchanges, and list them all in `docs/status.md` so they can be reviewed and rewritten. Reveal only what section 9 says the first valley reveals; never state or imply "The answer". Never use a pronoun for Wren.
-- Balance target for the Captain fight: the skilled bot wins with 15 to 50% HP left; a sword-only bot that never dodges loses.
+- Balance for the Stane fight, on Dusk: the skilled bot wins with 15 to 50% HP left; a blade-only bot that never dodges loses in phase 2. On Lantern that blade-only bot can win. A bot that thinned the guard by stealth beforehand finishes phase 1 faster than one that did not.
+- Test the bell: with no bandits won back the gate stays empty, and with some won back that many appear.
 
 ## Done when
 

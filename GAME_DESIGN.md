@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 20 (the households of Wick, enemy routines, the company of six, how people speak, money, and the music). Supersedes version 19.
+Version 21 (the Stane fight, difficulty settings, and the plan for sourcing models). Supersedes version 20.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -34,7 +34,7 @@ These are expensive to change. Do not revisit without asking.
 - **The world is generated from data and a seed, not hand-modelled.** Terrain comes from a seeded height function. Scenery (trees, rocks, grass, flowers) is scattered by seeded rules per biome. Points of interest (village, camps, outposts, chests, ruins, landmarks) are placed by hand in data files. The same seed always produces the same world.
 - **The world grows by regions.** Start with one valley about 800 m across. Later regions attach at its edges and are part of the same continuous world.
 - **Engine:** Babylon.js with TypeScript and Vite.
-- **Art style:** stylized low-poly from CC0 asset packs. Characters come from KayKit Adventurers. The hero is the hooded, cloaked archer model, not the armoured knight; no enemy may use the same model and colours as the hero. Scenery comes from packs that match them (KayKit first; Quaternius or Kenney where KayKit has nothing suitable). Keep each pack's license file in the repo beside its assets.
+- **Art style:** stylized low-poly from CC0 asset packs. Characters come from KayKit Adventurers. The hero is the hooded, cloaked archer model, not the armoured knight; no enemy may use the same model and colours as the hero. Scenery comes from packs that match them (KayKit first; Quaternius or Kenney where KayKit has nothing suitable). Keep each pack's license file in the repo beside its assets. Sourcing follows the rules in section 7 (Assets).
 - **No physics engine.** The core simulation owns every position, velocity, and hit, including ground height. Babylon renders what the simulation says.
 - **Canvas** fills the browser window. Target 60 fps on a desktop.
 - **Progression:** use-based skills, no classes.
@@ -91,7 +91,7 @@ The ten places off the path in Tallowmere. Every secret tells part of the story,
 
 Wildlife:
 
-Real animals only. There are no monsters; the only enemies who think are people. Use CC0 animated animal models (Quaternius first). If a species has no suitable model, log it in `docs/status.md` and leave it out rather than use a placeholder.
+Real animals only. There are no monsters; the only enemies who think are people. Use CC0 animated animal models (Quaternius first). Where no suitable model exists, follow the fallback ladder in section 7 (Assets).
 
 - **Alive:** songbirds, rabbits, and deer that scatter as the hero approaches; owls and crickets at night; bees at the wild orchard; fish in the lake.
 - **Stealth:**
@@ -472,6 +472,14 @@ Exact XP curves, perk lists, recipes, weights, prices, and tier stats are tuning
 - **Game state is serializable.** A single game-state object holds everything about a save: hero, skills, inventory, squad, which places are captured, which chests are opened, time of day. Generated terrain and scenery are not saved; they come from the seed.
 - **Saves:** browser `localStorage` first, autosaving on capture, on town visits, and every few minutes. Supabase cloud saves come later using the same serialized shape. Include a `version` field in the save from day one.
 - **Motion and scenes are verifiable without a human.** A showcase mode (`?showcase=<clip>`) plays one animation on one character at a fixed camera, driven by simulation time. A tour mode (`?tour=1`) moves the camera through fixed viewpoints in the world at set times of day. Rendering PRs attach contact sheets from showcase mode and screenshots from tour mode.
+- **Assets.** Everything on screen comes from somewhere, and gaps are found before they are built around.
+  - *The survey.* `docs/assets.md` lists every model the design needs: what it is for, the pack and file it comes from, its licence, its format, and a screenshot of it beside the hero for scale. Anything with no source is marked missing. The survey is done and reviewed before the world is built, and kept up to date afterwards.
+  - *Licences.* CC0 only, confirmed from the pack's own page or licence file, never from a comment or a third-party listing.
+  - *One look.* Models from different packs pass through a shared colour palette and material settings, so the world does not look stitched together. Scale is corrected so doors, windows, and furniture fit the characters.
+  - *The fallback ladder* for anything missing, in order: substitute something close; build it from modular pieces or simple shapes in matching materials; buy an inexpensive pack; change the design to something that can be sourced. Machine-generated models are a last resort.
+  - *Money.* Buying a pack, or using a machine-generated model, needs Greg's approval each time. The working budget for packs is about 50 US dollars in total.
+  - *Must-haves.* For these, never leave a gap: stop, log it in `docs/status.md`, and wait for a decision. Houses whose windows can light; the mill with a wheel that turns; the forge; the Watch-house; lanterns and banners; the hero, Hesper, Stane, and the six companions as distinguishable characters; wolves; the Mill's geese or their agreed replacement; sheep.
+  - *Nice-to-haves* (bees, butterflies, owls, fish, the white stag, extra props) may be left out and logged.
 - **Input rules for the browser.** The game runs in a tab, and several keys belong to the browser first.
   - `Esc` is consumed by the browser to release the mouse, and the game may never see it. Treat losing pointer lock as the pause signal, and resume by clicking.
   - Suppress the browser default for `Tab`, right mouse, the mouse wheel, and the backtick while the game has focus.
@@ -629,13 +637,28 @@ There is no quest log and no long dialogue. The story is carried by:
 
 The valley recovery level used elsewhere in this document is derived, not stored on its own: it is computed from the places freed, the households home, the bandits won back, the stolen things returned, and the projects built. It falls when a place is retaken. Scenery, animals, traders' stock, prices, banners, and music read from it.
 
+### The Stane fight
+
+The fight tests everything the player has learned as a scout, and its ending is decided by how they played the whole valley. It cannot begin until the retaken place has been freed again.
+
+- **The setting.** The yard of the Watch-house at dusk, his banners overhead, the supper table still set inside.
+- **Before the fight.** The Watch-house can be scouted and thinned like any place: its routine watched, its night watch picked off, its sleepers left asleep. A careful scout begins the fight against two guards; a careless one faces six. Stane himself cannot be surprised. He is the only person besides Hesper who hears the hero coming, and a first arrow does not gain its bonus against him.
+- **Phase 1: the Captain and his guard.** He fights behind a shield, disciplined, and directs his remaining men with short commands, shown as lines above his head. While he commands, his guard coordinate better than any bandits met before: they may attack three at a time and they cover each other. His guard can break; he cannot. Bram breaking his guard and the hero's marks are the tools.
+- **Phase 2: alone.** When his guard is down or fled, he throws away the shield and fights two-handed: a wide sweep, a long lunge, and an overhead blow, all telegraphed and all heavy. He is not staggered by ordinary hits; only a perfect dodge opens him. He speaks as he fights.
+- **Phase 3: the bell.** Nearly beaten, he backs to the alarm bell and rings it. Nobody comes, because every other place is free. If the hero has won bandits back, they are the ones who appear at the gate, and they stand with the hero. How many are there depends on how much mercy the player showed; if none, the gate stays empty. He looks at them, or at the empty gate, and lowers his sword.
+- **He always yields.** The fight ends the same way whether the hero fought to kill or not, and whatever the difficulty.
+- **If the hero falls,** the fight resumes from the start of the phase reached, with the guard as it was at the start of that phase.
+
 ### The valley finale
 
-1. The hero takes the Watch-house and faces Stane, who is the hardest fight in the valley. Beaten, he yields and tells the hero what he saw that night: the beacon, and his choice. It deepens the question; it does not answer it.
-2. The hero lights the Watch-house lantern. Every place in Tallowmere is free.
-3. That night Wick holds a festival: lanterns, the full melody, every returned villager gathered.
-4. Hesper leads the hero to the Fairlow house. The hero lights its window. It is the last dark window in the village, and the image the game is named for. The wren in the eaves sings.
-5. In the morning the road toward the castle is open and marked on the map. The Fairlow house is now the hero's home (section 6).
+1. **Stane yields**, as above.
+2. **Hesper arrives.** It is the first time they have spoken in a generation. She learns he did not desert; he chose to stay. He learns she did not abandon the valley; she was beyond the ridge and never saw the beacon. Each has been wrong about the other for twenty years. The scene is short.
+3. **He tells the hero what he saw that night:** the beacon, and his choice. It deepens the question; it does not answer it. If the hero shows him Wren's bow, he has a line about Wren.
+4. **He leaves.** He takes off the captain's cloak and walks the soldiers' road toward the castle, to find out at last what he refused to go and see. He will be met again there, as an uneasy ally.
+5. **The hero lights the Watch-house lantern.** Every place in Tallowmere is free, and the melody plays with every layer.
+6. **That night Wick holds a festival:** lanterns, Wick's theme in full, every household that has come home gathered in the square.
+7. **Hesper leads the hero to the Fairlow house.** The hero lights its window. It is the seventeenth window, the last dark one in the village, and the image the game is named for. The wren in the eaves sings the first phrase of the melody.
+8. **In the morning** the road toward the castle is open and marked on the map, and the Fairlow house is the hero's home (section 6).
 
 ## 10. Interface
 
@@ -643,6 +666,17 @@ The valley recovery level used elsewhere in this document is derived, not stored
 - **Pause menu** (`Esc`): Resume, Settings, Controls, Quit to title. The simulation stops while it is open.
 - **Settings:** mouse sensitivity, invert vertical look, field of view for each camera view, camera shake and hit-freeze strength, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
 - **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, crouch, mark, attack, switch weapon, change arrow, dodge, lock on, throw a knife, change view, eat, squad order, map, inventory, skills) and never again once used. Hesper points the hero toward the nearest camp.
+- **Difficulty.** Three presets, named for how much light the player is given, changeable at any time in settings with no penalty.
+
+  | Preset | For | What changes |
+  | --- | --- | --- |
+  | Lantern | Players here for the world and the story | Enemies deal less damage and notice the hero later; perfect-draw and perfect-dodge windows are wider; arrows rarely break; food heals more |
+  | Dusk | The default | What the bots and the balance tests are tuned against |
+  | Moonless | Players who want a hard stealth game | Enemies deal more damage and sense more; bells bring more reinforcements; arrows and food are scarcer |
+
+  - Difficulty never changes experience, loot quality, the story, or what can be earned. No perk, companion, household, or ending depends on it, and nothing records which preset was used.
+  - Each preset is a set of multipliers in the tuning file, applied on top of the same data.
+- **Aids,** separate from the preset: awareness markers on or off; a minimal HUD that hides the compass, damage numbers, and health bars until needed; hold or toggle for crouch and for sprint; and markers that differ in shape as well as colour, so nothing depends on telling colours apart.
 - **How people speak.** There is no recorded voice. Speech is text, in three forms:
   - *Lines above heads:* a short line floating over a character for a few seconds. Used for villagers at their day, companions in the field, bandits overheard, and shouts in a fight. At most two sentences, and it never stops play.
   - *Conversations:* `E` on Hesper, a trader, or anyone with more to say. The camera turns gently toward them and their name and line appear in a box at the bottom, stepped through with `E`. Services such as trade and rest are offered here.

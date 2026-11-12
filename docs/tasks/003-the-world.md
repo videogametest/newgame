@@ -50,7 +50,7 @@ Richness comes before breadth: if time is short, make a smaller area dense rathe
 
 ## Rules
 
-- Scenery and animals come from CC0 packs that match the KayKit characters. Keep licence files with the assets. If a species has no suitable model, log it and leave it out.
+- Build only from what the reviewed `docs/assets.md` lists, and keep it up to date. Follow section 7 (Assets): CC0 confirmed at the source, one shared palette, scale corrected to the characters, the fallback ladder for gaps, and a stop for any must-have.
 - Use only original or CC0 audio and art. Do not imitate characters, symbols, or melodies from any existing game.
 - Use the names in section 9 everywhere, and keep them in data.
 - Use everything in `docs/writing/` exactly as written. See `docs/writing/README.md`.

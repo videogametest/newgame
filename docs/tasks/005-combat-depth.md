@@ -28,5 +28,6 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 ## Done when
 
+- Difficulty from section 10 is in: the three presets as multiplier sets in the tuning file, and the aids (awareness markers, minimal HUD, hold or toggle, shape-coded markers) in settings. The balance targets above are for Dusk. On Lantern, a blade-only bot that never dodges frees the Mill. On Moonless, the skilled bot still frees the Mill with 10 to 40% HP left and the stealth bot still gets through unseen. A test proves experience and loot are identical across presets.
 - All three steps are merged and deployed, the contact sheets are in the PRs, and the balance tests pass.
 - Then continue to task 006.

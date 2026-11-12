@@ -18,6 +18,8 @@ Put the groundwork in place before the open world is built: the current engine, 
 8. **Contact sheets** of at least 8 evenly spaced frames each, for the new hero and the existing enemies: blade swing, bow draw and release, dodge, hit, death, soldier wind-up and strike, archer draw and release. Save them in `docs/pr-media/`.
 9. **Name the game.** One title constant in data, used for the page `<title>` and the heading of `README.md`. The `package.json` name becomes `every-lit-window`.
 
+10. **The asset survey.** Create `docs/assets.md` as section 7 (Assets) describes, covering everything tasks 003 and 004 need: terrain and scenery, at least sixteen distinguishable houses plus the Fairlow house and Hesper's, the mill with a wheel, the forge, the Watch-house, the well, fences, carts, lanterns, banners, an alarm bell, campfires, chests and breakables, characters for Hesper, Stane, villagers, each enemy type, and the six companions, and every animal in section 4. Start from these leads and confirm each licence yourself: KayKit Medieval Hexagon (CC0; its free tier lists a windmill, a watermill, a blacksmith, houses, a well, a market, a tavern, and a church, but it is made for a hex map, so check scale and whether the buildings work at character size), Quaternius Medieval Village MegaKit (modular walls, roofs, doors, and windows; licence not confirmed), and Quaternius animal packs (the farm set is CC0 but is FBX and covers a cow, horses, a pig, a llama, and a pug; no confirmed source yet for wolves, deer, a fox, geese, or a sheepdog). Include scale screenshots beside the hero. Mark what is missing and, for each gap, which rung of the fallback ladder you recommend and what it would cost. Do not buy anything.
+
 ## Check while you are in there
 
 - In the earlier drawn-bow screenshot (`docs/pr-media/03_bow_drawn.png`) the hero's arms appear to aim to the left of the crosshair. Use the bow contact sheet for the new hero to confirm the draw pose points where the arrow flies, and fix it if not.
@@ -32,4 +34,4 @@ Put the groundwork in place before the open world is built: the current engine, 
 - Every contact sheet clearly shows its motion.
 - The smoke test runs in the deploy workflow and passes.
 - Tests, typecheck, and build pass. Merged, deployed, and logged in `docs/status.md`.
-- Then continue to task 003.
+- The asset survey is merged and logged. Wait for Claude's review of it, and Greg's decisions on any gaps, before starting task 003.

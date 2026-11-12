@@ -7,8 +7,20 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
-| B | Task 002b (style test) in progress. Asset survey merged (PR #9, `cfd5bf6`). KayKit Medieval Hexagon free zip not downloadable (0 bytes twice). | none | Greg's decisions on the people question and the seven gaps; task 003 waits on both |
+| B | Task 002b (style test) PR open: `?styletest=1` scene, captures in `docs/pr-media/styletest/`. Review-002 survey changes applied in `docs/assets.md`. | 002b PR (see entry below) | Greg's review of the style test; decisions on the people question and the seven gaps; villager-set search not yet done; task 003 waits on all of these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-12 Task 002b: style test (Viktor)
+
+- **Scene:** `?styletest=1` (not linked from the game). Kenney Fantasy Town houses, watermill with turning wheel, forge, well and watch-house stand-ins, scenery; KayKit Adventurers people (10) with the hero beside each item; labelled signs.
+- **Screenshots** (`docs/pr-media/styletest/`): `row-front-noon`, `row-front-dusk`, `row-quarter`, `row-night`, `item-house-a/b/c`, `item-mill`, `item-forge`, `item-well`, `item-watch`, `item-scenery`, `people-front`, `people-quarter`.
+- **Checked by eye:** characters and mill read well at scale; house walls are loose kit panels and the roofs float above them, which is accepted for a stand-in; night shot is dark but readable.
+- **Deviations:** ground 70 × 36 m (brief said about 40 m) because the row runs longer. Clip playback uses the render loop, not a fixed frame.
+- **Stand-ins (labelled in scene):** forge, well (fountain), watch-house tower (stacked corner modules).
+- **Survey changes** from review 002 are applied in `docs/assets.md` ("Review 002 changes").
+- **Not done:** the bounded search for a CC0 stylised villager set (required before group 6). Nothing has been searched for it yet.
+- **Blocked:** KayKit Hexagon free zip (0 bytes); Quaternius quota (village, people, wildlife); Castle Kit not downloaded. See `docs/assets.md`.
+- **Verified:** `npx tsc --noEmit` exit 0; `npm run build` exit 0; `npm test` and smoke test: see the PR.
 
 ## 2026-11-12 03:05 ET (Viktor)
 

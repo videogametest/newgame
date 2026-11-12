@@ -2,6 +2,7 @@
 
 import { startGame } from './render/game';
 import { startShowcase } from './render/showcase';
+import { startStyletest } from './styletest/styletest';
 import { parseShowcaseTime } from './render/showcase_clips';
 import { GAME_TITLE } from './data/title';
 
@@ -14,7 +15,12 @@ if (!(canvas instanceof HTMLCanvasElement) || !ui) {
 }
 
 const params = new URLSearchParams(window.location.search);
-if (params.has('showcase')) {
+if (params.has('styletest')) {
+  startStyletest(canvas).catch((err: unknown) => {
+    ui.textContent = err instanceof Error ? err.message : String(err);
+    console.error(err);
+  });
+} else if (params.has('showcase')) {
   startShowcase(canvas, params.get('showcase') ?? '', parseShowcaseTime(params.get('t'))).catch((err: unknown) => {
     ui.textContent = err instanceof Error ? err.message : String(err);
     console.error(err);

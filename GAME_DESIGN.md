@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 12 (adds a first-person view toggle). Supersedes version 11.
+Version 13 (combat overhaul: a deeper bow, evasive close combat, lock-on, throwing knives, new enemy types, morale, squad play, and impact feel). Supersedes version 12.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -148,9 +148,12 @@ Controls:
 - `1` / `2`: switch between short blade and bow
 - `C`: crouch (toggle), for moving quietly and staying low
 - `V`: switch between third-person and first-person view
+- `Tab`: lock on to the nearest enemy in view, or release. While locked, moving the mouse sharply switches target
+- `R`: throw a knife
+- Mouse wheel: change arrow type
 - Left mouse: attack
-  - **Short blade:** melee swing in front of the hero, short range, brief cooldown. The scout's backup weapon
-  - **Bow:** hold to draw, release to fire along the crosshair. The arrow follows a gravity arc. Longer draw means more speed and damage.
+  - **Short blade:** a three-hit combo. Each press within a short window continues it; the third hit is slower and hits harder. The scout's backup weapon
+  - **Bow:** hold to draw, release to fire along the crosshair. The arrow follows a gravity arc. Longer draw means more speed and damage. Releasing at the peak of the draw is a perfect draw (see The bow)
 - Right mouse (bow only): zoom the camera in for aiming. Holding the zoom on an enemy for a moment marks them
 - `E`: interact (open chest, talk, use a town service)
 - `F`: eat food to heal
@@ -186,12 +189,59 @@ Rules:
 - Fighters collide with the opposing team and with scenery. Teammates do not block each other. A fighter that comes between the camera and the hero fades out.
 - Arrows are blocked by terrain and scenery.
 
-Starting unit types:
+The bow:
 
-| Unit | Behavior |
-| --- | --- |
-| Melee soldier | Runs to the nearest enemy, winds up, strikes |
-| Archer | Keeps distance, draws, fires arced arrows |
+The bow is the scout's main weapon and the deepest system in combat.
+
+- **Weak points.** A hit to the head deals heavily increased damage. Helmets on some enemies reduce the bonus; the brute's helmet removes it from the front.
+- **A limited quiver.** The hero carries a fixed number of arrows. Arrows that miss stick in the ground or scenery and can be picked up; arrows that hit can be recovered from fallen enemies, with a chance each one broke. Standard arrows are also sold in Wick and found in the world. Running dry is a real risk that the short blade and knives cover.
+- **Arrow types**, chosen with the mouse wheel and shown on the HUD:
+  - *Standard.* The default.
+  - *Fire.* Lights braziers, campfires, and dry grass, which spreads briefly and panics enemies caught in it. Reveals the hero's position when loosed at night. Scarce.
+  - *Whistling.* Does no damage. Where it lands, enemies within earshot become suspicious and go to look. The scout's tool for moving a guard. Scarce.
+- **Perfect draw.** There is a brief moment at full draw, marked by a subtle cue, when releasing gives bonus damage and a flatter flight. Holding past it loses the bonus and starts to tire the aim.
+
+Close combat:
+
+Close combat is about not being where the blow lands. The hero cannot block.
+
+- **Perfect dodge.** Dodging in the last moment before an enemy strike would land slows time for an instant and leaves that enemy open: the next hit on them is a critical strike. In first-person the sidestep does the same.
+- **Lock-on** keeps the camera and the hero's facing on one enemy, so circling and dodging around them is easy. It works in both views and is never required.
+- **Throwing knives.** A quick, silent, short-range throw that needs no draw. Low damage, but it interrupts a wind-up and counts as a strike on an unaware enemy. The hero carries a small number and recovers them like arrows.
+- **Stagger.** Light enemies are interrupted by any hit during their wind-up. Heavy enemies are not, except by a critical strike.
+
+How enemies fight:
+
+- **They take turns.** At most two enemies attack the hero at once. The others circle, reposition, or go for a companion. A group fight stays readable.
+- **Morale.** Enemies are people and want to live. Each place has a morale level that falls when defenders are beaten, when their leader is beaten, when they are surprised, or when fire spreads, and rises when the bell brings reinforcements. Below a threshold, individual enemies break: they drop their weapons and run, and they count as beaten. A whole place can be won by breaking its nerve.
+- **Nobody dies on screen.** A beaten enemy falls, yields, or flees. This is tone as well as mechanics.
+
+Unit types:
+
+| Unit | Weight | Behavior | How to beat them |
+| --- | --- | --- | --- |
+| Soldier | Light | Runs to the nearest enemy, winds up, strikes | Anything |
+| Archer | Light | Keeps distance, draws, fires arced arrows | Close the distance or out-shoot them |
+| Shield-bearer | Light | Advances behind a shield that stops arrows and knives from the front | Flank them, or let Bram break their guard |
+| Brute | Heavy | Slow, with long, heavy telegraphed swings that hit a wide area. Not staggered by ordinary hits | Dodge, then punish; a perfect dodge opens them |
+| Runner | Light | When the alarm goes up, breaks off and sprints for the bell | Stop them with an arrow, a knife, or Bram |
+
+Each unit type is a data entry with its model, weight, attacks, and morale. Stane, the boar, and the wolves are defined the same way.
+
+Fighting alongside Bram:
+
+- **Marked targets are Bram's priority.** Whoever the hero marks, Bram goes for first, so the player directs the fight by where they look.
+- **Bram breaks guards.** His heavy strike staggers a shield-bearer and drops their shield for a moment, opening the shot.
+- **Bram holds attention.** Enemies near him prefer him as a target, which is what lets the hero stay at range.
+- Later recruits each bring one such trait of their own.
+
+Impact:
+
+- A very brief freeze on every solid hit, longer on a critical strike.
+- A small camera shake on heavy hits given and taken.
+- A short slow-motion moment when the last defender of a place is beaten.
+- Distinct sounds for a normal hit, a weak-point hit, a critical strike, a blocked arrow, and a broken guard.
+- All of these are tunable and can be turned down in settings.
 
 ## 6. Progression
 
@@ -248,11 +298,12 @@ Each milestone ends deployed to Pages and playable. Do not start the next one un
 
 1. **Combat prototype.** Done: third-person hero, sword and bow, telegraphed enemies, dodge, waves, tuning panel. Remaining: camera fade for blocking fighters, sound effects, showcase mode.
 2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned with Hesper and her one lit window, plus the Mill, the Forge, and the Watch-house placed in data (section 9). Wildlife, the ten places off the path, alarm bells, fights in place with awareness ranges, squad following, pathfinding, capture by lighting the lantern, with the growing melody, falling banners, and visible restoration of each place and of the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
-3. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, the turn in which the Captain retakes the first freed place, the Captain fight at the Watch-house, and the valley finale ending at the hero's family house (section 9).
-4. **Progression.** Skills that level by use, including Stealth, perks, loot tables, inventory, equippable gear with tiers, and the apprenticeship: Hesper's six trials and the three ranks with their cloak colours (section 6).
-5. **Conquest and towns.** Town services that come from the people who return (the smith's crafting, the miller's food, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
-6. **Cloud saves.** Supabase auth and save sync.
-7. **More world.** A second region, the hero's horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
+3. **Combat depth.** Everything in section 5 under The bow, Close combat, How enemies fight, Unit types, Fighting alongside Bram, and Impact: weak points, the limited quiver, arrow types, perfect draw, the three-hit combo, perfect dodge, lock-on, throwing knives, stagger, attack turns, morale, the shield-bearer, brute, and runner, Bram's traits, and impact feel.
+4. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, the turn in which the Captain retakes the first freed place, the Captain fight at the Watch-house, and the valley finale ending at the hero's family house (section 9).
+5. **Progression.** Skills that level by use, including Stealth, perks, loot tables, inventory, equippable gear with tiers, and the apprenticeship: Hesper's six trials and the three ranks with their cloak colours (section 6).
+6. **Conquest and towns.** Town services that come from the people who return (the smith's crafting, the miller's food, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
+7. **Cloud saves.** Supabase auth and save sync.
+8. **More world.** A second region, the hero's horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
 
 ## 9. Story
 
@@ -369,9 +420,9 @@ Restoration is tracked as a single valley recovery level in the game state. It r
 
 - **Title screen:** the game's name over a slow view of the valley, with Continue (when a save exists) and New Game. New Game asks for confirmation before replacing a save.
 - **Pause menu** (`Esc`): Resume, Settings, Controls, Quit to title. The simulation stops while it is open.
-- **Settings:** mouse sensitivity, invert vertical look, field of view for each camera view, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
+- **Settings:** mouse sensitivity, invert vertical look, field of view for each camera view, camera shake and hit-freeze strength, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
 - **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, attack, switch weapon, dodge, eat, squad order, map) and never again once used. A villager at the start points the hero toward the nearest camp.
-- **HUD:** hero health, equipped weapon, food count, squad order, compass strip. Keep it small; hide what is not needed outside combat.
+- **HUD:** hero health, equipped weapon, arrow count and type, knife count, food count, squad order, lock-on marker, compass strip. Keep it small; hide what is not needed outside combat.
 - The tuning panel (backtick) stays as a developer tool and is not part of the player-facing menus.
 
 ## 11. Deferred ideas
@@ -379,7 +430,7 @@ Restoration is tracked as a single valley recovery level in the game state. It r
 Not in scope until the core game works. Do not build these unprompted.
 
 - Magic as a third combat style
-- Blocking and parrying
+- Blocking and parrying with a shield
 - Mounted combat
 - Swimming and climbing
 - Quests, a quest log, branching dialogue, and cutscenes

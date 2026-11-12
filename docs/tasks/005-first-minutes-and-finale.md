@@ -1,10 +1,10 @@
-# 004: First five minutes and the valley finale (milestone 3)
+# 005: First five minutes and the valley finale (milestone 4)
 
 Status: open
 
 ## Goal
 
-A new player can start the game, learn it without being told, save their progress, and reach a real ending for the first valley. Scoped in `GAME_DESIGN.md` section 8, milestone 3. Follow section 10 for interface and section 9 for the finale.
+A new player can start the game, learn it without being told, save their progress, and reach a real ending for the first valley. Scoped in `GAME_DESIGN.md` section 8, milestone 4. Follow section 10 for interface and section 9 for the finale.
 
 ## Do
 
@@ -13,7 +13,7 @@ A new player can start the game, learn it without being told, save their progres
 3. **Control prompts** that appear the first time each control is needed and never again once used.
 4. **A first nudge:** Hesper greets the hero and Bram, takes the hero on as an apprentice, and sends them to watch the Mill before attacking it. The Mill shows as the unlabelled compass mark. The control prompts teach crouch, marking, and the first arrow there.
 5. **The turn** (section 9): after the second place is freed, Stane retakes the first one that night. Its lantern goes dark, its person flees to the village, its reward is lost, and stronger defenders hold it. The recovery level falls. Hesper has a line for the next morning.
-6. **The Captain.** A named enemy at the Watch-house with more health, a heavier telegraphed attack, and a guard of soldiers and archers. The Watch-house cannot be taken until the retaken place is freed again. Beaten, the Captain yields and speaks, and is not killed.
+6. **The Captain.** Stane is a heavy enemy at the Watch-house with more health, two or three distinct telegraphed attacks, and a guard drawn from every unit type. He cannot be broken by morale and is not staggered by ordinary hits; a perfect dodge opens him. The Watch-house cannot be taken until the retaken place is freed again. Beaten, the Captain yields and speaks, and is not killed.
 7. **The valley finale** in the five beats listed in section 9, ending with the hero lighting the window of the Fairlow house while the wren sings, then the road toward the castle opening on the map.
 
 ## Rules
@@ -27,4 +27,4 @@ A new player can start the game, learn it without being told, save their progres
 
 - A fresh browser profile can go from title screen to finale with no instructions outside the game.
 - Tests, typecheck, and build pass. Merged, deployed, and logged in `docs/status.md`.
-- Stop after this task. Do not start milestone 4.
+- Stop after this task. Do not start milestone 5.

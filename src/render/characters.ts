@@ -190,8 +190,9 @@ export class CharacterView {
     this.poseOverride = pose;
   }
 
-  update(f: Fighter): void {
-    this.root.position.set(f.x, 0, f.z);
+  /** groundY: terrain height under the fighter (0 on the flat arena). */
+  update(f: Fighter, groundY = 0): void {
+    this.root.position.set(f.x, groundY, f.z);
     this.root.rotation.y = f.yaw + MODEL_YAW_OFFSET;
 
     const flash = TUNING.combat.hitFlashTime > 0 ? f.flashTimer / TUNING.combat.hitFlashTime : 0;

@@ -7,11 +7,14 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
-| 003 | Step 1 (ground, sky, movement) built on `feat/task-003-step1-valley`, not ready for first look. Step 2 not started. | this PR | Claude review of the first-look bar before step 2 |
+| 003 | Step 1 (ground, sky, movement) built on `feat/task-003-step1-valley`, not ready for first look. Step 2 not started. | PR #23 merged (`1e08e40`), not ready for first look | Claude review of the first-look bar before step 2 |
 | B | Task 002b style test rework (review 005), PR #21 on `feat/task-002b-rework`: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | #21 | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
 ## 2026-11-12 Task 003 step 1: ground, sky, movement (Viktor, not ready for first look)
+
+- **Merged and deployed:** PR #23 (`1e08e40`, squash). Pages run `43272733796` succeeded. `https://everylitwindow.com/` returns HTTP 200, passes `scripts/smoke.mjs` with no failed requests, and a live screenshot at 18:09 shows the valley at dusk with the placeholder hero.
+- **Verified in the worker sandbox on `21663ba` (`videogametest` author):** `tsc` exit 0, 573 tests pass, `npm run build` exit 0. PR #23 had no CI checks, so these local runs were the gate.
 
 - **Shipped:** seeded valley terrain (`src/core/world/valley.ts`, `heightAt`, seed 1066, about 800 m, water level 2 m), walking and sprint on the terrain (`walk.ts`), a camera (`valley_camera.ts`), a day-night clock (`valley_time.ts`, dawn 6, dusk 19, 1200 s per day), chunked terrain (`src/render/valley_terrain.ts`), a sky with sun, moon, stars, and distance haze (`src/render/valley_sky.ts`), lighting (`src/render/lighting.ts`), and the hero placed by `newGameState` (timeOfDay 18, day 1). The default route is the valley; `?arena=1` keeps the combat prototype.
 - **Sky defect fixed:** the dome now uses a shader material that outputs the interpolated vertex colour, so the sky is no longer flat grey or black. Stars, sun and moon keep the unlit material. Checked by eye in `docs/pr-media/valley/`: dusk orange, noon blue, night navy with a visible star, dawn orange.

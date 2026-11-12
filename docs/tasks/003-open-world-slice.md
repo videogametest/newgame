@@ -10,10 +10,10 @@ Replace the arena with the first valley of a continuous open world, as scoped in
 
 Open a PR, merge, and deploy after each step, and log each in `docs/status.md`. Greg will walk the world after each deploy, so do not batch the steps.
 
-1. **Ground and sky.** Seeded terrain with a pure `heightAt(x, z)` in `src/core`, chunked terrain around the hero, sky, sun with shadows, day-night cycle, distance haze. The hero walks and sprints across the valley, about 500 m across. No enemies yet. Remove the arena and waves.
+1. **Ground and sky.** Seeded terrain with a pure `heightAt(x, z)` in `src/core`, chunked terrain around the hero, sky, sun with shadows, day-night cycle, distance haze. The hero walks and sprints across the valley, about 500 m across. No enemies yet. Remove the arena and waves. Add the pause menu and settings from `GAME_DESIGN.md` section 10 (sensitivity, invert look, volume, graphics quality).
 2. **A living place.** Scattered scenery by biome (trees, rocks, grass, flowers) using instancing, water, a natural boundary, horizon landmarks, swaying foliage, butterflies and fireflies, ambient sound by area and time of day.
-3. **Places and fights.** The village in its half-abandoned starting state, two bandit camps, and one outpost defined in data. A few villagers with one or two short lines each. Enemies with awareness ranges that return home when led too far. The squad follows the hero and fights. Grid-based A* pathfinding in `src/core`. Arrows blocked by terrain and scenery.
-4. **Capture and rewards.** Clearing a place captures it and raises the valley recovery level, which visibly restores the village as described in `GAME_DESIGN.md` section 9 (villagers return, repairs, lights at night, a music layer per capture). Place at least four found notes or story objects off the paths. Chests, breakable objects, cuttable grass. Responsive music. Tour mode (`?tour=1`). Balance tests from section 8.
+3. **Places and fights.** The village in its half-abandoned starting state, two bandit camps, and one outpost defined in data. A few villagers with one or two short lines each. Enemies with awareness ranges that return home when led too far. The squad follows the hero and fights. Grid-based A* pathfinding in `src/core`. Arrows blocked by terrain and scenery. Healing by food and by resting in the village. Squad orders on `Q` (follow, hold). Compass strip.
+4. **Capture and rewards.** Clearing a place captures it and raises the valley recovery level, which visibly restores the village as described in `GAME_DESIGN.md` section 9 (villagers return, repairs, lights at night, a music layer per capture). Place at least four found notes or story objects off the paths. Chests, breakable objects, cuttable grass. Responsive music. The map on `M` with discovery. Tour mode (`?tour=1`). Balance tests from section 8.
 
 ## Rules
 
@@ -25,4 +25,4 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`. 
 ## Done when
 
 - All four steps are merged and deployed, and the balance tests pass.
-- Stop after this task. Do not start milestone 3.
+- Then continue to task 004.

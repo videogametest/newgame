@@ -13,6 +13,8 @@ Combat can be heard, and animations can be verified without a human watching.
 3. **Showcase mode** (`?showcase=<clip>`), as described in `GAME_DESIGN.md` section 7: one character, one animation, fixed camera, driven by simulation time so a capture at a given time is repeatable.
 4. **Contact sheets** of at least 8 evenly spaced frames each for: sword swing, bow draw and release, soldier wind-up and strike, hit, death, dodge. Save them in `docs/pr-media/`.
 
+5. **Upgrade Babylon.js** from 7 to the current stable major and pin it. Do this first, before the other items, so everything in this task is built and verified on the new version. If the upgrade breaks something you cannot fix quickly, stop and log it in `docs/status.md` instead of staying on 7 silently.
+
 ## Check while you are in there
 
 In the earlier drawn-bow screenshot (`docs/pr-media/03_bow_drawn.png`) the hero's arms appear to aim to the left of the crosshair. Use the bow contact sheet to confirm whether the draw pose points where the arrow flies, and fix it if not.

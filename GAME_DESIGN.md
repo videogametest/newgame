@@ -1,6 +1,6 @@
 # Game Design
 
-Version 6 (adds the story, section 9). Supersedes version 5.
+Version 7 (adds healing, navigation, squad orders, menus, onboarding, the valley finale, and fast travel). Supersedes version 6.
 
 Working title: TBD. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -53,6 +53,7 @@ Rules:
 - **Difficulty is fixed by location.** Enemies do not scale with the player. Places farther from the starting village are harder. Early areas become easy; later areas are gated by strength, not locks.
 - **Dying:** no permadeath. The player keeps XP earned, loses a portion of carried gold, and wakes at the nearest owned town. Squad members who fell are wounded: they stay behind until healed for gold or until the player rests at a town.
 - **Income** accrues per place captured and per in-game day, not real-world time.
+- **Healing.** Health does not regenerate on its own. Food, found in the world or bought in town, heals over a few seconds when eaten and can be interrupted by taking damage. Resting at an owned town heals the hero and squad fully and advances time to the next morning.
 - **Enemies stay dead** in captured places. Uncaptured camps restock their defenders after several in-game days.
 
 ## 4. The world
@@ -71,6 +72,13 @@ Things to find:
 - Breakable crates, barrels, and pots that drop small loot.
 - Tall grass the sword can cut, sometimes dropping items.
 - At least a few secrets off the paths in each region: a hidden grove, a ruin, a cave mouth, a lone chest on a hill.
+
+Finding your way:
+
+- **Compass strip** at the top of the screen showing the direction of nearby discovered places and of the nearest undiscovered one as an unlabelled mark.
+- **Map** (`M`): a simple drawn map of the region that fills in as places are discovered. It shows the hero, discovered places, and which are captured. No marker for anything the player has not found.
+- A place is discovered when the hero comes within sight of it. Discovery shows its name briefly on screen.
+- **Fast travel** between owned towns from the map. Not available in the first valley; it arrives with the second region.
 
 Layout of the first valley:
 
@@ -100,6 +108,10 @@ Controls:
   - **Bow:** hold to draw, release to fire along the crosshair. The arrow follows a gravity arc. Longer draw means more speed and damage.
 - Right mouse (bow only): zoom the camera in for aiming
 - `E`: interact (open chest, talk, use a town service)
+- `F`: eat food to heal
+- `Q`: squad order, toggling between "follow me" and "hold here"
+- `M`: map
+- `Esc`: pause menu (also releases the mouse)
 - Backtick: tuning panel
 
 Rules:
@@ -108,6 +120,7 @@ Rules:
 - **Enemy attacks are telegraphed.** Every enemy melee attack has a visible wind-up before damage lands, long enough to dodge or step away. Enemy archers visibly draw before firing.
 - **Awareness.** Each enemy has an awareness range. Outside it they idle or patrol their camp. Inside it they attack, and they give up and return home if led too far away.
 - Squad members follow the hero when out of combat and target the nearest enemy when a fight starts.
+- **Squad orders.** "Follow me" is the default. "Hold here" keeps the squad where they stand: they defend themselves but do not advance, so the hero can scout or open a fight alone. The current order is shown on the HUD.
 - Fighters collide with the opposing team and with scenery. Teammates do not block each other. A fighter that comes between the camera and the hero fades out.
 - Arrows are blocked by terrain and scenery.
 
@@ -138,7 +151,7 @@ Exact XP curves, perk lists, and tier stats are tuning, not design. Keep them in
 
 ## 7. Technical architecture
 
-- **Stack:** Babylon.js, TypeScript, Vite. Deployed to GitHub Pages by a GitHub Action that runs tests before it builds.
+- **Stack:** Babylon.js (current stable major, pinned in `package.json`), TypeScript, Vite. Deployed to GitHub Pages by a GitHub Action that runs tests before it builds.
 - **Simulation is separate from rendering.** `src/core` holds the world simulation: fixed-step, deterministic, no Babylon imports. Positions are on the ground plane (x, z) with y as height. Babylon reads simulation state each frame and draws it; it never owns game state.
 - **Ground height is a pure function** in `src/core`, `heightAt(x, z)`, built from the world seed. The simulation and the renderer both use it, so what the player sees and what the simulation believes always agree.
 - **Simulate only what is near.** Fighters and objects within an activation radius of the hero are simulated each step; the rest sleep and keep their saved state.
@@ -157,11 +170,12 @@ Exact XP curves, perk lists, and tier stats are tuning, not design. Keep them in
 Each milestone ends deployed to Pages and playable. Do not start the next one until the current one is approved, unless a build message says otherwise.
 
 1. **Combat prototype.** Done: third-person hero, sword and bow, telegraphed enemies, dodge, waves, tuning panel. Remaining: camera fade for blocking fighters, sound effects, showcase mode.
-2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned (see section 9), two bandit camps, and one outpost placed in data. Fights in place with awareness ranges, squad following, pathfinding, capture that raises the valley recovery level and visibly restores the village, chests and breakables with found notes, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
-3. **Progression.** Skills that level by use, perks, loot tables, inventory, equippable gear with tiers, local saves.
-4. **Conquest and towns.** Town services (crafting, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
-5. **Cloud saves.** Supabase auth and save sync.
-6. **More world.** A second region, more unit types, more secrets, more music.
+2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned (see section 9), two bandit camps, and one outpost placed in data. Fights in place with awareness ranges, squad following, pathfinding, capture that raises the valley recovery level and visibly restores the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
+3. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, and the finale when the last place in the valley is freed (section 9).
+4. **Progression.** Skills that level by use, perks, loot tables, inventory, equippable gear with tiers.
+5. **Conquest and towns.** Town services (crafting, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
+6. **Cloud saves.** Supabase auth and save sync.
+7. **More world.** A second region, fast travel between owned towns, more unit types, more secrets, more music.
 
 ## 9. Story
 
@@ -184,9 +198,20 @@ Tone: warm and hopeful, with a quiet sadness for what was lost. No gore, no grim
 - **Recruits.** Each squad member is a named person with a home in the valley and a two-sentence reason for joining. Some become available only after a specific place is freed.
 - **Landmarks** on the horizon that the found notes refer to.
 
+**The valley finale.** Freeing the last place in the valley completes its recovery. That night the village holds a festival: lanterns, the full village music, every returned villager gathered. In the morning the road toward the castle is open, marked on the map as the way onward. This is the end of the first valley and the hook for the next region.
+
 Restoration is tracked as a single valley recovery level in the game state, raised by each capture. Scenery, villager count, lights, and music read from it.
 
-## 10. Deferred ideas
+## 10. Interface
+
+- **Title screen:** the game's name over a slow view of the valley, with Continue (when a save exists) and New Game. New Game asks for confirmation before replacing a save.
+- **Pause menu** (`Esc`): Resume, Settings, Controls, Quit to title. The simulation stops while it is open.
+- **Settings:** mouse sensitivity, invert vertical look, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
+- **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, attack, switch weapon, dodge, eat, squad order, map) and never again once used. A villager at the start points the hero toward the nearest camp.
+- **HUD:** hero health, equipped weapon, food count, squad order, compass strip. Keep it small; hide what is not needed outside combat.
+- The tuning panel (backtick) stays as a developer tool and is not part of the player-facing menus.
+
+## 11. Deferred ideas
 
 Not in scope until the core game works. Do not build these unprompted.
 

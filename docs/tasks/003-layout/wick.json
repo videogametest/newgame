@@ -1,0 +1,48 @@
+{
+ "compass": "x is east, z is south; north is -z. Metres. facing is the compass bearing the door looks toward; window is the bearing the lit window looks toward.",
+ "plot": { "pitch": 15, "house_footprint": 9, "note": "Footprint is an estimate for home_A and home_B at BUILDING_SCALE 8. Measure and report." },
+ "buildings": [
+  { "id": "hesper", "who": "Hesper", "x": 86, "z": 98, "model": "home_A", "facing": 135, "window": 135, "state": "open, lit" },
+  { "id": "fairlow", "who": "The Fairlow house", "x": 71, "z": 98, "model": "home_B", "facing": 0, "window": 0, "state": "boarded; never opens before the finale" },
+  { "id": "old_maren", "who": "Old Maren", "x": 56, "z": 98, "model": "home_A", "facing": 0, "window": 315, "state": "lived in, dark, not boarded" },
+  { "id": "marrin", "who": "The Marrins", "x": 41, "z": 100, "model": "home_B", "facing": 0, "window": 0, "state": "boarded" },
+  { "id": "dunn", "who": "The Dunns", "x": 113, "z": 98, "model": "home_B", "facing": 0, "window": 0, "state": "boarded" },
+  { "id": "ashby", "who": "The Ashbys", "x": 128, "z": 98, "model": "home_A", "facing": 0, "window": 0, "state": "boarded" },
+  { "id": "pike", "who": "The Pikes", "x": 143, "z": 98, "model": "home_B", "facing": 0, "window": 0, "state": "boarded" },
+  { "id": "oona", "who": "Oona", "x": 152, "z": 116, "model": "home_A", "facing": 315, "window": 315, "state": "boarded" },
+  { "id": "brand", "who": "The Brands", "x": 52, "z": 116, "model": "home_A", "facing": 45, "window": 45, "state": "boarded" },
+  { "id": "wain", "who": "Empty; the Wains take it", "x": 62, "z": 74, "model": "home_A", "facing": 180, "window": 315, "state": "boarded" },
+  { "id": "inn", "who": "The inn", "x": 94, "z": 74, "model": "building_destroyed until the project is built, then tavern", "facing": 180, "window": 180, "state": "roofless; not one of the sixteen windows" },
+  { "id": "hollin", "who": "The Hollins", "x": 109, "z": 74, "model": "home_B", "facing": 180, "window": 180, "state": "boarded" },
+  { "id": "kettle", "who": "The Kettles", "x": 124, "z": 74, "model": "home_A", "facing": 180, "window": 180, "state": "boarded" },
+  { "id": "loomis", "who": "The Loomises", "x": 139, "z": 74, "model": "home_B", "facing": 180, "window": 180, "state": "boarded" },
+  { "id": "aldric", "who": "The Aldrics", "x": 92, "z": 52, "model": "home_B", "facing": 180, "window": 180, "state": "boarded" },
+  { "id": "rudd", "who": "The Rudds", "x": 107, "z": 52, "model": "home_A", "facing": 180, "window": 180, "state": "boarded" },
+  { "id": "sedge", "who": "The Sedges", "x": 122, "z": 52, "model": "home_B", "facing": 180, "window": 180, "state": "boarded" },
+  { "id": "tolley", "who": "The Tolleys", "x": 137, "z": 52, "model": "home_A", "facing": 180, "window": 180, "state": "boarded" }
+ ],
+ "lanes": {
+  "high_lane": [[50, 86], [76, 86], [98, 86], [150, 86]],
+  "gate_lane": [[98, 113], [98, 86]],
+  "shore_lane": [[78, 86], [78, 52]],
+  "back_lane": [[78, 63], [146, 63]],
+  "hesper_yard": [[98, 113], [88, 106]]
+ },
+ "gates": [
+  { "id": "south_gate", "x": 98, "z": 113, "road": "road_in" },
+  { "id": "west_gate", "x": 50, "z": 86, "road": "mill_road" },
+  { "id": "north_gate", "x": 78, "z": 52, "road": "east_road" }
+ ],
+ "things": [
+  { "id": "well", "x": 77, "z": 76, "note": "A dead tree lies across it until the project is built. People gather here at dusk" },
+  { "id": "bell_post", "x": 71, "z": 69, "note": "By the water. The bell is down and lies beside the post until the project is built" },
+  { "id": "market_stalls", "x": 84, "z": 80, "note": "Three bare frames along the square's east side until the project is built" },
+  { "id": "overturned_cart", "x": 62, "z": 87, "note": "On the high lane inside the west gate" },
+  { "id": "oona_garden", "x": 160, "z": 122, "note": "Gone wild. Comfrey and yarrow can be gathered here once she is home" },
+  { "id": "ashby_hives", "x": 128, "z": 110, "note": "Empty skeps behind the house" },
+  { "id": "pike_field", "x": 168, "z": 92, "note": "Empty strips east of the village, running toward the river" },
+  { "id": "dunn_field", "x": 122, "z": 122, "note": "A weed-grown plot south of the row. Keep it low: it lies beside the arrival view" },
+  { "id": "brand_woodpile", "x": 44, "z": 122, "note": "Toward the south wood" },
+  { "id": "landing", "x": 66, "z": 62, "note": "A short jetty with one sunk boat" }
+ ]
+}

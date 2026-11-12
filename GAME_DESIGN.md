@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 25 (household stories and loose threads). Supersedes version 24.
+Version 26 (the weak point on large-headed models). Supersedes version 25.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -307,6 +307,7 @@ Rulings on questions the logic raised. Numbers named here as "tuning" live in da
 - **Companions' gear and level.** Each companion has two gear slots: a weapon and armour. Companions have no experience of their own; their level follows the hero's Leadership.
 - **The clock.** Dawn is at six and dusk at eighteen. Windows light at nineteen and go dark at one, except Hesper's, which stays lit until dawn.
 - **Easy things stop teaching.** Every feat has a level it can teach up to, set by how hard its target is. A skill above that level learns less from it, and soon almost nothing. Shooting Mill bandits does not make a master archer. This holds each skill near the story however thorough the player is, so nothing is maxed early, and it makes the harder places the fastest way to grow.
+- **The weak point.** The head is the weak point, and it is the whole head as drawn: what the player sees is what they hit. Because heads are large on these models, a head shot is worth half as much again, not several times (tuning). An arrow kills outright when the target is unaware, when the draw is perfect, or at long range, never from the head alone. A helmet removes the bonus from the front and above.
 - **Names in data.** Every id is lower case with underscores and uses the full name: `tobin_pike`, `watch_house`, `east_road_lanterns`.
 
 ## 6. Progression

@@ -42,6 +42,8 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 
 **Scale (review 008).** Buildings are scaled to the people: a storey is 2.6 to 2.8 m, every door is at least 2.1 m high and 1.2 m wide, and the evidence includes the hero standing in a doorway in Wick. A world where people are bigger than their houses fails the bar outright.
 
+**Measured, not judged (review 009).** The capture script measures and fails on: at dusk the ground's average brightness is under a quarter of the sky's; any pool of window light where red is not at least a fifth stronger than blue; any window but Hesper's lit at 18:00, or a home household's window dark at 19:15; any door lower than the tallest character.
+
 **Lighting, carried over from the style test (review 007).** These three failed there and are settled here, in the real world, before anything else in the bar is judged:
 
 - **Dusk lights things, not only the sky.** A low warm sun, long shadows, and walls, ground, and faces that take the colour. The ground is never near-black while the sky is bright.

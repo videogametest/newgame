@@ -50,8 +50,12 @@ Each layer is added on top of the ones before it. Use the nearest available samp
 - **Wick's theme:** the same score, looping with long silences. Layer 1 from the start; add layer 2 at four lit windows, layer 3 at eight, layer 4 at twelve, layer 5 at sixteen.
 - **Character tones:** Hesper, D4 on the low reedy end of the palette. Bram, G4, warm and round. Stane, B3, flat and formal. Others, A4 or E4.
 - **Hesper's hum and the wren's song:** the first phrase alone, bars 1 and 2. The wren's is two octaves up and quicker.
-- **The castle:** the tune inverted around G4 and moved to G minor, on low strings alone, slower. D4 becomes D5, B4 becomes Eb4, and so on: each note is as far below G4 as the original was above it, and the reverse.
+- **The castle:** the tune inverted around G4 and moved to G minor, on low strings alone, slower. D4 becomes C5, B4 becomes Eb4, and so on: each note is as far below G4 as the original was above it, and the reverse.
 
 ## Dynamics
 
 Soft throughout. Each phrase swells slightly toward its third bar and falls away. No percussion.
+
+## What plays it now
+
+The first performance uses VSCO 2 Community Edition recordings (CC0), in `public/assets/audio/vsco2_ce/`: the concert harp for layers 1 and 2, the solo flute for layer 3 and Hesper's hum, the viola section for layer 4 and the castle, and a French horn for layer 5. Notes without a recording of their own play the nearest one, shifted by at most three semitones. The code is in `src/audio/music/`.

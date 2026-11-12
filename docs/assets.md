@@ -203,3 +203,31 @@ Licence column is the pack id (see Licences above). Must = must-have.
 | `horse` | region 2 arrival, deferrable | q_animals | glTF | found-needs-check |  | unknown | — | 3400000 | Each 3.4 MB listed; defer first-load. No rigged rider attachment verified. q_farm Horse.fbx 1023564 bytes is another animated CC0 option. |
 
 Survey last read: 2026-11-12. [survey, 2026-11-12]
+
+## Review 002 changes (task 002b)
+
+Applied from `docs/reviews/002-asset-survey.md`, "Changes wanted in the survey":
+
+1. **Scale screenshots produced.** Style test at `?styletest=1`. Captures in `docs/pr-media/styletest/` (row, quarter view, each item, people, night). Items: three houses, watermill, forge, well, watch-house, scenery.
+2. **Villagers and bandits marked must-have.** Counts still needed: about 35 villagers and 27 named bandits (`docs/writing/households.md`, `docs/writing/bandits.md`). Not yet sourced; see blocked list.
+3. **Rows for the newly named items** (stolen goods, slate, supper table, logbook, letter, fisher's boat, marker stones, hives, shuttle): not sourced in this PR. Still open for task 003 planning.
+4. **Licences:** the Kenney Fantasy Town licence is copied into `public/assets/kenney_fantasy_town/LICENSE.txt` (CC0). KayKit Adventurers licence already in its folder.
+5. **Kits side by side:** Kenney Fantasy Town (houses, mill, scenery) and KayKit Adventurers (people) are in the style test on one palette. Kenney Castle and KayKit Hexagon are not in the test (see blocked list).
+
+## Stand-ins used in the style test (labelled in the scene)
+
+- **Forge:** Kenney stand-in (no Hexagon forge model available).
+- **Well:** Kenney fountain used as a stand-in.
+- **Watch-house tower:** stand-in from stacked Kenney corner modules; no tower module in Kenney Fantasy Town.
+- **Ground:** 70 × 36 m, longer than the 40 m in the brief, because the row runs longer.
+
+## Blocked (not downloaded or not found)
+
+- **KayKit Medieval Hexagon (free):** the itch.io free route returned 0 bytes twice. No paid option clicked. Greg to download by hand if wanted.
+- **Quaternius Medieval Village and its people:** download quota.
+- **Wolves, deer, fox, stag, horse:** Quaternius quota.
+- **Castle Kit:** not downloaded.
+- **Sheep and goose:** no CC0 model found in the survey sources. Goose is a code-animated candidate per review 002.
+- **Mixed people group:** blocked with the Quaternius quota.
+- **Tall grass:** no Kenney model; not in the style test.
+- **Stylised villager set:** the bounded search for a CC0 stylised villager set (required before group 6) has **not been done** in this PR. Not searched yet; Viktor will run it and log the result before group 6.

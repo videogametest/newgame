@@ -26,6 +26,37 @@ function sight(a: keyof typeof VALLEY_PLACES, eyeA: number, b: keyof typeof VALL
   return sightMargin(VALLEY_PLACES[a], VALLEY_PLACES[b], eyeA, eyeB);
 }
 
+/** Segments of the wet river: the river in from its first bend past the falls, and the river out. */
+function riverSegments(): { a: { x: number; z: number }; b: { x: number; z: number } }[] {
+  const out: { a: { x: number; z: number }; b: { x: number; z: number } }[] = [];
+  for (let i = 1; i + 1 < VALLEY_RIVER_IN.length; i++) out.push({ a: VALLEY_RIVER_IN[i], b: VALLEY_RIVER_IN[i + 1] });
+  for (let i = 0; i + 1 < VALLEY_RIVER_OUT.length; i++) out.push({ a: VALLEY_RIVER_OUT[i], b: VALLEY_RIVER_OUT[i + 1] });
+  return out;
+}
+
+/** Points about every 3 m along the wet river, each with its unit normal across the river. */
+function riverSamples(): { x: number; z: number; px: number; pz: number }[] {
+  const out: { x: number; z: number; px: number; pz: number }[] = [];
+  for (const { a, b } of riverSegments()) {
+    const len = Math.hypot(b.x - a.x, b.z - a.z);
+    const px = -(b.z - a.z) / len;
+    const pz = (b.x - a.x) / len;
+    const n = Math.max(1, Math.round(len / 3));
+    for (let k = 0; k <= n; k++) out.push({ x: a.x + ((b.x - a.x) * k) / n, z: a.z + ((b.z - a.z) * k) / n, px, pz });
+  }
+  return out;
+}
+
+/** Inside a crossing or its approach, where the bed is raised or the stones and bridge are. */
+function nearCrossing(x: number, z: number): boolean {
+  return VALLEY_CROSSINGS.some((c) => Math.hypot(x - c.x, z - c.z) < 15);
+}
+
+/** Slope (rise over run) from ±1 m central differences, as the walking rule measures it. */
+function slopeAt(x: number, z: number): number {
+  return Math.hypot(valleyHeightAt(x + 1, z) - valleyHeightAt(x - 1, z), valleyHeightAt(x, z + 1) - valleyHeightAt(x, z - 1)) / 2;
+}
+
 describe('Tallowmere terrain (§4)', () => {
   it('is deterministic for the same seed and point', () => {
     expect(VALLEY_SEED).toBeTypeOf('number');
@@ -145,6 +176,42 @@ describe('Tallowmere terrain (§4)', () => {
     expect(median).toBeGreaterThanOrEqual(8);
     expect(median).toBeLessThanOrEqual(12);
     expect(p10).toBeGreaterThanOrEqual(6);
+  });
+
+  it('cuts each river as a channel 1.5 to 2.5 m deep in mid-stream', () => {
+    const depths = riverSamples()
+      .filter((p) => !nearCrossing(p.x, p.z) && Math.hypot(p.x, p.z) >= 140)
+      .map((p) => WATER_LEVEL - valleyHeightAt(p.x, p.z));
+    expect(depths.length).toBeGreaterThan(50);
+    for (const d of depths) {
+      expect(d).toBeGreaterThanOrEqual(1.5 - 1e-6);
+      expect(d).toBeLessThanOrEqual(2.5);
+    }
+  });
+
+  it('keeps the river under water on its centre line from the foot of the falls to the lake and out of the valley', () => {
+    for (const p of riverSamples()) {
+      if (nearCrossing(p.x, p.z)) continue;
+      expect(isWater(p.x, p.z), `river centre (${p.x.toFixed(0)}, ${p.z.toFixed(0)})`).toBe(true);
+    }
+  });
+
+  it('lets the hero walk down each bank to the water, at a slope of 0.31 or less', () => {
+    let banks = 0;
+    for (const p of riverSamples()) {
+      // The gorge beyond the rim is the edge's business (task 003 item 3), so only the inside of the rim is checked here.
+      if (nearCrossing(p.x, p.z) || Math.hypot(p.x, p.z) < 140 || Math.hypot(p.x, p.z) > EDGE_RADIUS - 5) continue;
+      for (const side of [1, -1]) {
+        let d = 0;
+        while (d < 40 && valleyHeightAt(p.x + side * p.px * d, p.z + side * p.pz * d) < WATER_LEVEL) d += 0.1;
+        const ex = p.x + side * p.px * d;
+        const ez = p.z + side * p.pz * d;
+        banks++;
+        expect(slopeAt(ex, ez), `bank edge (${ex.toFixed(0)}, ${ez.toFixed(0)})`).toBeLessThanOrEqual(0.31);
+        expect(isWalkableGround(ex + side * p.px * 0.5, ez + side * p.pz * 0.5)).toBe(true);
+      }
+    }
+    expect(banks).toBeGreaterThan(50);
   });
 
   it('lists every placed stop once, by name', () => {

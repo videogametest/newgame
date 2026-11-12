@@ -15,6 +15,8 @@ Combat can be heard, and animations can be verified without a human watching.
 
 5. **Upgrade Babylon.js** from 7 to the current stable major and pin it. Do this first, before the other items, so everything in this task is built and verified on the new version. If the upgrade breaks something you cannot fix quickly, stop and log it in `docs/status.md` instead of staying on 7 silently.
 
+6. **Name the game.** It is called "Every Lit Window". Add one title constant in data and use it for the page `<title>` in `index.html` (currently "Combat Prototype (Milestone 1)") and the heading of `README.md`.
+
 ## Check while you are in there
 
 In the earlier drawn-bow screenshot (`docs/pr-media/03_bow_drawn.png`) the hero's arms appear to aim to the left of the crosshair. Use the bow contact sheet to confirm whether the draw pose points where the arrow flies, and fix it if not.

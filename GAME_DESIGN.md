@@ -1,8 +1,8 @@
-# Game Design
+# Every Lit Window: Game Design
 
-Version 7 (adds healing, navigation, squad orders, menus, onboarding, the valley finale, and fast travel). Supersedes version 6.
+Version 8 (names the game). Supersedes version 7.
 
-Working title: TBD. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
+The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
 ## 1. Summary
 

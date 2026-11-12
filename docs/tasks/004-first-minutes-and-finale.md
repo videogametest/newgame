@@ -16,7 +16,7 @@ A new player can start the game, learn it without being told, save their progres
 
 ## Rules
 
-- The game still has no title. Use the placeholder "Untitled Valley" on the title screen, read from data so it changes in one place.
+- The game is called "Every Lit Window". Show it on the title screen, read from the single title constant.
 - Add a headless test that plays from New Game to the finale using the bot, and one that saves, reloads, and checks the state matches.
 
 ## Done when

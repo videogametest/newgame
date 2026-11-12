@@ -46,6 +46,8 @@ export interface ValleyHooks {
   setTod(hours: number): void;
   freeze(on: boolean): void;
   aimAt(body: 'sun' | 'moon'): void;
+  placeAt(x: number, z: number): void;
+  lookAt(x: number, z: number): void;
   state(): ValleyState;
 }
 export interface ValleyState {
@@ -324,6 +326,19 @@ class Valley {
         const a = aimAngles(body === 'sun' ? L.sunSky : L.moonSky);
         this.input.camYaw = a.yaw;
         this.input.aimPitch = a.pitch;
+      },
+      // Capture only: stands the hero at a point on the ground, and turns the camera to face a point.
+      placeAt: (x, z) => {
+        this.game.hero.position = { x, z };
+        this.hero.x = x;
+        this.hero.z = z;
+        this.groundY = valleyHeightAt(x, z);
+      },
+      lookAt: (x, z) => {
+        const hp = this.game.hero.position;
+        const a = aimAngles({ x: x - hp.x, y: 0, z: z - hp.z });
+        this.input.camYaw = a.yaw;
+        this.input.aimPitch = 0;
       },
       state: () => this.snapshot(),
     };

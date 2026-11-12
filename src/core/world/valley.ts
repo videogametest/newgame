@@ -12,7 +12,6 @@ import {
   VALLEY_RIVER_OUT,
   VALLEY_STOPS as LAYOUT_STOPS,
   VALLEY_TERRAIN_FEATURES,
-  type LayoutFeature,
   type LayoutPoint,
 } from './valley_layout';
 
@@ -34,49 +33,32 @@ export const EDGE_RADIUS = 335;
 const PATROL_HUT_OPEN = { x: VALLEY_PLACES.patrolHut.x, z: VALLEY_PLACES.patrolHut.z, radius: 60 };
 /** The north-west pass, where the soldiers' road leaves the valley. */
 const NW_PASS_OPEN = { x: -250, z: -262, radius: 40 };
-/** Ground within this distance of a river's centre line is river bank, not walkable. */
-const RIVER_CORRIDOR = 6;
 /** Crossings open a walkable disc this wide, even where the river is water. */
 const CROSSING_RADIUS = 11;
 /** Steepest walkable slope (rise over run). */
 const MAX_WALK_SLOPE = 0.7;
 
-/** The river bed: overlapping depressions along a centre line. */
-function riverBed(line: readonly LayoutPoint[], radius: number, height: number, step: number): LayoutFeature[] {
-  const out: LayoutFeature[] = [];
-  for (let i = 0; i + 1 < line.length; i++) {
-    const a = line[i];
-    const b = line[i + 1];
-    const n = Math.max(1, Math.round(Math.hypot(b.x - a.x, b.z - a.z) / step));
-    for (let k = 0; k < n; k++) {
-      out.push({ x: Math.round(a.x + ((b.x - a.x) * k) / n), z: Math.round(a.z + ((b.z - a.z) * k) / n), radius, height });
-    }
-  }
-  const last = line[line.length - 1];
-  out.push({ x: last.x, z: last.z, radius, height });
-  return out;
-}
-
-/** Tuned against the water-width test in valley.test.ts (8 to 12 m across, at several cross-sections). */
-const RIVER_RADIUS = 10;
-const RIVER_HEIGHT = -12;
-const RIVER_STEP = 6;
+/** Height (m) of the river bed on its centre line. Mid-stream depth is WATER_LEVEL - RIVER_BED = 1.5 m. */
+const RIVER_BED = 0.5;
+/** Rise (m) per metre away from the centre line. The water is about 10 m wide where the bank reaches WATER_LEVEL. */
+const RIVER_BANK_SLOPE = 0.3;
+/** The ford is 0.4 m of water over stones, so its bed sits 0.4 m below the water (design section 4, "The crossings"). */
+const FORD_BED = WATER_LEVEL - 0.4;
+/** The ford bed is FORD_BED inside FORD_FULL m of the ford and fades back to RIVER_BED by FORD_FADE m. */
+const FORD_FULL = 8;
+const FORD_FADE = 14;
 
 export const VALLEY_SHAPE: TerrainShape = {
   baseHeight: VALLEY_BASE_HEIGHT,
   layers: VALLEY_LAYERS,
-  features: [
-    ...VALLEY_TERRAIN_FEATURES,
-    ...riverBed(VALLEY_RIVER_IN, RIVER_RADIUS, RIVER_HEIGHT, RIVER_STEP),
-    ...riverBed(VALLEY_RIVER_OUT, RIVER_RADIUS, RIVER_HEIGHT, RIVER_STEP),
-  ],
+  features: VALLEY_TERRAIN_FEATURES,
 };
 
 const heightSampler = createHeightAt(VALLEY_SEED, VALLEY_SHAPE);
 
 /** Ground height (m) at a valley point. Same answer for the same (x, z) on every call. */
 export function valleyHeightAt(x: number, z: number): number {
-  return heightSampler(x, z);
+  return Math.min(heightSampler(x, z), riverBankHeight(x, z));
 }
 
 export function isWater(x: number, z: number): boolean {
@@ -105,13 +87,29 @@ function distanceToSegment(x: number, z: number, a: LayoutPoint, b: LayoutPoint)
   return Math.hypot(x - a.x - dx * t, z - a.z - dz * t);
 }
 
-function nearRiver(x: number, z: number): boolean {
-  for (const line of [VALLEY_RIVER_IN, VALLEY_RIVER_OUT]) {
-    for (let i = 0; i + 1 < line.length; i++) {
-      if (distanceToSegment(x, z, line[i], line[i + 1]) < RIVER_CORRIDOR) return true;
-    }
-  }
-  return false;
+/**
+ * Distance (m) from (x, z) to the nearer river centre line. The river in's first segment is the falls: a drop over
+ * the west rim with no water on it, so it is not cut (GAME_DESIGN section 4, "Banks and beds").
+ */
+function riverDistance(x: number, z: number): number {
+  let best = Infinity;
+  for (let i = 1; i + 1 < VALLEY_RIVER_IN.length; i++) best = Math.min(best, distanceToSegment(x, z, VALLEY_RIVER_IN[i], VALLEY_RIVER_IN[i + 1]));
+  for (let i = 0; i + 1 < VALLEY_RIVER_OUT.length; i++) best = Math.min(best, distanceToSegment(x, z, VALLEY_RIVER_OUT[i], VALLEY_RIVER_OUT[i + 1]));
+  return best;
+}
+
+/** Bed height (m) at (x, z): RIVER_BED, lifted to FORD_BED around the ford so the crossing is 0.4 m of water. */
+function riverBedAt(x: number, z: number): number {
+  const ford = VALLEY_CROSSINGS.find((c) => c.name === 'ford');
+  if (!ford) return RIVER_BED;
+  const r = Math.hypot(x - ford.x, z - ford.z);
+  const t = Math.max(0, Math.min(1, (FORD_FADE - r) / (FORD_FADE - FORD_FULL)));
+  return RIVER_BED + (FORD_BED - RIVER_BED) * t * t * (3 - 2 * t);
+}
+
+/** The river's bank: the bed on the centre line, rising RIVER_BANK_SLOPE per metre. Cuts the land down near a river. */
+function riverBankHeight(x: number, z: number): number {
+  return riverBedAt(x, z) + RIVER_BANK_SLOPE * riverDistance(x, z);
 }
 
 function inOpenZone(x: number, z: number, zone: { x: number; z: number; radius: number }): boolean {
@@ -126,7 +124,7 @@ function slopeAt(x: number, z: number): number {
 }
 
 /**
- * Ground the hero may walk on. Water is not ground (it is swum), the rivers have banks the hero does not walk,
+ * Ground the hero may walk on. Water is not ground (it is swum), river banks are walkable down to the water,
  * the edge ring is closed except the patrol hut's zone and the north-west pass, and the walk must be gentle.
  * The three crossings are open.
  */
@@ -134,7 +132,6 @@ export function isWalkableGround(x: number, z: number): boolean {
   if (!insideValley(x, z)) return false;
   if (isCrossing(x, z)) return true;
   if (isWater(x, z)) return false;
-  if (nearRiver(x, z)) return false;
   const r = Math.hypot(x, z);
   if (r > EDGE_RADIUS && !inOpenZone(x, z, PATROL_HUT_OPEN) && !inOpenZone(x, z, NW_PASS_OPEN)) return false;
   return slopeAt(x, z) < MAX_WALK_SLOPE;

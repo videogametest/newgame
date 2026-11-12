@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { valleyCameraPose, type ValleyCameraRig } from './valley_camera';
+import { aimAngles, valleyCameraPose, type ValleyCameraRig } from './valley_camera';
 
 const RIG: ValleyCameraRig = { distance: 4.6, shoulder: 0.9, lookHeight: 1.5, clearance: 0.6 };
 const flat = (): number => 0;
@@ -35,5 +35,28 @@ describe('valleyCameraPose', () => {
     const dz = pose.target.z - pose.position.z;
     expect(Math.hypot(dx, dy, dz)).toBeCloseTo(1, 6);
     expect(dy / Math.hypot(dx, dy, dz)).toBeCloseTo(Math.sin(0.2), 6);
+  });
+});
+
+describe('aimAngles', () => {
+  it('recovers the yaw and pitch that valleyCameraPose uses for a direction', () => {
+    const dirs = [
+      { x: 0.6, y: 0.5, z: -0.3 },
+      { x: -0.2, y: 0.9, z: 0.4 },
+      { x: 0.1, y: -0.4, z: 0.8 },
+    ];
+    for (const d of dirs) {
+      const a = aimAngles(d);
+      const len = Math.hypot(d.x, d.y, d.z);
+      const cp = Math.cos(a.pitch);
+      expect(Math.sin(a.yaw) * cp).toBeCloseTo(d.x / len, 6);
+      expect(Math.sin(a.pitch)).toBeCloseTo(d.y / len, 6);
+      expect(Math.cos(a.yaw) * cp).toBeCloseTo(d.z / len, 6);
+    }
+  });
+
+  it('is finite for a zero vector', () => {
+    const a = aimAngles({ x: 0, y: 0, z: 0 });
+    expect(Number.isFinite(a.yaw) && Number.isFinite(a.pitch)).toBe(true);
   });
 });

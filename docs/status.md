@@ -131,3 +131,10 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - PR #4 merged (`d532b10`): balance targets, tuning panel, visual captures. Live on Pages.
 - Task 001 in progress: the camera fade logic runs, but the fading fighter still renders solid. Not merged.
 - Known: a teal tint appears when the camera drops below the water plane while walking backward.
+
+## Task 003: sun and moon capture hook (review 016, PR #26 follow-up)
+
+- Added `aimAt('sun'|'moon')` and `aimAngles`, with tests. Capture now includes `noon-sun-12` and `night-moon-2`.
+- Gate in the worker sandbox: typecheck 0, vitest 638 pass, build 0, smoke pass, capture pass. No PR CI exists, so this local gate is the check.
+- Viewed: the sun disc is at centre in `noon-sun-12.png`. The moon disc is at centre in `night-moon-2.png`.
+- Open question: at 00:00 the moon disc is not visible under `aimAt('moon')`, while at 02:00 it is. Not yet explained. The capture uses 02:00 for now.

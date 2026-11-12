@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 31 (standing watch: raids after the finale, only by invitation). Supersedes version 30.
+Version 32 (the valley's layout is fixed: the compass, the two rivers, where each place stands). Supersedes version 31.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -141,7 +141,10 @@ Layout of the first valley:
 - The valley is Tallowmere, with a lake at its centre. The village is Wick, beside the lake.
 - The hero starts at the valley's edge at dusk, with Hesper's single lit window visible in the distance, and walks to Wick.
 - Paths lead out from Wick to the Mill, the Forge, and the Watch-house (section 9).
-- The ridge stands between the patrol hut and the castle; the signal hill is the highest point and sees over it.
+- **The compass.** The castle is beyond the north-west rim. The ridge runs north to south on the east side, with the patrol hut beyond it, so from the hut the ridge fills the western sky and hides both the castle and the signal hill. The signal hill is in the north and is the highest ground the hero can stand on.
+- **Two rivers.** One comes over the west rim as the waterfall, turns the Mill's wheel, and feeds the lake. One leaves the lake eastward, crosses the east road at the ford, and leaves the valley through a gorge. The hero cannot swim; the crossings are the ford, the mill bridge, and stepping stones below the falls.
+- **Where things stand.** Wick is on the south-east shore and the hero arrives from the south-east, so the first view holds Hesper's window, the village, the lake, and the castle on the horizon behind. The Mill is west, the Forge north at the end of the east road, the Watch-house north-west on the soldiers' road, which runs along the north shore in sight of Wick. Every coordinate is in `docs/tasks/003-layout.md` and its data file.
+- **The castle from afar.** Its outline is on the horizon from much of the valley. Only from the signal hill can the beacon itself be seen, and seen to be dark.
 - Hills, a forest area, open fields, and water, so different parts feel different.
 - A natural boundary (cliffs, dense forest, water) at the edge. No invisible walls in open ground and no coloured barrier.
 

@@ -43,3 +43,7 @@ The bar's measured list now includes draw calls per frame, failing above 300.
 ## Needs Greg
 
 Nothing to decide. No agent can measure the frame rate on a real graphics card; when step 2 is up, Greg's own machine is the test.
+
+## Added 18:40: the layout
+
+Items 1 and 2 are now answered by `docs/tasks/003-layout.md` (design version 32): the rivers, the start, the edge, and where every place stands. One correction: the patrol hut is not an enemy place, so "the patrol hut can be seen from Wick" was the wrong rule. The hut moves beyond the east ridge in the new layout, where the written lines put it.

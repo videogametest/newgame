@@ -1,0 +1,1127 @@
+{
+ "compass": "x is east, z is south; north is -z. Metres.",
+ "places": {
+  "lake": {
+   "x": 0,
+   "z": 0
+  },
+  "wick": {
+   "x": 64,
+   "z": 72
+  },
+  "hesper": {
+   "x": 86,
+   "z": 98
+  },
+  "start": {
+   "x": 226,
+   "z": 238
+  },
+  "castle": {
+   "x": -296,
+   "z": -388
+  },
+  "mill": {
+   "x": -172,
+   "z": 62
+  },
+  "forge": {
+   "x": 38,
+   "z": -176
+  },
+  "watch_house": {
+   "x": -170,
+   "z": -192
+  },
+  "signal_hill": {
+   "x": -78,
+   "z": -296
+  },
+  "patrol_hut": {
+   "x": 322,
+   "z": -112
+  },
+  "waterfall": {
+   "x": -282,
+   "z": 14
+  },
+  "orchard": {
+   "x": 196,
+   "z": -118
+  },
+  "practice": {
+   "x": -52,
+   "z": 222
+  },
+  "grove": {
+   "x": -226,
+   "z": 188
+  },
+  "fisher": {
+   "x": -74,
+   "z": -62
+  },
+  "soldiers_road": {
+   "x": -226,
+   "z": -238
+  }
+ },
+ "crossings": [
+  {
+   "name": "ford",
+   "x": 142,
+   "z": -12
+  },
+  {
+   "name": "mill_bridge",
+   "x": -178,
+   "z": 40
+  },
+  {
+   "name": "stepping_stones",
+   "x": -250,
+   "z": 0
+  }
+ ],
+ "roads": {
+  "road_in": [
+   [
+    226,
+    238
+   ],
+   [
+    176,
+    186
+   ],
+   [
+    124,
+    132
+   ],
+   [
+    88,
+    106
+   ]
+  ],
+  "mill_road": [
+   [
+    50,
+    86
+   ],
+   [
+    10,
+    118
+   ],
+   [
+    -40,
+    140
+   ],
+   [
+    -96,
+    146
+   ],
+   [
+    -140,
+    104
+   ],
+   [
+    -172,
+    62
+   ]
+  ],
+  "east_road": [
+   [
+    78,
+    52
+   ],
+   [
+    112,
+    22
+   ],
+   [
+    142,
+    -12
+   ],
+   [
+    124,
+    -68
+   ],
+   [
+    88,
+    -128
+   ],
+   [
+    38,
+    -176
+   ]
+  ],
+  "soldiers_road": [
+   [
+    124,
+    -68
+   ],
+   [
+    70,
+    -98
+   ],
+   [
+    0,
+    -104
+   ],
+   [
+    -60,
+    -112
+   ],
+   [
+    -104,
+    -168
+   ],
+   [
+    -170,
+    -192
+   ],
+   [
+    -226,
+    -238
+   ],
+   [
+    -262,
+    -276
+   ]
+  ],
+  "hill_path": [
+   [
+    -104,
+    -168
+   ],
+   [
+    -96,
+    -236
+   ],
+   [
+    -78,
+    -296
+   ]
+  ],
+  "ridge_path": [
+   [
+    124,
+    -68
+   ],
+   [
+    160,
+    -112
+   ],
+   [
+    196,
+    -118
+   ],
+   [
+    254,
+    -100
+   ],
+   [
+    322,
+    -112
+   ]
+  ],
+  "forest_path": [
+   [
+    -40,
+    140
+   ],
+   [
+    -52,
+    222
+   ],
+   [
+    -150,
+    250
+   ],
+   [
+    -226,
+    188
+   ]
+  ],
+  "falls_path": [
+   [
+    -172,
+    62
+   ],
+   [
+    -230,
+    40
+   ],
+   [
+    -282,
+    14
+   ]
+  ]
+ },
+ "river_in": [
+  [
+   -330,
+   -30
+  ],
+  [
+   -292,
+   -18
+  ],
+  [
+   -250,
+   0
+  ],
+  [
+   -215,
+   22
+  ],
+  [
+   -178,
+   40
+  ],
+  [
+   -140,
+   30
+  ],
+  [
+   -100,
+   14
+  ]
+ ],
+ "river_out": [
+  [
+   95,
+   -8
+  ],
+  [
+   142,
+   -12
+  ],
+  [
+   190,
+   14
+  ],
+  [
+   240,
+   48
+  ],
+  [
+   300,
+   70
+  ],
+  [
+   360,
+   90
+  ],
+  [
+   400,
+   100
+  ]
+ ],
+ "east_ridge": [
+  [
+   250,
+   -250
+  ],
+  [
+   254,
+   -190
+  ],
+  [
+   256,
+   -130
+  ],
+  [
+   252,
+   -70
+  ],
+  [
+   246,
+   -15
+  ]
+ ],
+ "signposts": [
+  {
+   "name": "sign_wick_gate",
+   "x": 50,
+   "z": 86
+  },
+  {
+   "name": "sign_split_oak",
+   "x": -40,
+   "z": 140
+  },
+  {
+   "name": "sign_ford",
+   "x": 124,
+   "z": -68
+  },
+  {
+   "name": "sign_hill_foot",
+   "x": -104,
+   "z": -168
+  }
+ ],
+ "stops": [
+  {
+   "name": "family_markers",
+   "kind": "secret",
+   "x": 150,
+   "z": 158,
+   "note": "Sixteen stones and the Fairlow stone, spaced along the road in from (190, 200) to (110, 124)"
+  },
+  {
+   "name": "camp_south_rise",
+   "kind": "campfire",
+   "x": 84,
+   "z": 318,
+   "note": "Looks north over the whole lake to the signal hill"
+  },
+  {
+   "name": "camp_gorge",
+   "kind": "campfire",
+   "x": 318,
+   "z": 100,
+   "note": "South bank, above the gorge where the river leaves the valley"
+  },
+  {
+   "name": "camp_north_slope",
+   "kind": "campfire",
+   "x": 44,
+   "z": -328,
+   "note": "Under the north rim, looking south across the lake to Wick's windows"
+  },
+  {
+   "name": "camp_west_bluff",
+   "kind": "campfire",
+   "x": -312,
+   "z": 116,
+   "note": "On the bluff south of the falls; the falls are heard from here"
+  },
+  {
+   "name": "camp_ridge_saddle",
+   "kind": "campfire",
+   "x": 244,
+   "z": -54,
+   "note": "On the east ridge, the last fire before the hut. Looks west over everything"
+  },
+  {
+   "name": "view_ridge_north",
+   "kind": "viewpoint",
+   "x": 248,
+   "z": -222,
+   "note": "The ridge's north end. The whole valley, and the hill"
+  },
+  {
+   "name": "view_west_heights",
+   "kind": "viewpoint",
+   "x": -288,
+   "z": -144,
+   "note": "Looks down into the Watch-house yard from behind"
+  },
+  {
+   "name": "chest_gorge_ledge",
+   "kind": "chest",
+   "x": 328,
+   "z": 58,
+   "note": "North bank of the gorge"
+  },
+  {
+   "name": "chest_north_wood",
+   "kind": "chest",
+   "x": 168,
+   "z": -286,
+   "note": "In the wood under the north-east rim"
+  },
+  {
+   "name": "chest_boat_shed",
+   "kind": "chest",
+   "x": -58,
+   "z": 38,
+   "note": "A fallen boat shed on the south-west shore, with crates to break"
+  },
+  {
+   "name": "chest_fallen_giant",
+   "kind": "chest",
+   "x": -136,
+   "z": 160,
+   "note": "Inside a great fallen tree"
+  },
+  {
+   "name": "chest_sheepfold",
+   "kind": "chest",
+   "x": 232,
+   "z": 136,
+   "note": "An empty stone sheepfold east of the road in"
+  },
+  {
+   "name": "ore_above_falls",
+   "kind": "gathering",
+   "x": -330,
+   "z": -44,
+   "note": "Copper and tin, north bank above the falls"
+  },
+  {
+   "name": "ore_ridge_foot",
+   "kind": "gathering",
+   "x": 292,
+   "z": -26,
+   "note": "Copper at the ridge's south foot"
+  },
+  {
+   "name": "ore_forge_bank",
+   "kind": "gathering",
+   "x": 130,
+   "z": -200,
+   "note": "Iron, in the bank north-east of the Forge"
+  },
+  {
+   "name": "ore_south_bank",
+   "kind": "gathering",
+   "x": -32,
+   "z": 330,
+   "note": "Tin, under the south rim"
+  },
+  {
+   "name": "garlic_reedbed",
+   "kind": "gathering",
+   "x": -204,
+   "z": 8,
+   "note": "Wild garlic on the river's north bank"
+  },
+  {
+   "name": "mushrooms_second_clearing",
+   "kind": "gathering",
+   "x": -150,
+   "z": 250,
+   "note": "The second clearing. The old boar lives past it"
+  },
+  {
+   "name": "garlic_south_wood",
+   "kind": "gathering",
+   "x": 32,
+   "z": 248,
+   "note": "Wild garlic under the trees"
+  },
+  {
+   "name": "yarrow_pike_fields",
+   "kind": "gathering",
+   "x": 200,
+   "z": 44,
+   "note": "Yarrow in the Pikes' empty fields, south of the river"
+  },
+  {
+   "name": "fishing_old_jetty",
+   "kind": "gathering",
+   "x": 24,
+   "z": -78,
+   "note": "A jetty on the north shore, below the soldiers' road"
+  },
+  {
+   "name": "mushrooms_north_bank",
+   "kind": "gathering",
+   "x": -188,
+   "z": -92,
+   "note": "In the wood between the river and the Watch-house"
+  },
+  {
+   "name": "yarrow_hill_shoulder",
+   "kind": "gathering",
+   "x": -128,
+   "z": -268,
+   "note": "On the signal hill's west shoulder"
+  },
+  {
+   "name": "garlic_river_east",
+   "kind": "gathering",
+   "x": 204,
+   "z": -28,
+   "note": "North bank, east of the ford"
+  },
+  {
+   "name": "sign_stile",
+   "kind": "ground_sign",
+   "x": 112,
+   "z": 206,
+   "note": "Bootprints at a stile west of the road in"
+  },
+  {
+   "name": "sign_boar_wallow",
+   "kind": "ground_sign",
+   "x": -156,
+   "z": 296,
+   "note": "A wallow and tusk marks on a trunk"
+  },
+  {
+   "name": "sign_relay_path",
+   "kind": "ground_sign",
+   "x": -36,
+   "z": -256,
+   "note": "Old bootprints set hard in the clay of the relay path"
+  }
+ ],
+ "prototype_terrain": {
+  "baseHeight": 12,
+  "layers": [
+   {
+    "wavelength": 140,
+    "amplitude": 5
+   },
+   {
+    "wavelength": 60,
+    "amplitude": 2.5
+   },
+   {
+    "wavelength": 18,
+    "amplitude": 0.8
+   }
+  ],
+  "features": [
+   {
+    "x": 0,
+    "z": 0,
+    "radius": 110,
+    "height": -22
+   },
+   {
+    "x": 386,
+    "z": 104,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 346,
+    "z": 200,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 283,
+    "z": 283,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 200,
+    "z": 346,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 104,
+    "z": 386,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 0,
+    "z": 400,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -104,
+    "z": 386,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -200,
+    "z": 346,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -283,
+    "z": 283,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -346,
+    "z": 200,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -386,
+    "z": 104,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -400,
+    "z": 0,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -386,
+    "z": -104,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -346,
+    "z": -200,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -283,
+    "z": -283,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -200,
+    "z": -346,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -104,
+    "z": -386,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 0,
+    "z": -400,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 104,
+    "z": -386,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 200,
+    "z": -346,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 283,
+    "z": -283,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": 346,
+    "z": -200,
+    "radius": 125,
+    "height": 30
+   },
+   {
+    "x": -78,
+    "z": -296,
+    "radius": 95,
+    "height": 46
+   },
+   {
+    "x": 250,
+    "z": -250,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 252,
+    "z": -220,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 254,
+    "z": -190,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 255,
+    "z": -160,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 256,
+    "z": -130,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 254,
+    "z": -100,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 252,
+    "z": -70,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 249,
+    "z": -42,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 246,
+    "z": -15,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 236,
+    "z": 250,
+    "radius": 90,
+    "height": 9
+   },
+   {
+    "x": -70,
+    "z": 96,
+    "radius": 60,
+    "height": 17
+   },
+   {
+    "x": 30,
+    "z": -118,
+    "radius": 50,
+    "height": 12
+   },
+   {
+    "x": -118,
+    "z": -124,
+    "radius": 70,
+    "height": 20
+   },
+   {
+    "x": -150,
+    "z": 170,
+    "radius": 70,
+    "height": 14
+   },
+   {
+    "x": 150,
+    "z": -70,
+    "radius": 45,
+    "height": 10
+   },
+   {
+    "x": -330,
+    "z": -30,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -317,
+    "z": -26,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -305,
+    "z": -22,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -292,
+    "z": -18,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -281,
+    "z": -13,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -271,
+    "z": -9,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -260,
+    "z": -4,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -250,
+    "z": 0,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -238,
+    "z": 7,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -227,
+    "z": 15,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -215,
+    "z": 22,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -203,
+    "z": 28,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -190,
+    "z": 34,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -178,
+    "z": 40,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -165,
+    "z": 37,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -153,
+    "z": 33,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -140,
+    "z": 30,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -130,
+    "z": 26,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -120,
+    "z": 22,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -110,
+    "z": 18,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -100,
+    "z": 14,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 95,
+    "z": -8,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 107,
+    "z": -9,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 119,
+    "z": -10,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 130,
+    "z": -11,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 142,
+    "z": -12,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 152,
+    "z": -7,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 161,
+    "z": -2,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 171,
+    "z": 4,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 180,
+    "z": 9,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 190,
+    "z": 14,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 200,
+    "z": 21,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 210,
+    "z": 28,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 220,
+    "z": 34,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 230,
+    "z": 41,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 240,
+    "z": 48,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 252,
+    "z": 52,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 264,
+    "z": 57,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 276,
+    "z": 61,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 288,
+    "z": 66,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 300,
+    "z": 70,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 312,
+    "z": 74,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 324,
+    "z": 78,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 336,
+    "z": 82,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 348,
+    "z": 86,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 360,
+    "z": 90,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 373,
+    "z": 93,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 387,
+    "z": 97,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": 400,
+    "z": 100,
+    "radius": 20,
+    "height": -14
+   },
+   {
+    "x": -296,
+    "z": -388,
+    "radius": 90,
+    "height": 26
+   },
+   {
+    "x": 326,
+    "z": -112,
+    "radius": 55,
+    "height": -6
+   },
+   {
+    "x": -322,
+    "z": -34,
+    "radius": 40,
+    "height": 12
+   }
+  ]
+ }
+}

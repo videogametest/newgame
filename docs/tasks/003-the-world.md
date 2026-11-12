@@ -8,6 +8,10 @@ Build Tallowmere as a place worth walking through, with nobody to fight yet. Sco
 
 This task is judged on how the world looks and feels. Greg does not look at it until Claude has reviewed the screenshots against the first-look bar below.
 
+## The layout
+
+Where everything stands is in `docs/tasks/003-layout.md`, with its data in `docs/tasks/003-layout/layout.json`. It replaces the provisional placement in `src/core/world/valley.ts`. Reshape the land to it before building Wick.
+
 ## Build in two steps
 
 Open a PR, merge, and deploy after each step, and log each in `docs/status.md` as "not ready for first look" until the bar is met.

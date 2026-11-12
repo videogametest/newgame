@@ -1,12 +1,12 @@
 # Every Lit Window: Game Design
 
-Version 9 (deepens the story: the Lamplighter, the Captain, the hero's house, places with a past, the lantern ritual, and the turn). Supersedes version 8.
+Version 10 (the hero becomes an apprentice scout: mentor, trials and ranks, stealth and scouting, a warrior companion, campfires, and a horse later). Supersedes version 9.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
 ## 1. Summary
 
-A single-player, medieval fantasy conquest RPG played in the browser in full 3D. The player explores one continuous open world on foot from a third-person camera, with an AI-controlled squad following. Enemy camps and outposts sit in the world; fights happen where the player meets them, with no loading into a separate arena. Clearing a place captures it. Between fights the player explores, loots, crafts gear, levels skills, and grows the squad.
+A single-player, medieval fantasy conquest RPG played in the browser in full 3D. The player is an apprentice scout: a cloaked archer who wins by watching, planning, and striking from hiding more than by brute force. The player explores one continuous open world on foot from a third-person camera, with an AI-controlled squad following. Enemy camps and outposts sit in the world; fights happen where the player meets them, with no loading into a separate arena. Clearing a place captures it. Between fights the player explores, loots, crafts gear, levels skills, and grows the squad.
 
 The world should feel like a place worth walking through: bright, alive, and full of small things to find. It is our own world. Do not use characters, names, symbols, music, or designs from any existing game.
 
@@ -21,6 +21,7 @@ Inspirations and what we take from each:
 | Worms | Aimed, arcing projectiles |
 | Pokémon | Collecting and developing a roster |
 | Far Cry | Outposts to clear and hold |
+| Ranger's Apprentice (book series) | The feeling of apprenticeship: a terse mentor with high standards, skill and wit over strength, the bow, moving unseen, a loyal warrior friend, small comforts on the road. Feelings only: use none of its names, insignia, characters, or places |
 
 ## 2. Fixed decisions
 
@@ -33,7 +34,7 @@ These are expensive to change. Do not revisit without asking.
 - **The world is generated from data and a seed, not hand-modelled.** Terrain comes from a seeded height function. Scenery (trees, rocks, grass, flowers) is scattered by seeded rules per biome. Points of interest (village, camps, outposts, chests, ruins, landmarks) are placed by hand in data files. The same seed always produces the same world.
 - **The world grows by regions.** Start with one valley about 500 m across. Later regions attach at its edges and are part of the same continuous world.
 - **Engine:** Babylon.js with TypeScript and Vite.
-- **Art style:** stylized low-poly from CC0 asset packs. Characters stay as they are (KayKit Adventurers). Scenery comes from packs that match them (KayKit first; Quaternius or Kenney where KayKit has nothing suitable). Keep each pack's license file in the repo beside its assets.
+- **Art style:** stylized low-poly from CC0 asset packs. Characters come from KayKit Adventurers. The hero is the hooded, cloaked archer model, not the armoured knight; no enemy may use the same model and colours as the hero. Scenery comes from packs that match them (KayKit first; Quaternius or Kenney where KayKit has nothing suitable). Keep each pack's license file in the repo beside its assets.
 - **No physics engine.** The core simulation owns every position, velocity, and hit, including ground height. Babylon renders what the simulation says.
 - **Canvas** fills the browser window. Target 60 fps on a desktop.
 - **Progression:** use-based skills, no classes.
@@ -53,7 +54,7 @@ Rules:
 - **Difficulty is fixed by location.** Enemies do not scale with the player. Places farther from the starting village are harder. Early areas become easy; later areas are gated by strength, not locks.
 - **Dying:** no permadeath. The player keeps XP earned, loses a portion of carried gold, and wakes at the nearest owned town. Squad members who fell are wounded: they stay behind until healed for gold or until the player rests at a town.
 - **Income** accrues per place captured and per in-game day, not real-world time.
-- **Healing.** Health does not regenerate on its own. Food, found in the world or bought in town, heals over a few seconds when eaten and can be interrupted by taking damage. Resting at an owned town heals the hero and squad fully and advances time to the next morning.
+- **Healing.** Health does not regenerate on its own. Food, found in the world or bought in town, heals over a few seconds when eaten and can be interrupted by taking damage. Resting at an owned town heals the hero and squad fully and advances time to the next morning. Resting at a campfire (section 4) heals the hero and squad to half and lets the player wait until dusk or dawn.
 - **Enemies stay dead** in captured places, except when the story retakes one (section 9, The turn). Uncaptured camps restock their defenders after several in-game days.
 
 ## 4. The world
@@ -80,6 +81,13 @@ Finding your way:
 - A place is discovered when the hero comes within sight of it. Discovery shows its name briefly on screen.
 - **Fast travel** between owned towns from the map. Not available in the first valley; it arrives with the second region.
 
+Campfires:
+
+- Fire rings are scattered through the wild as discoverable places, shown on the map once found. Each sits somewhere with a view.
+- At a campfire the hero can rest, cook (turn foraged ingredients into food that heals more than raw food), and wait until dusk or dawn.
+- While resting, the companions present say a line or two to each other or to the hero. These short exchanges are where the game's humour and warmth live.
+- A campfire cannot be used while enemies are aware of the hero.
+
 Layout of the first valley:
 
 - The hero starts at the valley's edge at dusk, with the Lamplighter's single lit window visible in the distance, and walks to the village near the centre.
@@ -102,11 +110,12 @@ Controls:
 - Mouse: look and aim (pointer lock during play; `Esc` releases it)
 - `Shift`: sprint
 - `Space`: dodge roll in the movement direction, with a short cooldown
-- `1` / `2`: switch between sword and bow
+- `1` / `2`: switch between short blade and bow
+- `C`: crouch (toggle), for moving quietly and staying low
 - Left mouse: attack
-  - **Sword:** melee swing in front of the hero, short range, brief cooldown
+  - **Short blade:** melee swing in front of the hero, short range, brief cooldown. The scout's backup weapon
   - **Bow:** hold to draw, release to fire along the crosshair. The arrow follows a gravity arc. Longer draw means more speed and damage.
-- Right mouse (bow only): zoom the camera in for aiming
+- Right mouse (bow only): zoom the camera in for aiming. Holding the zoom on an enemy for a moment marks them
 - `E`: interact (open chest, talk, use a town service)
 - `F`: eat food to heal
 - `Q`: squad order, toggling between "follow me" and "hold here"
@@ -119,7 +128,14 @@ Rules:
 - Every fighter has an HP bar above their head, shown when in combat or damaged. Hits apply knockback, flash the target, and show a damage number.
 - **Enemy attacks are telegraphed.** Every enemy melee attack has a visible wind-up before damage lands, long enough to dodge or step away. Enemy archers visibly draw before firing.
 - **Awareness.** Each enemy has an awareness range. Outside it they idle or patrol their camp. Inside it they attack, and they give up and return home if led too far away.
-- Squad members follow the hero when out of combat and target the nearest enemy when a fight starts.
+- **Stealth and scouting.** The intended way to take a place is to watch it first, then strike from hiding.
+  - Each enemy is unaware, suspicious, or alert, shown by a small marker above their head. Suspicious enemies turn and investigate; alert enemies attack and alert others nearby.
+  - How easily the hero is noticed depends on distance, whether the enemy is facing them, movement (still, crouched, walking, sprinting), cover (tall grass, scenery between them), and light (night hides the hero; standing near a lit fire or lantern does not).
+  - The scout's cloak: a hero who is crouched and not moving is very hard to notice, even in the open.
+  - **Marking.** Holding the bow zoom on an enemy for a moment marks them. Marked enemies stay outlined through scenery for a while, so the player can plan from a ridge before going in.
+  - **The first arrow.** An arrow that hits an unaware enemy deals heavily increased damage. A short-blade strike on an unaware enemy from behind does too.
+  - A fight that goes loud is still winnable; stealth is rewarded, never required.
+- Squad members follow the hero when out of combat and target the nearest enemy when a fight starts. They stay back and out of sight while the hero is crouched.
 - **Squad orders.** "Follow me" is the default. "Hold here" keeps the squad where they stand: they defend themselves but do not advance, so the hero can scout or open a fight alone. The current order is shown on the HUD.
 - Fighters collide with the opposing team and with scenery. Teammates do not block each other. A fighter that comes between the camera and the hero fades out.
 - Arrows are blocked by terrain and scenery.
@@ -142,7 +158,9 @@ Starting unit types:
 | Defense | Damage taken and blocked | Max HP, damage reduction |
 | Smithing | Crafting gear | Unlocks higher gear tiers, better craft quality |
 | Leadership | Places captured with a squad | Squad size, recruit quality |
+| Stealth | Time spent unnoticed near enemies, hits on unaware enemies | Harder to notice, stronger first strike, longer marks |
 
+- **Apprenticeship.** The hero's rank is Apprentice, then Scout, then Warden of the valley. Rank is earned by passing trials the Lamplighter sets, not by experience points. Each trial is a small, self-contained challenge in the world: hit a distant target across the river, cross an occupied place and back without being noticed, follow a trail through the forest to what is at the end of it. The Lamplighter judges the result in a line. Each rank changes the colour of the hero's cloak, so progress is visible on the character, and unlocks a perk tier.
 - **Perks:** one perk choice every 10 levels in a skill. Perks are where build identity comes from.
 - **Gear tiers** come from materials: bronze, iron, steel, then higher tiers. Gear is crafted or looted, and equipped gear is visible on the character model where the asset pack allows.
 - **Squad:** recruits have their own level and gear slots. Recruiting and developing them is the collecting layer.
@@ -172,10 +190,10 @@ Each milestone ends deployed to Pages and playable. Do not start the next one un
 1. **Combat prototype.** Done: third-person hero, sword and bow, telegraphed enemies, dodge, waves, tuning panel. Remaining: camera fade for blocking fighters, sound effects, showcase mode.
 2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned with the Lamplighter and one lit window, plus the Mill, the Forge, and the Watch-house placed in data (section 9). Fights in place with awareness ranges, squad following, pathfinding, capture by lighting the lantern, with the growing melody, falling banners, and visible restoration of each place and of the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
 3. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, the turn in which the Captain retakes the first freed place, the Captain fight at the Watch-house, and the valley finale ending at the hero's family house (section 9).
-4. **Progression.** Skills that level by use, perks, loot tables, inventory, equippable gear with tiers.
+4. **Progression.** Skills that level by use, including Stealth, perks, loot tables, inventory, equippable gear with tiers, and the apprenticeship: the Lamplighter's trials and the three ranks with their cloak colours.
 5. **Conquest and towns.** Town services that come from the people who return (the smith's crafting, the miller's food, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
 6. **Cloud saves.** Supabase auth and save sync.
-7. **More world.** A second region, fast travel between owned towns, more unit types, more secrets, more music.
+7. **More world.** A second region, the hero's horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
 
 ## 9. Story
 
@@ -192,9 +210,11 @@ Tone: warm and hopeful, with a quiet sadness for what was lost. No gore, no grim
 
 ### The people
 
-- **The Lamplighter.** An old villager who never left. Every night for a generation they have kept one window lit so that anyone coming home could find the way. That single light is visible across the valley at night and is the first thing the hero walks toward. The Lamplighter greets the hero, knew the hero's family, and is the heart of the village. They speak in short, plain lines that change as the valley recovers, and they are the one who teaches the lantern ritual.
-- **The Captain.** A former officer of the crown's guard who stayed when the army left and decided the valley was theirs to hold. They rule from the outpost and take a share of everything, and in their own eyes they are the only reason anyone here survived. They are not entirely wrong. Their banners fly over every place the hero has not freed, so their presence is visible everywhere. They are defeated, not killed.
-- **The hero** is silent and unnamed, so the player can be them.
+- **The Lamplighter.** The hero's mentor. Once a scout of the old crown guard, one of the wardens who watched the valleys, they were away on patrol the night the soldiers left, and came back to find them gone. That is why they stayed, and why they hold fragments of the question without the answer. They never left. Every night for a generation they have kept one window lit so that anyone coming home could find the way. That single light is visible across the valley at night and is the first thing the hero walks toward. The Lamplighter greets the hero, knew the hero's family, and is the heart of the village. They take the hero on as an apprentice and teach the scout's craft: the bow, patience, and not being seen. They are terse and dry, they expect a great deal, they praise rarely and briefly, and when the hero fails they say something wry and tell them to do it again. They speak in short, plain lines that change as the valley recovers, and they are the one who teaches the lantern ritual.
+- **The Captain.** A former officer of the crown's guard who stayed when the army left and decided the valley was theirs to hold. They rule from the outpost and take a share of everything, and in their own eyes they are the only reason anyone here survived. They are not entirely wrong. Their banners fly over every place the hero has not freed, so their presence is visible everywhere. They and the Lamplighter served together before the kingdom fell, and each thinks the other chose wrongly. They are defeated, not killed.
+- **The hero** is silent and unnamed, so the player can be them. They arrive as nobody in particular and become the Lamplighter's apprentice.
+- **The friend.** The hero does not come home alone. A childhood friend from the town where the hero grew up comes with them: a sword-and-shield fighter, loyal, blunt, and quick with a joke, who holds the line while the hero shoots. They are the first squad member, present from the start, and the hero's opposite in every way that makes them a good pair. Their lines at campfires carry most of the game's humour.
+- **The horse.** Arrives with the second region: small, shaggy, sturdy, and opinionated, with a name and a personality shown through how it behaves. It is for travel, not for fighting.
 
 ### The question
 
@@ -264,10 +284,9 @@ Restoration is tracked as a single valley recovery level in the game state. It r
 
 Not in scope until the core game works. Do not build these unprompted.
 
-- Stealth openers on outposts (sneak-attack bonus on the first shot)
 - Magic as a third combat style
 - Blocking and parrying
-- Mounts
+- Mounted combat
 - Swimming and climbing
 - Quests, a quest log, branching dialogue, and cutscenes
 - Weather

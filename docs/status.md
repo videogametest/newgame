@@ -7,7 +7,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
-| B | Task 002b (style test) PR open: `?styletest=1` scene, captures in `docs/pr-media/styletest/`. Review-002 survey changes applied in `docs/assets.md`. | 002b PR (see entry below) | Greg's review of the style test; decisions on the people question and the seven gaps; villager-set search not yet done; task 003 waits on all of these |
+| B | Task 002b (style test) merged as PR #15 (`be9b543`, squash). Pages run `43146924761` succeeded. `?styletest=1` scene; captures in `docs/pr-media/styletest/`. Review-002 survey changes applied in `docs/assets.md`. | none | Greg's review of the style test; decisions on the people question and the seven gaps; villager-set search not yet done; task 003 waits on all of these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
 ## 2026-11-12 Task 002b: style test (Viktor)
@@ -20,7 +20,8 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - **Survey changes** from review 002 are applied in `docs/assets.md` ("Review 002 changes").
 - **Not done:** the bounded search for a CC0 stylised villager set (required before group 6). Nothing has been searched for it yet.
 - **Blocked:** KayKit Hexagon free zip (0 bytes); Quaternius quota (village, people, wildlife); Castle Kit not downloaded. See `docs/assets.md`.
-- **Verified:** `npx tsc --noEmit` exit 0; `npm run build` exit 0; `npm test` and smoke test: see the PR.
+- **Merged:** PR #15 (`be9b543`, squash). No PR checks run (the deploy workflow runs on `main` only), so tests were run locally: `tsc --noEmit` exit 0; `npm test` 17 files, 128 tests pass; `npm run build` exit 0; smoke test passes on `vite preview`.
+- **Live:** Pages run `43146924761` succeeded. `https://everylitwindow.com/` returns HTTP 200 and passes `scripts/smoke.mjs` with no failed requests.
 
 ## 2026-11-12 03:05 ET (Viktor)
 

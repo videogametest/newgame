@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 15 (kill or knock out: knocked-out and surrendered bandits can be won back as villagers). Supersedes version 14.
+Version 16 (loot, gathering, crafting, carrying, the hero's home, and trade). Supersedes version 15.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -159,6 +159,7 @@ Controls:
 - `F`: eat food to heal
 - `Q`: squad order, toggling between "follow me" and "hold here"
 - `M`: map
+- `I`: inventory
 - `Esc`: pause menu (also releases the mouse)
 - Backtick: tuning panel
 
@@ -262,10 +263,13 @@ Impact:
 | Skill | Levels from | Effect |
 | --- | --- | --- |
 | Archery | Bow hits | Bow damage, draw speed |
-| Melee | Sword hits | Sword damage, swing speed |
+| Melee | Short-blade and knife hits | Blade damage, swing speed |
 | Defense | Damage taken and blocked | Max HP, damage reduction |
 | Smithing | Crafting gear | Unlocks higher gear tiers, better craft quality |
 | Leadership | Places captured with a squad | Squad size, recruit quality |
+| Gathering | Foraging, hunting, cutting wood, mining ore, fishing | Better yield, rarer finds, faster gathering |
+| Fletching | Making arrows | More arrows per batch, better quality, unlocks special arrow types |
+| Cooking | Cooking at campfires | Food that heals more and adds short bonuses |
 | Stealth | Time spent unnoticed near enemies, hits on unaware enemies | Harder to notice, stronger first strike, longer marks |
 
 - **Apprenticeship.** The hero's rank is Apprentice, then Scout, then Warden of the valley. Rank is earned by passing trials Hesper sets, not by experience points. Trials are optional: the valley can be finished as an Apprentice, but each rank unlocks a stronger tier of perks. Each trial teaches one part of the scout's craft and ends with a single dry line from Hesper, on failure as well as success.
@@ -286,7 +290,48 @@ Impact:
 - **Gear tiers** come from materials: bronze, iron, steel, then higher tiers. Gear is crafted or looted, and equipped gear is visible on the character model where the asset pack allows.
 - **Squad:** recruits have their own level and gear slots. Recruiting and developing them is the collecting layer.
 
-Exact XP curves, perk lists, and tier stats are tuning, not design. Keep them in data.
+### Loot
+
+What the player finds, and where:
+
+- **Enemies carry what you see.** Whatever a bandit visibly wears or holds can be taken from them once they are down: the brute's helmet, the shield-bearer's shield, an archer's quiver. A place's loot can be sized up from a ridge before going in. Knocked-out and spared bandits keep their personal things; only their weapons are taken.
+- **Each enemy-held place has a strongbox** holding the share Stane took from the valley: gold, materials, and stolen goods. It opens only once the place is freed.
+- **Stolen goods** belonged to someone: a family's candlesticks, the miller's tools, a wedding ring, a child's carved horse. Each is marked with whose it was. Returned to its owner, or to the family's house if they have not come home yet, it gives a reward, a line of thanks, and a rise in the valley recovery level; some families return only once their thing is back. It can instead be sold for gold. This is the link between looting and the story.
+- **Unique items** are placed by hand, each with a name, one special property, and a line of history. Wren's bow is the first. There are few of them, and none are random.
+- **Chests, breakables, and cut grass** give small things: coins, arrows, food, common materials.
+- **Quality:** common, fine, or masterwork, on top of the material tier. Quality is a small set of fixed bonuses, not random number rolls.
+- **Picking up:** coins, arrows, and gathered materials are collected by walking over them. Bodies, containers, and stolen goods need `E`.
+
+### Gathering
+
+- **Foraging:** herbs, mushrooms, fruit from the wild orchard, honey from its hives.
+- **Hunting:** meat, hides, and feathers from deer and rabbits; fish from the lake.
+- **Wood:** certain trees give staves for bows and shafts for arrows.
+- **Ore:** veins in the hills and by the waterfall give copper and tin for bronze, then iron.
+- Gathering spots regrow or refill after a few in-game days. Each is visible in the world as what it is; there are no glowing markers.
+- Everything gathered trains the Gathering skill.
+
+### Crafting
+
+- **Fletching** at any campfire: shafts, feathers, and heads become arrows. Standard arrows from wood, feathers, and bronze or iron heads; blunt arrows by padding a standard one; fire and whistling arrows from rarer materials. A scout who fletches rarely runs dry.
+- **Cooking** at any campfire: raw food and foraged ingredients become meals that heal more and give a short bonus.
+- **Smithing** at the Forge once the smith returns: blades, arrowheads, armour pieces, and upgrades from material to material and from common toward masterwork.
+- Recipes are learned by doing, by finding notes, and from the people who return. Known recipes are listed in the notebook.
+
+### Carrying and keeping
+
+- **A carry limit**, counted in weight. Over the limit the hero cannot sprint. Arrows, food, and materials all weigh something; gold does not.
+- **Inventory** on `I`: gear, arrows, food, materials, stolen goods, and unique items, with what each is for.
+- **Storage:** a chest at Hesper's house from the start, unlimited.
+- **Home.** After the valley finale the Fairlow house is the hero's. It has the storage chest, a bed to rest in, and racks, shelves, and a mantel where weapons, unique items, and trophies can be placed and seen. The house fills up as the collection grows.
+
+### Trade
+
+- Traders are among the people who return: a general trader early, then others tied to places and trades.
+- Prices improve and stock widens as the valley recovery level rises.
+- Gold comes from strongboxes, selling, and the income from freed places.
+
+Exact XP curves, perk lists, recipes, weights, prices, and tier stats are tuning, not design. Keep them in data.
 
 ## 7. Technical architecture
 
@@ -312,8 +357,8 @@ Each milestone ends deployed to Pages and playable. Do not start the next one un
 2. **Open world slice.** The first valley, about 500 m across: seeded terrain with `heightAt`, chunked scenery, sky and day-night cycle, wind, ambient life, water, a boundary, and horizon landmarks. A village that starts half abandoned with Hesper and her one lit window, plus the Mill, the Forge, and the Watch-house placed in data (section 9). Wildlife, the ten places off the path, alarm bells, fights in place with awareness ranges, squad following, pathfinding, capture by lighting the lantern, with the growing melody, falling banners, and visible restoration of each place and of the village, chests and breakables with found notes, healing by food and rest, compass strip and map, squad orders, pause menu with settings, ambient sound and responsive music. Tour mode. The milestone 1 arena and waves are removed. Balance target: the skilled bot clears the nearest camp in 60 to 150 s with 30 to 70% HP left, and a sword-only bot that never dodges loses at the outpost.
 3. **Combat depth.** Everything in section 5 under The bow, Close combat, How enemies fight, Unit types, Fighting alongside Bram, and Impact: weak points, the limited quiver, arrow types, perfect draw, the three-hit combo, perfect dodge, lock-on, throwing knives, stagger, attack turns, morale, the shield-bearer, brute, and runner, Bram's traits, and impact feel.
 4. **First five minutes and the valley finale.** Title screen with Continue and New Game, control prompts shown the first time each is needed, a nudge toward the first camp, local saves, the turn in which the Captain retakes the first freed place, the Captain fight at the Watch-house, and the valley finale ending at the hero's family house (section 9).
-5. **Progression.** Skills that level by use, including Stealth, perks, loot tables, inventory, equippable gear with tiers, and the apprenticeship: Hesper's six trials and the three ranks with their cloak colours (section 6).
-6. **Conquest and towns.** Town services that come from the people who return (the smith's crafting, the miller's food, recruiting, healing), income from captured places, wounded squad members, camps that restock, harder places farther out.
+5. **Progression and loot.** Skills that level by use, including Stealth, Gathering, Fletching, and Cooking, perks, everything in section 6 under Loot, Gathering, Crafting, and Carrying and keeping (smithing waits for milestone 6), and the apprenticeship: Hesper's six trials and the three ranks with their cloak colours (section 6).
+6. **Conquest and towns.** Town services that come from the people who return (smithing at the Forge, the miller's food, recruiting, healing), trade as in section 6, the Fairlow house as the hero's home with its displays, income from captured places, wounded squad members, camps that restock, harder places farther out.
 7. **Cloud saves.** Supabase auth and save sync.
 8. **More world.** A second region, the hero's horse (section 9), fast travel between owned towns, more unit types, more secrets, more music.
 
@@ -426,7 +471,7 @@ Restoration is tracked as a single valley recovery level in the game state. It r
 2. The hero lights the Watch-house lantern. Every place in Tallowmere is free.
 3. That night Wick holds a festival: lanterns, the full melody, every returned villager gathered.
 4. Hesper leads the hero to the Fairlow house. The hero lights its window. It is the last dark window in the village, and the image the game is named for. The wren in the eaves sings.
-5. In the morning the road toward the castle is open and marked on the map.
+5. In the morning the road toward the castle is open and marked on the map. The Fairlow house is now the hero's home (section 6).
 
 ## 10. Interface
 

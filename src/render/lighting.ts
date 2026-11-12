@@ -47,28 +47,36 @@ export interface Lighting {
 }
 
 /**
- * Hours 0..24. Sunrise 6, noon 12, dusk 19 (windows light), night 1..19 dark. Pure: no scene access.
- * Golden-hour warmth peaks at dusk (19) and at dawn (6): gold sun, warm fill, orange horizon, rose zenith.
+ * Hours 0..24, by the design's clock (section 5, "The clock"): dawn 6, dusk 18, windows lit from 19 to 1.
+ * Pure: no scene access.
+ *
+ * Dusk and dawn light things, not only the sky (task 003, first-look bar). The light does not stop when the sun
+ * touches the horizon: it fades over the hour after, so at 18 the ground, walls, and faces are gold, at 19 the
+ * windows are the brightest things, and by half past it is night. Golden warmth peaks at 18 and at 6.
  */
 export function lightingAt(tod: number): Lighting {
   const elev = Math.sin(((tod - 6) / 12) * Math.PI);
-  const dayness = clamp01(elev * 2.5);
-  const warm = Math.max(clamp01(1 - Math.abs(tod - 19) / 2.5), clamp01(1 - Math.abs(tod - 6) / 2));
-  // Mornings follow the sun's elevation; evenings darken from just after dusk.
-  const nightness = tod < 12 ? clamp01((0.2 - elev) * 3) : clamp01((tod - 18.6) / 1.2);
+  // Daylight outlasts the sun by about an hour at each end of the day.
+  const dayness = clamp01((elev + 0.2) * 2.2);
+  const warm = Math.max(clamp01(1 - Math.abs(tod - 18) / 1.8), clamp01(1 - Math.abs(tod - 6) / 1.8));
+  const nightness = tod < 12 ? clamp01((0.1 - elev) * 3) : clamp01((tod - 18.4) / 1.0);
   const zenith = mix(PALETTE.nightZenith, PALETTE.dayZenith, dayness);
   const horizon = mix(PALETTE.nightHorizon, PALETTE.dayHorizon, dayness);
+  // The low sun is strong: grazing light needs the strength to colour flat ground, and it is what makes long shadows.
+  const golden = warm * clamp01(dayness * 3);
+  const afterglow = clamp01(0.35 + dayness * 2);
   return {
-    // Never higher than 0.12 below the horizon: low sun gives long shadows at dusk and dawn.
-    sunDir: new Vector3(0.45, -Math.max(0.12, elev), 0.6).normalize(),
+    // Never lower than this above the horizon, so flat ground still takes the light at dusk and dawn.
+    sunDir: new Vector3(0.45, -Math.max(0.22, elev), 0.6).normalize(),
     elevation: elev,
-    sunColor: mix(mix(PALETTE.moon, PALETTE.sunWarm, dayness), PALETTE.sunGold, warm),
-    sunIntensity: 0.35 + 0.85 * dayness + 0.35 * warm,
-    hemiColor: mix(mix(PALETTE.moon, PALETTE.dayLight, dayness), PALETTE.warmHemi, warm * 0.5),
-    hemiIntensity: 0.7 + 0.25 * dayness,
+    sunColor: mix(mix(PALETTE.moon, PALETTE.sunWarm, dayness), PALETTE.sunGold, golden),
+    sunIntensity: 0.3 + 0.9 * dayness + 1.1 * golden,
+    hemiColor: mix(mix(PALETTE.moon, PALETTE.dayLight, dayness), PALETTE.warmHemi, golden * 0.7),
+    hemiIntensity: 0.6 + 0.3 * dayness + 0.35 * golden,
     lit: tod >= 19 || tod < 1,
     nightness,
-    zenith: mix(zenith, PALETTE.duskZenith, warm * 0.7),
-    sky: mix(horizon, PALETTE.duskHorizon, warm * 0.9),
+    // The sky's colour fades with the light, so the ground is never near-black under a bright sky.
+    zenith: mix(zenith, PALETTE.duskZenith, warm * 0.7 * afterglow),
+    sky: mix(horizon, PALETTE.duskHorizon, warm * 0.9 * afterglow),
   };
 }

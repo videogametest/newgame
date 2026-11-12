@@ -47,3 +47,14 @@ export function valleyCameraPose(
     target: { x: px + vx, y: py + vy, z: pz + vz },
   };
 }
+
+/**
+ * Yaw and pitch that make the camera look along a direction, using valleyCameraPose's convention:
+ * v = (sin yaw cos p, sin p, cos yaw cos p). Used by the capture hook to frame the sun and the moon.
+ */
+export function aimAngles(dir: Point3): { yaw: number; pitch: number } {
+  const len = Math.hypot(dir.x, dir.y, dir.z) || 1;
+  const yaw = Math.atan2(dir.x, dir.z);
+  const pitch = Math.asin(Math.max(-1, Math.min(1, dir.y / len)));
+  return { yaw, pitch };
+}

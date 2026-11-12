@@ -12,7 +12,7 @@ import { newGameState } from '../core/state';
 import type { GameState } from '../core/types';
 import { advanceClock } from '../core/world/clock';
 import { isWater, insideValley, valleyHeightAt, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL, VALLEY_HALF_EXTENT } from '../core/world/valley';
-import { valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
+import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
 import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
 import { walkStep, type WalkRules } from '../core/world/walk';
 import { TRAINING_FIELD } from '../data/arena';
@@ -45,6 +45,7 @@ const SUN_RANGE = 90;
 export interface ValleyHooks {
   setTod(hours: number): void;
   freeze(on: boolean): void;
+  aimAt(body: 'sun' | 'moon'): void;
   state(): ValleyState;
 }
 export interface ValleyState {
@@ -315,6 +316,14 @@ class Valley {
       },
       freeze: (on) => {
         this.frozen = on;
+      },
+      // Capture only: turns the camera to the sun or the moon at the current time. It skips the pitch limit
+      // on purpose, because the noon sun sits above the player's look range.
+      aimAt: (body) => {
+        const L = lightingAt(this.game.timeOfDay);
+        const a = aimAngles(body === 'sun' ? L.sunSky : L.moonSky);
+        this.input.camYaw = a.yaw;
+        this.input.aimPitch = a.pitch;
       },
       state: () => this.snapshot(),
     };

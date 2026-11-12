@@ -11,7 +11,9 @@ const outDir = process.argv[3] ?? 'docs/pr-media/valley';
 const TIMES = [
   { name: 'arrival-dusk-19', tod: 19 },
   { name: 'noon-12', tod: 12 },
+  { name: 'noon-sun-12', tod: 12, aim: 'sun' },
   { name: 'night-0', tod: 0 },
+  { name: 'night-moon-2', tod: 2, aim: 'moon' },
   { name: 'dawn-6', tod: 6 },
 ];
 
@@ -33,6 +35,7 @@ await page.evaluate(() => window.__valley.freeze(true));
 const report = [];
 for (const t of TIMES) {
   await page.evaluate((tod) => window.__valley.setTod(tod), t.tod);
+  if (t.aim) await page.evaluate((body) => window.__valley.aimAt(body), t.aim);
   // Let the terrain chunks build and the frame settle.
   await page.waitForTimeout(4000);
   const state = await page.evaluate(() => window.__valley.state());

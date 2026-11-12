@@ -24,6 +24,7 @@ const browser = await chromium.launch({
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 page.on('console', (msg) => { if (msg.type() === 'error') failures.push(`console error: ${msg.text()}`); });
+page.on('console', (msg) => { if (msg.type() === 'warning' && msg.text().includes('[bindClips]')) failures.push(`bind warning: ${msg.text()}`); });
 page.on('pageerror', (err) => failures.push(`page error: ${err.message}`));
 page.on('requestfailed', (req) => failures.push(`request failed: ${req.url()} (${req.failure()?.errorText})`));
 page.on('response', (res) => { if (res.status() >= 400) failures.push(`HTTP ${res.status()}: ${res.url()}`); });

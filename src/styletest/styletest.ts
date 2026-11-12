@@ -204,7 +204,7 @@ function placeOn(ctx: Ctx, kitName: string, tag: string, x: number, z: number, y
   const container = ctx.kit.get(kitName);
   if (!container) throw new Error(`Styletest: kit piece not loaded ${kitName}`);
   const name = `${tag}_${ctx.n++}`;
-  const entries = container.instantiateModelsToScene((n) => `${name}_${n}`, false);
+  const entries = container.instantiateModelsToScene((n) => n, false);
   const root = new TransformNode(name, ctx.scene);
   for (const r of entries.rootNodes) r.parent = root;
   root.scaling.setAll(opts.scale ?? 1);
@@ -384,7 +384,8 @@ interface Spawned {
 function spawnPerson(ctx: Ctx, containers: Map<string, AssetContainer>, clips: LoadedAssets['clips'], p: Person, tag: string, x: number, z: number, yaw: number): Spawned {
   const c = containers.get(p.model);
   if (!c) throw new Error(`Styletest: model not loaded ${p.model}`);
-  const entries = c.instantiateModelsToScene((n) => `${tag}_${n}`, true);
+  // Bone names stay as authored: the clips look bones up by name (the game does the same).
+  const entries = c.instantiateModelsToScene((n) => n, true);
   const root = new TransformNode(tag, ctx.scene);
   for (const r of entries.rootNodes) r.parent = root;
   root.position = new Vector3(x, 0, z);

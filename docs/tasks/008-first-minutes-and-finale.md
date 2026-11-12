@@ -36,3 +36,4 @@ A new player can start the game, learn it without being told, save their progres
 - **Where you left off:** on Continue, `showCatchUp` and `whereYouLeftOff` (`src/core/notes/notes.ts`); words in `docs/writing/interface.md`. Store the last-played time with settings, not in the save.
 - **The title's small line:** time one whole playthrough and put the measured hours in it. Until then it stays out of the build.
 - **Five new first-time prompts** in `docs/writing/interface.md`: Notes, holding aim, the pommel, binding, Hesper's loose thread.
+- **Standing watch (design v31):** `src/core/valley/watch.ts`, `GameState.watch`. Offered at freed lanterns at dusk once `stane_yields` is reached; lines in `hesper.md` and `interface.md`. The raid uses `raidTonight`'s party and difficulty, with the valley's answers applied. No place is ever retaken by it.

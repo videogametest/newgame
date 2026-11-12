@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 30 (what the second research pass taught: companions never in the way, mercy has its own tools and is judged by who, Notes as a record, no story breaks, nothing asks for a grind, something at every stop). Supersedes version 29.
+Version 31 (standing watch: raids after the finale, only by invitation). Supersedes version 30.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -742,6 +742,16 @@ The fight tests everything the player has learned as a scout, and its ending is 
 6. **That night Wick holds a festival:** lanterns, Wick's theme in full, every household that has come home gathered in the square.
 7. **Hesper leads the hero to the Fairlow house.** The hero lights its window. It is the seventeenth window, the last dark one in the village, and the image the game is named for. The wren in the eaves sings the first phrase of the melody.
 8. **In the morning** the road toward the castle is open and marked on the map, and the Fairlow house is the hero's home (section 6).
+
+### Standing watch
+
+After the finale the valley is safe, and a player who has finished the story still has something to fight if they want it, and only if they want it.
+
+- **Only by invitation.** Nothing ever attacks a freed place on its own. Once Stane has yielded, Hesper mentions that some of his men never came down from the hills. From then on, at any freed place's lantern at dusk, the hero can choose to stand watch. That choice, and nothing else, brings a raid that night.
+- **Nothing can be lost.** A place is never retaken. If the hero falls or walks away, the household and the bell drive the raiders off, and the hero wakes there at dawn. Nothing carried, stored, built, or learned is at risk. The turn remains the only time in the game a freed place is lost.
+- **It gets harder as it is won.** The first watch brings four stragglers; each one won brings a larger and tougher party, up to eight with two brutes. They have learned from how the hero fights, like any place (The valley learns). Because harder feats teach more, a watch is where a skill near the cap and a perk's mastery can still grow.
+- **They are fought like anyone.** Stragglers can be killed, knocked out, or made to yield. Those spared walk out of the valley; they are nobody's neighbours and none comes home. The household whose place it is gives a meal in thanks.
+- **One a night,** at one place. The parties are data.
 
 ## 10. Interface
 

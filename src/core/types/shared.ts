@@ -8,6 +8,7 @@ import type { InventoryState } from '../items/types';
 import type { Quiver, RecoverableArrow } from '../combat/quiver';
 import type { Stories } from '../stories/stories';
 import type { Taking } from '../valley/learns';
+import type { WatchState } from '../valley/watch';
 import type { Note } from '../notes/notes';
 import type { SpeechLog } from '../speech/said';
 
@@ -211,6 +212,8 @@ export interface GameState {
   speech: SpeechLog;
   /** Household ids whose one lesson has been taken (src/core/progression/lessons). Added in save version 3. */
   lessonsTaken: string[];
+  /** Standing watch after the finale: the only thing that ever brings a raid (src/core/valley/watch). Added in save version 3. */
+  watch: WatchState;
   /** Knocked-out bandits the hero has bound. Added in save version 3. */
   boundBandits: string[];
   places: PlaceState[];

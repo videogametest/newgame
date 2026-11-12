@@ -52,3 +52,7 @@ One addition to the first-look bar: the capture script measures the longest dist
 - The title line says "about twelve hours". Twelve is a guess. It stays out of the build until a playthrough is timed in task 008.
 - Whether a mentor's reminder (Hesper's loose threads) and hidden wishes work for players: the research found no game that tried either. Watch for it in the first playtest.
 - Reddit could not be reached in either research pass, so how many players hold each view is less certain than what the views are.
+
+## Added the same day: standing watch (design v31)
+
+Greg said yes to the last open item from the first research pass. After the finale, raids happen only when the hero stands watch at a freed lantern at dusk, and nothing can be lost by one. Built in `src/core/valley/watch.ts` (`GameState.watch`, still save version 3). It belongs to task 008.

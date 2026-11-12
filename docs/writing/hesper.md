@@ -333,6 +333,25 @@ After the window is lit and the wren has sung:
 2. "Seventeen." (Only if all sixteen households are home. Otherwise use the other line of `hesper.finale.count` in `households.md`.)
 3. "Hm. That'll do."
 
+## Standing watch
+
+`GAME_DESIGN.md` section 9. After the finale only.
+
+`hesper.watch.intro` (once, the first rest in Wick after the finale)
+
+1. "Not all of his went with him. There's a few still up in the hills with nobody to tell them it's over."
+2. "They'll not come down while a place looks kept. If you ever want them to, stand at a lantern at dusk and look like one person on your own."
+
+`hesper.watch.won` (one of, the morning after a watch won)
+
+- "I heard the bell didn't ring. Good. I slept."
+- "The Marrins sent bread up. For you. I've had one slice."
+- "Fewer in the hills this morning than last night."
+
+`hesper.watch.lost` (the morning after the hero fell or left)
+
+- "They ran when the bell went. Everyone's fine. You look terrible."
+
 ## Teaching a perk in someone's place
 
 When she teaches a perk whose teacher is gone.

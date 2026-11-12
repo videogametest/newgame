@@ -7,6 +7,7 @@ import { HOUSEHOLDS } from './people/households';
 import { createProgression } from './progression/skills';
 import { newStories } from './stories/stories';
 import { emptySpeechLog } from './speech/said';
+import { newWatch } from './valley/watch';
 import { SAVE_VERSION, type GameState } from './types';
 
 /** The valley as the hero first walks into it, at dusk: every place held, one window lit. */
@@ -46,6 +47,7 @@ export function newGameState(seed: number): GameState {
     speech: emptySpeechLog(),
     boundBandits: [],
     lessonsTaken: [],
+    watch: newWatch(),
   };
 }
 

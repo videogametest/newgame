@@ -162,6 +162,13 @@ Short lines that appear and fade. `{…}` is filled from data.
 
 - "Something went wrong. The game is still running. You can copy a debug report from the pause menu."
 
+## Standing watch
+
+- At a freed place's lantern at dusk, after the finale: `E` "Stand watch tonight."
+- Asking for confirmation: "They will come tonight. Nothing here can be lost." with **Stand watch** and **Not tonight**.
+- At the wrong hour: "Come back at dusk."
+- If the hero falls: "They ran when the bell rang. It's morning."
+
 ## When the hero falls
 
 No "You died." The screen dims and one line appears, then the hero wakes at the nearest owned place.

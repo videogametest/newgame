@@ -7,9 +7,19 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
-| 003 | Step 1 merged (PR #23). Walk-distance check merged (PR #25); it now passes at 92.7 m with the layout's 46 stops. Review 016 items 1–3 merged (PR #26) and the sun and moon hook (PR #27). Layout PR (places, water, roads, stops) on `feat/task-003-layout`: the road-grade requirement is **not met** (see the layout entry below). Step 2 not started. | Layout PR (branch `feat/task-003-layout`) | Road grades on `hill_path`, `ridge_path` and `east_road` (measured, not reshaped). Claude review of the first-look bar before step 2 |
+| 003 | Step 1 merged (PR #23). Walk-distance check merged (PR #25), now 91.4 m (limit 100 m). Review 016 items 1–3 merged (PR #26, PR #27). Review 018 item 1 (sun bearings) merged (PR #30). Review 018 item 2 (rivers) merged (PR #31). Next: review 018 item 3 (river out to the map edge). Step 2 not started. | none | Road grades on `hill_path`, `ridge_path` and `east_road` (review 018 item 6); tour-mode screenshots not built yet; Claude review of the first-look bar before step 2 |
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-12 Review 018 items 1 and 2: sun bearings, rivers (Viktor, merged)
+
+- **Item 1, sun bearings (PR #30, `0781444`):** merged. Pages run `43296956379` succeeded. `lighting.test.ts` passes (13 tests). Live check: `https://everylitwindow.com/` returned HTTP 200 and passed `scripts/smoke.mjs`. No tour-mode screenshots: tour mode is task 003 step 4 and is not built, so this PR has none.
+- **Item 2, rivers (PR #31, squash `58664a8`):** merged. Pages run `43302010715` succeeded. Live check: `https://everylitwindow.com/` returned HTTP 200 and passed `scripts/smoke.mjs`. Before and after images are in the PR body.
+- **Built:** rivers sit in a broad, shallow valley. The bed depressions are gone; height is `min(heightSampler, riverBankHeight)`, with banks at slope 0.3 (`RIVER_BANK_SLOPE`). The ford bed is lifted to 1.6 m. Four new tests in `valley.test.ts`: channel depth, centre line under water from the falls foot to the lake and out of the valley, bank walk slope, and the existing width test.
+- **Measured [tests and walk_gap, 2026-11-12]:** channel depth 1.5 m beyond r 140 and outside 15 m of crossings; water-level width median 10.1 m (range 9.6–10.3 m); bank slope 0.28–0.30; longest walk **91.4 m** (limit 100 m).
+- **Gate on `d836ddf` (worker sandbox):** tsc exit 0; vitest 50 files, 649 tests pass; build exit 0; walk gap PASS 91.4 m; `gen_valley_layout.mjs --check` exit 0; `scripts/smoke.mjs` exit 0.
+- **Not verified, said plainly:** the captures do not show the river change. At the ford, mill bridge and default route frames, the changed pixels lie around the hero sprite and the terrain looks the same. The falls close-up is not usable (its stand point looks at grass), so the falls are not shown. A likely cause, not verified, is that the lowered bed sits under the water plane and cannot be seen from above.
+- **Question for Greg and Claude:** the falls need a camera spot that actually looks at the falls. Should that wait for the tour-mode viewpoints in task 003 step 4, or should a hook for it be built now? Viktor will not invent a viewpoint.
 
 ## 2026-11-12 Task 003 layout: places, water, roads, stops (Viktor, PR open, road grades not met)
 

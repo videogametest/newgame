@@ -90,5 +90,5 @@ Review 007's lighting items were marked done when the frames showed otherwise. A
 
 ## What needs Greg
 
-1. Interiors: four rooms, or none.
+1. ~~Interiors.~~ **Decided by Greg, 12 Nov: many more than four.** A home opens when its family returns. See `GAME_DESIGN.md` version 27 and review 010.
 2. ~~The people's look.~~ **Approved by Greg, 12 Nov.** Task 003 may start once PR #22 is merged with the scale fix.

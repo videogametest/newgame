@@ -16,6 +16,7 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md` a
 
 - Seeded terrain with a pure `heightAt(x, z)` in `src/core`, about 800 m across, shaped to give a central lake, a river with a waterfall, hills, a ridge, and the signal hill as the highest point.
 - **Land that hides things** (section 4). Shape and place hills, ridges, and tree stands so that Wick cannot be seen whole from the start, no enemy place is visible from Wick, and each of the ten secret places is hidden from the nearest path by a rise or by trees. Every rise between two places can be crossed or walked round. Tour mode captures one frame from each of five viewpoints showing something half-hidden ahead.
+- **Inside** (section 4; `docs/writing/interiors.md`). In this task: Hesper's cottage only, fully dressed, with the switch to first person at the door and back. Every other house in Wick is boarded: planks across the door and windows. Build the door and room system so a boarded house can be opened by data later.
 - Chunked terrain around the hero, with no visible pop-in at walking speed.
 - Sky, a moving sun with shadows, the day-night cycle, a moon and stars, distance haze.
 - The hero walks, sprints, and crouches across the valley, standing on the terrain.
@@ -57,6 +58,7 @@ Richness comes before breadth: if time is short, make a smaller area dense rathe
 - **Density:** no patch of bare ground larger than a few metres anywhere the player can walk.
 - **The village reads as a village** and as abandoned, at a glance.
 - **Sound** is present from the first second, and the melody is heard, quietly, on the walk toward the lit window.
+- **Hesper's cottage** can be walked into, and from outside at night its lamp is the brightest thing in the valley.
 - **Evidence:** tour-mode screenshots of the arrival view at dusk in both camera views, the village at noon and at night, a forest view, a field view, the lake, the waterfall, and the view from the signal hill, plus the measured frame rate and draw calls for each.
 
 ## Rules

@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 26 (the weak point on large-headed models). Supersedes version 25.
+Version 27 (buildings can be entered: a home opens when its family returns). Supersedes version 26.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -63,6 +63,13 @@ Look and atmosphere:
 
 - Bright, saturated colour; soft lighting; light distance haze. A sun that moves, with shadows.
 - **Land that hides things.** Hills, ridges, and stands of trees are shaped and placed so that from any point something ahead is hidden and something is half-seen: a roof behind a rise, smoke past a ridge. Each rise offers a choice of going over or going round. Nothing worth finding stands in the open from far away except the landmarks meant to draw the eye: Hesper's window, the signal hill, the castle. Places are found by sight and by what people say, never revealed by a tower or a marker.
+- **Inside.** Buildings can be entered. Hesper's cottage is open from the start. Every other house in Wick is boarded shut while its family is gone, and opens when they come home: bringing a household back opens a room. The Mill, the Forge, the inn, and the Watch-house hall can be entered too, and the Fairlow house once it is the hero's. About twenty in all by the end.
+  - Each is one room on the ground floor, built from six shared layouts and dressed with a few things that say who lives there (`docs/writing/interiors.md`). Upper floors are not entered.
+  - Stolen things that were returned are on display in their owner's room. Sold ones leave an empty place.
+  - Stepping through a door switches to the first-person view by itself, and back on leaving.
+  - There is no loading and no cut: a room is part of the world, seen through its door and windows from outside.
+  - After dusk a household is at home inside, and its hearth is the light in its window.
+  - Enemies may be found inside the places they hold, eating or asleep. They come outside to fight; nobody fights in a doorway.
 - **Day-night cycle** of about 20 real minutes, with warm light at dawn and dusk, and a moon and stars at night.
 - Grass and foliage sway in the wind. Butterflies by day, fireflies at dusk and night. Clouds drift.
 - **Landmarks on the horizon** (a castle, a mountain, a tower) are visible from most of the valley. They mark future regions.

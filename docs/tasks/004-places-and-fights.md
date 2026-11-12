@@ -53,6 +53,8 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 The full inventory, gear, and crafting are task 006. Until then keep items as simple counts with no screen: food, arrows, gold. Wren's bow is a flat upgrade to the hero's bow. The miller's food appears as a supply in Wick once the Mill is freed. Build these so task 006 can replace them without rework.
 
+**Inside** (section 4; `docs/writing/interiors.md`). The six layouts as reusable rooms, dressed from data. The Mill's ground floor and the Forge, as held and as freed. A household's house loses its boards and opens when the household comes home, with its people inside after dusk. Returned and sold stolen things shown or missing in their place. Enemies found inside come out to fight.
+
 ## Rules
 
 - Nothing in the game may state or imply the answer in section 9 ("The answer"). Fragments reveal only what that section says the first valley reveals.

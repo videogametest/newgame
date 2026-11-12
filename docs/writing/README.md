@@ -22,3 +22,5 @@ Claude owns this folder. It holds the words and music that carry the game's stor
 Each group of lines has an id in code style, such as `hesper.arrival`. Keep those ids in the data files so a line can be traced back here.
 
 What is left for Viktor to draft is small: shouts in a fight for ordinary bandits, greetings for villagers passing in the lane, and the companion lines for Ketch if he stands in for Tobin. Follow the voices already written.
+- `interiors.md`: what is inside each building the player can enter.
+- `stories.md`: the five household stories and Hesper's loose threads.

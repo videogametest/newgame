@@ -11,7 +11,7 @@ import { forwardOf, rightOf } from '../core/vec';
 import { newGameState } from '../core/state';
 import type { GameState } from '../core/types';
 import { advanceClock } from '../core/world/clock';
-import { isWater, insideValley, valleyHeightAt, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL, VALLEY_HALF_EXTENT } from '../core/world/valley';
+import { blocksWalking, insideValley, valleyHeightAt, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL, VALLEY_HALF_EXTENT } from '../core/world/valley';
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
 import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
 import { walkStep, type WalkRules } from '../core/world/walk';
@@ -34,7 +34,7 @@ const CAMERA_RIG: ValleyCameraRig = {
 };
 const WALK_RULES: WalkRules = {
   heightAt: valleyHeightAt,
-  blocked: isWater,
+  blocked: blocksWalking,
   inside: insideValley,
 };
 const FOG_START = 160;

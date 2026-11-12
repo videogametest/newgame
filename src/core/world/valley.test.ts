@@ -1,68 +1,112 @@
 import { describe, expect, it } from 'vitest';
-import { VALLEY_HALF_EXTENT, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL, insideValley, isWater, valleyHeightAt } from './valley';
-
-/** True if the straight line from a to b (eye heights included) clears the ground everywhere along it. */
-function clearSight(a: { x: number; z: number; eye: number }, b: { x: number; z: number; eye: number }): boolean {
-  const n = 200;
-  for (let i = 1; i < n; i++) {
-    const t = i / n;
-    const x = a.x + (b.x - a.x) * t;
-    const z = a.z + (b.z - a.z) * t;
-    const sightY = a.eye + (b.eye - a.eye) * t;
-    if (valleyHeightAt(x, z) > sightY) return false;
-  }
-  return true;
-}
+import {
+  EDGE_RADIUS,
+  VALLEY_HALF_EXTENT,
+  VALLEY_PLACES,
+  VALLEY_SEED,
+  VALLEY_STOPS,
+  WATER_LEVEL,
+  blocksWalking,
+  insideValley,
+  isCrossing,
+  isWalkableGround,
+  isWater,
+  sightMargin,
+  valleyHeightAt,
+} from './valley';
+import { VALLEY_CROSSINGS, VALLEY_RIVER_IN, VALLEY_RIVER_OUT } from './valley_layout';
 import { walkStep, type WalkRules } from './walk';
 
 const STEP = 8;
+/** Eye heights (m) used for the sight-line checks; the same values the prototype and the spec table use. */
+const EYE = { person: 2, watchHouseYard: 3, signalHillTop: 4, mill: 9, watchHouse: 14, castleTop: 35 };
+
+/** Clearance of the sight line between two named places, with the given eye heights (m above the ground). */
+function sight(a: keyof typeof VALLEY_PLACES, eyeA: number, b: keyof typeof VALLEY_PLACES, eyeB: number): number {
+  return sightMargin(VALLEY_PLACES[a], VALLEY_PLACES[b], eyeA, eyeB);
+}
 
 describe('Tallowmere terrain (§4)', () => {
   it('is deterministic for the same seed and point', () => {
+    expect(VALLEY_SEED).toBeTypeOf('number');
     for (const [x, z] of [[0, 0], [-70, 95], [240, -210], [-399, 12]]) {
       expect(valleyHeightAt(x, z)).toBe(valleyHeightAt(x, z));
       expect(Number.isFinite(valleyHeightAt(x, z))).toBe(true);
     }
-    expect(VALLEY_SEED).toBeTypeOf('number');
   });
 
-  it('puts the lake centre below the water surface and the lake reaches the village shore', () => {
-    expect(valleyHeightAt(0, 0)).toBeLessThan(WATER_LEVEL);
-    expect(isWater(VALLEY_PLACES.lakeCentre.x, VALLEY_PLACES.lakeCentre.z)).toBe(true);
-    // Wick is beside the lake, not in it.
+  it('keeps the lake as water and Wick dry', () => {
+    expect(isWater(VALLEY_PLACES.lake.x, VALLEY_PLACES.lake.z)).toBe(true);
     expect(isWater(VALLEY_PLACES.wick.x, VALLEY_PLACES.wick.z)).toBe(false);
-    // ...and close enough to the water to count as beside it: a water cell within 25 m.
-    let nearest = Infinity;
-    for (let r = 0; r <= 25; r += 1) {
-      for (let a = 0; a < 360; a += 5) {
-        const x = VALLEY_PLACES.wick.x + r * Math.cos((a * Math.PI) / 180);
-        const z = VALLEY_PLACES.wick.z + r * Math.sin((a * Math.PI) / 180);
-        if (isWater(x, z)) nearest = Math.min(nearest, r);
+  });
+
+  it('keeps every walkable place walkable: all places except the lake', () => {
+    for (const [name, p] of Object.entries(VALLEY_PLACES)) {
+      // The lake is water. The castle is beyond the north-west rim and never walked to (docs/tasks/003-layout.md, places table).
+      if (name === 'lake' || name === 'castle') continue;
+      expect(isWalkableGround(p.x, p.z), `place ${name} at (${p.x}, ${p.z})`).toBe(true);
+    }
+  });
+
+  it('keeps the crossings walkable even where the river is water', () => {
+    for (const c of VALLEY_CROSSINGS) {
+      expect(isCrossing(c.x, c.z)).toBe(true);
+      expect(isWalkableGround(c.x, c.z), `crossing ${c.name} at (${c.x}, ${c.z})`).toBe(true);
+    }
+  });
+
+  it('blocks walking in water everywhere except at a crossing', () => {
+    let checked = 0;
+    for (let z = -VALLEY_HALF_EXTENT; z <= VALLEY_HALF_EXTENT; z += 10) {
+      for (let x = -VALLEY_HALF_EXTENT; x <= VALLEY_HALF_EXTENT; x += 10) {
+        if (!isWater(x, z) || isCrossing(x, z)) continue;
+        checked++;
+        expect(blocksWalking(x, z)).toBe(true);
+        expect(isWalkableGround(x, z)).toBe(false);
       }
     }
-    expect(nearest).toBeLessThanOrEqual(25);
+    expect(checked).toBeGreaterThan(0);
   });
 
-  it('lets the castle be seen from the signal hill and hides it from the patrol hut (§4)', () => {
-    const hill = { ...VALLEY_PLACES.signalHill, eye: valleyHeightAt(VALLEY_PLACES.signalHill.x, VALLEY_PLACES.signalHill.z) + 1.8 };
-    const hut = { ...VALLEY_PLACES.patrolHut, eye: valleyHeightAt(VALLEY_PLACES.patrolHut.x, VALLEY_PLACES.patrolHut.z) + 1.8 };
-    const castle = { ...VALLEY_PLACES.castle, eye: valleyHeightAt(VALLEY_PLACES.castle.x, VALLEY_PLACES.castle.z) + 12 };
-    expect(clearSight(hill, castle)).toBe(true);
-    expect(clearSight(hut, castle)).toBe(false);
+  it('keeps ground beyond the edge ring unwalkable, except the patrol hut zone and the north-west pass', () => {
+    for (let a = 0; a < 360; a += 3) {
+      const r = EDGE_RADIUS + 15;
+      const x = r * Math.cos((a * Math.PI) / 180);
+      const z = r * Math.sin((a * Math.PI) / 180);
+      if (!insideValley(x, z)) continue;
+      if (Math.hypot(x - VALLEY_PLACES.patrolHut.x, z - VALLEY_PLACES.patrolHut.z) < 60) continue;
+      if (Math.hypot(x + 250, z + 262) < 40) continue;
+      expect(isWalkableGround(x, z), `edge point (${x.toFixed(0)}, ${z.toFixed(0)})`).toBe(false);
+    }
   });
 
-  it('makes the signal hill the highest point of the valley', () => {
+  it('makes the sight lines in the layout: seen where it should be, hidden where it should not', () => {
+    // Positive clearance = the line clears the ground. Values from the spec table, docs/tasks/003-layout.md.
+    expect(sight('start', EYE.person, 'hesper', EYE.person)).toBeGreaterThan(0);
+    expect(sight('start', EYE.person, 'castle', EYE.castleTop)).toBeGreaterThan(0);
+    expect(sight('wick', EYE.person, 'mill', EYE.mill)).toBeLessThan(0);
+    expect(sight('wick', EYE.person, 'forge', EYE.person)).toBeLessThan(0);
+    expect(sight('wick', EYE.person, 'watchHouse', EYE.watchHouse)).toBeLessThan(0);
+    expect(sight('patrolHut', EYE.person, 'castle', EYE.castleTop)).toBeLessThan(0);
+    expect(sight('patrolHut', EYE.person, 'signalHill', EYE.signalHillTop)).toBeLessThan(0);
+    expect(sight('signalHill', EYE.signalHillTop, 'castle', EYE.castleTop)).toBeGreaterThan(0);
+    expect(sight('signalHill', EYE.signalHillTop, 'watchHouse', EYE.watchHouseYard)).toBeGreaterThan(0);
+    expect(sight('wick', EYE.person, 'signalHill', EYE.signalHillTop)).toBeGreaterThan(0);
+  });
+
+  it('makes the signal hill the highest point of the valley, close to its marked top', () => {
     let max = -Infinity;
-    let at = { x: 0, z: 0 };
+    let at2 = { x: 0, z: 0 };
     for (let z = -VALLEY_HALF_EXTENT; z <= VALLEY_HALF_EXTENT; z += STEP) {
       for (let x = -VALLEY_HALF_EXTENT; x <= VALLEY_HALF_EXTENT; x += STEP) {
         const h = valleyHeightAt(x, z);
-        if (h > max) { max = h; at = { x, z }; }
+        if (h > max) { max = h; at2 = { x, z }; }
       }
     }
     const hill = VALLEY_PLACES.signalHill;
-    expect(Math.hypot(at.x - hill.x, at.z - hill.z)).toBeLessThan(40);
-    expect(valleyHeightAt(hill.x, hill.z)).toBeGreaterThan(valleyHeightAt(VALLEY_PLACES.ridgeCrest.x, VALLEY_PLACES.ridgeCrest.z));
+    expect(Math.hypot(at2.x - hill.x, at2.z - hill.z)).toBeLessThan(40);
+    expect(max).toBeGreaterThan(60);
+    expect(max).toBeLessThan(70);
   });
 
   it('keeps the start and the castle inside the valley and the castle above the lake', () => {
@@ -70,12 +114,50 @@ describe('Tallowmere terrain (§4)', () => {
     expect(insideValley(VALLEY_PLACES.castle.x, VALLEY_PLACES.castle.z)).toBe(true);
     expect(isWater(VALLEY_PLACES.castle.x, VALLEY_PLACES.castle.z)).toBe(false);
   });
+
+  it('has a river about 8 to 12 m wide at its wet cross-sections', () => {
+    const widths: number[] = [];
+    for (const line of [VALLEY_RIVER_IN, VALLEY_RIVER_OUT]) {
+      for (let i = 0; i + 1 < line.length; i++) {
+        const a = line[i];
+        const b = line[i + 1];
+        const len = Math.hypot(b.x - a.x, b.z - a.z);
+        const px = -(b.z - a.z) / len;
+        const pz = (b.x - a.x) / len;
+        const n = Math.max(1, Math.round(len / 15));
+        for (let k = 0; k <= n; k++) {
+          const x = a.x + ((b.x - a.x) * k) / n;
+          const z = a.z + ((b.z - a.z) * k) / n;
+          if (Math.hypot(x, z) < 140 || isCrossing(x, z) || valleyHeightAt(x, z) >= WATER_LEVEL) continue;
+          const span = (sign: number) => {
+            let d = 0;
+            while (d < 40 && valleyHeightAt(x + sign * px * d, z + sign * pz * d) < WATER_LEVEL) d += 0.2;
+            return d;
+          };
+          widths.push(span(1) + span(-1));
+        }
+      }
+    }
+    widths.sort((p, q) => p - q);
+    expect(widths.length).toBeGreaterThan(10);
+    const median = widths[Math.floor(widths.length / 2)];
+    const p10 = widths[Math.floor(widths.length * 0.1)];
+    expect(median).toBeGreaterThanOrEqual(8);
+    expect(median).toBeLessThanOrEqual(12);
+    expect(p10).toBeGreaterThanOrEqual(6);
+  });
+
+  it('lists every placed stop once, by name', () => {
+    expect(VALLEY_STOPS.length).toBe(46);
+    const names = VALLEY_STOPS.map((s) => s.name);
+    expect(new Set(names).size).toBe(names.length);
+  });
 });
 
 describe('valley walking (§4, §7)', () => {
   const rules: WalkRules = {
     heightAt: valleyHeightAt,
-    blocked: isWater,
+    blocked: blocksWalking,
     inside: insideValley,
   };
 
@@ -95,12 +177,17 @@ describe('valley walking (§4, §7)', () => {
   });
 
   it('never walks into the lake', () => {
-    // Start on land at the west shore (the lake's shore is about r 90 m there) and walk straight into the lake.
-    const shore = { x: -95, z: 0 };
-    expect(isWater(shore.x, shore.z)).toBe(false);
-    let p: { x: number; z: number } = shore;
-    for (let i = 0; i < 400; i++) p = walkStep(p, 1, 0, 3, 0.1, rules);
-    expect(isWater(p.x, p.z)).toBe(false);
+    // Start at Wick and walk straight at the lake centre; every step must stay out of blocked water.
+    const lake = VALLEY_PLACES.lake;
+    const start = VALLEY_PLACES.wick;
+    const len = Math.hypot(lake.x - start.x, lake.z - start.z);
+    const dx = (lake.x - start.x) / len;
+    const dz = (lake.z - start.z) / len;
+    let p: { x: number; z: number } = { x: start.x, z: start.z };
+    for (let i = 0; i < 600; i++) {
+      p = walkStep(p, dx, dz, 3, 0.1, rules);
+      expect(blocksWalking(p.x, p.z)).toBe(false);
+    }
   });
 
   it('slides along a blocking edge instead of stopping dead', () => {

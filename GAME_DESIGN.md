@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 27 (buildings can be entered: a home opens when its family returns). Supersedes version 26.
+Version 28 (the people's proportions; KayKit buildings; how a door is entered). Supersedes version 27.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -67,7 +67,7 @@ Look and atmosphere:
   - Each is one room on the ground floor, built from six shared layouts and dressed with a few things that say who lives there (`docs/writing/interiors.md`). Upper floors are not entered.
   - Stolen things that were returned are on display in their owner's room. Sold ones leave an empty place.
   - Stepping through a door switches to the first-person view by itself, and back on leaving.
-  - There is no loading and no cut: a room is part of the world, seen through its door and windows from outside.
+  - The buildings are whole models with closed doors, so a room is entered at the door: `E`, a half-second fade, and the hero is inside. The room is its own small space. From outside, its windows still glow when someone is home. Leaving is the same in reverse and returns the hero to the doorstep.
   - After dusk a household is at home inside, and its hearth is the light in its window.
   - Enemies may be found inside the places they hold, eating or asleep. They come outside to fight; nobody fights in a doorway.
 - **Day-night cycle** of about 20 real minutes, with warm light at dawn and dusk, and a moon and stars at night.
@@ -503,7 +503,9 @@ Exact XP curves, perk lists, recipes, weights, prices, and tier stats are tuning
   - *The survey.* `docs/assets.md` lists every model the design needs: what it is for, the pack and file it comes from, its licence, its format, and a screenshot of it beside the hero for scale. Anything with no source is marked missing. The survey is done and reviewed before the world is built, and kept up to date afterwards.
   - *Licences.* CC0 only, confirmed from the pack's own page or licence file, never from a comment or a third-party listing.
   - *One look.* Models from different packs pass through a shared colour palette and material settings, so the world does not look stitched together. Scale is corrected so doors, windows, and furniture fit the characters.
-  - *Scale.* Buildings and props are scaled to the people, never the other way round. A storey is 2.6 to 2.8 m; a door is at least 2.1 m high and 1.2 m wide; a person can stand in every doorway with room over their head.
+  - *Scale.* Buildings and props are scaled to the people, never the other way round. The people stand about 2.2 m tall as modelled, and that is the unit: every door is at least a head taller than the tallest person and wide enough for the brute, and a person can stand at any door with room over their head.
+  - *The people.* The KayKit adventurers, reshaped on their shared rig so they read as less like toys: head at 78 percent, legs a third longer, shoulders slightly wider, and a thin dark outline. The numbers are `PROPORTIONS` in `src/styletest/upgrade.ts` until task 003 moves them into the character view. What a person carries is shown on them (bow across the back, blade at the hip), placed properly in task 005.
+  - *The buildings.* KayKit's Medieval Hexagon set (CC0, the same artist as the people): whole houses, a tavern, a smithy, a watermill, a well, a tower, in four roof colours, scaled eight times. Kenney's Fantasy Town kit is kept only for pieces KayKit lacks. `src/styletest/houses.ts` is the standard: `?styletest=houses`.
   - *The fallback ladder* for anything missing, in order: substitute something close; build it from modular pieces or simple shapes in matching materials; buy an inexpensive pack; change the design to something that can be sourced. Machine-generated models are a last resort.
   - *Money.* Buying a pack, or using a machine-generated model, needs Greg's approval each time. The working budget for packs is about 50 US dollars in total.
   - *Must-haves.* For these, never leave a gap: stop, log it in `docs/status.md`, and wait for a decision. Houses whose windows can light; the mill with a wheel that turns; the forge; the Watch-house; lanterns and banners; the hero, Hesper, Stane, and the six companions as distinguishable characters; wolves; the Mill's geese or their agreed replacement; sheep.

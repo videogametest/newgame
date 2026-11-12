@@ -11,6 +11,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 on `feat/task-002b-rework`: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | #21 | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-12 Review 016 items 1 to 3: sun path, moon, stars, draw calls (Viktor, PR (a))
+
+- **Sun and moon:** the sun follows a path, rising on one side and setting on the other (`sunSky` in `lighting.ts`). The moon is opposite it, so it rises as the sun sets. Each disc is drawn only above the horizon. The ground light keeps its earlier grazing strength.
+- **Stars:** quads instead of a point cloud. The point cloud drew one star in the night frame (review 016).
+- **Draw calls:** now the per-frame difference across `scene.render()`. The earlier cumulative figures are withdrawn. Capture run on this branch (swiftshader, one run): noon 54, dusk 56, dawn 55, night 55.
+- **Tests:** sun path, moon opposition, moon above the horizon at 0 and 23 and set by 6, stars from `nightness` (`lighting.test.ts`); star quad count, index bounds and sky placement (`valley_sky.test.ts`).
+- **Verified:** typecheck exit 0; `npx vitest run` 50 files, 636 tests pass; `npm run build` exit 0; `scripts/smoke.mjs` exit 0 (worker sandbox, `feat/task-003-review-016-017`).
+- **Not met, open:** the noon frame shows no sun disc and no hero shadow, and the night frame has no moon. The capture camera faces the hero, so a sun-facing or moon-facing shot needs a camera yaw hook, not yet built. The arena HUD and the old hint text still show (review 016 items 3 and 9).
+- **Frame rate:** not measured here (swiftshader).
+
 ## 2026-11-12 Task 003: walk-distance check (Viktor, fails as measured)
 
 - **Built:** `src/core/world/walk_gap.ts` (pure grid Dijkstra from the stops over 2 m cells; diagonals only when both orthogonal neighbours are walkable; reports longest walk, where, and stranded cells). `VALLEY_STOPS` and `isWalkableGround` in `valley.ts`. Stops now: wick, signalHill, ridgeCrest, patrolHut, start. Excluded: lakeCentre (water) and castle (horizon landmark on the valley edge).

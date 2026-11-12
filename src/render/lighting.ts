@@ -30,7 +30,12 @@ export const PALETTE = {
 };
 
 export interface Lighting {
+  /** Direction the light travels (from the sun toward the ground). */
   sunDir: Vector3;
+  /** Unit direction from the valley toward the sun in the sky. Rises in the east, sets in the west (section 5). */
+  sunSky: Vector3;
+  /** Unit direction toward the moon: always opposite the sun, so it rises as the sun sets. */
+  moonSky: Vector3;
   /** Sine of the sun's altitude: positive above the horizon. Drives the sun and moon discs. */
   elevation: number;
   sunColor: Color3;
@@ -55,7 +60,12 @@ export interface Lighting {
  * windows are the brightest things, and by half past it is night. Golden warmth peaks at 18 and at 6.
  */
 export function lightingAt(tod: number): Lighting {
-  const elev = Math.sin(((tod - 6) / 12) * Math.PI);
+  // The sun's path: theta is 0 at dawn (6), PI/2 at noon, PI at dusk (18). Below the horizon at night.
+  const theta = ((tod - 6) / 12) * Math.PI;
+  const elev = Math.sin(theta);
+  const along = -Math.cos(theta);
+  const sunSky = new Vector3(along * 0.8 + 0.5, elev, along * 0.6).normalize();
+  const horiz = new Vector3(along * 0.8 + 0.5, 0, along * 0.6).normalize();
   // Daylight outlasts the sun by about an hour at each end of the day.
   const dayness = clamp01((elev + 0.2) * 2.2);
   const warm = Math.max(clamp01(1 - Math.abs(tod - 18) / 1.8), clamp01(1 - Math.abs(tod - 6) / 1.8));
@@ -67,7 +77,10 @@ export function lightingAt(tod: number): Lighting {
   const afterglow = clamp01(0.35 + dayness * 2);
   return {
     // Never lower than this above the horizon, so flat ground still takes the light at dusk and dawn.
-    sunDir: new Vector3(0.45, -Math.max(0.22, elev), 0.6).normalize(),
+    // Horizontal heading comes from the sun's path; the downward part keeps the grazing-light strength it had.
+    sunDir: new Vector3(-horiz.x * 0.75, -Math.max(0.22, elev), -horiz.z * 0.75).normalize(),
+    sunSky,
+    moonSky: sunSky.scale(-1),
     elevation: elev,
     sunColor: mix(mix(PALETTE.moon, PALETTE.sunWarm, dayness), PALETTE.sunGold, golden),
     sunIntensity: 0.3 + 0.9 * dayness + 1.1 * golden,

@@ -41,3 +41,39 @@ describe('lighting follows the design clock: dawn 6, dusk 18, windows 19 to 1', 
     expect(noon.sunColor.g).toBeGreaterThan(0.9);
   });
 });
+
+describe('the sun and moon follow their paths (section 5, review 017)', () => {
+  it('the sun is up at noon and down at midnight', () => {
+    expect(lightingAt(12).sunSky.y).toBeGreaterThan(0.5);
+    expect(lightingAt(0).sunSky.y).toBeLessThan(-0.5);
+  });
+  it('the sun rises on one side and sets on the other', () => {
+    const dawnX = lightingAt(6).sunSky.x;
+    const duskX = lightingAt(18).sunSky.x;
+    const dawnZ = lightingAt(6).sunSky.z;
+    const duskZ = lightingAt(18).sunSky.z;
+    expect(Math.sign(dawnZ)).not.toBe(Math.sign(duskZ));
+    expect(dawnX * duskX).toBeLessThan(0.5);
+  });
+  it('the moon is up at 0 and 23 and has set by 6', () => {
+    expect(lightingAt(0).moonSky.y).toBeGreaterThan(0.5);
+    expect(lightingAt(23).moonSky.y).toBeGreaterThan(0.5);
+    expect(lightingAt(6.5).moonSky.y).toBeLessThan(-0.02);
+  });
+  it('the moon is always opposite the sun', () => {
+    for (let tod = 0; tod < 24; tod += 0.5) {
+      const L = lightingAt(tod);
+      expect(L.moonSky.x + L.sunSky.x).toBeCloseTo(0, 9);
+      expect(L.moonSky.y + L.sunSky.y).toBeCloseTo(0, 9);
+      expect(L.moonSky.z + L.sunSky.z).toBeCloseTo(0, 9);
+    }
+  });
+  it('the sun path is a unit direction at every hour', () => {
+    for (let tod = 0; tod < 24; tod += 0.5) expect(lightingAt(tod).sunSky.length()).toBeCloseTo(1, 6);
+  });
+  it('stars are visible at night and gone by noon', () => {
+    const starAlpha = (tod: number) => Math.min(1, Math.max(0, (lightingAt(tod).nightness - 0.3) / 0.5));
+    expect(starAlpha(23)).toBe(1);
+    expect(starAlpha(12)).toBe(0);
+  });
+});

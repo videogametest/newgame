@@ -962,8 +962,8 @@ export const VALLEY_STOPS: readonly LayoutStop[] = [
   {
     name: "view_ridge_north",
     kind: "viewpoint",
-    x: 248,
-    z: -222,
+    x: 250,
+    z: -214,
     note: "The ridge's north end. The whole valley, and the hill"
   },
   {

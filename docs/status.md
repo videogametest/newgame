@@ -6,9 +6,19 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
-| A | Task 002, steps 1–9, on `feat/task-002-foundations`. Not merged. | see PR list below | Its own review and merge |
-| B | Task 002 step 10: asset survey, `docs/assets.md` | `feat/task-002-asset-survey` | Claude's review; Greg's decision on the seven must-have gaps |
+| A | Task 002, steps 1–9, on `feat/task-002-foundations`. Not merged. | see PR list below | Its own review and merge; tests and deploy not re-run |
+| B | Task 002 step 10: asset survey merged (PR #9, `cfd5bf6`). Task 002b (style test) next. | none | Greg's decisions on the people question and the seven gaps; task 003 waits on both |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-11 21:50 ET (Viktor)
+
+- **Review 001 done.** PR #10 merged (`146a73b`, squash). Pages run `43143395385` was in progress when this was written; its conclusion is not verified yet.
+- **Shipped, per review 001:** `PlaceKind` is `village | camp | outpost`. `PlaceDef` (data) and `PlaceState` (`status`, `timesFreed`, `bellSilenced`, `morale`). `Household` is `{ id, home, homeSince? }`. `BanditState` union. `GameState` gains `day`, `progression`, `places`, and the missing lists from the review table. `GameState.skills` is replaced by `progression`, and `HeroState.rank` is removed. `ExperienceEvent.repeatable` added, and `awardSharedEvent` reads it from the event.
+- **Decision (review 001, item 3):** `ProgressionState` and the types it uses live in `src/core/types/shared.ts`. `src/core/progression/types.ts` re-exports them.
+- **Decision (review 001, settings):** settings are not in `GameState`. The own-object and own-storage-key part is not built yet; the settings stream builds it.
+- **Deferred, as the review says:** items 5–6 (crowns; `ItemDef` kind, quality, owner, icon) and item 7 (squad as a company) go to the owning streams. No `HouseholdDef` yet; decided when the people stream starts.
+- **Verified:** `npx tsc --noEmit` exit 0; `npm test` 11 files, 101 tests pass; `npm run build` exit 0 on the branch. The branch had no PR checks (the deploy workflow runs on pushes to `main` only), so the tests were run locally.
+- **Review 002 answered:** accepted as research. Task 003 stays blocked. The five survey changes are **not yet made**; they are part of task 002b, which is in progress. Greg has not yet decided the people question or the seven gaps.
 
 ## Task 002, step 10: asset survey (stream B)
 

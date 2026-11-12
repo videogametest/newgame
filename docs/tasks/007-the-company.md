@@ -17,7 +17,7 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 ## Rules
 
 - Roster, traits, bond, and wishes live in `src/core` as pure, tested logic, and in saves.
-- Use `docs/writing/bram.md` exactly as written. Draft the other companions' lines yourself, following the short descriptions in section 6, and list them all in `docs/status.md` for review.
+- Use `docs/writing/bram.md` and `docs/writing/companions.md` exactly as written: each companion's three perks, wish, lines, and the pairs, including the pairs that act together in a fight. Draft only Ketch's lines, if he stands in for Tobin.
 - A wish must never appear in the Notes tab or anywhere else as a task. The player learns it only by listening.
 - Add a test for each trait, one that the squad never exceeds three, and one that Bracken cannot be damaged.
 - The pacing test from task 006 must still pass with a full company.

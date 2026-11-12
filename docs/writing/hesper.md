@@ -319,7 +319,7 @@ She arrives after Stane yields. The scene is short. His lines are in `stane.md`;
 
 After the window is lit and the wren has sung:
 
-2. "Seventeen."
+2. "Seventeen." (Only if all sixteen households are home. Otherwise use the other line of `hesper.finale.count` in `households.md`.)
 3. "Hm. That'll do."
 
 ## Teaching a perk in someone's place

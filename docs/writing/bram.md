@@ -206,4 +206,4 @@ Exchanges at campfires. The other companion's lines are given here so the exchan
 
 `bram.finale.after` (the next morning)
 
-1. "Seventeen. I counted too."
+1. "Seventeen. I counted too." (Only if all sixteen households are home. Otherwise use the other line of `bram.finale.count` in `households.md`.)

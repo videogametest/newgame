@@ -19,7 +19,7 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 ### Step 2: Places and stealth
 
-- The Mill, the Forge, and the Watch-house in data, each with its past, its person, its reward, a named leader, six to eight named defenders, an alarm bell, an unlit lantern, and Stane's banners. Each looks like what it used to be.
+- The Mill, the Forge, and the Watch-house in data, each with its past, its person, its reward, and its leader and defenders exactly as named in `docs/writing/bandits.md` (with their loyalty, former trade, habits, and overheard lines), an alarm bell, an unlit lantern, and Stane's banners. Each looks like what it used to be.
 - A day at an enemy-held place, from section 5: the schedule by time of day, patrol routes, meals, guard changes, sleeping and night watch with torches, two or three habits per place, the reactions (bodies found, missing guards, extra watch after a place falls), and the tax cart on the road. Schedules, routes, and habits are data, and the schedule logic is pure and tested.
 - Stealth and scouting from section 5: the unaware, suspicious, and alert states with markers, the noticing rules as pure tested functions, marking through the bow zoom, the bonus for striking an unaware enemy, and the alarm bell with reinforcements.
 - The stealth animals from section 4: crows over held places, startled birds, the Mill's geese, and the fox.
@@ -27,10 +27,10 @@ Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 ### Step 3: Speech and the households
 
 - How people speak, from section 10: lines above heads, conversations with the bottom box, Show, character tones from the melody, and text settings. Overheard lines at enemy places use the lines-above-heads form and appear only while the hero is unnoticed.
-- The sixteen households of Wick from section 9, as data: the six written in full and ten lighter ones that you draft. Each household's trigger, house, trade, daily routine, lines by stage of recovery, and what it gives.
+- The sixteen households of Wick, as data, exactly as written in `docs/writing/households.md`: each household's trigger, house, trade, daily routine, lines, and what it gives, and the stolen things with their owners.
 - Daily life: villagers who are home wake, work, gather at the well at dusk, and go home at night, when their window lights.
 - The window count, shown on entering Wick at night and on the map.
-- Hesper and Old Maren present from the start, with conversations. Use `docs/writing/` for any character whose lines are written there; draft the rest and mark them as drafts.
+- Hesper and Old Maren present from the start, with conversations. Every named character's lines are in `docs/writing/`; use them as written. Draft only what `docs/writing/README.md` says is left to you.
 
 ### Step 4: The lantern and restoration
 
@@ -72,5 +72,5 @@ The full inventory, gear, and crafting are task 006. Until then keep items as si
 ## Done when
 
 - All five steps are merged and deployed and the balance tests pass.
-- A test proves each of the six written households comes home when, and only when, its trigger is met (for triggers available in this task).
+- A test proves each household comes home when, and only when, its trigger is met (for triggers available in this task), including the Pikes' return when Tobin was killed.
 - Then continue to task 005.

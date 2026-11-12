@@ -13,7 +13,10 @@ Claude owns this folder. It holds the words and music that carry the game's stor
 | `stane.md` | Stane's notices, fight lines, account, and leaving | Written |
 | `bram.md` | Bram's lines, campfire lines, and his side of each pair | Written |
 | `fragments.md` | The ten places off the path, the fisher, and Old Maren | Written |
+| `households.md` | The sixteen households: who, why they left, what brings them home, what they give, their lines, and the stolen things | Written |
+| `bandits.md` | Stane's men at the three places and the tax cart: names, natures, habits, overheard lines, and what they do if they stay | Written |
+| `companions.md` | The other five companions, every companion's perks and wish, their lines, and the pairs | Written |
 
 Each group of lines has an id in code style, such as `hesper.arrival`. Keep those ids in the data files so a line can be traced back here.
 
-Still Viktor's to draft, following `GAME_DESIGN.md` section 9: the other fourteen households' lines, the bandits' overheard lines, and the other five companions' lines apart from the pair exchanges in `bram.md`.
+What is left for Viktor to draft is small: shouts in a fight for ordinary bandits, greetings for villagers passing in the lane, and the companion lines for Ketch if he stands in for Tobin. Follow the voices already written.

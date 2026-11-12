@@ -23,7 +23,7 @@ export const P: Record<string, { x: number; z: number }> = {
   hesper: { x: 86, z: 98 },
   start: { x: 226, z: 238 },
   castle: { x: -296, z: -388 },
-  mill: { x: -172, z: 62 },
+  mill: { x: -176, z: 50 },
   forge: { x: 38, z: -176 },
   watch_house: { x: -170, z: -192 },
   signal_hill: { x: -78, z: -296 },
@@ -74,17 +74,19 @@ export const SHAPE: TerrainShape = {
 export const h = createHeightAt(1066, SHAPE);
 const isWater = (x: number, z: number) => h(x, z) < WATER;
 const slope = (x: number, z: number) => Math.hypot(h(x + 1, z) - h(x - 1, z), h(x, z + 1) - h(x, z - 1)) / 2;
-export const CROSSINGS = [{ name: 'ford', x: 142, z: -12 }, { name: 'mill_bridge', x: -178, z: 40 }, { name: 'stepping_stones', x: -250, z: 0 }];
+export const CROSSINGS = [{ name: 'ford', x: 142, z: -12 }, { name: 'mill_bridge', x: -191, z: 34 }, { name: 'stepping_stones', x: -250, z: 0 }];
 function segDist(x: number, z: number, a: [number, number], b: [number, number]) { const dx = b[0] - a[0], dz = b[1] - a[1]; const t = Math.max(0, Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / (dx * dx + dz * dz))); return Math.hypot(x - a[0] - dx * t, z - a[1] - dz * t); }
 export const ROADS: Record<string, [number, number][]> = {
   road_in: [[226, 238], [176, 186], [124, 132], [88, 106]],
-  mill_road: [[50, 86], [10, 118], [-40, 140], [-96, 146], [-140, 104], [-172, 62]],
+  mill_road: [[50, 86], [10, 118], [-40, 140], [-96, 146], [-140, 104], [-166, 66], [-176, 50]],
   east_road: [[78, 52], [112, 22], [142, -12], [124, -68], [88, -128], [38, -176]],
   soldiers_road: [[124, -68], [70, -98], [0, -104], [-60, -112], [-104, -168], [-170, -192], [-226, -238], [-262, -276]],
   hill_path: [[-104, -168], [-96, -236], [-78, -296]],
   ridge_path: [[124, -68], [160, -112], [196, -118], [254, -100], [322, -112]],
   forest_path: [[-40, 140], [-52, 222], [-150, 250], [-226, 188]],
-  falls_path: [[-172, 62], [-230, 40], [-282, 14]],
+  falls_path: [[-176, 50], [-230, 40], [-246, 32], [-282, 14]],
+  north_bank_path: [[-176, 50], [-196, 44], [-191, 34], [-186, 24], [-190, 0], [-188, -92], [-104, -168]],
+  stones_path: [[-246, 32], [-256, 10], [-250, 0], [-244, -10], [-262, -60], [-288, -144]],
 };
 const SIGNPOSTS = [{ name: 'sign_wick_gate', x: 50, z: 86 }, { name: 'sign_split_oak', x: -40, z: 140 }, { name: 'sign_ford', x: 124, z: -68 }, { name: 'sign_hill_foot', x: -104, z: -168 }];
 const BOUND_R = Number(process.env.BOUND ?? 335);

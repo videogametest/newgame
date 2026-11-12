@@ -27,7 +27,7 @@ The written lines fix more of the map than the first placement knew:
 | `hesper` | 86 | 98 | Hesper's cottage, at Wick's south-east corner, the first house on the road in. Her window faces south-east, up the road |
 | `start` | 226 | 238 | Where the hero begins, on a spur at the south-east pass, 198 m from Hesper's window |
 | `castle` | -296 | -388 | Beyond the north-west rim, on a crag. Never walked to in this region. Its beacon tower stands about 35 m |
-| `mill` | -172 | 62 | On the south bank of the river that feeds the lake. Enemy-held |
+| `mill` | -176 | 50 | Built into the south bank of the river that feeds the lake, its wheel in the water. Enemy-held. (Moved 12 m to the bank in review 020; it stood 20 m from the river) |
 | `forge` | 38 | -176 | North of the lake, at the end of the east road. Its east fence faces the road from the ford. Enemy-held |
 | `watch_house` | -170 | -192 | On the soldiers' road, below the north-west pass. Enemy-held. The supper table is inside |
 | `signal_hill` | -78 | -296 | The highest ground the hero can stand on |
@@ -46,7 +46,16 @@ All ten places off the path from section 4 are here. The supper table shares the
 
 - **The river in** comes over the west rim as the waterfall, runs east past the Mill, and enters the lake on its west side. Its line is `river_in` in the data.
 - **The river out** leaves the lake on the east side, crosses the east road at the ford, and leaves the valley through a gorge in the south-east. Its line is `river_out`.
-- **Three crossings.** The ford at (142, -12), with the broken bridge beside it (the project "The bridge to the Forge" mends it). The mill bridge at (-178, 40). Stepping stones below the falls at (-250, 0).
+- **The crossings** (review 020; full figures in the data as `crossings`, each with its two ends):
+
+| Crossing | Centre | Width | What the hero walks on |
+| --- | --- | --- | --- |
+| The ford | (142, -12) | 3.6 m | The bed, under 0.4 m of water |
+| The bridge to the Forge | (152, -7) | 3.6 m | Nothing until the project is built: two planks and the posts. Then a deck |
+| The mill bridge | (-191, 34) | 2.4 m | A timber deck, bank to bank, at least 1 m above the water |
+| The stepping stones | (-250, 0) | 1.2 m | Flat stones 0.3 m above the water, 1.2 m across, 0.5 m apart, walked without a jump |
+
+  Each runs straight across the river, square to its flow. Roads are 3.6 m wide and paths 1.2 m.
 - The hero swims (design version 33), slowly and unarmed, so the lake and the rivers can be crossed anywhere. The three crossings are still the quick way and the only way for carts, sheep, and villagers: the ford is where the tax cart stops, and the Mill stands at the other bridge. The river also gives a quiet way in to the Mill, and the lake a quiet way to the north shore below the soldiers' road.
 - The prototype's rivers are about 25 m wide because they are carved with round hollows. Make them 8 to 12 m.
 
@@ -63,7 +72,9 @@ In the data as `roads`. Roads are wide enough for a cart; paths are trodden grou
 | `hill_path` | From the soldiers' road up to the signal hill | 130 m |
 | `ridge_path` | From the ford's signpost, through the orchard, over the ridge's saddle, to the patrol hut | 220 m |
 | `forest_path` | From the split oak, through the practice ground and the second clearing, to the grove. It fades out after the practice ground | 280 m |
-| `falls_path` | From the Mill up the south bank to the falls | 120 m |
+| `falls_path` | From the Mill up the south bank to the falls | 115 m |
+| `north_bank_path` | From the Mill over the mill bridge, up through the wood north of the river, to the soldiers' road at the hill's foot. The long way round to the north | 270 m |
+| `stones_path` | Leaves the falls path, crosses the stepping stones, and climbs to the west heights' viewpoint | 190 m |
 
 **Signposts** stand where roads meet: Wick's west gate (50, 86), the split oak (-40, 140), north of the ford (124, -68), and the hill's foot (-104, -168). The split oak itself is the landmark at that junction.
 

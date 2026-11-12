@@ -22,8 +22,8 @@
    "z": -388
   },
   "mill": {
-   "x": -172,
-   "z": 62
+   "x": -176,
+   "z": 50
   },
   "forge": {
    "x": 38,
@@ -70,17 +70,76 @@
   {
    "name": "ford",
    "x": 142,
-   "z": -12
+   "z": -12,
+   "from": [
+    141,
+    -21
+   ],
+   "to": [
+    143,
+    -3
+   ],
+   "width": 3.6,
+   "surface": "bed",
+   "water_depth": 0.4,
+   "used_by": "east_road",
+   "note": "Stones under 0.4 m of water. Waded without slowing. No surface of its own."
+  },
+  {
+   "name": "forge_bridge",
+   "x": 152,
+   "z": -7,
+   "from": [
+    151,
+    -17
+   ],
+   "to": [
+    153,
+    3
+   ],
+   "width": 3.6,
+   "surface": "deck",
+   "used_by": "east_road",
+   "note": "The project \"The bridge to the Forge\". Two planks and the posts until it is built: not walkable before then.",
+   "deck": "Straight from the ground height at one end to the ground height at the other. Never less than 1.0 m above the water."
   },
   {
    "name": "mill_bridge",
-   "x": -178,
-   "z": 40
+   "x": -191,
+   "z": 34,
+   "from": [
+    -196,
+    44
+   ],
+   "to": [
+    -186,
+    24
+   ],
+   "width": 2.4,
+   "surface": "deck",
+   "used_by": "north_bank_path",
+   "note": "Timber, with a rail on the upstream side. Each end meets the bank at the bank's own height.",
+   "deck": "Straight from the ground height at one end to the ground height at the other. Never less than 1.0 m above the water."
   },
   {
    "name": "stepping_stones",
    "x": -250,
-   "z": 0
+   "z": 0,
+   "from": [
+    -256,
+    10
+   ],
+   "to": [
+    -244,
+    -10
+   ],
+   "width": 1.2,
+   "surface": "stones",
+   "top_above_water": 0.3,
+   "stone_size": 1.2,
+   "gap_between_stones": 0.5,
+   "used_by": "stones_path",
+   "note": "Flat-topped stones, walked without a jump. The walk surface is one unbroken strip at the stones' top height."
   }
  ],
  "roads": {
@@ -124,8 +183,12 @@
     104
    ],
    [
-    -172,
-    62
+    -166,
+    66
+   ],
+   [
+    -176,
+    50
    ]
   ],
   "east_road": [
@@ -244,16 +307,76 @@
   ],
   "falls_path": [
    [
-    -172,
-    62
+    -176,
+    50
    ],
    [
     -230,
     40
    ],
    [
+    -246,
+    32
+   ],
+   [
     -282,
     14
+   ]
+  ],
+  "north_bank_path": [
+   [
+    -176,
+    50
+   ],
+   [
+    -196,
+    44
+   ],
+   [
+    -191,
+    34
+   ],
+   [
+    -186,
+    24
+   ],
+   [
+    -190,
+    0
+   ],
+   [
+    -188,
+    -92
+   ],
+   [
+    -104,
+    -168
+   ]
+  ],
+  "stones_path": [
+   [
+    -246,
+    32
+   ],
+   [
+    -256,
+    10
+   ],
+   [
+    -250,
+    0
+   ],
+   [
+    -244,
+    -10
+   ],
+   [
+    -262,
+    -60
+   ],
+   [
+    -288,
+    -144
    ]
   ]
  },
@@ -1123,5 +1246,16 @@
     "height": 12
    }
   ]
+ },
+ "widths": {
+  "road": 3.6,
+  "path": 1.2,
+  "roads": [
+   "road_in",
+   "mill_road",
+   "east_road",
+   "soldiers_road"
+  ],
+  "note": "Every other entry in roads is a path."
  }
 }

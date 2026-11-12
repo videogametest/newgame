@@ -2,7 +2,7 @@
 
 A third-person 3D battle prototype, built with Babylon.js, TypeScript and Vite. Milestone 1 is the combat prototype described in `GAME_DESIGN.md` section 7.
 
-**Live build:** https://videogametest.github.io/newgame/
+**Live build:** https://everylitwindow.com/
 
 ## Run
 
@@ -37,6 +37,6 @@ npm run dev     # local dev server
 
 ## Deployment
 
-A GitHub Actions workflow (`.github/workflows/deploy.yml`) runs the tests and build on every push to `main`, then publishes `dist/` to GitHub Pages. Vite's `base` is `/newgame/`, which matches the Pages path. If the repo is renamed, change `base` in `vite.config.ts` too.
+A GitHub Actions workflow (`.github/workflows/deploy.yml`) runs the tests and build on every push to `main`, then publishes `dist/` to GitHub Pages. Vite's `base` is `/`, which matches the custom domain root. A path-based Pages URL (`https://<user>.github.io/<repo>/`) would need `base: '/<repo>/'` instead.
 
 Supabase is not used in milestone 1 (design section 7). Keys and the service-role key do not belong in this repo.

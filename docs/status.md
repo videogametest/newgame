@@ -7,8 +7,18 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
+| 003 | Step 1 (ground, sky, movement) built on `feat/task-003-step1-valley`, not ready for first look. Step 2 not started. | this PR | Claude review of the first-look bar before step 2 |
 | B | Task 002b style test rework (review 005), PR #21 on `feat/task-002b-rework`: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | #21 | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-12 Task 003 step 1: ground, sky, movement (Viktor, not ready for first look)
+
+- **Shipped:** seeded valley terrain (`src/core/world/valley.ts`, `heightAt`, seed 1066, about 800 m, water level 2 m), walking and sprint on the terrain (`walk.ts`), a camera (`valley_camera.ts`), a day-night clock (`valley_time.ts`, dawn 6, dusk 19, 1200 s per day), chunked terrain (`src/render/valley_terrain.ts`), a sky with sun, moon, stars, and distance haze (`src/render/valley_sky.ts`), lighting (`src/render/lighting.ts`), and the hero placed by `newGameState` (timeOfDay 18, day 1). The default route is the valley; `?arena=1` keeps the combat prototype.
+- **Sky defect fixed:** the dome now uses a shader material that outputs the interpolated vertex colour, so the sky is no longer flat grey or black. Stars, sun and moon keep the unlit material. Checked by eye in `docs/pr-media/valley/`: dusk orange, noon blue, night navy with a visible star, dawn orange.
+- **Not built in step 1 (stays open in task 003):** first-person `V` view, pause and settings menus, crouch, Hesper's interior and its door fade, boarded houses, Wick buildings, scenery, water animation, wildlife, sound, music, tour mode, the arrival view. **The hero start is a placeholder** until Hesper's lit window is built in step 2.
+- **Verified:** `npx tsc --noEmit` exit 0; `npx vitest run` 41 files, 573 tests pass; `npm run build` exit 0; `node scripts/smoke.mjs http://localhost:4173/` exit 0; `?styletest=1` and `?styletest=room` render with no console or page errors.
+- **Draw calls (measured, swiftshader, not a GPU):** dusk 3438, noon 6570, night 9815, dawn 13063 (one run); an earlier run gave 4978, 10886, 16586, 22556. Both runs rise from dusk to dawn. Active meshes about 48, chunks 58. **Not attributed yet:** the probe that would split the count (shadow pass, per-chunk meshes, sky) was removed; the cause is open. **Frame rate:** swiftshader gives about 17–24 fps, which says nothing about the 60 fps target. The target is not claimed as met.
+- **Open:** the first-look bar (dusk arrival view, village, lit window) is not met, so Claude has not reviewed this build for first look.
 
 ## 2026-11-12 Review 008: building scale fix on PR #22 (Viktor)
 

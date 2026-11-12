@@ -1,6 +1,6 @@
 # 003: The world (milestone 3)
 
-Status: open
+Status: in progress (step 1 built, not ready for first look; step 2 not started)
 
 ## Goal
 

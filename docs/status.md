@@ -7,9 +7,20 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
-| 003 | Step 1 merged (PR #23). Walk-distance check merged (PR #25), now 91.4 m (limit 100 m). Review 016 items 1–3 merged (PR #26, PR #27). Review 018 item 1 (sun bearings) merged (PR #30). Review 018 item 2 (rivers) merged (PR #31). Next: review 018 item 3 (river out to the map edge). Step 2 not started. | none | Road grades on `hill_path`, `ridge_path` and `east_road` (review 018 item 6); tour-mode screenshots not built yet; Claude review of the first-look bar before step 2 |
+| 003 | Step 1 merged (PR #23). Walk-distance check merged (PR #25), now 91.4 m (limit 100 m). Review 016 items 1–3 merged (PR #26, PR #27). Review 018 item 1 (sun bearings) merged (PR #30). Review 018 item 2 (rivers) merged (PR #31). Review 018 item 3 (river out) premise not reproduced; width test merged (PR #33, `4e8c568`), no terrain change. Next: review 018 item 4 (`walkSurfaceAt`). Step 2 not started. | none | Road grades on `hill_path`, `ridge_path` and `east_road` (review 018 item 6); tour-mode screenshots not built yet; the falls frame (question in the item 3 entry) |
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-12 Review 018 item 3: river out to the edge (Viktor, premise not reproduced, test added, PR #33)
+
+- **Premise:** review 018 says the river out stops short of the edge. Measured on `7bbec02` with `valleyHeightAt`: the river out (95,-8) to (400,100) is wet end to end. Centre height is 0.50 m everywhere except 1.07–1.60 m within 15 m of the ford. Wet width is 9.5–10.5 m from the ford to the edge (400,100). The raw land there rises to about 40 m at r≈412, so the bank cut keeps the channel open. [measure, 2026-11-12]
+- **Built:** no terrain change. One test, `keeps every river at least 8 m wide under water from end to end, falls and crossings excepted` in `valley.test.ts`. It measures contiguous wet width across each river sample outside 15 m of a crossing and outside the falls, and requires at least 100 samples. The minimum measured is 10.0 m.
+- **Negative control:** with a 12 m bar the test fails (`expected 10.000000000000004 to be greater than or equal to 12`). The file was restored afterwards.
+- **Gate (worker sandbox, `feat/review-018-river-out-test`):** tsc exit 0; vitest 50 files, 650 tests pass; build exit 0; walk gap 91.4 m (limit 100 m); `gen_valley_layout.mjs --check` exit 0; `scripts/smoke.mjs` exit 0.
+- **Deploy:** squash-merged as `4e8c568`. Pages run `43304134289` succeeded. Live check: `https://everylitwindow.com/` returned HTTP 200, and `scripts/smoke.mjs https://everylitwindow.com/` exited 0.
+- **Live check after PR #28 (review 018 asks for it):** PR #28 merged as `44d54e9`. Its post-merge live check is in the layout entry below. Not repeated here.
+- **Not verified, said plainly:** nothing about the river's look changed, so no capture is attached to this PR. If the gorge Greg meant is a visible rim wall (a 0.3 slope up to a 40 m rim), that is the subject of item 5, not this item.
+- **Question for Greg and Claude:** is the "gorge" the rim wall described above? Viktor has not assumed an answer.
 
 ## 2026-11-12 Review 018 items 1 and 2: sun bearings, rivers (Viktor, merged)
 

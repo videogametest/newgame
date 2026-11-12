@@ -111,6 +111,7 @@ class Valley {
   private accumulator = 0;
   private frozen = false;
   private fps = 0;
+  private lastFrameDrawCalls = 0;
   private fpsFrames = 0;
   private fpsTime = 0;
 
@@ -212,7 +213,15 @@ class Valley {
       this.stepHero(T.fixedDt);
     }
     this.updateView(dt);
+    // The engine's draw-call counter is cumulative, so the frame's own count is the difference across the render.
+    const before = this.drawCallCount();
     this.scene.render();
+    this.lastFrameDrawCalls = this.drawCallCount() - before;
+  }
+
+  private drawCallCount(): number {
+    const counters = this.engine as unknown as { _drawCalls?: { current?: number } };
+    return typeof counters._drawCalls?.current === 'number' ? counters._drawCalls.current : 0;
   }
 
   /** One fixed step of walking. Movement only while the mouse is captured, so Esc pauses the hero. */
@@ -312,7 +321,6 @@ class Valley {
   }
 
   private snapshot(): ValleyState {
-    const engineCounters = this.engine as unknown as { _drawCalls?: { current?: number } };
     return {
       x: this.game.hero.position.x,
       z: this.game.hero.position.z,
@@ -324,7 +332,7 @@ class Valley {
       chunks: this.terrain.chunkCount,
       chunkBuilds: this.terrain.buildCount,
       fps: this.fps,
-      drawCalls: typeof engineCounters._drawCalls?.current === 'number' ? engineCounters._drawCalls.current : null,
+      drawCalls: this.lastFrameDrawCalls,
       activeMeshes: this.scene.getActiveMeshes().length,
     };
   }

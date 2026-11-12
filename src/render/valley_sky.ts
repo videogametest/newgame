@@ -31,16 +31,17 @@ export class ValleySky {
     this.dome.isPickable = false;
     this.dome.infiniteDistance = true;
 
+    // Stars are small quads facing the valley, not point sprites: point lists drew only one star in the
+    // night frames (review 016), so every star is a triangle pair that any renderer draws.
     this.stars = new Mesh('valley_stars', scene);
     this.starMat = unlit('valley_stars_mat', scene);
-    this.starMat.pointsCloud = true;
-    this.starMat.pointSize = 2;
     this.stars.material = this.starMat;
     this.stars.infiniteDistance = true;
-    const starData = starPositions(STAR_COUNT);
+    this.stars.isPickable = false;
+    const starData = starQuads(STAR_COUNT);
     const vd = new VertexData();
-    vd.positions = starData;
-    vd.indices = Array.from({ length: STAR_COUNT }, (_, i) => i);
+    vd.positions = starData.positions;
+    vd.indices = starData.indices;
     vd.applyToMesh(this.stars);
 
     this.sunMat = unlit('valley_sun_mat', scene);
@@ -60,11 +61,12 @@ export class ValleySky {
     this.stars.position.set(heroX, 0, heroZ);
     this.dome.updateVerticesData(VertexBuffer.ColorKind, domeColors(this.dome, light));
 
-    const sunDir = light.sunDir;
-    this.sun.position.copyFrom(sunDir.scale(-DISC_DISTANCE));
-    this.moon.position.copyFrom(sunDir.scale(DISC_DISTANCE));
-    this.sun.setEnabled(light.elevation > -0.02);
-    this.moon.setEnabled(light.nightness > 0.4);
+    // The discs follow the sun's and moon's paths in the sky (section 5): the sun rises in the east and sets in
+    // the west, and the moon rises as the sun sets. A disc is drawn only while it is above the horizon.
+    this.sun.position.copyFrom(light.sunSky.scale(DISC_DISTANCE));
+    this.moon.position.copyFrom(light.moonSky.scale(DISC_DISTANCE));
+    this.sun.setEnabled(light.sunSky.y > -0.02);
+    this.moon.setEnabled(light.moonSky.y > -0.02);
     this.sunMat.emissiveColor = light.sunColor;
     this.moonMat.emissiveColor = PALETTE.moon.scale(1.2);
     this.starMat.alpha = clamp01((light.nightness - 0.3) / 0.5);
@@ -138,17 +140,32 @@ export function domeColors(dome: Mesh, light: Lighting): number[] {
   return colors;
 }
 
-/** Stars on the upper hemisphere, deterministic from the valley seed. */
-export function starPositions(count: number): number[] {
-  const out: number[] = [];
+function starPoint(i: number): Vector3 {
+  const u = seededValue(VALLEY_SEED, i, 1, 11);
+  const v = seededValue(VALLEY_SEED, i, 2, 12);
+  const az = u * Math.PI * 2;
+  // Stars fill the sky from the horizon up; the square of v keeps more of them low and near the horizon's dome.
+  const el = 0.04 + v * v * 1.3;
+  const r = DISC_DISTANCE * 0.95;
+  return new Vector3(Math.cos(az) * Math.cos(el) * r, Math.sin(el) * r, Math.sin(az) * Math.cos(el) * r);
+}
+
+/** Each star as a 2 m square tangent to the sky, so it reads at about 4 pixels from the valley. */
+export function starQuads(count: number): { positions: number[]; indices: number[] } {
+  const positions: number[] = [];
+  const indices: number[] = [];
+  const half = 1.1;
   for (let i = 0; i < count; i++) {
-    const u = seededValue(VALLEY_SEED, i, 1, 11);
-    const v = seededValue(VALLEY_SEED, i, 2, 12);
-    const az = u * Math.PI * 2;
-    const el = 0.05 + v * 1.2;
-    const r = DISC_DISTANCE * 0.95;
-    const p = new Vector3(Math.cos(az) * Math.cos(el) * r, Math.sin(el) * r, Math.sin(az) * Math.cos(el) * r);
-    out.push(p.x, p.y, p.z);
+    const p = starPoint(i);
+    const n = p.clone().normalize();
+    const ref = Math.abs(n.y) > 0.9 ? new Vector3(1, 0, 0) : new Vector3(0, 1, 0);
+    const t = Vector3.Cross(ref, n).normalize().scale(half);
+    const b = Vector3.Cross(n, t).normalize().scale(half);
+    const c = p;
+    const corners = [c.add(t).add(b), c.subtract(t).add(b), c.subtract(t).subtract(b), c.add(t).subtract(b)];
+    const base = positions.length / 3;
+    for (const q of corners) positions.push(q.x, q.y, q.z);
+    indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
   }
-  return out;
+  return { positions, indices };
 }

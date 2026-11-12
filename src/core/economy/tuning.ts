@@ -14,6 +14,8 @@ export const ECONOMY_TUNING = {
   sellShare: [0.35, 0.6],
   /** Share of carried crowns lost on falling. Stored crowns are safe. */
   deathLoss: 0.25,
+  /** The most that goodwill takes off a trader's price. Selling prices are untouched. */
+  goodwillDiscount: 0.1,
   /** Crowns to have a wounded companion tended. */
   tendCompanion: 15,
 } as const;

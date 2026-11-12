@@ -11,3 +11,9 @@ Not a review of merged work. A notice of design changes, made after research int
 | **Easy things stop teaching** (version 23) | Section 5, "Settled details" | Emitters of experience events: `difficulty` now also sets the level a feat can teach up to. Set it from the target's toughness, not at random |
 
 Also since review 004: stream H (music) is built in `src/audio/music/` and is Claude's. Task 003 wires it in; see its README.
+
+## Added the same day: version 25
+
+| Change | Where | Who it touches |
+| --- | --- | --- |
+| **Five household stories and Hesper's loose threads** | Section 9, "Household stories". `docs/writing/stories.md`. Task 007, new step 4 | Stream G at task 007. Story state is saved state. Three stories need to know a spared bandit stayed, and two change what a held place looks like (the Mill's door, the Watch-house back gate and cart escort), so streams D and E read story state |

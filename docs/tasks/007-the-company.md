@@ -6,13 +6,15 @@ Status: open
 
 Turn the squad from Bram alone into a roster of six people worth collecting, as described in `GAME_DESIGN.md` section 6, Companions. Scoped in section 8, milestone 7.
 
-## Build in three steps
+## Build in four steps
 
 Open a PR, merge, and deploy after each step, and log each in `docs/status.md`.
 
 1. **The roster.** The six companions as data: where each comes from, the household or event that makes them available, their signature trait, their three perks, and their gear slots. Choosing which three travel, at Hesper's or a campfire, with a company screen. Companions who are not travelling are visible in Wick, living their day. The fallback for Tobin if he was killed.
 2. **What each does.** Each signature trait working in a fight and tested: Tamsin shooting marked targets, Tobin revealing patrol routes and shaking his former comrades' morale, Oona raising fallen companions and improving food without ever attacking, Garrick staggering heavy enemies, and Bracken growling at nearby enemies, leading toward secrets, and being unharmable. The pairs that act together.
 3. **Bond and campfires.** Three stages of bond per companion, growing by travelling, fighting, and campfires. Each companion's wish, mentioned in passing and never listed, and what fulfils it. Campfire scenes as specified in section 10, with lines for each companion alone and for each pair.
+
+4. **Household stories and loose threads** (section 9; `docs/writing/stories.md`). The five stories as data: each step's condition, what the hero does or shows to move it, the decision and both outcomes, and the shorter form when the person was killed. The four story keepsakes are already in `src/core/items/data.ts`. The tally's kinder prices use `Market.goodwill`. Loose threads: one line from Hesper per rest in Wick, chosen from what is open, never the same twice running. Tests: each story can be finished both ways and in its shorter form; no decision changes which perks, companions, or households can be had; a thread is never offered for something already closed.
 
 ## Rules
 

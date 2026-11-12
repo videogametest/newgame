@@ -10,6 +10,8 @@ export interface Market {
   recovery: number;
   /** True while Stane's tax applies (see `taxed`). */
   taxed: boolean;
+  /** Goodwill the village bears the hero, 0 to 1, from the household stories. Takes a little off what traders charge. */
+  goodwill?: number;
 }
 
 const mix = ([a, b]: readonly [number, number], t: number) => a + (b - a) * Math.min(1, Math.max(0, t));
@@ -21,7 +23,8 @@ export function worth(def: ItemDef, quality: Quality = 'common'): number {
 
 /** What a trader charges for one. Never less than one crown. */
 export function buyPrice(def: ItemDef, quality: Quality, market: Market): number {
-  const price = worth(def, quality) * mix(ECONOMY_TUNING.buyMarkup, market.recovery) * (market.taxed ? ECONOMY_TUNING.taxPrice : 1);
+  const price = worth(def, quality) * mix(ECONOMY_TUNING.buyMarkup, market.recovery) * (market.taxed ? ECONOMY_TUNING.taxPrice : 1)
+    * (1 - ECONOMY_TUNING.goodwillDiscount * Math.min(1, Math.max(0, market.goodwill ?? 0)));
   return Math.max(1, Math.ceil(price));
 }
 

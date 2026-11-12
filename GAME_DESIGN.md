@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 24 (changes from the research into the five closest games: the valley learns, winning back is decided not rolled, the turn's limits, terrain that hides). Supersedes version 23.
+Version 25 (household stories and loose threads). Supersedes version 24.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -633,6 +633,26 @@ A place is not freed when the last defender falls. It is freed when the hero lig
 - A short melody plays. It is the same melody every time, with one more instrument for each place freed, so it grows fuller across the game.
 - A lit lantern can be seen from a distance at night, and wolves will not come near it. As the valley is freed, the night fills with lights and becomes safer.
 - Hesper lights the hero's first lantern alongside them, to teach it.
+
+### Household stories
+
+Most of what brings a household home is one act: free a place, return a thing. Five households also have a longer story, three steps each, written in `docs/writing/stories.md`:
+
+| Story | About | The decision |
+| --- | --- | --- |
+| The miller's hand | Dob Finch, who guarded the mill he once worked at, and the Marrins | When the Mill is retaken: send him back inside to open the door, or keep him safe |
+| The striker | Peg Rudge, who kept the smith's fire for Stane, and Bertram Aldric | Steel now, with Peg sent from the valley; or Peg stays, and steel waits |
+| The tally | Tobin Pike and the sixty-one doors he knocked on | Show his father, and lose Tobin from the company for a while; or let him burn it |
+| The thatcher | Hew Pollard, on the tax cart | Bring him home now, and the Watch-house hardens; or send him back to open its gate |
+| Maren's second lamp | Old Maren and the son who marched | Leave the guard's helmet in her window, or keep it |
+
+Rules for all of them:
+
+- **Never listed.** No log, no marker. Each begins from something overheard or said in passing, and moves when the hero does something or shows something.
+- **One decision each,** made by doing or by Show, never from a menu. Both ways are honourable and both cost something.
+- **Nothing is locked away.** No perk, companion, household, or ending depends on a decision. What changes is who is where, how soon a thing comes, and what people say.
+- **Mercy opens them.** Three of the five need a bandit who was spared and stayed. If that person was killed, the story has a shorter, sadder form that still ends.
+- **Loose threads.** When the hero rests in Wick, Hesper may say one line about one thing left open: a story, a stolen thing still carried, a trial set, a companion's wish, a place seen and not reached. At most one per rest, never an instruction. This is how a player who has been away finds the way back in.
 
 ### The turn
 

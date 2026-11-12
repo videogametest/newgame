@@ -73,6 +73,7 @@ Read this before proposing to reverse something. Most of these were argued over 
 | Winning a bandit back is decided, not rolled | MGSV's recruiting is loved because it is a choice made on scouted information. An overheard tell now guarantees the result | A chance each morning |
 | The Mill is retaken once, seen coming, and costs only the place | Players resent a liberation being undone ("when I have conquered an outpost it should be mine") and stories that take control away | Places that can be retaken at any time; dropping the turn |
 | Terrain hides what is beyond it | Breath of the Wild's exploration, the most praised in the research, rests on hills that hide and offer over or around | An open valley visible from the first ridge |
+| Five longer household stories, and Hesper's loose threads | Side content was broad but one step deep, and with no log a returning player could lose every thread. The best-loved side content in the research was hand-built and several steps long | A quest log; more one-step errands; repeating tasks |
 
 ## How it is built
 

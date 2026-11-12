@@ -82,6 +82,13 @@ describe('trade', () => {
     expect(buyPrice(blade, 'common', { recovery: 0.5, taxed: true })).toBeGreaterThan(buyPrice(blade, 'common', { recovery: 0.5, taxed: false }));
     expect(buyPrice(blade, 'fine', thriving)).toBeGreaterThan(buyPrice(blade, 'common', thriving));
   });
+  it('goodwill takes a little off buying and never makes selling a money machine', () => {
+    const jerkin = get('steel_jerkin');
+    const liked: Market = { ...thriving, goodwill: 1 };
+    expect(buyPrice(jerkin, 'common', liked)).toBeLessThan(buyPrice(jerkin, 'common', thriving));
+    expect(buyPrice(jerkin, 'common', liked)).toBeGreaterThan(sellPrice(jerkin, 'common', liked));
+    expect(buyPrice(jerkin, 'common', { ...thriving, goodwill: 9 })).toBe(buyPrice(jerkin, 'common', liked));
+  });
   it('stock widens with recovery and thins under the tax', () => {
     const kettles = TRADERS.find(t => t.id === 'kettles')!;
     expect(shelf(kettles, thriving).length).toBeGreaterThan(shelf(kettles, { recovery: 0, taxed: false }).length);

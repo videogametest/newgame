@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 16 (loot, gathering, crafting, carrying, the hero's home, and trade). Supersedes version 15.
+Version 17 (specifies the inventory, looting, and storage screens). Supersedes version 16.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -321,7 +321,7 @@ What the player finds, and where:
 ### Carrying and keeping
 
 - **A carry limit**, counted in weight. Over the limit the hero cannot sprint. Arrows, food, and materials all weigh something; gold does not.
-- **Inventory** on `I`: gear, arrows, food, materials, stolen goods, and unique items, with what each is for.
+- **Inventory** on `I`, laid out as in section 10.
 - **Storage:** a chest at Hesper's house from the start, unlimited.
 - **Home.** After the valley finale the Fairlow house is the hero's. It has the storage chest, a bed to rest in, and racks, shelves, and a mantel where weapons, unique items, and trophies can be placed and seen. The house fills up as the collection grows.
 
@@ -480,6 +480,18 @@ Restoration is tracked as a single valley recovery level in the game state. It r
 - **Settings:** mouse sensitivity, invert vertical look, field of view for each camera view, camera shake and hit-freeze strength, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
 - **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, attack, switch weapon, dodge, eat, squad order, map) and never again once used. A villager at the start points the hero toward the nearest camp.
 - **HUD:** hero health, equipped weapon, arrow count and type, knife count, food count, squad order, lock-on marker, compass strip. Keep it small; hide what is not needed outside combat.
+- **Inventory screen** (`I`). The world pauses and the mouse is freed while it is open.
+  - *Left:* the scout as they currently look, with equipment slots for bow, blade, knives, cloak, and armour pieces. Clicking a slot shows what can go in it.
+  - *Top:* tabs, one per kind of thing: Weapons, Arrows, Armour, Food, Materials, Stolen Goods, Keepsakes (unique items).
+  - *Middle:* a grid of items, each an icon with a count. Icons are simple and generated from each item's model or a small drawn set; no item may appear without one.
+  - *Right:* a detail panel for the selected item: name, what it does, weight, value, quality, and a comparison with what is equipped. Stolen goods show whose they were.
+  - *Bottom:* a weight bar showing the current load against the carry limit.
+  - Sort by type, weight, or value. A dot marks anything picked up since the inventory was last opened.
+  - One food can be marked as the favourite; `F` eats that one.
+  - Keepsakes cannot be sold, and dropping one asks for confirmation.
+- **Loot window** (`E` on a body or container). A small list of what is inside, with each item's weight. Tap `E` to take the selected item; hold `E` to take everything. An item that would put the hero over the carry limit is shown in red before it is taken. The world does not pause, so looting during a fight is a risk.
+- **Storage screen** (the chest at Hesper's, and later the Fairlow house). Two panels side by side: carried and stored. Clicking an item moves it across. A "store all materials" button.
+- **Display in the house.** Racks, shelves, and the mantel are slots: interacting with one opens a list of items that fit it, and the chosen item appears there in the world.
 - The tuning panel (backtick) stays as a developer tool and is not part of the player-facing menus.
 
 ## 11. Deferred ideas

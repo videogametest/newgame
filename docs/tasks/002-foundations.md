@@ -1,6 +1,6 @@
 # 002: Foundations (milestone 2)
 
-Status: open
+Status: done
 
 ## Goal
 

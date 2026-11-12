@@ -6,9 +6,18 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
-| A | Task 002, steps 1–9, on `feat/task-002-foundations`. Not merged. | see PR list below | Its own review and merge; tests and deploy not re-run |
-| B | Task 002 step 10: asset survey merged (PR #9, `cfd5bf6`). Task 002b (style test) next. | none | Greg's decisions on the people question and the seven gaps; task 003 waits on both |
+| A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
+| B | Task 002b (style test) in progress. Asset survey merged (PR #9, `cfd5bf6`). KayKit Medieval Hexagon free zip not downloadable (0 bytes twice). | none | Greg's decisions on the people question and the seven gaps; task 003 waits on both |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-12 03:05 ET (Viktor)
+
+- **Task 002 done.** PR #12 (`659222d`, squash) merged. Its Pages run `43144274493` **failed**, so the live site stayed on the `3e8da2d` build. Cause: `ubuntu-latest` now resolves to Ubuntu 26.04, which Playwright 1.59 does not support. Fix: PR #13 (`2a13035`, squash) pins both jobs to `ubuntu-24.04`. Pages run `43145058218` succeeded.
+- **Live check:** `https://everylitwindow.com/` returns HTTP 200 and passes `scripts/smoke.mjs` with no failed requests. Verified 03:05 ET.
+- **Verified on the PR #13 branch:** `tsc --noEmit` exit 0; 128 tests pass; `npm run build` exit 0; smoke test against `vite preview` passes.
+- **Not verified:** the drawn-bow arm aim in a live deployed frame (checked only on the contact sheet). Greg asked for this check on PR #4 work; it still needs a live frame.
+- **Blocked: KayKit Medieval Hexagon (free).** The free download saved a 0-byte file twice, from the itch free route only. The empty file is deleted. No paid option was clicked. Greg: if you can download the free zip by hand into the repo's asset folder, I'll pick it up.
+- **Next:** task 002b (style test). Then logic streams C–H, shipped dark, at most four at once.
 
 ## 2026-11-11 21:50 ET (Viktor)
 

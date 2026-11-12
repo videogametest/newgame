@@ -92,10 +92,10 @@ export function multiplierFromShared(difficulty: number): number {
  * - The event's skill must be one the action really teaches; a mismatch throws, so experience
  *   cannot be sent to the wrong skill by mistake.
  * - The event's region raises the cap if that region's cap is higher. It never lowers it.
- * - Pass `repeatable` for targets that can be farmed for free (a practice target, one gathering
+ * - Set `repeatable` on the event for targets that can be farmed for free (a practice target, one gathering
  *   spot); rewards for the same action on the same target then shrink to nothing.
  */
-export function awardSharedEvent(state: ProgressionState, event: SharedExperienceEvent, repeatable = false): SkillGain[] {
+export function awardSharedEvent(state: ProgressionState, event: SharedExperienceEvent): SkillGain[] {
   const action = event.action.replace(/-/g, '_');
   const awards = ACTIONS[action];
   if (!awards) throw new Error(`Unknown experience action "${event.action}"`);
@@ -107,7 +107,7 @@ export function awardSharedEvent(state: ProgressionState, event: SharedExperienc
   return awardExperience(state, {
     action,
     difficulty: multiplierFromShared(event.difficulty),
-    repeatKey: repeatable ? `${action}:${event.targetId}` : undefined,
+    repeatKey: event.repeatable ? `${action}:${event.targetId}` : undefined,
   });
 }
 

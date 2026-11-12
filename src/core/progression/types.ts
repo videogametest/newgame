@@ -1,48 +1,15 @@
 // Progression types. Pure data: nothing here may import the engine.
 // Owned by Claude's stream (docs/PARALLEL.md). See GAME_DESIGN.md section 6.
 
-// Skill ids, skill state, and the hero's rank are shared with every stream; they live in
-// src/core/types (docs/PARALLEL.md rule 1) and are re-exported here under this module's names.
+// Skill ids, skill state, the hero's rank, perk progress, and ProgressionState live in src/core/types
+// (docs/PARALLEL.md rule 1; review 001, item 3). They are re-exported here under this module's names.
 import { SKILL_IDS } from '../types';
-import type { HeroRank, SkillId, SkillState } from '../types';
+import type { HeroRank, MasteryRank, PerkProgress, PerkSet, ProgressionState, SkillId, SkillState } from '../types';
 
 export const SKILLS = SKILL_IDS;
-export type { SkillId, SkillState };
+export type { MasteryRank, PerkProgress, PerkSet, ProgressionState, SkillId, SkillState };
 export type Rank = HeroRank;
 export const RANKS: readonly Rank[] = ['apprentice', 'scout', 'warden'];
-
-export type MasteryRank = 1 | 2 | 3;
-
-export interface PerkProgress {
-  rank: MasteryRank;
-  /** Mastery points earned in total. Rank is derived from this. */
-  mastery: number;
-  /** How the perk was earned: from its primary source or its fallback. */
-  via: 'primary' | 'fallback';
-}
-
-export interface PerkSet {
-  name: string;
-  perks: string[];
-}
-
-/** Everything about the hero's growth. Serializable; part of the save. */
-export interface ProgressionState {
-  skills: Record<SkillId, SkillState>;
-  rank: Rank;
-  /** No skill passes this level in the current region. */
-  regionCap: number;
-  /** Earned perks by id. A perk is never removed once earned. */
-  perks: Record<string, PerkProgress>;
-  /** Ids of equipped perks. Only these are active. */
-  equipped: string[];
-  /** Up to three named sets of perks. */
-  sets: PerkSet[];
-  /** How many times each repeat key has been rewarded. */
-  repeats: Record<string, number>;
-  /** Overflow experience waiting for a perk of that skill to exist. */
-  overflowBank: Record<SkillId, number>;
-}
 
 /**
  * Something the hero accomplished. Experience is only ever awarded for a registered

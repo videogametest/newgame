@@ -211,7 +211,7 @@ describe('the shared event form', () => {
     let lastFarmed = 0;
     let lastFought = 0;
     for (let i = 0; i < 10; i++) {
-      lastFarmed = awardSharedEvent(farmed, { ...event, action: 'arrow-hit', targetId: 'practice-target' }, true)[0].gained;
+      lastFarmed = awardSharedEvent(farmed, { ...event, action: 'arrow-hit', targetId: 'practice-target', repeatable: true })[0].gained;
       lastFought = awardSharedEvent(fought, { ...event, action: 'arrow-hit', targetId: 'practice-target' })[0].gained;
     }
     expect(lastFarmed).toBe(0);

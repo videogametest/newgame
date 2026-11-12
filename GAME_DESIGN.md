@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 11 (names, the answer behind the story, the valley's ten secret places, the six trials, alarm bells, and wildlife). Supersedes version 10.
+Version 12 (adds a first-person view toggle). Supersedes version 11.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -29,7 +29,7 @@ These are expensive to change. Do not revisit without asking.
 
 - **Single-player only.** No multiplayer, now or later. No server-authoritative logic needed.
 - **Platform:** desktop browser, keyboard and mouse only. No touch or controller support.
-- **Full 3D, third-person.** Over-the-shoulder camera that follows the hero; mouse controls the camera.
+- **Full 3D, third-person by default, with a first-person toggle.** The default is an over-the-shoulder camera that follows the hero; the player can switch to first-person at any time (section 5). Mouse controls the camera in both.
 - **One continuous open world.** No battle arenas, no menu map, no loading screens between places inside a region. Combat happens in the world.
 - **The world is generated from data and a seed, not hand-modelled.** Terrain comes from a seeded height function. Scenery (trees, rocks, grass, flowers) is scattered by seeded rules per biome. Points of interest (village, camps, outposts, chests, ruins, landmarks) are placed by hand in data files. The same seed always produces the same world.
 - **The world grows by regions.** Start with one valley about 500 m across. Later regions attach at its edges and are part of the same continuous world.
@@ -147,6 +147,7 @@ Controls:
 - `Space`: dodge roll in the movement direction, with a short cooldown
 - `1` / `2`: switch between short blade and bow
 - `C`: crouch (toggle), for moving quietly and staying low
+- `V`: switch between third-person and first-person view
 - Left mouse: attack
   - **Short blade:** melee swing in front of the hero, short range, brief cooldown. The scout's backup weapon
   - **Bow:** hold to draw, release to fire along the crosshair. The arrow follows a gravity arc. Longer draw means more speed and damage.
@@ -157,6 +158,15 @@ Controls:
 - `M`: map
 - `Esc`: pause menu (also releases the mouse)
 - Backtick: tuning panel
+
+Views:
+
+- **Third-person** is the default: over the shoulder, showing the hero, the cloak, and the surroundings.
+- **First-person** puts the camera at the hero's eye height. The hero's own model is hidden but still casts a shadow. The equipped weapon is shown at the edge of the view: the bow, which visibly draws, or the short blade, which visibly swings. No arms are shown.
+- In first-person the dodge roll becomes a quick sidestep in the movement direction, with the same cooldown and the same brief invulnerability, so the camera never tumbles.
+- Crouching lowers the camera in both views. The bow zoom works in both.
+- Every rule of the game is identical in both views; only the camera and the dodge animation differ.
+- The chosen view is remembered between sessions. Field of view for each is a setting.
 
 Rules:
 
@@ -359,7 +369,7 @@ Restoration is tracked as a single valley recovery level in the game state. It r
 
 - **Title screen:** the game's name over a slow view of the valley, with Continue (when a save exists) and New Game. New Game asks for confirmation before replacing a save.
 - **Pause menu** (`Esc`): Resume, Settings, Controls, Quit to title. The simulation stops while it is open.
-- **Settings:** mouse sensitivity, invert vertical look, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
+- **Settings:** mouse sensitivity, invert vertical look, field of view for each camera view, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
 - **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, attack, switch weapon, dodge, eat, squad order, map) and never again once used. A villager at the start points the hero toward the nearest camp.
 - **HUD:** hero health, equipped weapon, food count, squad order, compass strip. Keep it small; hide what is not needed outside combat.
 - The tuning panel (backtick) stays as a developer tool and is not part of the player-facing menus.

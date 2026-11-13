@@ -67,6 +67,10 @@ export interface ValleyHooks {
   tourNames(): string[];
   /** Share of sampled screen points whose first hit is ground (not the sky dome, stars, sun or moon), 0 to 1. */
   groundShare(cols?: number, rows?: number): number;
+  /** Row-major sampled screen points: 1 where the first hit is ground, 0 where it is sky. */
+  groundMask(cols?: number, rows?: number): number[];
+  /** Capture only: hides the clock, figures, hint and tour label. */
+  hideChrome(): void;
 }
 /** Meshes that make up the sky. A pick that passes through these is sky. */
 const SKY_MESHES = new Set(['valley_sky', 'valley_stars', 'valley_sun', 'valley_moon']);
@@ -134,6 +138,8 @@ class Valley {
   private readonly clockText: HTMLElement;
   private readonly figuresText: HTMLElement;
   private readonly tourText: HTMLElement;
+  /** The clock, figures, hint and tour label box. Capture hides it. */
+  private chromeBox?: HTMLElement;
   /** ?tour=1 turns on tour mode: [ and ] step between named views (src/core/world/tour.ts). */
   private readonly tour = new URLSearchParams(window.location.search).get('tour') === '1';
   private tourIndex = 0;
@@ -349,6 +355,7 @@ class Valley {
     this.tourText.style.cssText = 'margin-top:4px;color:#ffd98a;';
     box.append(this.clockText, this.figuresText, this.hint, this.tourText);
     box.hidden = !(this.debug || this.tour);
+    this.chromeBox = box;
     uiRoot.appendChild(box);
   }
 
@@ -365,22 +372,26 @@ class Valley {
     return true;
   }
 
-  /** Sampled screen points whose first hit is not sky. Water, terrain, houses and trees all count as ground. */
-  groundShare(cols = 40, rows = 23): number {
+  /** Sampled screen points, row by row: 1 where the first hit is not sky. Water, terrain, houses and trees all count as ground. */
+  groundMask(cols = 40, rows = 23): number[] {
     const w = this.engine.getRenderWidth();
     const h = this.engine.getRenderHeight();
-    let ground = 0;
-    let total = 0;
+    const mask: number[] = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const x = Math.round(((c + 0.5) / cols) * w);
         const y = Math.round(((r + 0.5) / rows) * h);
         const hit = this.scene.pick(x, y, (m) => !SKY_MESHES.has(m.name) && m.isEnabled());
-        total++;
-        if (hit?.hit) ground++;
+        mask.push(hit?.hit ? 1 : 0);
       }
     }
-    return total === 0 ? 0 : ground / total;
+    return mask;
+  }
+
+  /** Share of sampled screen points that are ground. Kept for the old figure; the brightness figure is ground_vs_sky.py. */
+  groundShare(cols = 40, rows = 23): number {
+    const mask = this.groundMask(cols, rows);
+    return mask.length === 0 ? 0 : mask.reduce((a, b) => a + b, 0) / mask.length;
   }
 
   private placeAt(x: number, z: number): void {
@@ -436,6 +447,10 @@ class Valley {
       tourTo: (nameOrIndex) => this.tourTo(nameOrIndex),
       tourNames: () => TOUR_VIEWS.map((v) => v.name),
       groundShare: (cols, rows) => this.groundShare(cols, rows),
+      groundMask: (cols, rows) => this.groundMask(cols, rows),
+      hideChrome: () => {
+        if (this.chromeBox) this.chromeBox.hidden = true;
+      },
       project: (name) => {
         const m = this.scene.getMeshByName(name);
         if (!m) return null;

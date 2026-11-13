@@ -3,7 +3,7 @@
 
 import {
   Color3, Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
-  MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Vector3,
+  Matrix, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Vector3,
 } from '@babylonjs/core';
 import { createBattle, getHero } from '../core/battle';
 import type { Fighter } from '../core/types';
@@ -26,6 +26,7 @@ import { lightingAt, PALETTE } from './lighting';
 import { ValleySky } from './valley_sky';
 import { ValleyTerrain } from './valley_terrain';
 import { buildWick, type Wick } from '../village/build';
+import { wickHouses } from '../village/plan';
 import { TUNING as T } from '../config/tuning';
 
 const CAMERA_RIG: ValleyCameraRig = {
@@ -50,6 +51,7 @@ export interface ValleyHooks {
   aimAt(body: 'sun' | 'moon'): void;
   placeAt(x: number, z: number): void;
   lookAt(x: number, z: number): void;
+  project(name: string): { x: number; y: number; w: number; h: number } | null;
   state(): ValleyState;
 }
 export interface ValleyState {
@@ -210,9 +212,11 @@ class Valley {
   /** The hero starts at the valley's edge, facing Wick. The start is set here, not in newGameState. */
   private placeHeroAtStart(): void {
     const s = VALLEY_PLACES.start;
-    const w = VALLEY_PLACES.wick;
+    // The hero faces Hesper's house (docs/tasks/overnight-2026-11-12.md, item 4), so her window is centred at 18:00.
+    const hesper = wickHouses(VALLEY_SEED).find((h) => h.id === 'hesper');
+    if (!hesper) throw new Error("Hesper's cottage is missing from the Wick plan");
     this.game.hero.position = { x: s.x, z: s.z };
-    this.hero.yaw = Math.atan2(w.x - s.x, w.z - s.z);
+    this.hero.yaw = Math.atan2(hesper.x - s.x, hesper.z - s.z);
     this.syncHeroProxy();
   }
 
@@ -361,6 +365,13 @@ class Valley {
         const a = aimAngles({ x: x - hp.x, y: 0, z: z - hp.z });
         this.input.camYaw = a.yaw;
         this.input.aimPitch = 0;
+      },
+      project: (name) => {
+        const m = this.scene.getMeshByName(name);
+        if (!m) return null;
+        const e = this.engine;
+        const v = Vector3.Project(m.getAbsolutePosition(), Matrix.Identity(), this.scene.getTransformMatrix(), this.camera.viewport.toGlobal(e.getRenderWidth(), e.getRenderHeight()));
+        return { x: v.x, y: v.y, w: e.getRenderWidth(), h: e.getRenderHeight() };
       },
       state: () => this.snapshot(),
     };

@@ -1,7 +1,7 @@
 // Captures every tour view (?tour=1, src/core/world/tour.ts) at 18:00 and 12:00, one frame per view and time.
 // The clock is frozen and set by window.__valley before each frame; nothing plays in real time.
 // Each shot also records the ground share (sampled screen points that are not sky) in state.json.
-// Usage: node scripts/tour_capture.mjs [baseUrl] [outDir] [viewNames comma-separated]
+// Usage: node scripts/tour_capture.mjs [baseUrl] [outDir] [viewNames comma-separated] [tods comma-separated]
 //   default baseUrl: http://localhost:4173/   default outDir: docs/pr-media/tour
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -10,7 +10,7 @@ import { join } from 'node:path';
 const base = process.argv[2] ?? 'http://localhost:4173/';
 const outDir = process.argv[3] ?? 'docs/pr-media/tour';
 const only = process.argv[4] ? process.argv[4].split(',') : null;
-const TODS = [18, 12];
+const TODS = process.argv[5] ? process.argv[5].split(',').map(Number) : [18, 12];
 
 const failures = [];
 const browser = await chromium.launch({

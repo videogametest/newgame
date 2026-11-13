@@ -8,13 +8,14 @@ import { join } from 'node:path';
 
 const base = process.argv[2] ?? 'http://localhost:4173/';
 const outDir = process.argv[3] ?? 'docs/pr-media/valley';
+// Aimed shots go last: aimAt turns the camera and nothing resets it, so every shot after one would inherit its aim.
 const TIMES = [
   { name: 'arrival-dusk-19', tod: 19 },
   { name: 'noon-12', tod: 12 },
-  { name: 'noon-sun-12', tod: 12, aim: 'sun' },
   { name: 'night-0', tod: 0 },
-  { name: 'night-moon-2', tod: 2, aim: 'moon' },
   { name: 'dawn-6', tod: 6 },
+  { name: 'noon-sun-12', tod: 12, aim: 'sun' },
+  { name: 'night-moon-2', tod: 2, aim: 'moon' },
 ];
 
 const failures = [];
@@ -39,10 +40,11 @@ for (const t of TIMES) {
   // Let the terrain chunks build and the frame settle.
   await page.waitForTimeout(4000);
   const state = await page.evaluate(() => window.__valley.state());
+  const share = await page.evaluate(() => window.__valley.groundShare());
   const file = join(outDir, `${t.name}.png`);
   await page.locator('canvas').first().screenshot({ path: file });
-  report.push({ shot: file, ...state });
-  console.log(`captured ${file} ${JSON.stringify(state)}`);
+  report.push({ shot: file, groundShare: Number(share.toFixed(3)), ...state });
+  console.log(`captured ${file} ground=${share.toFixed(3)} x=${state.x.toFixed(1)} z=${state.z.toFixed(1)}`);
 }
 
 writeFileSync(join(outDir, 'state.json'), JSON.stringify(report, null, 2));

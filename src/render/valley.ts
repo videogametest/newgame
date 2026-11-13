@@ -10,7 +10,6 @@ import type { Fighter } from '../core/types';
 import { forwardOf, rightOf } from '../core/vec';
 import { newGameState } from '../core/state';
 import type { GameState } from '../core/types';
-import { advanceClock } from '../core/world/clock';
 import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED } from '../core/world/valley';
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
 import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
@@ -38,6 +37,8 @@ import { ValleyTerrain } from './valley_terrain';
 import { buildWick, type Wick } from '../village/build';
 import { wickHouses } from '../village/plan';
 import { TUNING as T } from '../config/tuning';
+import { PauseMenu } from './menu';
+import { clockAfterFrame, clockRuns, pausedAfter } from './pause';
 
 const CAMERA_RIG: ValleyCameraRig = {
   distance: T.camera.distance,
@@ -87,6 +88,10 @@ export interface ValleyState {
   tod: number;
   day: number;
   locked: boolean;
+  paused: boolean;
+  /** Frame counter, and the frame on which the pause last took effect (null before the first pause). */
+  frame: number;
+  pausedFrame: number | null;
   chunks: number;
   chunkBuilds: number;
   fps: number;
@@ -158,6 +163,11 @@ class Valley {
   private glow?: GlowLayer;
   private accumulator = 0;
   private frozen = false;
+  /** Pause menu open: the clock, the walk and the fixed steps stop. The scene still draws. */
+  private paused = false;
+  private frame = 0;
+  private pausedFrame: number | null = null;
+  private readonly pauseMenu: PauseMenu;
   private fps = 0;
   private lastFrameDrawCalls = 0;
   private fpsFrames = 0;
@@ -189,7 +199,7 @@ class Valley {
     this.sun.shadowMaxZ = 400;
     this.shadow = new ShadowGenerator(2048, this.sun);
     this.shadow.usePercentageCloserFiltering = true;
-    this.shadow.darkness = 0.35;
+    this.shadow.darkness = 0.1; // the sky's light already fills shade; the sun's share is nearly all removed
 
     this.terrain = new ValleyTerrain(scene);
     buildFarLand(scene); // the whole valley, coarse, so nothing past the stream radius is a hole (review 023)
@@ -208,7 +218,8 @@ class Valley {
     this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
 
-    this.input = new PlayerInput(canvas, () => undefined);
+    this.pauseMenu = new PauseMenu(uiRoot, () => this.resume());
+    this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
     this.input.camYaw = this.hero.yaw;
 
     this.hint = document.createElement('div');
@@ -268,13 +279,19 @@ class Valley {
   }
 
   private tick(): void {
+    this.frame += 1;
     const dt = Math.min(this.engine.getDeltaTime() / 1000, 0.1);
-    if (!this.frozen && this.input.isWindowFocused) {
-      const next = advanceClock(this.game, dt, VALLEY_CLOCK);
-      this.game.day = next.day;
-      this.game.timeOfDay = next.timeOfDay;
+    if (this.input.takePause()) this.onPauseKey();
+    const next = clockAfterFrame(this.game, dt, VALLEY_CLOCK, clockRuns(this.paused, this.frozen, this.input.isWindowFocused));
+    this.game.day = next.day;
+    this.game.timeOfDay = next.timeOfDay;
+    if (this.paused) {
+      // Presses made while paused are dropped, so a stale attack or dodge does not fire on resume.
+      this.accumulator = 0;
+      this.input.consumeEdges();
+    } else {
+      this.accumulator += dt;
     }
-    this.accumulator += dt;
     while (this.accumulator >= T.fixedDt) {
       this.accumulator -= T.fixedDt;
       this.stepHero(T.fixedDt);
@@ -289,6 +306,33 @@ class Valley {
   private drawCallCount(): number {
     const counters = this.engine as unknown as { _drawCalls?: { current?: number } };
     return typeof counters._drawCalls?.current === 'number' ? counters._drawCalls.current : 0;
+  }
+
+  /** Pause key: opens the pause menu, backs out of Settings, or resumes from the menu page (Esc works both ways). */
+  private onPauseKey(): void {
+    if (!this.paused) {
+      this.setPaused(true);
+    } else if (this.pauseMenu.onSettings) {
+      this.pauseMenu.showMenu();
+    } else {
+      this.resume();
+    }
+  }
+
+  private resume(): void {
+    this.setPaused(false);
+    this.input.requestLock();
+  }
+
+  private setPaused(on: boolean): void {
+    this.paused = on;
+    if (on) {
+      this.pausedFrame = this.frame;
+      this.input.releaseLock();
+      this.pauseMenu.show();
+    } else {
+      this.pauseMenu.hide();
+    }
   }
 
   /** One fixed step of walking. Movement only while the mouse is captured, so Esc pauses the hero. */
@@ -493,6 +537,9 @@ class Valley {
       tod: this.game.timeOfDay,
       day: this.game.day,
       locked: this.input.isLocked,
+      paused: this.paused,
+      frame: this.frame,
+      pausedFrame: this.pausedFrame,
       chunks: this.terrain.chunkCount,
       chunkBuilds: this.terrain.buildCount,
       fps: this.fps,

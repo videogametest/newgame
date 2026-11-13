@@ -2,6 +2,30 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+# Status
+
+Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
+
+## 2026-11-13 Task 009 step 2a: pause menu (Viktor, PR #65)
+
+- Step 2 is split per Greg's 15:26 ruling: 2a pause menu (this entry), 2b Controls, 2c Brightness, 2d remaining settings, 2e quality levels. Each is deployed before the next starts.
+- Merged to `main` as `8ab81ac` (PR #65, squash). Pages run 43504849600 (Test and deploy to GitHub Pages): success. Live smoke `node scripts/smoke.mjs https://everylitwindow.com/`: passed.
+- Gates on branch `pause-menu` at `e873b06`: 827 tests pass, `tsc --noEmit` exit 0, `vite build` exit 0, smoke test passed on a local preview. The workflow only runs on push to `main`, so PR #65 had no checks to report.
+- Pause timing, measured in frames (headless Chromium, software GL): Esc read at frame 29; pause took effect at frame 30 (one frame). Clock frozen from frame 30. Six samples at frames 33 to 43 show one time of day. Test: clock does not advance on the Esc frame or any later frame while paused.
+- Built: pause menu with Resume and Settings. Esc on the menu resumes; Esc on Settings goes back to the menu. Losing mouse capture pauses; regaining it resumes. Escape is reserved: a slot-0 rebind of pause is refused as `reserved`; a spare slot keeps Escape.
+- Not built in 2a: Controls, Copy debug report, Return to title. The "Back" label on Settings is not in `docs/writing/interface.md`, so it is a placeholder to confirm. Gamepad pause (Pad 9) waits for task 004.
+- Page list discrepancy: `docs/writing/interface.md` lists Resume, Settings, Controls, Copy debug report, Return to title for the pause menu, and its Settings section differs from design v36's settings list. 2a follows `docs/writing/interface.md`. Greg to confirm which governs.
+- Frame: `docs/pr-media/pause-menu/pause_menu.jpg` (960x540).
+- Noon hero shadow (review 029 item 1): checked at hero (120,-2), 12:00; the shadow shows under the feet (downscaled copy only). The 15:00 check is still open.
+- Sandbox outage (about 19:15 to 19:33 UTC) is logged in the entry above.
+
+## 2026-11-13 Review 030 retake: shadows and ground share (Viktor, branch `review030-frames`)
+
+- Retake after main `c0c790f` with `shadow.darkness` 0.1: 16 tour views at 18:00 and 12:00 in `docs/pr-media/review030-retake/`.
+- Ground share (ground luma over sky luma), full per-view list in `docs/pr-media/review030-retake/ground_share.txt`. 18:00 ranges 0.66 (hesper_door) to 1.045 (stepping_stones); 12:00 ranges 0.417 (high_lane) to 1.004 (stepping_stones). All above the 0.25 floor.
+- Noon hero shadow: visible on the ground under the hero's feet (hero at 120,-2, 12:00; `hero-noon.png`). Checked on a downscaled copy, not at full resolution.
+- Sky blocker: no such entry existed. Greg closed it.
+
 ## Ford (PR #60): frames for review, not merged
 
 - Gravel lightened from (0.66, 0.62, 0.54) to (0.86, 0.82, 0.72) in `FORD.gravel`; nothing else changed (landHeightAt and water alpha untouched).

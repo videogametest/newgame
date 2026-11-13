@@ -11,6 +11,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-12 Review 022: Wick wired into the valley (Viktor, branch `feat/review-022-wick-wiring`)
+
+- **Wired:** `src/render/valley.ts` calls `buildWick(scene, { heightAt: valleyHeightAt, seed, shadow })` before the valley starts, calls `wick.light(L, timeOfDay)` each frame, and drives a GlowLayer at 0.3 + 0.9 × nightness. No Claude paths edited.
+- **Not done: the shelf wrap (review 022 step 1).** `valleyHeightAt = withWickShelf(landHeightAt, WATER_LEVEL)` breaks two tests in `valley.test.ts`. The fade east of the village box (x 168–200, z 2–21) raises the river bed by up to 0.36 m (land 0.50 → shelf 0.86 at (184.2, 10.9)). Channel depth falls to 1.14 m (rule 1.5–2.5 m, 16 samples). Bank-edge slope rises to 0.34–0.36 (limit 0.31, 76 samples); (167, 6) reads 0.3408. The wrap was tried, measured, and reverted. Village sits on land ground for now. The switch is one line once `src/village/shelf.ts`'s fade tail is fixed.
+- **Sight lines, measured after wiring:** output identical to the pre-wiring baseline (`docs/tasks/003-layout/check.ts`, CELL=2). Wick to signal-hill top reads **2.3 m** clear, not the 0.1 m in review 022. Reported as measured; the 0.1 m figure is not reproduced by this script. Other lines unchanged: start→Hesper 2.1; start→castle top 2.9; Wick hidden from Mill −4.6, Forge −3.6, Watch −7.4.
+- **Measured [this run]:** walk gap **97.0 m** (limit 100), nearest stop `chest_gorge_ledge` 25.3 m; `gen_valley_layout.mjs --check` PASS; tsc OK; vitest 51 files, 668 pass.
+- **Screenshots:** `docs/pr-media/wick-wired/` (default-route valley captures at six times of day). These are not tour-mode frames; tour mode is not built. Wick is at the village edge in the noon frame and was not checked close up.
+- **Not verified:** Wick on screen up close, the hero colliding with houses (not built), and the live Pages result (pending the merge below).
+
 ## 2026-11-12 Review 021: the signal hill test and the stepping-stone landings (Viktor, merged as PR #39, `66694be`)
 
 - **Signal hill test:** active again as "all ground more than 30 m from the marker is lower than the marker's height". Highest ground outside 30 m of the marker is 60.4 m; the marker is 63.14 m. The 64.8 m summit is 13.6 m from the marker and is excluded by that rule. No reshape; the marker does not move.

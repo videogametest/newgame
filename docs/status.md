@@ -16,7 +16,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - Not built in 2a: Controls, Copy debug report, Return to title. The "Back" label on Settings is not in `docs/writing/interface.md`, so it is a placeholder to confirm. Gamepad pause (Pad 9) waits for task 004.
 - Page list discrepancy: `docs/writing/interface.md` lists Resume, Settings, Controls, Copy debug report, Return to title for the pause menu, and its Settings section differs from design v36's settings list. 2a follows `docs/writing/interface.md`. Greg to confirm which governs.
 - Frame: `docs/pr-media/pause-menu/pause_menu.jpg` (960x540).
-- Noon hero shadow (review 029 item 1): checked at hero (120,-2), 12:00; the shadow shows under the feet (downscaled copy only). The 15:00 check is still open.
+- Noon hero shadow (review 029 item 1): checked at hero (120,-2), 12:00 and 15:00. Light follows the hero, so range is not the cause; the noon shadow is short under the feet because the sun is high. See the "Noon shadow" entry below. Any lighting change is Claude's.
 - Sandbox outage (about 19:15 to 19:33 UTC) is logged in the entry above.
 
 ## 2026-11-13 Review 030 retake: shadows and ground share (Viktor, branch `review030-frames`)
@@ -87,7 +87,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - **Work saved:** the review 029 item 1 `aimAt` reset is pushed as `92f9d1d` on `task-009-step2` (two files: `src/render/valley.ts`, `scripts/valley_capture.mjs`). Scratch folders and `scripts/_shadow_check.mjs` were not committed. `main` is at `5171126`, which changes only `docs/writing/`; the branch is not rebased.
 - **Noon shadow frame (review 029 item 1):** the hero's shadow is not visible under his feet. The ground around him is evenly lit (`hero-noon.png` on the worker, `docs/pr-media/review029/`). The shadow wiring looks present (terrain receives shadows; the hero is registered as a caster in `CharacterView`). The cause is not found yet.
 - **Sky blocker:** no sky blocker entry exists in this branch's `docs/status.md`, so nothing was removed. Greg, if it is in another file, tell me which one.
-- **Next:** find the shadow cause, then task 009 step 2.
+- **Shadow cause (follow-up, see the entry below):** not a light-range or bias fault. The earlier "no shadow" reading came from a probe that read the light before its first tick.
+- **Next:** task 009 step 2.
+
+## 2026-11-13 Noon shadow: checked at 12:00 and 15:00 (Viktor, branch `task-009-step2`)
+- **Light follows the hero:** yes. `updateView()` sets the sun position to the hero, 200 m back along the sun direction, every frame. The hero is inside the ±90 m shadow frustum at both times [sandbox probe, 2026-11-13].
+- **Overhead angle and bias:** not the cause. At 12:00 the sun direction is (0, −0.607, −0.794), about 37° up. Bias 0.00005, normal bias 0.
+- **15:00:** the hero's shadow is visible and long along the bank. At 12:00 it is short and tucked under the feet. Both frames are in the sandbox (`tod-12.png`, `tod-15.png`, cropped low bands).
+- **Conclusion:** the shadow works. At noon the high sun gives a short shadow under the hero, so it reads weakly. Any change is a light-angle or strength value in `src/render/lighting.ts` (Claude's file). Not changed; asked Greg in the Slack thread.
+- **Caveat:** the shadow-map pixel readout returned 0 everywhere, so it was not used. The probe's depth values for the hero were negative, which was not explained.
+- **Diagnostic hook:** the uncommitted `__diag` line was removed before this entry; nothing from the probe is committed.
 
 
 ## Streams

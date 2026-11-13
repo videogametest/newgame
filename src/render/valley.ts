@@ -2,7 +2,7 @@
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
 
 import {
-  Color3, Color4, DirectionalLight, Engine, FreeCamera, HemisphericLight, ImageProcessingConfiguration,
+  Color3, Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
   MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Vector3,
 } from '@babylonjs/core';
 import { createBattle, getHero } from '../core/battle';
@@ -24,6 +24,7 @@ import { PlayerInput } from './input';
 import { lightingAt, PALETTE } from './lighting';
 import { ValleySky } from './valley_sky';
 import { ValleyTerrain } from './valley_terrain';
+import { buildWick, type Wick } from '../village/build';
 import { TUNING as T } from '../config/tuning';
 
 const CAMERA_RIG: ValleyCameraRig = {
@@ -87,6 +88,7 @@ export async function startValley(canvas: HTMLCanvasElement, uiRoot: HTMLElement
     const rawTod = params.get('tod');
     if (rawTod !== null) game.timeOfDay = parseTod(rawTod);
     const valley = new Valley(engine, scene, uiRoot, assets, game);
+    await valley.loadWick();
     valley.start();
     hud.hideBoot();
     logEvent('valley', 'ready');
@@ -111,6 +113,8 @@ class Valley {
   private readonly hint: HTMLElement;
   private readonly clockText: HTMLElement;
   private groundY: number;
+  private wick?: Wick;
+  private glow?: GlowLayer;
   private accumulator = 0;
   private frozen = false;
   private fps = 0;
@@ -170,6 +174,13 @@ class Valley {
       if (!this.input.isLocked) this.input.requestLock();
     });
     this.installHooks();
+  }
+
+  /** Wick, the village (docs/tasks/003-wick.md). Built once; its light follows the clock every frame. */
+  async loadWick(): Promise<void> {
+    this.wick = await buildWick(this.scene, { heightAt: valleyHeightAt, seed: VALLEY_SEED, shadow: this.shadow });
+    this.glow = new GlowLayer('glow', this.scene);
+    this.glow.intensity = 0.3;
   }
 
   start(): void {
@@ -270,6 +281,8 @@ class Valley {
     this.syncHeroProxy();
     this.terrain.update(this.hero);
     this.sky.update(L, this.hero.x, this.hero.z);
+    this.wick?.light(L, this.game.timeOfDay);
+    if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
 
     const pose = valleyCameraPose(

@@ -1,7 +1,7 @@
 // One character on screen. Reads a simulation fighter each frame and draws it; owns no game state.
 
 import {
-  AbstractMesh, Color3, Material, Mesh, MeshBuilder, Nullable, PBRMaterial, Scene, ShadowGenerator,
+  AbstractMesh, Color3, Material, Mesh, MeshBuilder, Nullable, Node, PBRMaterial, Scene, ShadowGenerator,
   StandardMaterial, TransformNode,
 } from '@babylonjs/core';
 import { TUNING } from '../config/tuning';
@@ -10,6 +10,7 @@ import { forwardOf, rightOf } from '../core/vec';
 import { UNITS, WEAPON_MODELS, type UnitDef } from '../data/units';
 import { bindClips, nodeMap, type LoadedAssets } from './assets';
 import { ClipPlayer, hold, loop, once, scrub, type Pose } from './clips';
+import { type Proportions } from './proportions';
 
 /** Rotation that turns the model's authored forward into the sim's yaw 0 (+z). Checked on screen. */
 const MODEL_YAW_OFFSET = 0;
@@ -117,6 +118,10 @@ export class CharacterView {
   private readonly weapons = new Map<WeaponId, TransformNode>();
   private disc: Mesh | null = null;
   private discMaterial: StandardMaterial | null = null;
+  /** Set when the character is reshaped (see Proportions). Null for the stock model. */
+  private readonly reshape: (() => void) | null = null;
+  private readonly afterAnimations: (() => void) | null = null;
+  private readonly scene: Scene;
 
   constructor(
     scene: Scene,
@@ -124,7 +129,9 @@ export class CharacterView {
     fighter: Fighter,
     private readonly shadow: ShadowGenerator,
     tag: string,
+    proportions?: Proportions,
   ) {
+    this.scene = scene;
     this.fighterId = fighter.id;
     this.unit = UNITS[fighter.unitId];
     const container = assets.characters.get(this.unit.model);
@@ -133,9 +140,27 @@ export class CharacterView {
     // Bone names must stay as authored: clips and the weapon mount look bones up by name.
     const entries = container.instantiateModelsToScene((n) => n, true);
     this.root = new TransformNode(`${tag}_root`, scene);
-    for (const n of entries.rootNodes) n.parent = this.root;
+    // The model sits under its own node so the proportions can lift the body without touching the sim position.
+    const model = new TransformNode(`${tag}_model`, scene);
+    model.parent = this.root;
+    for (const n of entries.rootNodes) n.parent = model;
 
     const boneNodes = nodeMap(entries.rootNodes);
+    if (proportions) {
+      const { head, chest, legs } = findProportionBones(boneNodes, this.unit.model);
+      model.position.y = proportions.legLength * (proportions.leg - 1);
+      this.reshape = () => {
+        head.scaling.set(proportions.head / proportions.chestWidth, proportions.head, proportions.head);
+        chest.scaling.set(proportions.chestWidth, 1, 1);
+        for (const [upper, foot] of legs) {
+          upper.scaling.set(1, proportions.leg, 1);
+          foot.scaling.set(1, 1 / proportions.leg, 1);
+        }
+      };
+      // Animation groups run during scene.render, after update(); the reshape must follow them.
+      this.afterAnimations = this.reshape;
+      scene.onAfterAnimationsObservable.add(this.afterAnimations);
+    }
     const clips = bindClips(entries.rootNodes, assets.clips, clipNamesOf(this.unit), tag);
     this.player = new ClipPlayer(clips);
 
@@ -200,6 +225,7 @@ export class CharacterView {
     for (const m of this.materials) setEmissive(m, glow);
 
     this.player.apply(this.poseOverride ?? poseFor(f, this.unit));
+    this.reshape?.();
 
     for (const [w, node] of this.weapons) {
       node.setEnabled(f.kind === 'hero' ? f.weapon === w : true);
@@ -249,11 +275,41 @@ export class CharacterView {
     for (const c of this.casters) c.visibility = this.opacity;
   }
 
+  /** Capture and measurement only: world-space height of the character's meshes, in metres, from the ground up. */
+  /** Capture only: the skinned body's world top and bottom in metres. Weapons are not skinned and are left out. */
+  measureHeight(): { top: number; bottom: number } {
+    let top = -Infinity;
+    let bottom = Infinity;
+    for (const m of this.casters) {
+      if (!(m instanceof Mesh) || m.getTotalVertices() === 0 || m.skeleton === null) continue;
+      m.refreshBoundingInfo({ applySkeleton: true, applyMorph: true });
+      const box = m.getBoundingInfo().boundingBox;
+      top = Math.max(top, box.maximumWorld.y);
+      bottom = Math.min(bottom, box.minimumWorld.y);
+    }
+    return { top, bottom };
+  }
+
   dispose(): void {
+    if (this.afterAnimations) this.scene.onAfterAnimationsObservable.removeCallback(this.afterAnimations);
     for (const m of this.casters) this.shadow.removeShadowCaster(m);
     this.player.dispose();
     this.discMaterial?.dispose();
     this.disc?.dispose();
     this.root.dispose(false, true);
   }
+}
+
+/** The bones the proportions reshape. Names as authored in the KayKit rig; a missing one is a load error, not a silent skip. */
+function findProportionBones(bones: Map<string, Node>, model: string): { head: TransformNode; chest: TransformNode; legs: [TransformNode, TransformNode][] } {
+  const get = (name: string): TransformNode => {
+    const b = bones.get(name);
+    if (!(b instanceof TransformNode)) throw new Error(`Bone ${name} missing on ${model} (proportions)`);
+    return b;
+  };
+  return {
+    head: get('head'),
+    chest: get('chest'),
+    legs: (['l', 'r'] as const).map((side): [TransformNode, TransformNode] => [get(`upperleg.${side}`), get(`foot.${side}`)]),
+  };
 }

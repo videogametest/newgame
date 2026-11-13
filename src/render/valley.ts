@@ -18,6 +18,7 @@ import { walkStep, type WalkRules } from '../core/world/walk';
 import { TRAINING_FIELD } from '../data/arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
+import { PROPORTIONS } from './proportions';
 import { buildFarLand } from './valley_far';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
@@ -48,9 +49,10 @@ export interface ValleyHooks {
   setTod(hours: number): void;
   freeze(on: boolean): void;
   aimAt(body: 'sun' | 'moon'): void;
-  placeAt(x: number, z: number): void;
+  placeAt(x: number, z: number, yaw?: number): void;
   lookAt(x: number, z: number): void;
   state(): ValleyState;
+  heroHeight(): { top: number; bottom: number };
 }
 export interface ValleyState {
   x: number;
@@ -162,7 +164,7 @@ class Valley {
 
     this.hero = getHero(createBattle(TRAINING_FIELD));
     this.placeHeroAtStart();
-    this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
+    this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero', PROPORTIONS);
     this.groundY = walkSurfaceAt(this.hero.x, this.hero.z);
 
     this.camera = new FreeCamera('valley_cam', new Vector3(0, 10, 0), scene);
@@ -333,11 +335,17 @@ class Valley {
       : 'Click the view to look around, then WASD to walk';
   }
 
+  /**
+   * Capture only. Finds a Wick door's real opening: horizontal rays from outside the front wall, aimed through the
+   * door's centre line at each height, that hit only this house's meshes. Open heights are where no wall is hit.
+   */
   private installHooks(): void {
     window.__valley = {
       setTod: (hours) => {
         this.game.timeOfDay = parseTod(String(hours));
       },
+      // Capture only: the hero's world height in metres, measured from its meshes.
+      heroHeight: () => this.heroView.measureHeight(),
       freeze: (on) => {
         this.frozen = on;
       },
@@ -350,10 +358,11 @@ class Valley {
         this.input.aimPitch = a.pitch;
       },
       // Capture only: stands the hero at a point on the ground, and turns the camera to face a point.
-      placeAt: (x, z) => {
+      placeAt: (x, z, yaw) => {
         this.game.hero.position = { x, z };
         this.hero.x = x;
         this.hero.z = z;
+        if (yaw !== undefined) this.hero.yaw = yaw;
         this.groundY = walkSurfaceAt(x, z);
       },
       lookAt: (x, z) => {

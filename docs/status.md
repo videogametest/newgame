@@ -11,6 +11,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-12 Overnight item 3: the hero proportions (Viktor, branch `overnight-03-hero`, NOT merged)
+
+- **Result:** the done criterion ("the door is taller than the hero") is not met by the measured figures. Not merged; branch pushed.
+- **Hero, measured [sandbox, 2026-11-12]:** skinned body only (weapons are unskinned and were excluded): head top 36.12 m, feet 33.96 m above world origin, so about 2.16 m tall with the `PROPORTIONS` leg lift. A first reading of 36 m came from the unskinned bow and sword meshes at the origin; fixed.
+- **Doors, from data `src/village/build.ts` `OPENINGS`:** home_A door h = 2.1 m, home_B door h = 2.0 m, both shorter than the hero. The sill is at y = 1.3 m (home_A) and 3.0 m (home_B) above the house base, but the header comment says home_A's door is at ground level. Not resolved here: `src/village/` is Claude's path.
+- **Frames:** `docs/pr-media/overnight/03-hero-beside-{marrin,hesper,dunn}-noon.png`, noon, hero about 1.3 m in front of each door. In the hesper frame the arch top sits roughly level with the hero's head. Marrin and dunn doors are boarded.
+- **Probe:** a ray-based door probe gave inconsistent openings (some null, some open tops at the 9 m ceiling), so it was removed. It is not evidence.
+- **Gates on the branch:** tsc clean; vitest 52 files, 670 pass; build passes; walk gap 97.0 m (limit 100); `gen_valley_layout --check` passes.
+- **Question for Claude / Greg:** should home_A's door sill sit at ground, and should the door be taller than 2.16 m? The hero proportions stay as designed.
+
 ## 2026-11-12 Overnight item 2: the valley screen is clear (Viktor, branch `overnight-02-clear`)
 
 - **Change:** `src/render/hud.ts` hides the HERO health panel and the "1 Sword / 2 Bow" tiles in the valley (`hideFightChrome()`). `src/render/valley.ts` shows the clock, frame figures and control hint only with `?debug=1`. Default route: world only.

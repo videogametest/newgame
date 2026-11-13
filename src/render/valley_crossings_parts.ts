@@ -33,7 +33,7 @@ export const FORD = {
   /** The gravel's top sits this far above the ford bed (the bed is water_depth below the water). */
   gravelLift: 0.03,
   /** Pale gravel, a little lighter than the water over it. */
-  gravel: { r: 0.66, g: 0.62, b: 0.54 },
+  gravel: { r: 0.86, g: 0.82, b: 0.72 },
 } as const;
 
 export type CrossingMaterial = 'wood' | 'stone';

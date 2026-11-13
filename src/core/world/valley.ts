@@ -3,7 +3,8 @@
 // valley_layout.ts (do not edit that by hand). This file turns them into the terrain and the walking rules.
 
 import { createHeightAt, type TerrainShape } from './terrain';
-import { withWickShelf } from '../../village/shelf';
+import { SHELF_TUNING, withWickShelf } from '../../village/shelf';
+import { withGradedRoads, type Graded } from './grading';
 import { WICK_THINGS, wickHouses } from '../../village/plan';
 import { solidAt, type Footprint } from './solids';
 import {
@@ -54,7 +55,7 @@ const RIM_STEP_MIN = 8;
  * it, GATE_WALL_HALF thick either side of the line. The wall is thicker than a 4 m grid step in its direction, so a
  * grid walk cannot step over it.
  */
-const GATE_RADIUS = 336;
+export const GATE_RADIUS = 336;
 export const GATE_HALF_WIDTH = 6;
 export const GATE_WALL_HALF = 2;
 const GATE_CORRIDOR_DEPTH = 15;
@@ -92,9 +93,44 @@ const heightSampler = createHeightAt(VALLEY_SEED, VALLEY_SHAPE);
 
 /** Ground height (m) at a valley point. Same answer for the same (x, z) on every call. */
 export function valleyHeightAt(x: number, z: number): number {
+  return (graded ??= gradeTheRoads()).heightAt(x, z);
+}
+let graded: Graded | null = null;
+
+/** Roads keep to 0.2 along their line and paths to 0.45 (design section 4; review 018 item 6). */
+export const ROAD_LIMIT = 0.2;
+export const PATH_LIMIT = 0.45;
+export const isRoadId = (id: string): boolean => id === 'road_in' || id.endsWith('_road');
+
+/** The land with Wick's shelf cut into it, before the roads are graded. */
+export function shelvedHeightAt(x: number, z: number): number {
   return (shelved ??= withWickShelf(landHeightAt, WATER_LEVEL, riverDistance))(x, z);
 }
 let shelved: ((x: number, z: number) => number) | null = null;
+
+function gradeTheRoads(): Graded {
+  const roads = Object.entries(VALLEY_ROADS).map(([id, points]) => ({ id, points, limit: isRoadId(id) ? ROAD_LIMIT : PATH_LIMIT }));
+  return withGradedRoads(shelvedHeightAt, roads, {
+    // A road's height is fixed where it stands on a crossing or in water, close to a river, and from the gate outward.
+    pinned: (x, z) => nearCrossing(x, z) || insideWickBox(x, z) || shelvedHeightAt(x, z) < WATER_LEVEL + 0.2 || riverDistance(x, z) < RIVER_KEEP || Math.hypot(x, z) > GATE_RADIUS - 1,
+  });
+}
+/** Wick's shelf is already level; roads are left as the shelf made them inside the village. */
+export const insideWickBox = (x: number, z: number): boolean => { const b = SHELF_TUNING.box; return x >= b.x0 && x <= b.x1 && z >= b.z0 && z <= b.z1; };
+/** Within this distance of a crossing's line, bank to bank: the crossing and its landings are left as built. */
+const CROSSING_KEEP = 9;
+export function nearCrossing(x: number, z: number): boolean {
+  return VALLEY_CROSSINGS.some((c) => {
+    const dx = c.to.x - c.from.x, dz = c.to.z - c.from.z;
+    const u = Math.min(1, Math.max(0, ((x - c.from.x) * dx + (z - c.from.z) * dz) / (dx * dx + dz * dz)));
+    return Math.hypot(x - (c.from.x + dx * u), z - (c.from.z + dz * u)) < CROSSING_KEEP;
+  });
+}
+/** Roads leave the rivers' channels and banks as the valley cut them: no grading this close to a river's centre line. */
+const RIVER_KEEP = 4;
+
+/** What the grading did to each road: largest cut, largest fill, and samples it could not bring within the limit. */
+export const gradingReport = () => (graded ??= gradeTheRoads()).report();
 
 /** The valley's land before Wick's shelf and bay are cut into it (docs/tasks/003-wick.md, rules 4 and 5). */
 export function landHeightAt(x: number, z: number): number {

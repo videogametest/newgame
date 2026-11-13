@@ -57,6 +57,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - Ground share is brightness against sky (Greg's definition, 2026-11-13). The capture script still prints the old screen-share figure (0.983 for these frames); that is superseded and the script change is the next item.
 - Identity note: squash commits on `main` since #49 are authored `videogametest <support@gridironwife.com>`, not the noreply address Greg asked for. New commits use `355531315+videogametest@users.noreply.github.com`. Not rewritten.
 
+## 2026-11-13 Sandbox outage, aimAt push, and the noon shadow frame (Viktor, branch `task-009-step2`)
+
+- **Outage:** sandbox calls failed with `AuthError: token validation failed (sandbox exec infrastructure failure)`. Worker commands failed with `InvalidError: Total length of CMD arguments cannot exceed 65536 bytes (ARG_MAX)`, even for `echo ok`. It started about 19:15 UTC (14:15 ET) and recovered about 19:33 UTC (14:33 ET), so about 18 minutes. The start time comes from my notes, so treat it as approximate.
+- **Work saved:** the review 029 item 1 `aimAt` reset is pushed as `92f9d1d` on `task-009-step2` (two files: `src/render/valley.ts`, `scripts/valley_capture.mjs`). Scratch folders and `scripts/_shadow_check.mjs` were not committed. `main` is at `5171126`, which changes only `docs/writing/`; the branch is not rebased.
+- **Noon shadow frame (review 029 item 1):** the hero's shadow is not visible under his feet. The ground around him is evenly lit (`hero-noon.png` on the worker, `docs/pr-media/review029/`). The shadow wiring looks present (terrain receives shadows; the hero is registered as a caster in `CharacterView`). The cause is not found yet.
+- **Sky blocker:** no sky blocker entry exists in this branch's `docs/status.md`, so nothing was removed. Greg, if it is in another file, tell me which one.
+- **Next:** find the shadow cause, then task 009 step 2.
+
+
 ## Streams
 
 | Stream | Doing | Open PR | Blocked |

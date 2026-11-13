@@ -1,6 +1,8 @@
 // Captures every tour view (?tour=1, src/core/world/tour.ts) at 18:00 and 12:00, one frame per view and time.
 // The clock is frozen and set by window.__valley before each frame; nothing plays in real time.
-// Each shot also records the ground share (sampled screen points that are not sky) in state.json.
+// Each shot records a ground mask (sampled screen points that are not sky) in state.json; then run
+// `uv run --with pillow python scripts/ground_vs_sky.py <outDir>` for the brightness figure. The HUD
+// (clock, figures, hint, tour label) is hidden for every frame.
 // Usage: node scripts/tour_capture.mjs [baseUrl] [outDir] [viewNames comma-separated] [tods comma-separated]
 //   default baseUrl: http://localhost:4173/   default outDir: docs/pr-media/tour
 import { chromium } from 'playwright';
@@ -28,6 +30,7 @@ url.searchParams.set('tour', '1');
 await page.goto(url.toString(), { waitUntil: 'load', timeout: 120_000 });
 await page.waitForFunction(() => Boolean(window.__valley), null, { timeout: 240_000 });
 await page.evaluate(() => window.__valley.freeze(true));
+await page.evaluate(() => window.__valley.hideChrome());
 
 const names = await page.evaluate(() => window.__valley.tourNames());
 const views = only ? names.filter((n) => only.includes(n)) : names;
@@ -40,11 +43,11 @@ for (const name of views) {
     // Let the terrain chunks build and the frame settle.
     await page.waitForTimeout(4000);
     const state = await page.evaluate(() => window.__valley.state());
-    const share = await page.evaluate(() => window.__valley.groundShare());
+    const mask = await page.evaluate(() => window.__valley.groundMask().join(''));
     const file = join(outDir, `${name}-${tod}.png`);
     await page.locator('canvas').first().screenshot({ path: file });
-    report.push({ view: name, tod, shot: file, groundShare: Number(share.toFixed(3)), ...state });
-    console.log(`captured ${file} ground=${share.toFixed(3)} x=${state.x.toFixed(1)} z=${state.z.toFixed(1)}`);
+    report.push({ view: name, tod, shot: file, groundMask: mask, ...state });
+    console.log(`captured ${file} x=${state.x.toFixed(1)} z=${state.z.toFixed(1)}`);
   }
 }
 

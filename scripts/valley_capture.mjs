@@ -32,6 +32,7 @@ mkdirSync(outDir, { recursive: true });
 await page.goto(base, { waitUntil: 'load', timeout: 120_000 });
 await page.waitForFunction(() => Boolean(window.__valley), null, { timeout: 240_000 });
 await page.evaluate(() => window.__valley.freeze(true));
+await page.evaluate(() => window.__valley.hideChrome());
 
 const report = [];
 for (const t of TIMES) {
@@ -40,11 +41,11 @@ for (const t of TIMES) {
   // Let the terrain chunks build and the frame settle.
   await page.waitForTimeout(4000);
   const state = await page.evaluate(() => window.__valley.state());
-  const share = await page.evaluate(() => window.__valley.groundShare());
+  const mask = await page.evaluate(() => window.__valley.groundMask().join(''));
   const file = join(outDir, `${t.name}.png`);
   await page.locator('canvas').first().screenshot({ path: file });
-  report.push({ shot: file, groundShare: Number(share.toFixed(3)), ...state });
-  console.log(`captured ${file} ground=${share.toFixed(3)} x=${state.x.toFixed(1)} z=${state.z.toFixed(1)}`);
+  report.push({ shot: file, groundMask: mask, ...state });
+  console.log(`captured ${file} x=${state.x.toFixed(1)} z=${state.z.toFixed(1)}`);
 }
 
 writeFileSync(join(outDir, 'state.json'), JSON.stringify(report, null, 2));

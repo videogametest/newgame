@@ -93,7 +93,9 @@ function domeMaterial(name: string, scene: Scene): ShaderMaterial {
     'uniform mat4 worldViewProjection;',
     'varying vec4 vColor;',
     'void main(void) {',
-    '  gl_Position = worldViewProjection * vec4(position, 1.0);',
+    // Pinned to the far plane: the dome can never be cut by the camera's far limit, whatever its size or offset.
+    '  vec4 p = worldViewProjection * vec4(position, 1.0);',
+    '  gl_Position = vec4(p.xy, p.w * 0.99999, p.w);',
     '  vColor = color;',
     '}',
   ].join('\n');

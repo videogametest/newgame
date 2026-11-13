@@ -197,7 +197,7 @@ class Valley {
 
     this.camera = new FreeCamera('valley_cam', new Vector3(0, 10, 0), scene);
     this.camera.minZ = 0.1;
-    this.camera.maxZ = 1200;
+    this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
 
     this.input = new PlayerInput(canvas, () => undefined);

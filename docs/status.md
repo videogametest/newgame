@@ -2,6 +2,12 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## Ford (PR #60): frames for review, not merged
+
+- Gravel lightened from (0.66, 0.62, 0.54) to (0.86, 0.82, 0.72) in `FORD.gravel`; nothing else changed (landHeightAt and water alpha untouched).
+- Frames at (132, -36) looking at (132, -12), and at (160, -14) looking at (142, -22), at 12:00 and 18:00. Pass mark (review 028 item 3): one continuous river with a pale band under the water.
+- By eye: the river reads as one continuous body of water, bank to bank. The pale band under the water is faint at 12:00 from the first position and weak at 18:00. It does not clearly pass. PR #60 is not merged; Greg to judge from the frames.
+
 ## 2026-11-13 Review 025 item 5: the tour views (Viktor, branch `overnight-14-ridge-path`)
 
 - The old `high_lane` view is renamed `ridge_path` (hero 160,-112; look 254,-100). New `high_lane` (hero 150,86; look 100,85, Wick's high lane) and `hesper_door` (hero 92,108; look 86,98) are in `src/core/world/tour.ts`, before `landing`. The walkability test covers the new hero points.

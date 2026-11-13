@@ -58,3 +58,24 @@ Against `valleyHeightAt` on `main` at `b08f7c3`: all eighteen plots and all ten 
 ## Evidence wanted, with step 2
 
 A frame of Wick from above at noon with every house in it, and the brief's frames: the arrival view at 18:00 in both camera views, Wick at noon and at night from the square, and the hero and the brute at a house door.
+
+## Built (12 November, by Claude)
+
+The village is built as a module, so step 2 wires it in and does not rebuild it. See it at `?styletest=wick`; frames are in `docs/pr-media/wick/`.
+
+| File | What it is |
+| --- | --- |
+| `src/village/plan.ts` | Pure. Every house's place, turn, model, roof colour, and state, from the seed (rules 1 and 2) |
+| `src/village/shelf.ts` | Pure. `withWickShelf(heightAt, water)`: the level shelf and the bay at the landing (rules 4 and 5) |
+| `src/village/build.ts` | `buildWick(scene, { heightAt, seed, shadow })`: houses, planks on the boarded ones, Hesper's lit window, lamp and smoke, lanes, gates and fences, the ten things, weeds |
+| `src/village/village.test.ts` | Holds the rules: 17 windows and an inn, the shelf's heights and slopes, the bay joined to the lake |
+
+To wire it in:
+
+1. In `valleyHeightAt`, wrap the land with `withWickShelf(..., WATER_LEVEL)`, so walking, the terrain mesh, and the tests all see the same ground. Then run the walk gap and the sight-line checks again.
+2. In the valley scene: `const wick = await buildWick(scene, { heightAt: valleyHeightAt, seed: VALLEY_SEED, shadow })`, and call `wick.light(lighting, tod)` whenever the light changes.
+3. Add a `GlowLayer` if the scene has none: the window is the only emissive thing in the village.
+
+Measured with the shelf on today's land: the start still sees Hesper's window, clear by 1.9 m (unchanged). Wick is better hidden from the Mill, the Forge, and the Watch-house than before. "Wick sees the signal hill's top" is clear by only 0.1 m; if the land work moves it under, raise the hill or say so.
+
+Not built: the people, the inn's interior, collision with houses and fences, and trees. The door and window positions for the two house models are in `OPENINGS` in `build.ts`, measured from the models at scale 8.

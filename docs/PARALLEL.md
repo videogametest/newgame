@@ -32,6 +32,7 @@ Run at most four streams at once. Each stream is one sub-agent, one branch, and 
 | V | **Claude's stream, built.** The valley learns (section 5): the hero's habits and the answers held places make | 005 | `src/core/valley/` |
 | S | **Claude's stream, built.** The five household stories and Hesper's loose threads (section 9): which line is said when, what each decision changes | 007 | `src/core/stories/` |
 | R | **Claude's stream, built (12 Nov, from the second research pass).** Companions' conduct, lines that never repeat, Notes, and teachers | 004, 006, 007 | `src/core/company/`, `src/core/speech/`, `src/core/notes/`, `src/core/progression/lessons.ts` |
+| W | **Claude's stream, built (12 Nov).** Wick: the village plan, the shelf it stands on, and the builder that draws it. Task 003 step 2 wires it in | 003 | `src/village/`, `src/styletest/wick.ts` |
 
 Start with A and B together. Add C, D, E, F2, G, and H as capacity allows, logic streams only, never more than four streams in total.
 

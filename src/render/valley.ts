@@ -2,8 +2,8 @@
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
 
 import {
-  Color3, Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
-  Matrix, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Vector3,
+  Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
+  Matrix, Scene, ShadowGenerator, Vector3,
 } from '@babylonjs/core';
 import { createBattle, getHero } from '../core/battle';
 import type { Fighter } from '../core/types';
@@ -11,7 +11,7 @@ import { forwardOf, rightOf } from '../core/vec';
 import { newGameState } from '../core/state';
 import type { GameState } from '../core/types';
 import { advanceClock } from '../core/world/clock';
-import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL, VALLEY_HALF_EXTENT } from '../core/world/valley';
+import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED } from '../core/world/valley';
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
 import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
 import { walkStep, type WalkRules } from '../core/world/walk';
@@ -19,12 +19,14 @@ import { TRAINING_FIELD } from '../data/arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
 import { buildFarLand } from './valley_far';
+import { PROPORTIONS } from './proportions';
+import { buildValleyWater, type ValleyWater } from './valley_water';
 import { buildGate } from './valley_gate';
 import { buildScenery } from './valley_scenery';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
-import { lightingAt, PALETTE } from './lighting';
+import { lightingAt } from './lighting';
 import { ValleySky } from './valley_sky';
 import { ValleyTerrain } from './valley_terrain';
 import { buildWick, type Wick } from '../village/build';
@@ -167,6 +169,7 @@ class Valley {
     this.hero = getHero(createBattle(TRAINING_FIELD));
     this.placeHeroAtStart();
     this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
+    this.heroView.asDesigned(scene, PROPORTIONS); // overnight item 3
     this.groundY = walkSurfaceAt(this.hero.x, this.hero.z);
 
     this.camera = new FreeCamera('valley_cam', new Vector3(0, 10, 0), scene);
@@ -200,17 +203,11 @@ class Valley {
     this.engine.runRenderLoop(() => this.tick());
   }
 
+  private water: ValleyWater | null = null;
+  private waterSeconds = 0;
+
   private buildWater(scene: Scene): void {
-    const size = VALLEY_HALF_EXTENT * 2 + 400;
-    const water = MeshBuilder.CreateGround('valley_water', { width: size, height: size, subdivisions: 1 }, scene);
-    water.position.y = WATER_LEVEL;
-    const mat = new StandardMaterial('valley_water_mat', scene);
-    mat.diffuseColor = PALETTE.water;
-    mat.specularColor = new Color3(0.5, 0.5, 0.5);
-    mat.alpha = 0.85;
-    water.material = mat;
-    water.receiveShadows = true;
-    water.isPickable = false;
+    this.water = buildValleyWater(scene); // the lake and rivers take the sky (overnight item 5)
   }
 
   /** The hero starts at the valley's edge, facing Wick. The start is set here, not in newGameState. */
@@ -296,6 +293,8 @@ class Valley {
     this.syncHeroProxy();
     this.terrain.update(this.hero);
     this.sky.update(L, this.hero.x, this.hero.z);
+    this.waterSeconds += dt;
+    if (this.scene.activeCamera) this.water?.update(L, this.waterSeconds, this.scene.activeCamera.globalPosition, FOG_START, FOG_END);
     this.wick?.light(L, this.game.timeOfDay);
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);

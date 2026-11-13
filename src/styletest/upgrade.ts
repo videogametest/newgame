@@ -34,14 +34,8 @@ const PEOPLE: Who[] = [
   { id: 'villager', model: `${KAY}Mage.glb`, hide: /Mage_Cape|Mage_Hat/, tint: [0.75, 0.6, 0.45], carries: [] },
 ];
 
-/** Column B. Bone scales applied after the animation each frame. Feet are counter-scaled so only the legs lengthen. */
-export const PROPORTIONS = {
-  head: 0.78,
-  leg: 1.34,
-  chestWidth: 1.06,
-  /** Leg bones' combined rest length in metres (upper to lower to foot), for lifting the body by the extra. */
-  legLength: 0.38,
-};
+export { PROPORTIONS } from '../render/proportions';
+import { PROPORTIONS } from '../render/proportions';
 
 const X_STEP = 1.9;
 /** Clips the test can pin, to check that reshaped bodies still move properly. */

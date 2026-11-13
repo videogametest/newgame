@@ -117,6 +117,34 @@ export class CharacterView {
   private readonly weapons = new Map<WeaponId, TransformNode>();
   private disc: Mesh | null = null;
   private discMaterial: StandardMaterial | null = null;
+  private readonly boneNodes: Map<string, unknown>;
+  private readonly modelRoots: TransformNode[];
+
+  /**
+   * The designed body (design section 7, review 011): a smaller head, longer legs, a slightly broader chest, and a
+   * thin dark outline. Bone scales are set after the animation each frame; the body is lifted by what the legs gained.
+   * Proportions are the ones Greg approved in the style test (`PROPORTIONS`).
+   */
+  asDesigned(scene: Scene, P: { head: number; leg: number; chestWidth: number; legLength: number }): void {
+    const bone = (name: string): TransformNode | null => {
+      const b = this.boneNodes.get(name);
+      return b instanceof TransformNode ? b : null;
+    };
+    for (const r of this.modelRoots) r.position.y += P.legLength * (P.leg - 1);
+    scene.onAfterAnimationsObservable.add(() => {
+      bone('head')?.scaling.set(P.head / P.chestWidth, P.head, P.head);
+      bone('chest')?.scaling.set(P.chestWidth, 1, 1);
+      for (const side of ['l', 'r']) {
+        bone(`upperleg.${side}`)?.scaling.set(1, P.leg, 1);
+        bone(`foot.${side}`)?.scaling.set(1, 1 / P.leg, 1);
+      }
+    });
+    for (const m of this.casters) {
+      m.renderOutline = true;
+      m.outlineWidth = 0.011;
+      m.outlineColor = new Color3(0.16, 0.1, 0.08);
+    }
+  }
 
   constructor(
     scene: Scene,
@@ -136,6 +164,8 @@ export class CharacterView {
     for (const n of entries.rootNodes) n.parent = this.root;
 
     const boneNodes = nodeMap(entries.rootNodes);
+    this.boneNodes = boneNodes;
+    this.modelRoots = entries.rootNodes as TransformNode[];
     const clips = bindClips(entries.rootNodes, assets.clips, clipNamesOf(this.unit), tag);
     this.player = new ClipPlayer(clips);
 

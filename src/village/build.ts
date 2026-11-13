@@ -10,19 +10,25 @@ import type { Lighting } from '../render/lighting';
 import { bearingVector, chance, WICK_GATES, WICK_LANES, WICK_THINGS, wickHouses, type House } from './plan';
 
 const HEX = 'assets/kaykit_medieval_hexagon/';
-/** Review 012: buildings at 8, props at 3.2, trees about 12. */
-export const BUILDING_SCALE = 8;
+/**
+ * Buildings at 9.6, props at 3.2, trees about 12. Review 012 set buildings at 8; measured in the valley, that left
+ * the doors (2.1 m) no taller than the people (2.16 m), so they are a fifth larger: a 2.5 m door.
+ */
+export const BUILDING_SCALE = 9.6;
+/** Openings were measured at scale 8. */
+const K = BUILDING_SCALE / 8;
 const PROP = 3.2;
 
 /**
  * Where the door and the windows are on each model's front and sides, in metres at BUILDING_SCALE, measured from
- * the house's centre: `u` along the wall (toward the house's own left hand, as it looks out of its door), `y` up, `out` from the centre to the wall face.
+ * the house's centre. `y` is the height of the opening's middle above the house's base, not its sill: `u` along the wall (toward the house's own left hand, as it looks out of its door), `y` up, `out` from the centre to the wall face.
  */
+const opening = (u: number, y: number, out: number, w: number, h: number) => ({ u: u * K, y: y * K, out: out * K, w: w * K, h: h * K });
 export const OPENINGS = {
-  // A cottage: the door at the ground in the middle of the front, one window above it in the gable.
-  home_A: { door: { u: 0, y: 1.3, out: 2.62, w: 1.4, h: 2.1 }, window: { u: 0, y: 4.0, out: 2.5, w: 0.62, h: 0.74 } },
-  // A taller house on a stone footing with steps: the door to one side, a window beside it.
-  home_B: { door: { u: 1.05, y: 3.0, out: 2.3, w: 1.5, h: 2.0 }, window: { u: -1.08, y: 3.3, out: 2.3, w: 0.62, h: 0.74 } },
+  // A cottage: the door stands on the ground in the middle of the front, with one window above it in the gable.
+  home_A: { door: opening(0, 1.3, 2.62, 1.4, 2.1), window: opening(0, 4.0, 2.5, 0.62, 0.74) },
+  // A taller house on a stone footing with steps up to it: the door to one side, a window beside it.
+  home_B: { door: opening(1.05, 3.0, 2.3, 1.5, 2.0), window: opening(-1.08, 3.3, 2.3, 0.62, 0.74) },
 } as const;
 
 export interface WickOptions {
@@ -154,7 +160,7 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
       pane.material = glow;
       pane.parent = root;
       lampAt = new Vector3(h.x + wv.x * (open.window.out + 1.2), base + open.window.y, h.z + wv.z * (open.window.out + 1.2));
-      chimney = new Vector3(h.x, base + 7.4, h.z);
+      chimney = new Vector3(h.x, base + 7.4 * K, h.z);
       // What stands round a lived-in house.
       const side = at(3.6, 1.2);
       await place('props/barrel', side.x, side.z, PROP);
@@ -386,7 +392,7 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
       const x = cx + (chance(o.seed, `${key}:x:${i}`) * 2 - 1) * rx, z = cz + (chance(o.seed, `${key}:z:${i}`) * 2 - 1) * rz;
       const y = ground(x, z);
       if (y < 2.15) continue;
-      const s = (0.6 + chance(o.seed, `${key}:s:${i}`) * 0.9) * tall;
+      const s = (0.55 + chance(o.seed, `${key}:s:${i}`) * 0.6) * tall;
       const mesh = chance(o.seed, `${key}:m:${i}`) > 0.78 ? dry : green;
       const a = chance(o.seed, `${key}:a:${i}`) * Math.PI, c = Math.cos(a) * s, sn = Math.sin(a) * s;
       (mesh === dry ? dryAt : greenAt).push(c, 0, -sn, 0, 0, s, 0, 0, sn, 0, c, 0, x, y, z, 1);
@@ -401,10 +407,10 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     });
   }
   scatter('square', 78, 80, 9, 7, 150, 0.6);
-  for (const h of houses) if (h.state !== 'lit') scatter(`yard:${h.id}`, h.x, h.z, 7.5, 7.5, 150, 1.2);
-  scatter('pike_field', thing('pike_field').x, thing('pike_field').z, 11, 15, 1100, 1.5);
+  for (const h of houses) if (h.state !== 'lit') scatter(`yard:${h.id}`, h.x, h.z, 7.5, 7.5, 150, 0.85);
+  scatter('pike_field', thing('pike_field').x, thing('pike_field').z, 11, 15, 1100, 0.95);
   scatter('dunn_field', thing('dunn_field').x, thing('dunn_field').z, 8, 7, 420, 0.6);
-  scatter('oona_garden', thing('oona_garden').x, thing('oona_garden').z, 5, 5.5, 300, 1.7);
+  scatter('oona_garden', thing('oona_garden').x, thing('oona_garden').z, 5, 5.5, 300, 1.0);
   green.thinInstanceSetBuffer('matrix', new Float32Array(greenAt), 16, true);
   dry.thinInstanceSetBuffer('matrix', new Float32Array(dryAt), 16, true);
   for (const m of [green, dry]) { m.alwaysSelectAsActiveMesh = true; m.receiveShadows = true; }

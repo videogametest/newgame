@@ -2,6 +2,14 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 Review 025 item 5: the tour views (Viktor, branch `overnight-14-ridge-path`)
+
+- The old `high_lane` view is renamed `ridge_path` (hero 160,-112; look 254,-100). New `high_lane` (hero 150,86; look 100,85, Wick's high lane) and `hesper_door` (hero 92,108; look 86,98) are in `src/core/world/tour.ts`, before `landing`. The walkability test covers the new hero points.
+- Merged to `main` as `aaecabb` (PR #57, squash). Deploy run 43461685945 (Test and deploy to GitHub Pages): success. Live smoke `node scripts/smoke.mjs https://everylitwindow.com/`: passed.
+- Frames: `docs/pr-media/review025-item5/` (`high_lane`, `hesper_door`, `ridge_path`, at 18:00 and 12:00). Checked by eye: the hero is in frame on high_lane and hesper_door, seen from behind. On ridge_path the hero still faces the camera at the stop; that is item 6 (`tourYaw`), not done here.
+- Gates: tsc clean; vitest 62 files / 779 tests; build OK.
+- Not done here: review 025 items 6 (tour camera), 7 (signal-hill bushes), the ford rework, and the sky.
+
 ## 2026-11-13 Review 025 item 4: capture without the interface (Viktor, branch `overnight-13-capture-hud`)
 
 - The capture scripts hide the HUD box (clock, figures, hint, tour label) before each frame. `window.__valley.hideChrome()` is the hook; `scripts/tour_capture.mjs` and `scripts/valley_capture.mjs` call it after freeze. Babylon has no line meshes in the render layer, so the debug lines were the text in that box.

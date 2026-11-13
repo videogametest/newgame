@@ -7,7 +7,7 @@ import {
 } from '@babylonjs/core';
 import { assetUrl } from '../render/assets';
 import type { Lighting } from '../render/lighting';
-import { bearingVector, chance, WICK_GATES, WICK_LANES, WICK_THINGS, wickHouses, type House } from './plan';
+import { bearingVector, chance, SCARECROW, WICK_GATES, WICK_LANES, WICK_THINGS, wickHouses, type House } from './plan';
 
 const HEX = 'assets/kaykit_medieval_hexagon/';
 /**
@@ -423,6 +423,18 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     const group = loose.filter((m) => m.material === mat);
     const merged = Mesh.MergeMeshes(group, true, true);
     if (merged) { merged.name = `wick_${mat?.name ?? 'boxes'}`; merged.parent = root; cast(merged); }
+  }
+
+  // ---- The scarecrow in Hesper's yard: a dark figure, a little taller than a man, arms out, facing the door ----
+  {
+    const dark = pbr('wick_scarecrow', new Color3(0.1, 0.09, 0.08));
+    const { x, z } = SCARECROW, g = ground(x, z), yaw = 0.5;
+    box('scarecrow_post', dark, x, z, 0.1, 1.5, 0.1, yaw, g);
+    box('scarecrow_arms', dark, x, z, 1.5, 0.09, 0.09, yaw, g + 1.32, 0, 0.06);
+    box('scarecrow_coat', dark, x, z, 0.55, 0.75, 0.22, yaw, g + 0.66, 0.04);
+    box('scarecrow_head', dark, x, z, 0.3, 0.32, 0.28, yaw, g + 1.46);
+    box('scarecrow_hat', dark, x, z, 0.52, 0.06, 0.5, yaw, g + 1.78);
+    box('scarecrow_crown', dark, x, z, 0.26, 0.14, 0.26, yaw, g + 1.84, 0, 0.1);
   }
 
   // The houses and props share one atlas: merged, the whole village's models are a draw call or two, not one per part.

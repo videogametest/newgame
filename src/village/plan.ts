@@ -78,3 +78,9 @@ export const bearingVector = (bearing: number): { x: number; z: number } => {
   const r = (bearing * Math.PI) / 180;
   return { x: Math.sin(r), z: -Math.cos(r) };
 };
+
+/**
+ * The scarecrow in Hesper's yard: the dark figure in the brightness picture (design section "Brightness"), and the
+ * thing the hero creeps up on and marks on the first evening (task 010 step 4). In view from the `hesper_door` stop.
+ */
+export const SCARECROW = { x: 82.5, z: 106.5, height: 1.9 } as const;

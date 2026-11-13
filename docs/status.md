@@ -386,6 +386,6 @@ Until these are answered, `walkSurfaceAt` is not written for the bridge or the s
 - Item 3: scenery keeps out 30 m of the Mill and Forge and 26 m of the Watch-house yard (`LANDMARK_CLEAR`). Test: `scenery_landmarks.test.ts`.
 - Item 4: no change needed. `mill`, `forge`, `watch_house` and `family_markers` are already stops in the generated layout.
 - Checks: vitest 65 files / 796 tests pass; tsc clean; build clean; walk gap 97.0 m (limit 100), 0 stranded.
-- Draw calls at tour views (ground share from `ground_vs_sky.py`, dusk 18:00 / noon 12:00): hesper_door 294 / 314; ridge_path 208 / 206; mill 218 / 236; forge 238 / 246; watch_house 240 / 238; family_stones 362 / 368. The 300 budget is for the arrival view; family_stones and hesper_door at noon are over it. Reported, not changed.
+- Draw calls: the figures from the first capture pass are withdrawn. They were read before the chunks had settled, so they are not valid. Not re-measured in this entry. Steady-state rule (review 027 addendum): read `drawCalls` only after `state().chunks` stops rising. Ford frames (PR #60, 12:00 and 18:00) read 198 draw calls with chunks steady at 109.
 - Ground share (ground luma / sky luma): hesper_door 0.68 / 0.478; ridge_path 0.947 / 0.618; mill 0.71 / 0.532; forge 0.682 / 0.49; watch_house 0.774 / 0.598; family_stones 0.689 / 0.516. All above the 0.25 floor.
 - Open: the Mill and family-stones frames do not clearly show the landmark; Greg to judge at eye check. The ridge_path frame shows the path a few metres from the hero, not under him; stop not moved.

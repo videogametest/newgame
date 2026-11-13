@@ -64,6 +64,8 @@ const GORGE_END = 35;
 const GORGE_WALL_TOP = WATER_LEVEL + 15;
 /** Stepping stones: their tops sit this far above the water (design section 4, "The crossings"). */
 const STONE_TOP = WATER_LEVEL + 0.3;
+/** Length (m) of the landing at each end of the stepping stones: the bank is cut down to the stone top over it (review 021). */
+const LANDING_RUN = 6;
 /** A bridge deck is never lower than this above the water (design section 4, "The crossings"). */
 const DECK_MIN = WATER_LEVEL + 1.0;
 
@@ -89,7 +91,25 @@ const heightSampler = createHeightAt(VALLEY_SEED, VALLEY_SHAPE);
 export function valleyHeightAt(x: number, z: number): number {
   const d = riverDistance(x, z);
   const bank = Math.min(heightSampler(x, z), riverBedAt(x, z) + RIVER_BANK_SLOPE * d);
-  return gorgeAdjust(bank, rimHold(bank, x, z, d), x, z);
+  return landingAdjust(gorgeAdjust(bank, rimHold(bank, x, z, d), x, z), x, z);
+}
+
+/**
+ * Stepping-stone landings (review 021): within LANDING_RUN m beyond each end of the stones, and within the path's width
+ * plus a metre each side, the ground ramps from the stone top at the stones' end up to the bank at LANDING_RUN m out.
+ * It only ever lowers the ground, so the bank is untouched beyond the cut.
+ */
+function landingAdjust(h: number, x: number, z: number): number {
+  for (const c of VALLEY_CROSSINGS) {
+    if (c.walkable === false || c.surface !== 'stones') continue;
+    const { t, across } = stripFrame(x, z, c);
+    if (across > c.width / 2 + 1) continue;
+    const len = Math.hypot(c.to.x - c.from.x, c.to.z - c.from.z);
+    const beyond = t < 0 ? -t * len : t > 1 ? (t - 1) * len : -1;
+    if (beyond < 0 || beyond >= LANDING_RUN) continue;
+    return Math.min(h, STONE_TOP + (h - STONE_TOP) * (beyond / LANDING_RUN));
+  }
+  return h;
 }
 
 export function isWater(x: number, z: number): boolean {

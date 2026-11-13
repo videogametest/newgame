@@ -2,6 +2,15 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 Review 025 item 7 and review 027 item 4: signal-hill bushes (Viktor, not done)
+
+- Frame checked by eye: `docs/pr-media/overnight-13-hud/signal_hill_top-18.png` (18:00). The bright green cones on the left (and one small cone at the right edge) are flat, unshaded and saturated. They are not the scenery trees, which shade correctly.
+- Searched: `src/render/valley_scenery.ts` draws only the five pack models in `SCENERY_MODELS`, all from `nature/` (trees, rock). No bush asset is loaded anywhere in `src/` (`docs/assets.md` lists `bushes` as found, but no file in `public/assets/kaykit_medieval_hexagon/nature/` is named bush). The landmark, village and terrain code draws no cone geometry.
+- Not yet identified: the source of the cones. Next step is to list the meshes in the arrival scene at the signal hill (mesh names, material and normals) in the browser console, then fix at the source. Nothing changed in code.
+- Claude's paths (`valley_far.ts`, `valley_sky.ts`, `src/landmarks/`) were not edited.
+- Sky (item 10) and review 027 item 4 are still open. Ford water check (review 027 item 3) was reported separately.
+
+
 ## 2026-11-13 Review 025 item 5: the tour views (Viktor, branch `overnight-14-ridge-path`)
 
 - The old `high_lane` view is renamed `ridge_path` (hero 160,-112; look 254,-100). New `high_lane` (hero 150,86; look 100,85, Wick's high lane) and `hesper_door` (hero 92,108; look 86,98) are in `src/core/world/tour.ts`, before `landing`. The walkability test covers the new hero points.

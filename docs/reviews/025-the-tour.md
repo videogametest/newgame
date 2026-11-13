@@ -25,3 +25,11 @@ Checked: typecheck, all tests, walk gap.
 - The landing at (61, 63): accepted.
 - No view for the forge bridge: right, it is not walkable until the Forge is freed. Add a view from the bank looking at it once item 2 draws it.
 - Ground share 1.000 at the gate: correct as measured then; measure again now the pass is open.
+
+## Added 10:10: item 12, the standard frames (PR #50)
+
+Accepted, with three notes.
+
+- **"Ground share 0.522" is not the figure asked for.** That is how much of the screen is ground, which is why it is the same in all four. The first-look bar wants the ground's brightness against the sky's. Measured from your frames: 0.49 at 19:00, 0.68 at dawn, 0.82 at midnight, 0.48 at noon. All clear the 0.25 floor. Report that figure from now on.
+- **The dusk frame is 18:00, not 19:00.** By 19:00 it is night. Keep 19:00 as well: it is the frame where the windows are lit.
+- **Hesper's lamp** threw a hard-edged disc across her yard. Mine: it is now a small pool by the window (`hesper-door-night.png`).

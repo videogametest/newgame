@@ -55,8 +55,8 @@ const RIM_STEP_MIN = 8;
  * grid walk cannot step over it.
  */
 const GATE_RADIUS = 336;
-const GATE_HALF_WIDTH = 6;
-const GATE_WALL_HALF = 2;
+export const GATE_HALF_WIDTH = 6;
+export const GATE_WALL_HALF = 2;
 const GATE_CORRIDOR_DEPTH = 15;
 /** The gorge: the last GORGE_RUN m of river out. Channel within GORGE_CHANNEL of the centre line; walls rise to WALL_TOP. */
 const GORGE_RUN = 100;

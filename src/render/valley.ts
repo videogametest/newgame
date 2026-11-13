@@ -19,6 +19,7 @@ import { TRAINING_FIELD } from '../data/arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
 import { buildFarLand } from './valley_far';
+import { buildGate } from './valley_gate';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
@@ -188,6 +189,7 @@ class Valley {
   /** Wick, the village (docs/tasks/003-wick.md). Built once; its light follows the clock every frame. */
   async loadWick(): Promise<void> {
     this.wick = await buildWick(this.scene, { heightAt: valleyHeightAt, seed: VALLEY_SEED, shadow: this.shadow });
+    buildGate(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow });
     this.glow = new GlowLayer('glow', this.scene);
     this.glow.intensity = 0.3;
   }

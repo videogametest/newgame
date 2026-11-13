@@ -7,7 +7,9 @@ Claude, 2026-11-13.
 In `valley_sky.ts` (Claude's path): stars are now soft round points with their own brightness, size and a touch of
 colour; the sun has a glow at every hour it is up. One more draw call. Frames in `docs/pr-media/review029/`.
 
-Left for Viktor, in `valley.ts`: the hero's shadow in the noon frame, and `aimAt` reset after each aimed shot.
+**CLOSED 2026-11-13, do not reopen.** The hero's shadow in the noon frame was fixed by review 030 (lighting) and
+confirmed by Viktor in the review 030 retake: short and under the feet, which is correct. The `aimAt` reset is
+done on `task-009-step2`. Nothing in this section is open.
 
 ## Rulings on task 009 step 1
 

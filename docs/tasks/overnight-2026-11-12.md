@@ -35,7 +35,7 @@ Each item says what "done" is. Frames go in `docs/pr-media/overnight/`.
 
 **9. Trees and scenery, first pass.** Use the trees, bushes, and rocks already in `public/assets/kaykit_medieval_hexagon/nature/` at about scale 12 for trees (review 012), as thin instances. Seeded. Forest thick on the rim and the hills' north sides, thin on the valley floor, none on roads, lanes, in water, inside Wick's box, or within 12 m of the line from the start to Hesper's window (`003-wick.md`, rule 6). Done: at least three kinds of tree; draw calls under 300 in the arrival view and in Wick's square, measured per frame; the start still sees the window.
 
-**10. Review 018 item 7: the sky frames.** Round stars of varied brightness, the noon sun with a glow, the hero's shadow in the noon frame, and `aimAt` reset after each aimed shot.
+**10. CLOSED 2026-11-13 (reviews 029 and 030): stars, sun glow, noon shadow and `aimAt` reset are all done. Do not reopen.** ~~Review 018 item 7: the sky frames.~~ Round stars of varied brightness, the noon sun with a glow, the hero's shadow in the noon frame, and `aimAt` reset after each aimed shot.
 
 **11. Tour mode, `?tour=1`.** A fixed list of named views, each `{ x, z, look, tod }`, stepped with a key and reachable from the capture script by name. Start with: the arrival, the road in, Wick's square, the landing, the high lane, Hesper's door, the signal hill's top, each bridge, the gate. Done: the capture script writes one frame per view at 18:00 and at 12:00.
 

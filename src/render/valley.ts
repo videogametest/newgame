@@ -15,7 +15,7 @@ import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES,
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
 import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
 import { walkStep, type WalkRules } from '../core/world/walk';
-import { TOUR_VIEWS, nextTourIndex, tourIndexOf } from '../core/world/tour';
+import { TOUR_VIEWS, nextTourIndex, tourIndexOf, tourYaw } from '../core/world/tour';
 import { TRAINING_FIELD } from '../data/arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
@@ -368,6 +368,8 @@ class Valley {
     this.game.timeOfDay = parseTod(String(view.tod));
     this.placeAt(view.hero.x, view.hero.z);
     this.lookAt(view.look.x, view.look.z);
+    // The model must face the look point too; lookAt alone turns only the camera, so the model faced the lens.
+    this.hero.yaw = tourYaw(view);
     this.tourText.textContent = `Tour ${i + 1}/${TOUR_VIEWS.length}: ${view.name} · ${view.note} · [ ] step`;
     return true;
   }

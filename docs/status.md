@@ -11,6 +11,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-13 Overnight item 8: the soldiers' road gate is drawn (Viktor, branch `overnight-08-gate`)
+
+- **Change:** `src/render/valley_gate_parts.ts` (pure geometry: two posts, a crossbar, 30 planks on each collision face, 2.7 m tall = 1.5 × the 1.8 m hero); `src/render/valley_gate.ts` (Babylon builder, one merged mesh, wood colour); `buildGate` called in `loadWick` in `valley.ts`. `GATE_HALF_WIDTH` and `GATE_WALL_HALF` are now exported from `src/core/world/valley.ts`; no collision logic changed.
+- **Tests:** `valley_gate_parts.test.ts` (5): planks on both faces at s = ±GATE_WALL_HALF; the parts span the corridor exactly across the road; every part inside the wall in s; height 2.7 m; crossbar centred on the gate line above the hero.
+- **Measured [sandbox, 2026-11-13]:** vitest all pass; `tsc --noEmit` clean; `vite build` OK; walk gap **97.0 m** (limit 100); `scripts/smoke.mjs` passed on the branch build. In the browser the gate projects at screen centre from 14 m out.
+- **Frames:** `docs/pr-media/gate/gate-road-noon-s-14.png` (noon, 14 m from the gate on the valley side), `gate-near-noon-s-5.png` (noon, 5 m), `gate-road-dusk-s-14.png` (18:00 dusk, dark).
+- **Mistake, corrected:** the first smoke and capture run hit a preview server left running from the `ov06` worktree on port 4173, not this build, so the gate was missing from those frames. Rerun on this build's own preview (port 4181): smoke passed and the frames above show the gate.
+- **Not verified:** the hero stopping at the planks in play (a collision check at the wall face is covered by the core tests, not a frame).
+- **Next:** overnight item 9 (trees and scenery).
+
 ## 2026-11-13 Overnight item 6: Wick's houses and the well are solid (Viktor, branch `overnight-06-solid`)
 
 - **Change:** `src/core/world/solids.ts` (pure footprint maths: 9 m square turned by `facing`, well 2.4 m square). `VALLEY_SOLIDS` in `valley.ts` is every house from `wickHouses(VALLEY_SEED)` plus the well; `blocksHero` and `isWalkableGround` use it. Fences and gate posts are not solid.

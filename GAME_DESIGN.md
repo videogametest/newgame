@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 35 (road and path widths; what each crossing is made of). Supersedes version 34.
+Version 36 (controller support, brightness, and rebinding; the settings in full). Supersedes version 35.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -28,7 +28,7 @@ Inspirations and what we take from each:
 These are expensive to change. Do not revisit without asking.
 
 - **Single-player only.** No multiplayer, now or later. No server-authoritative logic needed.
-- **Platform:** desktop browser, keyboard and mouse only. No touch or controller support.
+- **Platform:** desktop browser, played with keyboard and mouse or with a controller. Any controller the browser sees works, wired or Bluetooth. No touch support.
 - **Full 3D, third-person by default, with a first-person toggle.** The default is an over-the-shoulder camera that follows the hero; the player can switch to first-person at any time (section 5). Mouse controls the camera in both.
 - **One continuous open world.** No battle arenas, no menu map, no loading screens between places inside a region. Combat happens in the world.
 - **The world is generated from data and a seed, not hand-modelled.** Terrain comes from a seeded height function. Scenery (trees, rocks, grass, flowers) is scattered by seeded rules per biome. Points of interest (village, camps, outposts, chests, ruins, landmarks) are placed by hand in data files. The same seed always produces the same world.
@@ -210,6 +210,32 @@ Controls:
 - `I`: inventory
 - `K`: skills and perks
 - `Esc`: pause menu (also releases the mouse)
+
+These are the defaults. Every one can be changed (section 10, Controls).
+
+**On a controller.** The same game, with nothing left out. Defaults, in Xbox names; PlayStation and Nintendo controllers show their own.
+
+| Input | Does |
+| --- | --- |
+| Left stick | Move. A full push runs, a part push walks |
+| Right stick | Look and aim |
+| `RT` | Attack. With the bow: pull to draw, release to loose; the trigger is the draw |
+| `LT` | Aim the bow. Held on an enemy for a moment, it marks them |
+| `A` | Dodge |
+| `B` | Crouch |
+| `X` | Interact. In a fight, knock out; held on a knocked-out enemy, bind |
+| `Y` | Switch between blade and bow |
+| `LB` / `RB` | Throw a knife / lock on |
+| D-pad up, right, down, left | Eat / next arrow type / follow or hold / take them alive |
+| `L3` / `R3` | Sprint / change view |
+| `View` | Map. Inventory and Skills are tabs beside it, turned with `LB` and `RB` |
+| `Menu` | Pause |
+
+- **Either device, at any moment.** Nothing is chosen in a menu. The game follows whichever was touched last, and every prompt on screen changes with it at once.
+- **Every screen works on a controller:** the stick or D-pad moves, `A` chooses, `B` goes back, bumpers turn tabs. The mouse pointer is hidden while a controller is in use.
+- **Aim assist, on a stick only.** Aiming a bow with a thumb is harder than with a mouse, so while the bow is aimed the look slows as the crosshair nears an enemy and leans toward one the player is already steering at. It never moves the aim by itself, never bends an arrow, and never chooses a target. The mouse gets none. Its strength is a setting, and it can be turned off.
+- **Vibration,** light: a draw reaching its peak, a hit taken, a bell. A setting, and off if the controller has none.
+- **Unusual controllers.** One the browser does not recognise as standard can still be used by binding each action by hand.
 - Backtick: tuning panel
 
 Views:
@@ -772,8 +798,19 @@ After the finale the valley is safe, and a player who has finished the story sti
 ## 10. Interface
 
 - **Title screen:** the game's name over a slow view of the valley, with Continue (when a save exists) and New Game. New Game asks for confirmation before replacing a save.
-- **Pause menu** (`Esc`): Resume, Settings, Controls, Quit to title. The simulation stops while it is open.
-- **Settings:** mouse sensitivity, invert vertical look, field of view for each camera view, camera shake and hit-freeze strength, master, music, and effects volume, and graphics quality (low, medium, high: shadow quality, scenery density, view distance). Settings are saved in the browser separately from the game save.
+- **Pause menu** (`Esc`, or `Menu` on a controller): Resume, Settings, Controls, Quit to title. The simulation stops while it is open.
+- **Settings.** Saved in the browser, apart from the game save, so a new game keeps them. Every change shows at once behind the menu, and each page has "Back to defaults". A save that is damaged or edited by hand can never leave the screen black or the game without a way to pause: each value is checked on its own and takes its default if it is wrong (`src/core/settings`).
+  - *Display:* brightness; graphics quality (low, medium, high: shadow quality, scenery density, view distance); full screen; frame-rate cap (30, 60, none); show frame rate.
+  - *Sound:* master, music, and effects volume; character tones on or off.
+  - *Camera:* mouse sensitivity; invert vertical look; field of view for each camera view; camera shake and hit-freeze strength.
+  - *Controller:* look sensitivity; invert vertical look; dead zone; swap the sticks; aim assist strength; vibration strength.
+  - *Play:* difficulty; hold or toggle for crouch and for sprint; awareness markers; minimal HUD; text size and speed.
+- **Brightness.** A game with this much night needs it. The first time the game is started, and again from Display, one picture is shown: Hesper's house at midnight with her window lit, and a dark figure standing in the yard. The player moves the slider "until you can only just see the figure". Brightness changes the finished picture and never the interface. Turning it up lifts the darkest tones more than the bright ones, so night opens without washing out noon; at its lowest the picture is still readable.
+- **Controls.** One page for keyboard and mouse, one for the controller. Every action is listed with what does it, and every one can be changed: choose it, then press the new key or button. Each action can have a main input and a spare.
+  - *One input, one thing.* Giving an action a key that something else has moves it. If that would leave something the game cannot be played without (moving, attacking, interacting, dodging, the map) with nothing, the two swap.
+  - *The way out always works.* `Esc` and the controller's `Menu` always pause and cannot be given to anything else or removed.
+  - *Prompts tell the truth.* Every prompt and hint in the game shows what the player has actually bound, on the device in their hands. An action with nothing bound shows no prompt, never the wrong key.
+  - "Back to defaults" resets one device and leaves the other alone.
 - **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, crouch, mark, attack, switch weapon, change arrow, dodge, lock on, throw a knife, change view, eat, squad order, map, inventory, skills) and never again once used. Hesper points the hero toward the nearest camp.
 - **Difficulty.** Three presets, named for how much light the player is given, changeable at any time in settings with no penalty.
 

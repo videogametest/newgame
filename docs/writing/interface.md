@@ -217,3 +217,23 @@ No "You died." The screen dims and one line appears, then the hero wakes at the 
 - Places not yet discovered are not shown.
 - A freed place shows a small lit lantern; a held place shows Stane's banner.
 - In Wick, the window count is shown as sixteen small squares, lit or dark, and a seventeenth set apart.
+
+## Settings and controls (design version 36)
+
+Page names: "Display", "Sound", "Camera", "Controller", "Play", "Controls". Every page ends with **Back to defaults**, which asks "Put this page back as it was?" with **Yes** and **No**.
+
+- **Brightness picture.** Heading: "Brightness". Under the picture: "Move the slider until you can only just see the figure in the yard." Button: "That's right." Shown once at first start, and from Display as "Set brightness again".
+- **Sliders** show their value as a plain number with no unit, except field of view ("60 degrees") and the frame-rate cap ("30", "60", "No cap").
+- **Aim assist:** "Aim assist (controller)". Under it, small: "Slows your aim near an enemy while the bow is drawn. It never aims for you."
+- **Swap the sticks:** "Swap sticks". Under it, small: "Move with the right stick and look with the left."
+- **Controls page.** Two tabs, "Keyboard and mouse" and "Controller". Columns: the action, "Main", "Spare".
+  - Choosing a slot: "Press a key or button. Esc to cancel." On the controller tab: "Press a button. Menu to cancel."
+  - A swap: "{action} now uses {input}. {other} has moved to {old input}."
+  - A plain take: "{action} now uses {input}. {other} has nothing bound."
+  - Reserved: "{input} always pauses. Choose another."
+  - Refused: "{other} needs a key. Give it another first."
+  - An empty slot shows a dash. An essential action can never show two dashes.
+- **A controller is connected:** a small notice, once per session: "Controller connected. Press any button to use it."
+- **A controller is lost during play:** the game pauses. "Controller disconnected." with **Resume**.
+- **Prompts** are written with the action in braces and filled in from the player's bindings: "{dodge} to roll", "{interact} to talk". Write new prompts this way and never with a key's name.
+

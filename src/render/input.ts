@@ -81,6 +81,11 @@ export class PlayerInput {
     return this.actions.isDown('aim') && this.weapon === 'bow';
   }
 
+  /** True once for each press of the pause key. Read before takeInput, which clears the edges. */
+  takePause(): boolean {
+    return this.actions.takePressed('pause');
+  }
+
   /** Builds this step's input and consumes the edge flags. */
   takeInput(): BattleInput {
     const a = this.actions;

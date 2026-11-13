@@ -2,8 +2,8 @@
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
 
 import {
-  Color3, Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
-  Matrix, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Vector3,
+  Color3, Color4, DirectionalLight, DynamicTexture, Engine, FreeCamera, FresnelParameters, GlowLayer, HemisphericLight,
+  ImageProcessingConfiguration, Matrix, MeshBuilder, Scene, ShadowGenerator, StandardMaterial, Vector3,
 } from '@babylonjs/core';
 import { createBattle, getHero } from '../core/battle';
 import type { Fighter } from '../core/types';
@@ -22,7 +22,7 @@ import { buildFarLand } from './valley_far';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
-import { lightingAt, PALETTE } from './lighting';
+import { lightingAt, mix, PALETTE, type Lighting } from './lighting';
 import { ValleySky } from './valley_sky';
 import { ValleyTerrain } from './valley_terrain';
 import { buildWick, type Wick } from '../village/build';
@@ -43,6 +43,40 @@ const WALK_RULES: WalkRules = {
 const FOG_START = 240;
 const FOG_END = 1100; // the far rim and the castle are meant to be seen across the whole valley
 const SUN_RANGE = 90;
+/** How much of the sky colour the lake emits. The lake is a mirror of the sky, not a dark pool (review 018). */
+const WATER_SKY_SHARE = 0.9;
+
+/**
+ * A tileable height map for the lake's ripples: a few integer-frequency waves, so the texture repeats seamlessly.
+ * Fixed phases, so every visit looks the same.
+ */
+function makeRippleTexture(scene: Scene): DynamicTexture {
+  const size = 256;
+  const tex = new DynamicTexture('valley_ripples', { width: size, height: size }, scene, false);
+  const ctx = tex.getContext();
+  const img = ctx.getImageData(0, 0, size, size);
+  const waves: ReadonlyArray<readonly [number, number, number, number]> = [
+    [1, 0, 0.9, 0.3], [0, 2, 0.6, 1.1], [3, 1, 0.4, 2.0], [2, 3, 0.35, 0.7], [5, 2, 0.2, 2.6], [4, 5, 0.18, 0.2],
+  ];
+  const norm = waves.reduce((sum, w) => sum + w[2], 0);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      let h = 0;
+      for (const [fx, fy, a, phase] of waves) {
+        h += a * Math.cos((2 * Math.PI * (fx * x + fy * y)) / size + phase);
+      }
+      const v = Math.round(128 + (127 * h) / norm);
+      const i = (y * size + x) * 4;
+      img.data[i] = v;
+      img.data[i + 1] = v;
+      img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  tex.update();
+  return tex;
+}
 
 /** Test and capture hooks, read by the screenshot scripts. Not part of play. */
 export interface ValleyHooks {
@@ -128,6 +162,10 @@ class Valley {
   private lastFrameDrawCalls = 0;
   private fpsFrames = 0;
   private fpsTime = 0;
+  /** The lake's material and ripple texture; updateWater takes the light and drifts the ripples. */
+  private waterMat?: StandardMaterial;
+  private waterRipples?: DynamicTexture;
+  private waterClock = 0;
 
   constructor(
     private readonly engine: Engine,
@@ -202,11 +240,41 @@ class Valley {
     water.position.y = WATER_LEVEL;
     const mat = new StandardMaterial('valley_water_mat', scene);
     mat.diffuseColor = PALETTE.water;
-    mat.specularColor = new Color3(0.5, 0.5, 0.5);
+    mat.specularColor = new Color3(0.9, 0.9, 0.9);
+    mat.specularPower = 96;
     mat.alpha = 0.85;
+    // Fresnel: the far shore, seen at a grazing angle, takes the lighter sky colour (updateWater sets the colours).
+    const fresnel = new FresnelParameters();
+    fresnel.bias = 0.2;
+    fresnel.power = 2;
+    fresnel.isEnabled = true;
+    mat.emissiveFresnelParameters = fresnel;
+    // Slow ripples: a height map that drifts across the lake each frame (updateWater).
+    const ripples = makeRippleTexture(scene);
+    ripples.uScale = 8;
+    ripples.vScale = 8;
+    ripples.level = 0.6;
+    mat.bumpTexture = ripples;
     water.material = mat;
     water.receiveShadows = true;
     water.isPickable = false;
+    this.waterMat = mat;
+    this.waterRipples = ripples;
+  }
+
+  /** The lake takes the light of the sky above it, and its ripples drift slowly. Pure drawing; no game state. */
+  private updateWater(L: Lighting, dt: number): void {
+    const mat = this.waterMat;
+    const ripples = this.waterRipples;
+    if (!mat || !ripples) return;
+    this.waterClock += dt;
+    if (mat.emissiveFresnelParameters) {
+      mat.emissiveFresnelParameters.leftColor = L.sky;
+      mat.emissiveFresnelParameters.rightColor = L.zenith;
+    }
+    mat.emissiveColor = mix(L.zenith, L.sky, 0.5).scale(WATER_SKY_SHARE);
+    ripples.uOffset = this.waterClock * 0.012;
+    ripples.vOffset = this.waterClock * 0.007;
   }
 
   /** The hero starts at the valley's edge, facing Wick. The start is set here, not in newGameState. */
@@ -292,6 +360,7 @@ class Valley {
     this.syncHeroProxy();
     this.terrain.update(this.hero);
     this.sky.update(L, this.hero.x, this.hero.z);
+    this.updateWater(L, dt);
     this.wick?.light(L, this.game.timeOfDay);
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);

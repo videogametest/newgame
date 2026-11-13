@@ -7,6 +7,7 @@ import { SHELF_TUNING, withWickShelf } from '../../village/shelf';
 import { withGradedRoads, type Graded } from './grading';
 import { WICK_THINGS, wickHouses } from '../../village/plan';
 import { solidAt, type Footprint } from './solids';
+import { landmarkSolids } from '../../landmarks/plan';
 import {
   VALLEY_BASE_HEIGHT,
   VALLEY_CROSSINGS,
@@ -242,7 +243,7 @@ export function blocksWalking(x: number, z: number): boolean {
  * the gorge walls are walls by slope, not by radius.
  */
 export function blocksHero(x: number, z: number): boolean {
-  return onGateWall(x, z) || blocksWalking(x, z) || solidAt(VALLEY_SOLIDS, x, z)
+  return onGateWall(x, z) || blocksWalking(x, z) || solidAt(valleySolids(), x, z)
     || (!isCrossing(x, z) && walkSlopeAt(x, z) >= MAX_WALK_SLOPE);
 }
 
@@ -250,10 +251,30 @@ export function blocksHero(x: number, z: number): boolean {
 export const WELL_HALF = 1.2;
 
 /** Solid footprints in Wick: every house (9 m square, turned by its facing) and the well. Fences and gate posts are not solid. */
-export const VALLEY_SOLIDS: readonly Footprint[] = [
+export const WICK_SOLIDS: readonly Footprint[] = [
   ...wickHouses(VALLEY_SEED).map((h) => ({ x: h.x, z: h.z, facing: h.facing, half: 4.5 })),
   ...WICK_THINGS.filter((t) => t.id === 'well').map((t) => ({ x: t.x, z: t.z, facing: 0, half: WELL_HALF })),
 ];
+
+let landmarkFootprints: Footprint[] | undefined;
+/**
+ * The landmarks' buildings, walls and tents as footprints (review 026 item 1). Built on first use, not at import:
+ * landmarks/plan.ts reads VALLEY_PLACES from this file, so the two modules import each other.
+ * Babylon yaw is π − bearing, so the footprint's compass facing is π − yaw in degrees.
+ */
+function landmarkFootprintList(): Footprint[] {
+  if (!landmarkFootprints) {
+    landmarkFootprints = landmarkSolids().map((s) => ({
+      x: s.x, z: s.z, facing: (((Math.PI - s.yaw) * 180) / Math.PI + 360) % 360, half: s.half,
+    }));
+  }
+  return landmarkFootprints;
+}
+
+/** Every solid footprint in the valley: Wick's houses and well, then the landmarks. */
+export function valleySolids(): readonly Footprint[] {
+  return [...WICK_SOLIDS, ...landmarkFootprintList()];
+}
 
 /** Distance from (x, z) to the segment a-b. */
 function distanceToSegment(x: number, z: number, a: LayoutPoint, b: LayoutPoint): number {
@@ -455,7 +476,7 @@ export function walkSlopeAt(x: number, z: number): number {
  * The walkable crossings' strips are open (walkSurfaceAt gives their height); the forge bridge's strip is not.
  */
 export function isWalkableGround(x: number, z: number): boolean {
-  if (!insideValley(x, z) || onGateWall(x, z) || solidAt(VALLEY_SOLIDS, x, z)) return false;
+  if (!insideValley(x, z) || onGateWall(x, z) || solidAt(valleySolids(), x, z)) return false;
   if (isCrossing(x, z)) return true;
   if (isWater(x, z)) return false;
   return walkSlopeAt(x, z) < MAX_WALK_SLOPE;

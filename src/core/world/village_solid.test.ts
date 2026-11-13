@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { WICK_LANES, WICK_THINGS, wickHouses } from '../../village/plan';
 import { findPath, type WalkableGrid } from './pathfinding';
 import { insideFootprint } from './solids';
-import { blocksHero, isWalkableGround, VALLEY_SEED, VALLEY_SOLIDS } from './valley';
+import { blocksHero, isWalkableGround, VALLEY_SEED, WICK_SOLIDS } from './valley';
 
 const houses = wickHouses(VALLEY_SEED);
 const footprintOf = (h: { x: number; z: number; facing: number }) => ({ x: h.x, z: h.z, facing: h.facing, half: 4.5 });
@@ -44,7 +44,7 @@ describe('Wick is solid', () => {
   it('the well blocks the hero', () => {
     const well = WICK_THINGS.find((t) => t.id === 'well');
     expect(well).toBeDefined();
-    expect(VALLEY_SOLIDS.length).toBe(houses.length + 1);
+    expect(WICK_SOLIDS.length).toBe(houses.length + 1);
     expect(blocksHero(well!.x, well!.z)).toBe(true);
   });
 });

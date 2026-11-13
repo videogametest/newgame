@@ -33,6 +33,10 @@ export const TOUR_VIEWS: readonly TourView[] = [
   { name: 'mill_bridge', hero: { x: -191, z: 22 }, look: { x: -191, z: 34 }, tod: 18, note: 'The mill bridge' },
   { name: 'stepping_stones', hero: { x: -238, z: 0 }, look: { x: -250, z: 0 }, tod: 18, note: 'The stepping stones' },
   { name: 'gate', hero: { x: -220, z: -232 }, look: { x: -231.36, z: -243.66 }, tod: 18, note: 'The north-west gate' },
+  { name: 'mill', hero: { x: -160, z: 82 }, look: { x: -182, z: 58 }, tod: 18, note: 'The Mill, at the river' },
+  { name: 'forge', hero: { x: 62, z: -154 }, look: { x: 38, z: -176 }, tod: 18, note: 'The Forge' },
+  { name: 'watch_house', hero: { x: -124, z: -170 }, look: { x: -170, z: -192 }, tod: 18, note: 'The Watch-house' },
+  { name: 'family_stones', hero: { x: 196, z: 210 }, look: { x: 110, z: 124 }, tod: 18, note: 'The family stones on the road in' },
 ];
 
 /**

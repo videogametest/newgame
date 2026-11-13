@@ -15,6 +15,7 @@ import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES,
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
 import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
 import { walkStep, type WalkRules } from '../core/world/walk';
+import { TOUR_VIEWS, nextTourIndex, tourIndexOf } from '../core/world/tour';
 import { TRAINING_FIELD } from '../data/arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
@@ -57,7 +58,14 @@ export interface ValleyHooks {
   lookAt(x: number, z: number): void;
   project(name: string): { x: number; y: number; w: number; h: number } | null;
   state(): ValleyState;
+  /** Tour mode (?tour=1): moves the hero and camera to a named view, or to the view at an index. */
+  tourTo(nameOrIndex: string | number): boolean;
+  tourNames(): string[];
+  /** Share of sampled screen points whose first hit is ground (not the sky dome, stars, sun or moon), 0 to 1. */
+  groundShare(cols?: number, rows?: number): number;
 }
+/** Meshes that make up the sky. A pick that passes through these is sky. */
+const SKY_MESHES = new Set(['valley_sky', 'valley_stars', 'valley_sun', 'valley_moon']);
 export interface ValleyState {
   x: number;
   z: number;
@@ -121,6 +129,10 @@ class Valley {
   private readonly hint: HTMLElement;
   private readonly clockText: HTMLElement;
   private readonly figuresText: HTMLElement;
+  private readonly tourText: HTMLElement;
+  /** ?tour=1 turns on tour mode: [ and ] step between named views (src/core/world/tour.ts). */
+  private readonly tour = new URLSearchParams(window.location.search).get('tour') === '1';
+  private tourIndex = 0;
   /** ?debug=1 shows the clock, frame figures and control hint. The default route shows only the world. */
   private readonly debug = new URLSearchParams(window.location.search).get('debug') === '1';
   private groundY: number;
@@ -183,10 +195,18 @@ class Valley {
     this.hint = document.createElement('div');
     this.clockText = document.createElement('div');
     this.figuresText = document.createElement('div');
+    this.tourText = document.createElement('div');
     this.installHud(uiRoot);
     canvas.addEventListener('pointerdown', () => {
       if (!this.input.isLocked) this.input.requestLock();
     });
+    if (this.tour) {
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'BracketRight') this.tourTo(nextTourIndex(this.tourIndex, 1));
+        if (e.code === 'BracketLeft') this.tourTo(nextTourIndex(this.tourIndex, -1));
+      });
+      this.tourTo(0);
+    }
     this.installHooks();
   }
 
@@ -318,9 +338,55 @@ class Valley {
     box.style.cssText = 'position:absolute;left:16px;top:14px;font:600 14px/1.4 system-ui,sans-serif;color:#f4ead2;text-shadow:0 1px 3px #000;pointer-events:none;';
     this.clockText.style.cssText = 'font-size:16px;';
     this.hint.style.cssText = 'margin-top:4px;opacity:0.85;font-weight:400;';
-    box.append(this.clockText, this.figuresText, this.hint);
-    box.hidden = !this.debug;
+    this.tourText.style.cssText = 'margin-top:4px;color:#ffd98a;';
+    box.append(this.clockText, this.figuresText, this.hint, this.tourText);
+    box.hidden = !(this.debug || this.tour);
     uiRoot.appendChild(box);
+  }
+
+  /** Tour mode: stands the hero at a view, turns the camera to its look point, and sets its clock hour. */
+  tourTo(nameOrIndex: string | number): boolean {
+    const i = typeof nameOrIndex === 'number' ? nameOrIndex : tourIndexOf(nameOrIndex);
+    const view = TOUR_VIEWS[i];
+    if (!view) return false;
+    this.tourIndex = i;
+    this.game.timeOfDay = parseTod(String(view.tod));
+    this.placeAt(view.hero.x, view.hero.z);
+    this.lookAt(view.look.x, view.look.z);
+    this.tourText.textContent = `Tour ${i + 1}/${TOUR_VIEWS.length}: ${view.name} · ${view.note} · [ ] step`;
+    return true;
+  }
+
+  /** Sampled screen points whose first hit is not sky. Water, terrain, houses and trees all count as ground. */
+  groundShare(cols = 40, rows = 23): number {
+    const w = this.engine.getRenderWidth();
+    const h = this.engine.getRenderHeight();
+    let ground = 0;
+    let total = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = Math.round(((c + 0.5) / cols) * w);
+        const y = Math.round(((r + 0.5) / rows) * h);
+        const hit = this.scene.pick(x, y, (m) => !SKY_MESHES.has(m.name) && m.isEnabled());
+        total++;
+        if (hit?.hit) ground++;
+      }
+    }
+    return total === 0 ? 0 : ground / total;
+  }
+
+  private placeAt(x: number, z: number): void {
+    this.game.hero.position = { x, z };
+    this.hero.x = x;
+    this.hero.z = z;
+    this.groundY = walkSurfaceAt(x, z);
+  }
+
+  private lookAt(x: number, z: number): void {
+    const hp = this.game.hero.position;
+    const a = aimAngles({ x: x - hp.x, y: 0, z: z - hp.z });
+    this.input.camYaw = a.yaw;
+    this.input.aimPitch = 0;
   }
 
   private updateHud(dt: number): void {
@@ -357,18 +423,11 @@ class Valley {
         this.input.aimPitch = a.pitch;
       },
       // Capture only: stands the hero at a point on the ground, and turns the camera to face a point.
-      placeAt: (x, z) => {
-        this.game.hero.position = { x, z };
-        this.hero.x = x;
-        this.hero.z = z;
-        this.groundY = walkSurfaceAt(x, z);
-      },
-      lookAt: (x, z) => {
-        const hp = this.game.hero.position;
-        const a = aimAngles({ x: x - hp.x, y: 0, z: z - hp.z });
-        this.input.camYaw = a.yaw;
-        this.input.aimPitch = 0;
-      },
+      placeAt: (x, z) => this.placeAt(x, z),
+      lookAt: (x, z) => this.lookAt(x, z),
+      tourTo: (nameOrIndex) => this.tourTo(nameOrIndex),
+      tourNames: () => TOUR_VIEWS.map((v) => v.name),
+      groundShare: (cols, rows) => this.groundShare(cols, rows),
       project: (name) => {
         const m = this.scene.getMeshByName(name);
         if (!m) return null;

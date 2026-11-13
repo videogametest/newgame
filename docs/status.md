@@ -13,6 +13,8 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 ## 2026-11-13 Overnight item 12: standard frames (Viktor, branch `overnight-12-frames`)
 
+- **Merged:** PR #50, squash `8fe23eb`. Deploy run 43447408101 succeeded. Live smoke on https://everylitwindow.com/ passed.
+
 - **Frames:** `docs/pr-media/overnight-12/`: `arrival-dusk-19.png`, `noon-12.png`, `night-0.png`, `dawn-6.png`. Taken from the tour's arrival view (`?tour=1`, `arrival`) with `scripts/tour_capture.mjs <url> <dir> arrival 19,12,0,6`.
 - **Ground share [tour capture, 2026-11-13]:** 0.522 at all four times.
 - **Script fixes:** `tour_capture.mjs` takes an optional fourth argument of times. `valley_capture.mjs` now records ground share, and runs the aimed sun and moon shots last, because `aimAt` persists and was tinting the night and dawn frames.

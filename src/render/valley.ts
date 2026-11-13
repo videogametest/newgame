@@ -185,7 +185,7 @@ class Valley {
     this.sun.shadowMaxZ = 400;
     this.shadow = new ShadowGenerator(2048, this.sun);
     this.shadow.usePercentageCloserFiltering = true;
-    this.shadow.darkness = 0.35;
+    this.shadow.darkness = 0.1; // the sky's light already fills shade; the sun's share is nearly all removed
 
     this.terrain = new ValleyTerrain(scene);
     buildFarLand(scene); // the whole valley, coarse, so nothing past the stream radius is a hole (review 023)

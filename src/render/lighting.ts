@@ -88,9 +88,11 @@ export function lightingAt(tod: number): Lighting {
     moonSky: sunSky.scale(-1),
     elevation: elev,
     sunColor: mix(mix(PALETTE.moon, PALETTE.sunWarm, dayness), PALETTE.sunGold, golden),
-    sunIntensity: 0.3 + 0.9 * dayness + 1.1 * golden,
+    // By day the sun carries most of the light and the sky fills in, so what the sun does not reach is plainly in
+    // shade (review 030: with the two near equal, cast shadows were too faint to see).
+    sunIntensity: 0.3 + 1.35 * dayness + 1.1 * golden,
     hemiColor: mix(mix(PALETTE.moon, PALETTE.dayLight, dayness), PALETTE.warmHemi, golden * 0.7),
-    hemiIntensity: 0.6 + 0.3 * dayness + 0.35 * golden,
+    hemiIntensity: 0.6 + 0.05 * dayness + 0.35 * golden,
     lit: tod >= 19 || tod < 1,
     nightness,
     // The sky's colour fades with the light, so the ground is never near-black under a bright sky.

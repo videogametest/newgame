@@ -3,6 +3,8 @@
 
 import type { BattleState, BattleStatus, Fighter, WeaponId } from '../core/types';
 import { TUNING } from '../config/tuning';
+import { fillPrompt } from '../core/settings/labels';
+import { currentSettings } from './settings_store';
 
 export type Projector = (x: number, y: number, z: number) => { x: number; y: number; visible: boolean };
 
@@ -40,14 +42,14 @@ const MARKUP = `
       <h1>Click to take control</h1>
       <p>Hold the line. Defeat every enemy to win.</p>
       <div class="keys">
-        <div><b>W A S D</b> move</div>
+        <div><b>{moveForward} {moveLeft} {moveBack} {moveRight}</b> move</div>
         <div><b>Mouse</b> look and aim</div>
-        <div><b>Shift</b> sprint</div>
-        <div><b>Space</b> dodge roll</div>
-        <div><b>1 / 2</b> sword / bow</div>
-        <div><b>Left mouse</b> attack (hold to draw the bow)</div>
-        <div><b>Right mouse</b> zoom (bow)</div>
-        <div><b>Esc</b> pause</div>
+        <div><b>{sprint}</b> sprint</div>
+        <div><b>{dodge}</b> dodge roll</div>
+        <div><b>{weaponBlade} / {weaponBow}</b> sword / bow</div>
+        <div><b>{attack}</b> attack (hold to draw the bow)</div>
+        <div><b>{aim}</b> zoom (bow)</div>
+        <div><b>{pause}</b> pause</div>
       </div>
     </div>
   </div>
@@ -102,7 +104,7 @@ export class Hud {
   private restartHandler: (() => void) | null = null;
 
   constructor(root: HTMLElement) {
-    root.innerHTML = MARKUP;
+    root.innerHTML = fillPrompt(MARKUP, currentSettings().bindings, 'keyboard');
     const q = <T extends HTMLElement>(sel: string): T => {
       const el = root.querySelector<T>(sel);
       if (!el) throw new Error(`HUD markup is missing ${sel}`);

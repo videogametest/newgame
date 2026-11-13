@@ -7,15 +7,17 @@
 // its yaw is atan2(ux, uz) (Babylon's rotation.y).
 import { GATE_HALF_WIDTH, GATE_WALL_HALF } from '../core/world/valley';
 
-/** The hero is 1.8 m tall (docs/assets.md); the gate is taller by half. */
-export const GATE_HEIGHT = 2.7;
+/** The planks are 4 m tall: about twice the hero (2.16 m), so the gate reads from 30 m (review 025 item 1). */
+export const GATE_HEIGHT = 4;
+/** The posts stand 1 m above the planks. */
+export const POST_HEIGHT = 5;
 /** Planks stand this far into the ground so they meet a slope. */
 const SINK = 0.3;
 const BOARD_WIDTH = 0.4;
 const BOARD_GAP = 0.02;
 const BOARD_THICK = 0.15;
 const POST = 0.5;
-const BAR_HEIGHT = 2.2;
+const BAR_HEIGHT = 3.4;
 
 export interface GateLine {
   x: number;
@@ -46,7 +48,7 @@ export function gatePoint(line: GateLine, s: number, a: number): { x: number; z:
  * The gate's boxes. Two posts with the across extent of the corridor, a crossbar, and one row of planks on each collision
  * face (s = ±GATE_WALL_HALF), so the hero stops at a visible surface.
  */
-export function gateParts(line: GateLine, heightAt: (x: number, z: number) => number, height = GATE_HEIGHT): GatePart[] {
+export function gateParts(line: GateLine, heightAt: (x: number, z: number) => number, height = GATE_HEIGHT, postHeight = POST_HEIGHT): GatePart[] {
   const yaw = Math.atan2(line.ux, line.uz);
   const parts: GatePart[] = [];
   const ground = (s: number, a: number) => {
@@ -60,7 +62,7 @@ export function gateParts(line: GateLine, heightAt: (x: number, z: number) => nu
 
   for (const side of [-1, 1]) {
     const a = side * (GATE_HALF_WIDTH - POST / 2);
-    add(`post_${side < 0 ? 'valley' : 'far'}`, 0, a, POST, POST, height + SINK, ground(0, a));
+    add(`post_${side < 0 ? 'valley' : 'far'}`, 0, a, POST, POST, postHeight + SINK, ground(0, a));
   }
 
   const barA = 0;
@@ -71,7 +73,7 @@ export function gateParts(line: GateLine, heightAt: (x: number, z: number) => nu
     const s = face * (GATE_WALL_HALF - BOARD_THICK / 2);
     for (let i = 0; i < count; i++) {
       const a = -GATE_HALF_WIDTH + BOARD_WIDTH / 2 + i * BOARD_WIDTH;
-      add(`board_${face < 0 ? 'valley' : 'far'}_${i}`, s, a, BOARD_WIDTH - BOARD_GAP, BOARD_THICK, height - 0.2 + SINK, ground(s, a));
+      add(`board_${face < 0 ? 'valley' : 'far'}_${i}`, s, a, BOARD_WIDTH - BOARD_GAP, BOARD_THICK, height + SINK, ground(s, a));
     }
   }
   return parts;

@@ -2,6 +2,14 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 — Review 025 item 1: the gate
+
+- Gate is 4 m planks, 5 m posts, bar 3.4 m; the pass floor is level from 10 m before the gate to 2 m beyond it (`passFloor` in `src/core/world/valley.ts`). Continuity test at s = −10 added.
+- Frames: `docs/pr-media/overnight-13-gate/gate-18.png` (dusk 18:00), `gate-12.png` (noon). Taken from the tour's `gate` view, about 15 m from the gate.
+- Gates: tsc clean; vitest 59 files / 720 tests; walk-gap 97.0 m; build OK; smoke OK (local).
+- Ground share is brightness against sky (Greg's definition, 2026-11-13). The capture script still prints the old screen-share figure (0.983 for these frames); that is superseded and the script change is the next item.
+- Identity note: squash commits on `main` since #49 are authored `videogametest <support@gridironwife.com>`, not the noreply address Greg asked for. New commits use `355531315+videogametest@users.noreply.github.com`. Not rewritten.
+
 ## Streams
 
 | Stream | Doing | Open PR | Blocked |

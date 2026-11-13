@@ -248,6 +248,26 @@ describe('Tallowmere terrain (§4)', () => {
     expect(approach.length, 'reached cells on the road before the gate').toBeGreaterThan(0);
   }, 60000);
 
+  it('levels the pass floor: from 10 m before the gate to the gate wall, each cross-section across the corridor is one height (review 025 item 1)', () => {
+    const at = (s: number, across: number) => ({
+      x: GATE_LINE.x + GATE_LINE.ux * s + GATE_LINE.uz * across,
+      z: GATE_LINE.z + GATE_LINE.uz * s - GATE_LINE.ux * across,
+    });
+    let checked = 0;
+    for (let across = -6; across <= 6; across += 1) {
+      const floor = valleyHeightAt(at(-10, across).x, at(-10, across).z);
+      for (let s = -10; s <= 1.5; s += 0.5) {
+        const p = at(s, across);
+        expect(valleyHeightAt(p.x, p.z), `floor at s=${s} across=${across}`).toBeCloseTo(floor, 6);
+        checked++;
+      }
+    }
+    expect(checked).toBeGreaterThan(300);
+    // Continuous at the floor's start: 0.5 m further out the natural slope carries on from the same height.
+    const before = at(-10.5, 0), start = at(-10, 0);
+    expect(Math.abs(valleyHeightAt(before.x, before.z) - valleyHeightAt(start.x, start.z))).toBeLessThan(0.5);
+  });
+
   it('makes the corridor sides cliffs: at 7 to 10 m across the road, from 0 to 5 m before the gate line, the slope is at least 0.7', () => {
     let checked = 0;
     for (let s = -5; s <= 0; s += 0.5) {

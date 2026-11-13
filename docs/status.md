@@ -119,6 +119,11 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - **Diagnostic hook:** the uncommitted `__diag` line was removed before this entry; nothing from the probe is committed.
 
 
+## 2026-11-13 Noon shadow: answer to Greg (Viktor, branch `task-009-brightness`)
+- **Answer:** the sun's height. Not range (the sun light follows the hero every frame, `valley.ts` `updateView`), not bias (shadow bias 0.00005, normal bias 0).
+- **Check this session:** `docs/pr-media/review030-retake/hero-noon.png` (12:00) shows the hero's shadow under his feet, short and visible. The 15:00 frame named in the earlier entry (`tod-15.png`) was not found in this sandbox, so the 15:00 result is from the earlier capture, not re-rendered.
+- **Not changed:** `src/render/lighting.ts` is Claude's. Reported in Slack, thread `1794430314.296969`, at 1794607173.
+
 ## Streams
 
 | Stream | Doing | Open PR | Blocked |

@@ -20,6 +20,7 @@ import { TRAINING_FIELD } from '../data/arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
 import { buildFarLand } from './valley_far';
+import { buildRoads } from './valley_roads';
 import { buildLandmarks, type Landmarks } from '../landmarks/build';
 import { PROPORTIONS } from './proportions';
 import { buildValleyWater, type ValleyWater } from './valley_water';
@@ -186,6 +187,7 @@ class Valley {
 
     this.terrain = new ValleyTerrain(scene);
     buildFarLand(scene); // the whole valley, coarse, so nothing past the stream radius is a hole (review 023)
+    buildRoads(scene); // every road and path outside Wick, as worn earth (review 027)
     this.sky = new ValleySky(scene);
     this.buildWater(scene);
 

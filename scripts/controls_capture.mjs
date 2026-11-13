@@ -36,7 +36,7 @@ const menuRow = page.locator('.pause button', { hasText: 'Controls' });
 // Open the pause menu with Esc, then go to Controls.
 await page.keyboard.press('Escape');
 await page.waitForTimeout(500);
-check(await menuRow.isVisible(), 'pause menu shows a Controls button');
+check(await menuRow.waitFor({ state: 'visible', timeout: 5000 }).then(() => true, () => false), 'pause menu shows a Controls button');
 await page.screenshot({ path: join(outDir, 'pause_menu.png') });
 
 await menuRow.click();

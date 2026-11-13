@@ -56,3 +56,11 @@ export function noticeFor(
   // The displaced action keeps the input it had as its other slot.
   return `${ACTION_NAMES[action]} now uses ${label}. ${ACTION_NAMES[displaced]} still has ${inputLabel(other[0])}.`;
 }
+
+/**
+ * Whether the scroll hint shows: true while the action rows continue past the bottom edge of the scroll area.
+ * The 2 px slack stops a sub-pixel remainder from showing a hint on a list that is in fact fully read.
+ */
+export function moreBelow(scrollTop: number, clientHeight: number, scrollHeight: number): boolean {
+  return scrollTop + clientHeight < scrollHeight - 2;
+}

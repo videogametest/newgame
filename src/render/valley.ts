@@ -2,7 +2,7 @@
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
 
 import {
-  Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
+  Color3, Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
   Matrix, Scene, ShadowGenerator, Vector3,
 } from '@babylonjs/core';
 import { createBattle, getHero } from '../core/battle';
@@ -31,6 +31,9 @@ import { Hud } from './hud';
 import { PlayerInput } from './input';
 import { fillPrompt } from '../core/settings/labels';
 import { currentSettings, saveSettings } from './settings_store';
+import { showBrightnessPrompt } from './display_settings';
+import { brightnessCurve } from '../core/settings/settings';
+import { qualityProfile } from './quality';
 import { lightingAt } from './lighting';
 import { ValleySky } from './valley_sky';
 import { ValleyTerrain } from './valley_terrain';
@@ -77,6 +80,8 @@ export interface ValleyHooks {
   groundMask(cols?: number, rows?: number): number[];
   /** Capture only: hides the clock, figures, hint and tour label. */
   hideChrome(): void;
+  /** Capture only: the image exposure and the grey ambient lift now in use (brightness, task 009 step 2c). */
+  exposure(): { exposure: number; ambient: number };
 }
 /** Meshes that make up the sky. A pick that passes through these is sky. */
 const SKY_MESHES = new Set(['valley_sky', 'valley_stars', 'valley_sun', 'valley_moon']);
@@ -197,11 +202,14 @@ class Valley {
     this.sun.orthoTop = SUN_RANGE;
     this.sun.shadowMinZ = 1;
     this.sun.shadowMaxZ = 400;
-    this.shadow = new ShadowGenerator(2048, this.sun);
+    const display = currentSettings().display;
+    const quality = qualityProfile(display.quality); // read at start: shadow size and stream radius change on the next start
+    this.applyBrightness(display.brightness);
+    this.shadow = new ShadowGenerator(quality.shadowMapSize, this.sun);
     this.shadow.usePercentageCloserFiltering = true;
     this.shadow.darkness = 0.1; // the sky's light already fills shade; the sun's share is nearly all removed
 
-    this.terrain = new ValleyTerrain(scene);
+    this.terrain = new ValleyTerrain(scene, quality.streamRadius);
     buildFarLand(scene); // the whole valley, coarse, so nothing past the stream radius is a hole (review 023)
     buildRoads(scene); // every road and path outside Wick, as worn earth (review 027)
     this.sky = new ValleySky(scene);
@@ -221,7 +229,8 @@ class Valley {
     this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
       saveSettings({ ...currentSettings(), bindings: b });
       this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
-    });
+    }, (b) => this.applyBrightness(b));
+    showBrightnessPrompt(uiRoot, (b) => this.applyBrightness(b)); // once, until the player sets brightness (task 009 step 2c)
     this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
     this.input.camYaw = this.hero.yaw;
 
@@ -260,6 +269,17 @@ class Valley {
 
   private water: ValleyWater | null = null;
   private waterSeconds = 0;
+
+  /**
+   * Brightness (task 009 step 2c): exposure on the finished picture, and a grey ambient lift for the darkest tones.
+   * At 1 both are as authored, so the default look is unchanged. The interface is never touched.
+   */
+  applyBrightness(brightness: number): void {
+    const { exposure, shadowLift } = brightnessCurve(brightness);
+    const config = this.scene.imageProcessingConfiguration;
+    config.exposure = exposure;
+    this.scene.ambientColor = new Color3(shadowLift, shadowLift, shadowLift);
+  }
 
   private buildWater(scene: Scene): void {
     this.water = buildValleyWater(scene); // the lake and rivers take the sky (overnight item 5)
@@ -515,6 +535,7 @@ class Valley {
       hideChrome: () => {
         if (this.chromeBox) this.chromeBox.hidden = true;
       },
+      exposure: () => ({ exposure: this.scene.imageProcessingConfiguration.exposure, ambient: this.scene.ambientColor.r }),
       project: (name) => {
         const m = this.scene.getMeshByName(name);
         if (!m) return null;

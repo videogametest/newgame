@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { defaultBindings, rebind, type Bindings } from '../core/settings/actions';
-import { inputFromKey, inputFromMouse, inputFromWheel, noticeFor } from './controls_rules';
+import { inputFromKey, inputFromMouse, inputFromWheel, moreBelow, noticeFor } from './controls_rules';
 
 const none = { ctrlKey: false, altKey: false, metaKey: false };
 
@@ -94,5 +94,21 @@ describe('noticeFor', () => {
     const r = rebind(b, 'keyboard', 'eat', 'Key:KeyJ', 1);
     expect(r).toMatchObject({ ok: false, reason: 'would_strand', stranded: 'interact' });
     expect(noticeFor(r, b, 'eat', 1, 'Key:KeyJ')).toBe('Interact needs a key. Give it another first.');
+  });
+});
+
+describe('moreBelow', () => {
+  it('shows the hint while rows remain below the visible area', () => {
+    expect(moreBelow(0, 200, 400)).toBe(true);
+    expect(moreBelow(150, 200, 400)).toBe(true);
+  });
+
+  it('hides the hint once the list is read to its end', () => {
+    expect(moreBelow(200, 200, 400)).toBe(false);
+    expect(moreBelow(0, 400, 400)).toBe(false);
+  });
+
+  it('ignores a sub-pixel remainder at the end', () => {
+    expect(moreBelow(199, 200, 400)).toBe(false);
   });
 });

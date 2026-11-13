@@ -21,6 +21,12 @@ const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'],
 });
 const page = await browser.newPage({ viewport: { width, height } });
+// Optional: TOUR_SETTINGS='{"display":{"brightness":1,"brightnessSet":true}}' is written to the settings key before load,
+// so the first-start brightness prompt does not cover the Controls page.
+if (process.env.TOUR_SETTINGS) {
+  const raw = process.env.TOUR_SETTINGS;
+  await page.addInitScript((r) => localStorage.setItem('everylitwindow.settings.v1', r), raw);
+}
 const errors = [];
 page.on('console', (msg) => { if (msg.type() === 'error') errors.push(`console error: ${msg.text()}`); });
 page.on('pageerror', (err) => errors.push(`page error: ${err.message}`));

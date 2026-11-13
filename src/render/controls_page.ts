@@ -14,7 +14,7 @@ import {
 } from '../core/settings/actions';
 import { inputLabel } from '../core/settings/labels';
 import { currentSettings } from './settings_store';
-import { inputFromKey, inputFromMouse, inputFromWheel, LISTEN_PROMPT, noticeFor } from './controls_rules';
+import { inputFromKey, inputFromMouse, inputFromWheel, LISTEN_PROMPT, moreBelow, noticeFor } from './controls_rules';
 
 const NO_INPUT = '\u2014'; // an empty slot shows a dash
 const LISTEN_LABEL = 'Press\u2026'; // the text inside a slot that is listening
@@ -24,6 +24,8 @@ const COLUMNS = 'minmax(0, 1fr) 170px 170px'; // action name, Main, Spare: share
 export class ControlsPage {
   readonly el: HTMLElement;
   private readonly scroll: HTMLElement;
+  private readonly viewport: HTMLElement;
+  private readonly scrollHint: HTMLElement;
   private readonly rows: HTMLElement;
   private readonly prompt: HTMLElement;
   private readonly notice: HTMLElement;
@@ -76,10 +78,21 @@ export class ControlsPage {
       head.append(cell);
     }
 
+    // The scroll area sits in a relative wrapper so a fade can lie over its bottom edge while more rows remain.
+    this.viewport = document.createElement('div');
+    Object.assign(this.viewport.style, { flex: '1 1 0', minHeight: '0', position: 'relative' });
     this.scroll = document.createElement('div');
-    Object.assign(this.scroll.style, { flex: '1 1 0', minHeight: '0', overflowY: 'auto' });
+    Object.assign(this.scroll.style, { height: '100%', overflowY: 'auto' });
     this.rows = document.createElement('div');
     this.scroll.append(this.rows);
+    this.scrollHint = document.createElement('div');
+    this.scrollHint.setAttribute('aria-hidden', 'true');
+    Object.assign(this.scrollHint.style, {
+      position: 'absolute', left: '0', right: '0', bottom: '0', height: '36px', pointerEvents: 'none',
+      background: 'linear-gradient(to bottom, rgba(16, 22, 30, 0), rgba(16, 22, 30, 0.94))', display: 'none',
+    });
+    this.viewport.append(this.scroll, this.scrollHint);
+    this.scroll.addEventListener('scroll', () => this.updateScrollHint());
 
     this.prompt = document.createElement('div');
     this.notice = document.createElement('div');
@@ -100,7 +113,7 @@ export class ControlsPage {
     this.confirm.append(question, button('Yes', () => this.backToDefaults()), button('No', () => this.setConfirm(false)));
     footer.append(this.footerButtons, this.confirm);
 
-    inner.append(top, head, this.scroll, this.prompt, this.notice, footer);
+    inner.append(top, head, this.viewport, this.prompt, this.notice, footer);
     this.el.append(inner);
 
     // Installed while the page is open; they only act while a slot is listening.
@@ -142,15 +155,22 @@ export class ControlsPage {
     this.fitRows();
   }
 
+  /** Shows the fade only while rows continue below the visible part of the list. */
+  private updateScrollHint(): void {
+    const s = this.scroll;
+    this.scrollHint.style.display = moreBelow(s.scrollTop, s.clientHeight, s.scrollHeight) ? 'block' : 'none';
+  }
+
   /** Trims the scroll area to a whole number of rows that fit in the space the card has left. */
   private fitRows(): void {
     if (this.el.hidden) return;
-    this.scroll.style.flex = '1 1 0';
-    this.scroll.style.height = '';
-    const available = this.scroll.clientHeight;
+    this.viewport.style.flex = '1 1 0';
+    this.viewport.style.height = '';
+    const available = this.viewport.clientHeight;
     const rows = Math.max(1, Math.floor(available / ROW_HEIGHT));
-    this.scroll.style.flex = 'none';
-    this.scroll.style.height = `${rows * ROW_HEIGHT}px`;
+    this.viewport.style.flex = 'none';
+    this.viewport.style.height = `${rows * ROW_HEIGHT}px`;
+    this.updateScrollHint();
   }
 
   private startListening(action: Action, slot: number): void {

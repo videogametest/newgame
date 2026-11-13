@@ -24,7 +24,7 @@ The rules are built and tested in `src/core/settings/` (Claude's, read-only). Th
 
 1. Pause on the `pause` action. The simulation stops; the valley stays drawn behind, dimmed.
 2. The six pages, built from one small set of parts: a slider (from `RANGES`), a switch, a choice. Each change is applied and saved at once.
-3. **Brightness:** apply `brightnessCurve` to the scene's image processing (exposure, and a lift of the darkest tones), never to the interface. The brightness picture is the tour's `hesper_door` view at midnight with a dark figure in the yard; show it once at first start (`display.brightnessSet`).
+3. **Brightness:** (status: built in 2c; dark figure and midnight prompt are open, see `docs/status.md`) apply `brightnessCurve` to the scene's image processing (exposure, and a lift of the darkest tones), never to the interface. The brightness picture is the tour's `hesper_door` view at midnight with a dark figure in the yard; show it once at first start (`display.brightnessSet`).
 4. **Quality:** low, medium, high set shadow map size, scenery density, and how far the fine land streams. Say in `docs/status.md` what each one sets and the draw calls and frame time of each in the arrival view.
 5. **Controls page** for keyboard and mouse: listen for the next key, mouse button, or wheel tick; call `rebind`; show its result in the words given. `Esc` cancels listening and is never bound.
 6. Done when: frames of each page; a test that a damaged settings string still gives a playable game; brightness at 0.5, 1, and 1.5 as three frames of the same midnight view.

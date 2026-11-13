@@ -90,7 +90,7 @@ export class ValleyTerrain {
   private readonly material: StandardMaterial;
   private builtThisRun = 0;
 
-  constructor(private readonly scene: Scene) {
+  constructor(private readonly scene: Scene, private readonly streamRadius: number = STREAM_RADIUS) {
     const mat = new StandardMaterial('valley_ground_mat', scene);
     mat.diffuseColor = Color3.White();
     mat.specularColor = Color3.Black();
@@ -100,7 +100,7 @@ export class ValleyTerrain {
 
   /** Call once per frame with the hero's ground position. */
   update(hero: { x: number; z: number }): void {
-    const desired = chunksWithinRadius(hero, STREAM_RADIUS, CHUNK_SIZE).filter(chunkInValley);
+    const desired = chunksWithinRadius(hero, this.streamRadius, CHUNK_SIZE).filter(chunkInValley);
     const wanted = new Map(desired.map((c) => [chunkKey(c), c] as const));
     const diff = diffChunks(new Set(this.loaded.keys()), desired);
     for (const key of diff.unload) {

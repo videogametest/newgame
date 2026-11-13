@@ -79,12 +79,12 @@ describe('noticeFor', () => {
     expect(noticeFor(r, b, 'knife', 0, 'Key:KeyY')).toBe('Throw a knife now uses Y.');
   });
 
-  it('shows nothing when the displaced action keeps a spare, since the copy has no line for it', () => {
+  it('says the displaced action still has its other input when it keeps one', () => {
     const b = known();
     b.keyboard.knife = ['Key:KeyR', 'Key:KeyY'];
     const r = rebind(b, 'keyboard', 'lockOn', 'Key:KeyY');
     expect(r.ok).toBe(true);
-    expect(noticeFor(r, b, 'lockOn', 0, 'Key:KeyY')).toBeNull();
+    expect(noticeFor(r, b, 'lockOn', 0, 'Key:KeyY')).toBe('Lock on now uses Y. Throw a knife still has R.');
   });
 
   it('says a refused change needs another input first', () => {

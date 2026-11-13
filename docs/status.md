@@ -8,7 +8,9 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - Ground share is replaced by the brightness figure (review 025 note). The scripts record a ground mask per shot; `scripts/ground_vs_sky.py` turns it into ground luma over sky luma. Run with `uv run --with pillow python scripts/ground_vs_sky.py <dir>`. Luma is Rec. 709 on sRGB values, a brightness proxy and not photometric. The old screen-share figures (0.522 and similar) are superseded.
 - Ground-vs-sky, 18:00 / 12:00 (`docs/pr-media/overnight-13-hud/state.json`): arrival 0.737 / 0.563; road_in 0.679 / 0.505; wick_square 0.779 / 0.561; landing 0.808 / 0.640; high_lane 0.973 / 0.636; signal_hill_top 0.786 / 0.603; ford 0.844 / 0.570; mill_bridge 0.859 / 0.591; stepping_stones 1.109 / 0.998; gate 0.751 / 0.607. All above the 0.25 floor.
 - Frames: `docs/pr-media/overnight-13-hud/` (20 PNGs, 10 views at 18:00 and 12:00). `ford-18.png` and `high_lane-12.png` checked by eye: no HUD text or tour label. The ford still shows the grey slabs on the banks; that is review 025 item 2's follow-up, not this item.
-- Gates: tsc clean; vitest 61 files / 765 tests; build OK; walk gap 97.0 m (limit 100 m). Smoke: see the PR.
+- Gates: tsc clean; vitest 61 files / 765 tests; build OK; walk gap 97.0 m (limit 100 m); local smoke OK.
+- Merged to `main` as `3388c54` (PR #55, squash). Deploy run 43459007837 (Test and deploy to GitHub Pages): success.
+- Live smoke: `node scripts/smoke.mjs https://everylitwindow.com/` passed.
 - Not done here: review 025 items 5 to 7 (ridge_path rename, tour camera behind the hero, signal-hill bushes), then the ford rework, then the sky.
 
 ## 2026-11-13 Review 025 item 3: the tree keep-out (Viktor, branch `overnight-13-tree-keepout`)

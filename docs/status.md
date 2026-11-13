@@ -2,6 +2,13 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 Review 025 item 3: the tree keep-out (Viktor, branch `overnight-13-tree-keepout`)
+
+- The arrival sight line keeps scenery 25 m off for its last 150 m, ending at Hesper's window (`hesperSightNearLine` and `SIGHT_NEAR_LENGTH` / `SIGHT_NEAR_HALF_WIDTH` in `src/core/world/scenery.ts`). The keep-out is a road zone added to `sceneryKeepOuts()`. New test in `scenery.test.ts` (review 024 item 4).
+- Frames: `docs/pr-media/overnight-13-keepout/` (`arrival` and `road_in`, at 18:00 and 12:00), with `state.json`. Ground share from these captures: arrival 0.522, road_in 0.582.
+- Gates: tsc clean; vitest 61 files / 765 tests; walk-gap 97.0 m; build OK. Smoke to follow after the deploy.
+- Not checked by eye in this run: the frames did not load in the viewer here, so the hero-in-frame and tree-clearance look still needs Greg's review.
+
 ## 2026-11-13 Review 025 item 2: the crossings (Viktor, branch `overnight-13-crossings`)
 
 - The ford (gravel slab under 0.4 m of water, worn bank stones at ground level), the mill bridge (deck from `walkSurfaceAt`, piers every 2.5 m, rail on the upstream side with posts every 2 m) and the stepping stones (tops at water + 0.3 m, equal to `walkSurfaceAt`) are drawn in `src/render/valley_crossings.ts`. The geometry is pure, in `src/render/valley_crossings_parts.ts`, with 14 tests. The forge bridge is not drawn (not walkable).

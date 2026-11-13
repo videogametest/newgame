@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { gateFrameAt, GATE_HALF_WIDTH, GATE_LINE, GATE_WALL_HALF } from '../core/world/valley';
-import { gateParts, GATE_HEIGHT, gatePoint } from './valley_gate_parts';
+import { gateParts, GATE_HEIGHT, gatePoint, POST_HEIGHT } from './valley_gate_parts';
 
 const flat = () => 0;
 const PARTS = gateParts(GATE_LINE, flat);
@@ -41,10 +41,16 @@ describe('soldiers gate geometry (overnight item 8)', () => {
     }
   });
 
-  it('is taller than the hero by half (hero 1.8 m, gate 2.7 m)', () => {
-    expect(GATE_HEIGHT).toBeCloseTo(1.5 * 1.8, 6);
-    const tops = PARTS.map((p) => p.y + p.h);
-    expect(Math.max(...tops)).toBeCloseTo(GATE_HEIGHT, 6);
+  it('has planks 4 m tall and posts 5 m, about twice the hero (2.16 m), so the gate reads from 30 m (review 025 item 1)', () => {
+    expect(GATE_HEIGHT).toBeCloseTo(4, 6);
+    expect(POST_HEIGHT).toBeCloseTo(5, 6);
+    const planks = PARTS.filter((p) => p.name.startsWith('board_'));
+    expect(Math.max(...planks.map((p) => p.y + p.h))).toBeCloseTo(GATE_HEIGHT, 6);
+    const posts = PARTS.filter((p) => p.name.startsWith('post_'));
+    expect(posts.length).toBe(2);
+    // Ground is flat here, so each post's top is POST_HEIGHT above it (its foot sinks SINK m, and the box makes up for that).
+    for (const p of posts) expect(p.y + p.h).toBeCloseTo(POST_HEIGHT, 6);
+    expect(Math.max(...PARTS.map((p) => p.y + p.h))).toBeCloseTo(POST_HEIGHT, 6);
   });
 
   it('has the crossbar above the hero, and the gate line centre is in the middle of the crossbar', () => {
@@ -52,6 +58,6 @@ describe('soldiers gate geometry (overnight item 8)', () => {
     expect(bar).toBeDefined();
     const mid = gatePoint(GATE_LINE, 0, 0);
     expect(Math.hypot(bar!.x - mid.x, bar!.z - mid.z)).toBeLessThan(1e-9);
-    expect(bar!.y).toBeGreaterThan(1.8);
+    expect(bar!.y).toBeGreaterThan(2.16);
   });
 });

@@ -1,0 +1,36 @@
+[
+  {
+    "view": "gate",
+    "tod": 18,
+    "shot": "docs/pr-media/overnight-13-gate/gate-18.png",
+    "groundShare": 0.983,
+    "x": -220,
+    "z": -232,
+    "groundY": 25.86358836386515,
+    "yaw": -2.356194490192345,
+    "day": 1,
+    "locked": false,
+    "chunks": 62,
+    "chunkBuilds": 62,
+    "fps": 17,
+    "drawCalls": 145,
+    "activeMeshes": 38
+  },
+  {
+    "view": "gate",
+    "tod": 12,
+    "shot": "docs/pr-media/overnight-13-gate/gate-12.png",
+    "groundShare": 0.983,
+    "x": -220,
+    "z": -232,
+    "groundY": 25.86358836386515,
+    "yaw": -2.356194490192345,
+    "day": 1,
+    "locked": false,
+    "chunks": 78,
+    "chunkBuilds": 78,
+    "fps": 10,
+    "drawCalls": 145,
+    "activeMeshes": 38
+  }
+]

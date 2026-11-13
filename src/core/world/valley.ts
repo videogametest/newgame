@@ -59,6 +59,9 @@ export const GATE_RADIUS = 336;
 export const GATE_HALF_WIDTH = 6;
 export const GATE_WALL_HALF = 2;
 const GATE_CORRIDOR_DEPTH = 15;
+/** The pass floor is level over this many metres before the gate, and to PASS_FLOOR_TO m beyond the gate line (inside the wall). */
+const PASS_FLOOR_RUN = 10;
+const PASS_FLOOR_TO = 2;
 /** How far the pass stays open behind the gate: seen through the bars, never reached. */
 const GATE_PASS_BEYOND = 60;
 /** The gorge: the last GORGE_RUN m of river out. Channel within GORGE_CHANNEL of the centre line; walls rise to WALL_TOP. */
@@ -95,7 +98,25 @@ const heightSampler = createHeightAt(VALLEY_SEED, VALLEY_SHAPE);
 
 /** Ground height (m) at a valley point. Same answer for the same (x, z) on every call. */
 export function valleyHeightAt(x: number, z: number): number {
-  return (graded ??= gradeTheRoads()).heightAt(x, z);
+  return passFloor(x, z, (graded ??= gradeTheRoads()).heightAt(x, z));
+}
+
+/**
+ * The pass floor is level for the last PASS_FLOOR_RUN m before the gate and across the gate line to PASS_FLOOR_TO m
+ * beyond it (review 025 item 1). Each cross-section holds the height it has PASS_FLOOR_RUN m out on the valley side, so
+ * the ground meets the natural slope continuously there and the gate's foot is not hidden by the rise.
+ */
+function passFloor(x: number, z: number, h: number): number {
+  const dx = x - GATE.x;
+  const dz = z - GATE.z;
+  const s = dx * GATE.ux + dz * GATE.uz;
+  if (s < -PASS_FLOOR_RUN || s > PASS_FLOOR_TO + 1e-6) return h;
+  const a = dx * GATE.uz - dz * GATE.ux;
+  if (Math.abs(a) > GATE_HALF_WIDTH + 1e-6) return h;
+  const floorS = -PASS_FLOOR_RUN;
+  const fx = GATE.x + GATE.ux * floorS + GATE.uz * a;
+  const fz = GATE.z + GATE.uz * floorS - GATE.ux * a;
+  return (graded ??= gradeTheRoads()).heightAt(fx, fz);
 }
 let graded: Graded | null = null;
 

@@ -10,6 +10,7 @@ Claude owns this folder. It holds the words and music that carry the game's stor
 | --- | --- | --- |
 | `melody.md` | The score of the game's one melody and its layers | First draft, to be judged by ear |
 | `hesper.md` | Hesper's lines, by situation, with ids | Written |
+| `first-evening.md` | The tutorial at Hesper's on the first evening: her lines for each step, each miss, and the skip | Written |
 | `stane.md` | Stane's notices, fight lines, account, and leaving | Written |
 | `bram.md` | Bram's lines, campfire lines, and his side of each pair | Written |
 | `fragments.md` | The ten places off the path, the fisher, and Old Maren | Written |

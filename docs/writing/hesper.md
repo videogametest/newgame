@@ -30,7 +30,7 @@ The hero and Bram reach her door at dusk, having walked toward her window.
 
 ## Taking an apprentice
 
-The next morning.
+The same evening, in her yard: these open the lesson (`first-evening.md`, step 3).
 
 `hesper.apprentice`
 

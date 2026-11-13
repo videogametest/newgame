@@ -84,6 +84,8 @@ export class Hud {
   private readonly crosshair: HTMLElement;
   private readonly draw: HTMLElement;
   private readonly drawFill: HTMLElement;
+  private readonly heroPanel: HTMLElement;
+  private readonly weaponPanel: HTMLElement;
   private readonly heroFill: HTMLElement;
   private readonly heroText: HTMLElement;
   private readonly weaponSpans: Record<WeaponId, HTMLElement>;
@@ -113,6 +115,8 @@ export class Hud {
     this.crosshair = q('.crosshair');
     this.draw = q('.draw');
     this.drawFill = q('.draw-fill');
+    this.heroPanel = q('.hero');
+    this.weaponPanel = q('.weapon');
     this.heroFill = q('.hp-fill');
     this.heroText = q('.hp-text');
     this.weaponSpans = {
@@ -131,6 +135,12 @@ export class Hud {
 
   set onRestart(fn: () => void) {
     this.restartHandler = fn;
+  }
+
+  /** The valley has no fights yet: hide the hero health bar and the weapon tiles (they return with task 004). */
+  hideFightChrome(): void {
+    this.heroPanel.style.display = 'none';
+    this.weaponPanel.style.display = 'none';
   }
 
   setBoot(label: string, fraction: number): void {

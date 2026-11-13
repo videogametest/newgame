@@ -20,6 +20,7 @@ import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
 import { buildFarLand } from './valley_far';
 import { buildGate } from './valley_gate';
+import { buildScenery } from './valley_scenery';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
@@ -190,6 +191,7 @@ class Valley {
   async loadWick(): Promise<void> {
     this.wick = await buildWick(this.scene, { heightAt: valleyHeightAt, seed: VALLEY_SEED, shadow: this.shadow });
     buildGate(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow });
+    await buildScenery(this.scene);
     this.glow = new GlowLayer('glow', this.scene);
     this.glow.intensity = 0.3;
   }

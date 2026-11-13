@@ -91,7 +91,8 @@ void main() {
   float fog = clamp((dist - fogRange.x) / (fogRange.y - fogRange.x), 0.0, 1.0);
   col = mix(col, fogColor, fog);
   // Thin at the very edge, so the shore is a soft line and not a cut.
-  float alpha = clamp(0.35 + vDepth * 2.2, 0.0, 0.94);
+  // Shallows stay clear enough to show the bed (the ford gravel at 0.4 m reads through); full by 0.7 m.
+  float alpha = clamp(0.3 + vDepth * 0.9, 0.0, 0.94);
   gl_FragColor = vec4(col, alpha);
 }`;
 

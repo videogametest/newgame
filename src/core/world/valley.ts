@@ -159,7 +159,9 @@ export const gradingReport = () => (graded ??= gradeTheRoads()).report();
 /** The valley's land before Wick's shelf and bay are cut into it (docs/tasks/003-wick.md, rules 4 and 5). */
 export function landHeightAt(x: number, z: number): number {
   const d = riverDistance(x, z);
-  const bank = Math.min(heightSampler(x, z), riverBedAt(x, z) + RIVER_BANK_SLOPE * d);
+  // The bed is flat where it is lifted (the ford), and the banks keep the river's usual V: lifting the bed must not
+  // pinch the river to a trickle (review 028). Away from the ford riverBedAt is RIVER_BED and this is the plain V.
+  const bank = Math.min(heightSampler(x, z), Math.max(riverBedAt(x, z), RIVER_BED + RIVER_BANK_SLOPE * d));
   return landingAdjust(gorgeAdjust(bank, rimHold(bank, x, z, d), x, z), x, z);
 }
 

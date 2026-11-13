@@ -11,6 +11,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-12 Overnight item 2: the valley screen is clear (Viktor, branch `overnight-02-clear`)
+
+- **Change:** `src/render/hud.ts` hides the HERO health panel and the "1 Sword / 2 Bow" tiles in the valley (`hideFightChrome()`). `src/render/valley.ts` shows the clock, frame figures and control hint only with `?debug=1`. Default route: world only.
+- **Measured [this commit, sandbox, 2026-11-12]:** tsc OK; vitest 52 files, 670 tests pass; build OK; `scripts/smoke.mjs` passed against `vite preview`. In the default route `.hero` and `.weapon` compute to `display: none`, and no console or page errors.
+- **Frames:** `docs/pr-media/overnight/02-clear-default.png` (world only) and `02-clear-debug.png` (clock, "10 fps · 224 draw calls" from headless swiftshader, and the hint).
+- **Next:** overnight item 3, the hero as designed (`PROPORTIONS`).
+
 ## 2026-11-12 Review 022: Wick wired into the valley (Viktor, merged as PR #41, `61007c5`)
 
 - **Wired:** `src/render/valley.ts` calls `buildWick(scene, { heightAt: valleyHeightAt, seed, shadow })` before the valley starts, calls `wick.light(L, timeOfDay)` each frame, and drives a GlowLayer at 0.3 + 0.9 × nightness. No Claude paths edited.

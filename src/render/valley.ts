@@ -78,6 +78,7 @@ export async function startValley(canvas: HTMLCanvasElement, uiRoot: HTMLElement
   installErrorCapture();
   logEvent('valley', 'boot');
   const hud = new Hud(uiRoot);
+  hud.hideFightChrome();
   const params = new URLSearchParams(search);
   try {
     const engine = new Engine(canvas, true, { stencil: true }, true);
@@ -113,6 +114,9 @@ class Valley {
   private readonly heroView: CharacterView;
   private readonly hint: HTMLElement;
   private readonly clockText: HTMLElement;
+  private readonly figuresText: HTMLElement;
+  /** ?debug=1 shows the clock, frame figures and control hint. The default route shows only the world. */
+  private readonly debug = new URLSearchParams(window.location.search).get('debug') === '1';
   private groundY: number;
   private wick?: Wick;
   private glow?: GlowLayer;
@@ -171,6 +175,7 @@ class Valley {
 
     this.hint = document.createElement('div');
     this.clockText = document.createElement('div');
+    this.figuresText = document.createElement('div');
     this.installHud(uiRoot);
     canvas.addEventListener('pointerdown', () => {
       if (!this.input.isLocked) this.input.requestLock();
@@ -306,7 +311,8 @@ class Valley {
     box.style.cssText = 'position:absolute;left:16px;top:14px;font:600 14px/1.4 system-ui,sans-serif;color:#f4ead2;text-shadow:0 1px 3px #000;pointer-events:none;';
     this.clockText.style.cssText = 'font-size:16px;';
     this.hint.style.cssText = 'margin-top:4px;opacity:0.85;font-weight:400;';
-    box.append(this.clockText, this.hint);
+    box.append(this.clockText, this.figuresText, this.hint);
+    box.hidden = !this.debug;
     uiRoot.appendChild(box);
   }
 
@@ -321,6 +327,7 @@ class Valley {
     const h = Math.floor(this.game.timeOfDay);
     const m = Math.floor((this.game.timeOfDay - h) * 60);
     this.clockText.textContent = `Day ${this.game.day}, ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    this.figuresText.textContent = `${this.fps} fps · ${this.lastFrameDrawCalls} draw calls`;
     this.hint.textContent = this.input.isLocked
       ? 'WASD walk · Shift sprint · Esc releases the mouse'
       : 'Click the view to look around, then WASD to walk';

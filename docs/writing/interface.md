@@ -230,6 +230,7 @@ Page names: "Display", "Sound", "Camera", "Controller", "Play", "Controls". Ever
   - Choosing a slot: "Press a key or button. Esc to cancel." On the controller tab: "Press a button. Menu to cancel."
   - A swap: "{action} now uses {input}. {other} has moved to {old input}."
   - A plain take: "{action} now uses {input}. {other} has nothing bound."
+  - A take that leaves the other its second input: "{action} now uses {input}. {other} still has {remaining}."
   - Reserved: "{input} always pauses. Choose another."
   - Refused: "{other} needs a key. Give it another first."
   - An empty slot shows a dash. An essential action can never show two dashes.

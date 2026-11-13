@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { valleyHeightAt, WATER_LEVEL, VALLEY_PLACES } from './valley';
 import { isExcluded, type ExclusionZone } from './scatter';
 import {
-  hesperSightLine, sceneryBands, sceneryBiomeAt, sceneryKeepOuts, sceneryPlacements, SCENERY_MODELS, SCENERY_RULES,
+  hesperSightLine, hesperSightNearLine, sceneryBands, sceneryBiomeAt, sceneryKeepOuts, sceneryPlacements, SCENERY_MODELS,
+  SCENERY_RULES, SIGHT_NEAR_HALF_WIDTH, SIGHT_NEAR_LENGTH,
 } from './scenery';
 
 const spots = sceneryPlacements();
@@ -43,6 +44,13 @@ describe('valley scenery (overnight item 9)', () => {
     expect(sight.from).toEqual(VALLEY_PLACES.start);
     expect(Math.hypot(sight.to.x - 86, sight.to.z - 98)).toBeCloseTo(2.55, 2);
     for (const s of spots) expect(distanceToSegment(s, sight.from, sight.to)).toBeGreaterThan(12);
+  });
+
+  it('keeps 25 m from the last 150 m of the arrival line (review 024 item 4)', () => {
+    const near = hesperSightNearLine();
+    const len = Math.hypot(near.to.x - near.from.x, near.to.z - near.from.z);
+    expect(len).toBeCloseTo(SIGHT_NEAR_LENGTH, 6);
+    for (const s of spots) expect(distanceToSegment(s, near.from, near.to)).toBeGreaterThan(SIGHT_NEAR_HALF_WIDTH);
   });
 
   it('is denser on the rim and slopes than on the lake floor', () => {

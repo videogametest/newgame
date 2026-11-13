@@ -11,6 +11,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-13 Overnight item 6: Wick's houses and the well are solid (Viktor, branch `overnight-06-solid`)
+
+- **Change:** `src/core/world/solids.ts` (pure footprint maths: 9 m square turned by `facing`, well 2.4 m square). `VALLEY_SOLIDS` in `valley.ts` is every house from `wickHouses(VALLEY_SEED)` plus the well; `blocksHero` and `isWalkableGround` use it. Fences and gate posts are not solid.
+- **Tests added:** `solids.test.ts` (footprint maths); `village_solid.test.ts` (every point inside every house and the well blocks the hero; no walkable 1 m cell lies inside a house; every lane in `WICK_LANES` has a walkable path end to end on the 1 m lattice, detour at most 1.5× lane length + 12 m).
+- **Existing test changed, and why:** `valley.test.ts` "every walkable place walkable" expected each place centre to be walkable. Two place centres now sit inside a house footprint (`wick` at (64, 72) inside `wain`; `hesper` at (86, 98) is Hesper's own house). The test now requires walkable ground within 6 m for a place centre that lies inside a solid; all other places are unchanged. Place coordinates were not moved.
+- **Measured [sandbox, 2026-11-13]:** vitest 54 files, 682 pass; `tsc --noEmit` clean; `vite build` OK; walk gap **97.0 m** (limit 100), longest at (304, 66), nearest stop `chest_gorge_ledge` 25.3 m, so the solids did not move it; `scripts/smoke.mjs` passed against `vite preview`.
+- **Not verified:** the hero visibly stopping at a wall (no frame taken; this is a collision change, not rendering).
+- **Next:** overnight item 7 (road and path grades).
+
 ## 2026-11-13 Overnight item 4: the hero starts facing Hesper's house (Viktor, merged as PR #45, `1a5b882`)
 
 - **Merged:** `placeHeroAtStart()` in `src/render/valley.ts` sets the start yaw to the bearing to Hesper's house (`wickHouses(VALLEY_SEED)`, id `hesper`), not to Wick. Capture-only hook `window.__valley.project(name)` added. Pages run `43362287226` succeeded; `https://everylitwindow.com/` returned HTTP 200 and `scripts/smoke.mjs` passed live.

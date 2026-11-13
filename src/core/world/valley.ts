@@ -59,6 +59,8 @@ export const GATE_RADIUS = 336;
 export const GATE_HALF_WIDTH = 6;
 export const GATE_WALL_HALF = 2;
 const GATE_CORRIDOR_DEPTH = 15;
+/** How far the pass stays open behind the gate: seen through the bars, never reached. */
+const GATE_PASS_BEYOND = 60;
 /** The gorge: the last GORGE_RUN m of river out. Channel within GORGE_CHANNEL of the centre line; walls rise to WALL_TOP. */
 const GORGE_RUN = 100;
 const GORGE_CHANNEL = 5;
@@ -327,7 +329,8 @@ export function beyondGate(x: number, z: number): boolean {
  */
 function inGateCorridor(x: number, z: number): boolean {
   const f = gateFrameAt(x, z);
-  return f.s <= 0 && f.s >= -GATE_CORRIDOR_DEPTH && f.across <= GATE_HALF_WIDTH;
+  // The pass runs on behind the gate, so the gate stands in an opening between cliffs and not against a wall (review 025).
+  return f.s <= GATE_PASS_BEYOND && f.s >= -GATE_CORRIDOR_DEPTH && f.across <= GATE_HALF_WIDTH;
 }
 
 /** The openings in the rim: the patrol hut's zone and the gate corridor. The rim is not lifted inside them. */

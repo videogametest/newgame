@@ -217,6 +217,8 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
       if (i > 0) { const a = (i - 1) * 2; indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
     });
     VertexData.ComputeNormals(positions, indices, normals);
+    // Lit as the ground is, whichever way the strip was wound: a lane must never come out black.
+    for (let i = 1; i < normals.length; i += 3) if (normals[i] < 0) { normals[i - 1] = -normals[i - 1]; normals[i] = -normals[i]; normals[i + 1] = -normals[i + 1]; }
     const mesh = new Mesh(name, scene);
     const vd = new VertexData();
     vd.positions = positions; vd.indices = indices; vd.normals = normals;

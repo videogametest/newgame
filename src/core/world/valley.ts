@@ -10,6 +10,7 @@ import {
   VALLEY_PLACES as LAYOUT_PLACES,
   VALLEY_RIVER_IN,
   VALLEY_RIVER_OUT,
+  VALLEY_ROADS,
   VALLEY_STOPS as LAYOUT_STOPS,
   VALLEY_TERRAIN_FEATURES,
   type LayoutCrossing,
@@ -32,14 +33,28 @@ export const VALLEY_STOPS: ReadonlyArray<{ name: string; x: number; z: number }>
 export const EDGE_RADIUS = 335;
 /** The patrol hut's open zone: the one edge-side walk the layout allows. */
 const PATROL_HUT_OPEN = { x: VALLEY_PLACES.patrolHut.x, z: VALLEY_PLACES.patrolHut.z, radius: 60 };
-/** The north-west pass, where the soldiers' road leaves the valley. */
-const NW_PASS_OPEN = { x: -250, z: -262, radius: 40 };
 /** Steepest walkable slope (rise over run). */
 const MAX_WALK_SLOPE = 0.7;
-/** The rim: ground rises by RIM_RISE across the band RIM_START..RIM_FULL, a 1.25 slope, so the edge is land the hero cannot climb. */
+/**
+ * The rim: a band RIM_START..RIM_FULL that climbs to a crest. The crest is the land plus RIM_RISE, capped at RIM_CAP,
+ * which keeps the rim below the signal hill's top (63.1 m). The band always rises at least RIM_STEP_MIN, so it is a
+ * wall (slope >= 1), not a slope: steep, not tall (review 020).
+ */
 const RIM_START = EDGE_RADIUS - 5;
 const RIM_FULL = EDGE_RADIUS + 3;
 const RIM_RISE = 10;
+const RIM_CAP = 58;
+const RIM_STEP_MIN = 8;
+/**
+ * The soldiers' road gate (design v34): a fixed line across the road where it crosses GATE_RADIUS. The road's
+ * corridor through the rim (GATE_HALF_WIDTH to each side, valley side only) is the one opening; the gate wall fills
+ * it, GATE_WALL_HALF thick either side of the line. The wall is thicker than a 4 m grid step in its direction, so a
+ * grid walk cannot step over it.
+ */
+const GATE_RADIUS = 336;
+const GATE_HALF_WIDTH = 6;
+const GATE_WALL_HALF = 2;
+const GATE_CORRIDOR_DEPTH = 15;
 /** The gorge: the last GORGE_RUN m of river out. Channel within GORGE_CHANNEL of the centre line; walls rise to WALL_TOP. */
 const GORGE_RUN = 100;
 const GORGE_CHANNEL = 5;
@@ -139,7 +154,7 @@ export function blocksWalking(x: number, z: number): boolean {
  * the gorge walls are walls by slope, not by radius.
  */
 export function blocksHero(x: number, z: number): boolean {
-  return blocksWalking(x, z) || (!isCrossing(x, z) && walkSlopeAt(x, z) >= MAX_WALK_SLOPE);
+  return onGateWall(x, z) || blocksWalking(x, z) || (!isCrossing(x, z) && walkSlopeAt(x, z) >= MAX_WALK_SLOPE);
 }
 
 /** Distance from (x, z) to the segment a-b. */
@@ -174,29 +189,102 @@ function inOpenZone(x: number, z: number, zone: { x: number; z: number; radius: 
   return Math.hypot(x - zone.x, z - zone.z) < zone.radius;
 }
 
-/** The openings in the rim: the patrol hut's zone and the north-west pass. The rim is not lifted inside them. */
-function inOpening(x: number, z: number): boolean {
-  return inOpenZone(x, z, PATROL_HUT_OPEN) || inOpenZone(x, z, NW_PASS_OPEN);
+/** Where (x, z) falls on the gate: `s` along the soldiers' road (m, 0 on the gate line, negative on the valley side) and `across` (m) from the road's centre line. */
+export interface GateFrame {
+  s: number;
+  across: number;
 }
 
-/** Rim height (m) at (x, z): the land's own height, lifted by RIM_RISE across the band RIM_START..RIM_FULL. */
-function rimHeightAt(x: number, z: number): number {
-  const t = Math.max(0, Math.min(1, (Math.hypot(x, z) - RIM_START) / (RIM_FULL - RIM_START)));
-  return heightSampler(x, z) + RIM_RISE * t;
+interface GateLine {
+  x: number;
+  z: number;
+  ux: number;
+  uz: number;
+}
+
+/** The gate line: where the soldiers' road crosses GATE_RADIUS going outward, with the road's direction there. */
+function buildGateLine(): GateLine {
+  const road = VALLEY_ROADS.soldiers_road;
+  for (let i = 0; i + 1 < road.length; i++) {
+    const a = road[i];
+    const b = road[i + 1];
+    if (Math.hypot(a.x, a.z) >= GATE_RADIUS || Math.hypot(b.x, b.z) < GATE_RADIUS) continue;
+    let lo = 0;
+    let hi = 1;
+    for (let k = 0; k < 60; k++) {
+      const m = (lo + hi) / 2;
+      if (Math.hypot(a.x + (b.x - a.x) * m, a.z + (b.z - a.z) * m) < GATE_RADIUS) lo = m;
+      else hi = m;
+    }
+    const m = (lo + hi) / 2;
+    const len = Math.hypot(b.x - a.x, b.z - a.z);
+    return { x: a.x + (b.x - a.x) * m, z: a.z + (b.z - a.z) * m, ux: (b.x - a.x) / len, uz: (b.z - a.z) / len };
+  }
+  throw new Error(`soldiers_road does not cross r=${GATE_RADIUS}`);
+}
+const GATE = buildGateLine();
+
+/** Where (x, z) falls on the gate's frame. */
+export function gateFrameAt(x: number, z: number): GateFrame {
+  const dx = x - GATE.x;
+  const dz = z - GATE.z;
+  return { s: dx * GATE.ux + dz * GATE.uz, across: Math.abs(dx * GATE.uz - dz * GATE.ux) };
+}
+
+/** The gate line: its centre (x, z) on the road and the road's unit direction (ux, uz) outward, for tests. */
+export const GATE_LINE: Readonly<GateLine> = GATE;
+
+/** The gate wall: across the road at the gate line, GATE_WALL_HALF thick. Walking and blocking both stop there. */
+export function onGateWall(x: number, z: number): boolean {
+  const f = gateFrameAt(x, z);
+  return Math.abs(f.s) <= GATE_WALL_HALF && f.across <= GATE_HALF_WIDTH;
+}
+
+/** Beyond the gate line, outside the valley. Nothing on this side is walkable to reach it (the wall is across the road). */
+export function beyondGate(x: number, z: number): boolean {
+  return gateFrameAt(x, z).s > 0;
 }
 
 /**
- * The rim holds: beyond RIM_START the ground is never lower than the rim, so a river cut or a gorge wall cannot
- * lower it into a walkable way out. Not applied in the river channel (the water runs through) or in the openings.
+ * The road's corridor through the rim on the valley side of the gate line: the one opening in the rim besides the
+ * patrol hut. Only GATE_CORRIDOR_DEPTH m deep: the road is radial, so the gate frame's line runs on through the valley
+ * centre and out the far side of the rim, and an unbounded corridor would open a second hole there.
+ */
+function inGateCorridor(x: number, z: number): boolean {
+  const f = gateFrameAt(x, z);
+  return f.s <= 0 && f.s >= -GATE_CORRIDOR_DEPTH && f.across <= GATE_HALF_WIDTH;
+}
+
+/** The openings in the rim: the patrol hut's zone and the gate corridor. The rim is not lifted inside them. */
+export function isRimOpening(x: number, z: number): boolean {
+  return inOpenZone(x, z, PATROL_HUT_OPEN) || inGateCorridor(x, z);
+}
+
+/**
+ * Rim height (m) at (x, z). The crest is the land plus RIM_RISE, capped at RIM_CAP. Across RIM_START..RIM_FULL the rim
+ * climbs from its foot to the crest; the foot is the land, lowered if needed so the climb is at least RIM_STEP_MIN.
+ * Beyond RIM_FULL it is the crest.
+ */
+function rimHeightAt(x: number, z: number): number {
+  const land = heightSampler(x, z);
+  const crest = Math.min(land + RIM_RISE, RIM_CAP);
+  const t = Math.max(0, Math.min(1, (Math.hypot(x, z) - RIM_START) / (RIM_FULL - RIM_START)));
+  const foot = Math.min(land, crest - RIM_STEP_MIN);
+  return foot + (crest - foot) * t;
+}
+
+/**
+ * The rim holds: beyond RIM_START the ground is the rim, so a river cut or a gorge wall cannot lower it into a walkable
+ * way out, and the rim never rises above RIM_CAP. Not applied in the river channel (the water runs through) or in the openings.
  */
 function rimTopAt(x: number, z: number): number {
-  if (Math.hypot(x, z) < RIM_START || inOpening(x, z)) return -Infinity;
+  if (Math.hypot(x, z) < RIM_START || isRimOpening(x, z)) return -Infinity;
   return rimHeightAt(x, z);
 }
 
 function rimHold(h: number, x: number, z: number, riverD: number): number {
-  if (Math.hypot(x, z) < RIM_START || riverD < GORGE_CHANNEL || inOpening(x, z)) return h;
-  return Math.max(h, rimHeightAt(x, z));
+  if (Math.hypot(x, z) < RIM_START || riverD < GORGE_CHANNEL || isRimOpening(x, z)) return h;
+  return rimHeightAt(x, z);
 }
 
 /** The gorge's centre line: the last GORGE_RUN m of the river out, cut at the right arc length. */
@@ -268,7 +356,7 @@ export function walkSlopeAt(x: number, z: number): number {
  * The walkable crossings' strips are open (walkSurfaceAt gives their height); the forge bridge's strip is not.
  */
 export function isWalkableGround(x: number, z: number): boolean {
-  if (!insideValley(x, z)) return false;
+  if (!insideValley(x, z) || onGateWall(x, z)) return false;
   if (isCrossing(x, z)) return true;
   if (isWater(x, z)) return false;
   return walkSlopeAt(x, z) < MAX_WALK_SLOPE;

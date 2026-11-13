@@ -120,8 +120,7 @@ class Game {
     this.accumulator += dt;
     while (this.accumulator >= TUNING.fixedDt && this.state.status === 'fighting') {
       this.accumulator -= TUNING.fixedDt;
-      const sprint = this.input.isDown('ShiftLeft') || this.input.isDown('ShiftRight');
-      const events = step(this.state, this.input.takeInput(sprint));
+      const events = step(this.state, this.input.takeInput());
       this.handleEvents(events);
       this.tickFootsteps();
     }

@@ -30,6 +30,8 @@ import { buildScenery } from './valley_scenery';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
+import { fillPrompt } from '../core/settings/labels';
+import { currentSettings } from './settings_store';
 import { lightingAt } from './lighting';
 import { ValleySky } from './valley_sky';
 import { ValleyTerrain } from './valley_terrain';
@@ -287,8 +289,7 @@ class Valley {
 
   /** One fixed step of walking. Movement only while the mouse is captured, so Esc pauses the hero. */
   private stepHero(dt: number): void {
-    const sprint = this.input.isDown('ShiftLeft') || this.input.isDown('ShiftRight');
-    const intent = this.input.takeInput(sprint);
+    const intent = this.input.takeInput();
     const from = { ...this.game.hero.position };
     let dirX = 0;
     let dirZ = 0;
@@ -304,7 +305,7 @@ class Valley {
       this.groundY = walkSurfaceAt(from.x, from.z);
       return;
     }
-    const speed = sprint ? T.hero.sprintSpeed : T.hero.walkSpeed;
+    const speed = intent.sprint ? T.hero.sprintSpeed : T.hero.walkSpeed;
     const next = walkStep(from, dirX, dirZ, speed, dt, WALK_RULES);
     this.game.hero.position = { x: next.x, z: next.z };
     this.syncHeroProxy();
@@ -425,8 +426,8 @@ class Valley {
     this.clockText.textContent = `Day ${this.game.day}, ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     this.figuresText.textContent = `${this.fps} fps · ${this.lastFrameDrawCalls} draw calls`;
     this.hint.textContent = this.input.isLocked
-      ? 'WASD walk · Shift sprint · Esc releases the mouse'
-      : 'Click the view to look around, then WASD to walk';
+      ? fillPrompt('{moveForward}{moveLeft}{moveBack}{moveRight} walk · {sprint} sprint · {pause} releases the mouse', currentSettings().bindings, 'keyboard')
+      : fillPrompt('Click the view to look around, then {moveForward}{moveLeft}{moveBack}{moveRight} to walk', currentSettings().bindings, 'keyboard');
   }
 
   private installHooks(): void {

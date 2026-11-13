@@ -1,20 +1,19 @@
-// Keyboard and mouse to BattleInput. Edge flags (pressed, released, dodge) are handed to exactly one sim step.
+// Keyboard and mouse to BattleInput. The game asks for actions (dodge, attack, sprint), never for keys: the key
+// that does each one comes from the player's bindings (task 009). Edge flags are handed to exactly one sim step.
 
 import { TUNING } from '../config/tuning';
+import type { Action } from '../core/settings/actions';
 import type { BattleInput, WeaponId } from '../core/types';
 import { clamp } from '../core/vec';
+import { ActionState } from './action_state';
 import { hasModifier, isSuppressedKey, isSuppressedMouseButton } from './input_rules';
+import { currentSettings } from './settings_store';
 
 export class PlayerInput {
   camYaw = 0;
   aimPitch = 0;
   weapon: WeaponId = 'sword';
-  private readonly keys = new Set<string>();
-  private attackHeld = false;
-  private rmbHeld = false;
-  private pendingAttack = false;
-  private pendingRelease = false;
-  private pendingDodge = false;
+  private readonly actions = new ActionState(currentSettings().bindings);
   private locked = false;
   private windowFocused = document.hasFocus();
   private readonly listeners: [EventTarget, string, (e: Event) => void, AddEventListenerOptions?][] = [];
@@ -24,7 +23,7 @@ export class PlayerInput {
     private readonly onLockChange: (locked: boolean) => void,
   ) {
     this.on(window, 'keydown', (e) => this.onKeyDown(e as KeyboardEvent));
-    this.on(window, 'keyup', (e) => this.keys.delete((e as KeyboardEvent).code));
+    this.on(window, 'keyup', (e) => this.actions.release(`Key:${(e as KeyboardEvent).code}`));
     this.on(window, 'blur', () => {
       this.windowFocused = false;
       this.clearHeld();
@@ -33,14 +32,23 @@ export class PlayerInput {
       this.windowFocused = true;
     });
     this.on(canvas, 'mousedown', (e) => this.onMouseDown(e as MouseEvent));
-    this.on(window, 'mouseup', (e) => this.onMouseUp(e as MouseEvent));
+    this.on(window, 'mouseup', (e) => this.actions.release(`Mouse:${(e as MouseEvent).button}`));
     // Right and middle mouse defaults (context menu, autoscroll) are cancelled across the whole page.
     this.on(window, 'mousedown', (e) => {
       if (isSuppressedMouseButton((e as MouseEvent).button)) e.preventDefault();
     });
     this.on(window, 'contextmenu', (e) => e.preventDefault());
     // The wheel scrolls the page unless cancelled, so it needs a non-passive listener.
-    this.on(window, 'wheel', (e) => e.preventDefault(), { passive: false });
+    this.on(
+      window,
+      'wheel',
+      (e) => {
+        e.preventDefault();
+        const dy = (e as WheelEvent).deltaY;
+        if (dy !== 0) this.actions.tick(dy > 0 ? 'Wheel:down' : 'Wheel:up');
+      },
+      { passive: false },
+    );
     this.on(document, 'mousemove', (e) => this.onMouseMove(e as MouseEvent));
     this.on(document, 'pointerlockchange', () => {
       this.locked = document.pointerLockElement === this.canvas;
@@ -63,41 +71,38 @@ export class PlayerInput {
     return this.windowFocused;
   }
 
-  /** True while the key with this KeyboardEvent.code is held. */
-  isDown(code: string): boolean {
-    return this.keys.has(code);
+  /** True while an input bound to this action is held. */
+  isDown(action: Action): boolean {
+    return this.actions.isDown(action);
   }
 
-  /** True while the bow is equipped and the right button is held. */
+  /** True while the bow is equipped and the zoom action is held. */
   get isZooming(): boolean {
-    return this.rmbHeld && this.weapon === 'bow';
+    return this.actions.isDown('aim') && this.weapon === 'bow';
   }
 
   /** Builds this step's input and consumes the edge flags. */
-  takeInput(sprint: boolean): BattleInput {
+  takeInput(): BattleInput {
+    const a = this.actions;
     const input: BattleInput = {
-      moveX: axis(this.keys.has('KeyD'), this.keys.has('KeyA')),
-      moveZ: axis(this.keys.has('KeyW'), this.keys.has('KeyS')),
+      moveX: axis(a.isDown('moveRight'), a.isDown('moveLeft')),
+      moveZ: axis(a.isDown('moveForward'), a.isDown('moveBack')),
       camYaw: this.camYaw,
       aimPitch: this.aimPitch,
-      sprint,
+      sprint: a.isDown('sprint'),
       weapon: this.weapon,
-      attackPressed: this.pendingAttack,
-      attackHeld: this.attackHeld,
-      attackReleased: this.pendingRelease,
-      dodgePressed: this.pendingDodge,
+      attackPressed: a.takePressed('attack'),
+      attackHeld: a.isDown('attack'),
+      attackReleased: a.takeReleased('attack'),
+      dodgePressed: a.takePressed('dodge'),
     };
-    this.pendingAttack = false;
-    this.pendingRelease = false;
-    this.pendingDodge = false;
+    a.clearEdges();
     return input;
   }
 
   /** Drops any queued edges, e.g. while the battle is over. */
   consumeEdges(): void {
-    this.pendingAttack = false;
-    this.pendingRelease = false;
-    this.pendingDodge = false;
+    this.actions.clearEdges();
   }
 
   reset(): void {
@@ -116,41 +121,35 @@ export class PlayerInput {
   }
 
   private clearHeld(): void {
-    this.keys.clear();
-    this.attackHeld = false;
-    this.rmbHeld = false;
+    this.actions.clear();
   }
 
   private onKeyDown(e: KeyboardEvent): void {
-    if (isSuppressedKey(e.code)) e.preventDefault();
+    const input = `Key:${e.code}`;
+    if (isSuppressedKey(e.code) || this.actions.isBound(input)) e.preventDefault();
     // Ctrl, Alt and Cmd chords belong to the browser or OS; they never reach the game.
     if (hasModifier(e)) return;
     if (e.repeat) return;
-    this.keys.add(e.code);
-    if (e.code === 'Space') this.pendingDodge = true;
-    if (e.code === 'Digit1') this.weapon = 'sword';
-    if (e.code === 'Digit2') this.weapon = 'bow';
+    this.applyPress(this.actions.press(input));
   }
 
   private onMouseDown(e: MouseEvent): void {
-    if (e.button === 2) {
-      this.rmbHeld = true;
-      return;
-    }
-    if (e.button !== 0) return;
-    if (!this.locked) {
+    const input = `Mouse:${e.button}`;
+    const acts = this.actions.press(input);
+    // A click on the view first takes the pointer; the attack it would make is not played.
+    if (!this.locked && acts.includes('attack')) {
+      this.actions.cancel(input);
       this.requestLock();
       return;
     }
-    this.attackHeld = true;
-    this.pendingAttack = true;
+    this.applyPress(acts);
   }
 
-  private onMouseUp(e: MouseEvent): void {
-    if (e.button === 2) this.rmbHeld = false;
-    if (e.button === 0 && this.attackHeld) {
-      this.attackHeld = false;
-      this.pendingRelease = true;
+  /** Weapon choice takes effect at once, even while the sim is paused. Other actions wait for the sim step. */
+  private applyPress(acts: Action[]): void {
+    for (const a of acts) {
+      if (a === 'weaponBlade') this.weapon = 'sword';
+      if (a === 'weaponBow') this.weapon = 'bow';
     }
   }
 

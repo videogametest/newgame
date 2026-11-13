@@ -64,6 +64,18 @@ export function hesperSightLine(): { from: { x: number; z: number }; to: { x: nu
 }
 
 const SIGHT_HALF_WIDTH = 12;
+/** Review 024 item 4: the last 150 m of the arrival line keeps scenery 25 m off, so no tree hides Wick's first view. */
+export const SIGHT_NEAR_LENGTH = 150;
+export const SIGHT_NEAR_HALF_WIDTH = 25;
+
+/** The last SIGHT_NEAR_LENGTH metres of the sight line, ending at Hesper's window. */
+export function hesperSightNearLine(): { from: { x: number; z: number }; to: { x: number; z: number } } {
+  const sight = hesperSightLine();
+  const dx = sight.to.x - sight.from.x, dz = sight.to.z - sight.from.z;
+  const len = Math.hypot(dx, dz);
+  const t = Math.max(0, (len - SIGHT_NEAR_LENGTH) / len);
+  return { from: { x: sight.from.x + dx * t, z: sight.from.z + dz * t }, to: sight.to };
+}
 const ROAD_HALF_WIDTH = 4;
 const LANE_HALF_WIDTH = 3;
 const PLACE_RADIUS = 14;
@@ -89,6 +101,8 @@ export function sceneryKeepOuts(): ExclusionZone[] {
   zones.push({ kind: 'rectangle', minX: box.x0, minZ: box.z0, maxX: box.x1, maxZ: box.z1 });
   const sight = hesperSightLine();
   zones.push({ kind: 'road', from: sight.from, to: sight.to, halfWidth: SIGHT_HALF_WIDTH });
+  const near = hesperSightNearLine();
+  zones.push({ kind: 'road', from: near.from, to: near.to, halfWidth: SIGHT_NEAR_HALF_WIDTH });
   return zones;
 }
 

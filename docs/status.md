@@ -11,6 +11,14 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-13 Overnight item 4: the hero starts facing Hesper's house (Viktor, merged as PR #45, `1a5b882`)
+
+- **Merged:** `placeHeroAtStart()` in `src/render/valley.ts` sets the start yaw to the bearing to Hesper's house (`wickHouses(VALLEY_SEED)`, id `hesper`), not to Wick. Capture-only hook `window.__valley.project(name)` added. Pages run `43362287226` succeeded; `https://everylitwindow.com/` returned HTTP 200 and `scripts/smoke.mjs` passed live.
+- **Measured [sandbox, 2026-11-13, 1280×720, 18:00 first frame]:** start yaw −2.36 → −2.356 rad (−135°). `hesper_window` projected x 645.5 → 636.6 px, y 477.8 px. Done criterion is the middle third, x 427–853: met.
+- **Gates:** tsc clean; vitest 670 pass; `vite build` OK; walk gap PASS 97.0 m; `gen_valley_layout --check` PASS; smoke passed.
+- **Frames:** `docs/pr-media/overnight/04-before-1800.png`, `docs/pr-media/overnight/04-hesper-window-1800.png`.
+- **Next:** overnight item 5 (water takes the sky).
+
 ## 2026-11-12 Overnight item 2: the valley screen is clear (Viktor, branch `overnight-02-clear`)
 
 - **Change:** `src/render/hud.ts` hides the HERO health panel and the "1 Sword / 2 Bow" tiles in the valley (`hideFightChrome()`). `src/render/valley.ts` shows the clock, frame figures and control hint only with `?debug=1`. Default route: world only.

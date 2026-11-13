@@ -10,6 +10,14 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - Gates: tsc clean; vitest 62 files / 779 tests; build OK.
 - Not done here: review 025 items 6 (tour camera), 7 (signal-hill bushes), the ford rework, and the sky.
 
+## 2026-11-13 Review 025 item 6: tour camera faces the view
+
+- Tour hero now faces each view's look point (`tourYaw` in `src/core/world/tour.ts`, set in `tourTo`). Tests: every view's hero faces its look point; the tour camera sits behind the hero at tour distance.
+- `hesper_door`: hero moved one step to (93.3, 107.2) on walkable ground so the door shows past his shoulder. Frame: `docs/pr-media/review025-item6/hesper_door-18.png`.
+- `ridge_path`: stop kept at (160, -112). Frame: `docs/pr-media/review025-item6/ridge_path-18.png`, hero from behind on grass.
+- Camera check: the earlier frame that showed the hero facing the camera came from a stale preview build. Fresh captures show him from behind. No camera change was made.
+- Finding, not fixed: `ridge_path` has no visible surface. It exists only as core data (`VALLEY_ROADS`, used for keep-out, grading and walkability). The renderer draws only Wick's lanes and the walkable crossings, so no path is drawn there. The stop was not moved.
+
 ## 2026-11-13 Review 025 item 4: capture without the interface (Viktor, branch `overnight-13-capture-hud`)
 
 - The capture scripts hide the HUD box (clock, figures, hint, tour label) before each frame. `window.__valley.hideChrome()` is the hook; `scripts/tour_capture.mjs` and `scripts/valley_capture.mjs` call it after freeze. Babylon has no line meshes in the render layer, so the debug lines were the text in that box.

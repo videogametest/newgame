@@ -53,6 +53,6 @@ export function noticeFor(
   if (old && other.includes(old)) return `${ACTION_NAMES[action]} now uses ${label}. ${ACTION_NAMES[displaced]} has moved to ${inputLabel(old)}.`;
   // A plain take, worded only when it is true: the displaced action has nothing left on the keyboard.
   if (other.length === 0) return `${ACTION_NAMES[action]} now uses ${label}. ${ACTION_NAMES[displaced]} has nothing bound.`;
-  // The displaced action still has a spare and the copy has no line for that case; no notice is shown (logged in status).
-  return null;
+  // The displaced action keeps the input it had as its other slot.
+  return `${ACTION_NAMES[action]} now uses ${label}. ${ACTION_NAMES[displaced]} still has ${inputLabel(other[0])}.`;
 }

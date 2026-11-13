@@ -6,6 +6,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 Task 009 step 2b, layout fix (Viktor, branch `task-009-layout`)
+
+- Built, per Greg's 16:25 list: the card is 80% of the screen height (576 px at 1280x720); the scroll area holds whole rows only (`fitRows`, 36 px rows), so no row is cut; "Keyboard and mouse", the title and the Action / Main / Spare header stay fixed above it; action names are centred on their row and left-aligned under "Action"; the listening slot shows "Press…" with a 2 px outline until bound or cancelled.
+- "Still has" notice wired: `noticeFor` in `src/render/controls_rules.ts` returns "{action} now uses {input}. {other} still has {remaining}." (`docs/writing/interface.md` line 233). Test in `controls_rules.test.ts`.
+- Frame at 1280x720 (`docs/pr-media/controls/`): 10 rows shown in full, 0 cut (printed by `scripts/controls_capture.mjs`). Before frames from the live site in `docs/pr-media/controls/before/` (the old page cuts a row).
+- Capture fix: the Esc checks now wait for the menu change (up to 5 s) instead of a fixed 300 ms. The pause key is read once per game frame, so a fixed delay failed on a slow frame.
+- Gates: `tsc --noEmit` exit 0; 839 tests pass; `vite build` exit 0; `node scripts/smoke.mjs` passes on a local preview.
+- Finding for Claude (not changed here): `ShiftLeft` shows as "Shift". `KEYS` in `src/core/settings/labels.ts` maps `ShiftLeft` to `'Shift'`, and `src/core/settings/settings.test.ts` (around line 126) asserts `'Shift'`. Greg asked for "Left Shift". Both files are Claude's paths; the label will change once Claude edits them.
+
 ## 2026-11-13 Task 009 step 2b: Controls page (Viktor, branch `task-009-step2`)
 
 - Built: Controls page in the pause menu (Resume, Settings, Controls). Table of every action with Main and Spare slots (keyboard and mouse). Click a slot, then press a key, mouse button or wheel tick. Esc cancels a listening slot without closing the menu. Reserved Esc keeps the slot listening. Back to defaults asks for confirmation first and resets the keyboard page.

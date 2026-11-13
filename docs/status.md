@@ -11,6 +11,21 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-13 Overnight item 7: road and path grades (Viktor, branch `overnight-07-grades`, NOT MERGED, stuck)
+
+- **Status:** stuck after the 30-minute limit. Branch pushed with the failing work. `main` is unchanged (`6a6f454`).
+- **Change on branch:** `src/core/world/road_grade.ts` (new: per-road Lipschitz-envelope target, blended into the land by distance weight); `valley.ts` routes `valleyHeightAt` and `landHeightAt` through it; `WIDE_ROADS` and `roadProfile` exported; `road_grades.test.ts` (new, 12 tests, per-road 0.2 / 0.45 limits on walked samples, excluding water, crossings and beyond-gate).
+- **Failing on the branch, exact:**
+  - `road_grades.test.ts` mill_road, 5 dry samples over 0.2: s 281.0 (-172.3, 55.9) slope -0.238; s 282.0 (-172.8, 55.1) -0.341; s 282.9 (-173.4, 54.2) -0.431; s 283.9 (-173.9, 53.4) -0.413; s 284.9 (-174.4, 52.5) -0.300.
+  - `road_grades.test.ts` soldiers_road, 5 dry samples over 0.2: s 10.0 (115.3, -72.8) -0.207; s 11.0 (114.4, -73.3) -0.206; s 257.8 (-100.3, -163.3) -0.229; s 258.8 (-100.9, -164.1) -0.248; s 259.8 (-101.5, -164.8) -0.214.
+  - `valley.test.ts`, 9 tests fail that pass on main: the rim cap, the gate closure (nothing beyond the gate reachable), the sight lines, the signal hill as highest walkable ground, the 30 m marker test, the river channel depths, the bank slope (0.31), the ford bed, and the stepping stones (no step above 0.5 m).
+  - Walk gap: **153.5 m** on the branch (limit 100; nearest stop to the longest point `patrol_hut` 58.4 m). Main: 97.0 m.
+- **Measured on main [sandbox, 2026-11-13]:** `src/core/world` and `src/village` 100 of 100 pass; walk gap 97.0 m.
+- **Tried, all reverted or failed:** sharpness 4, 6, 8, 9, 10; path target 0.36 to 0.40; fade 6 and 8; exact in-strip target (roads reach 0.16 but paths jump at junctions, falls_path 1.36); road target 0.12 and 0.10 (moves the failure to east_road and ridge_path). Best config (sharpness 9, path 0.35, fade 15, road 0.16): road_in 0.160, east_road 0.172, mill_road 0.431, soldiers_road 0.21 to 0.25 in the five samples above, and the walk gap and terrain tests fail as listed.
+- **Soldiers' road beyond the gate:** 42 of its 47 over-0.2 samples lie beyond the gate; the slope reaches 12.7 at s 414.5, where the gate wall is. Those are excluded from the limit test as beyond the gate. This is a decision for Greg, not a fix.
+- **Patch:** the item 7 WIP is in the branch as committed. Re-running the gates on a fresh branch is the next step once the grading approach changes.
+- **Decision needed (Greg):** either accept an exemption for the five mill_road and five soldiers_road samples, or change the grading approach (the blend is what breaks the walk gap and the terrain tests). I have not changed the limits.
+
 ## 2026-11-13 Overnight item 6: Wick's houses and the well are solid (Viktor, branch `overnight-06-solid`)
 
 - **Change:** `src/core/world/solids.ts` (pure footprint maths: 9 m square turned by `facing`, well 2.4 m square). `VALLEY_SOLIDS` in `valley.ts` is every house from `wickHouses(VALLEY_SEED)` plus the well; `blocksHero` and `isWalkableGround` use it. Fences and gate posts are not solid.

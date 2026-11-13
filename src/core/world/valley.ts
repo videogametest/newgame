@@ -4,6 +4,7 @@
 
 import { createHeightAt, type TerrainShape } from './terrain';
 import { withWickShelf } from '../../village/shelf';
+import { buildRoadGrade, type GradeField } from './road_grade';
 import { WICK_THINGS, wickHouses } from '../../village/plan';
 import { solidAt, type Footprint } from './solids';
 import {
@@ -92,15 +93,73 @@ const heightSampler = createHeightAt(VALLEY_SEED, VALLEY_SHAPE);
 
 /** Ground height (m) at a valley point. Same answer for the same (x, z) on every call. */
 export function valleyHeightAt(x: number, z: number): number {
-  return (shelved ??= withWickShelf(landHeightAt, WATER_LEVEL, riverDistance))(x, z);
+  return valleyGrade().heightAt(x, z, shelvedBaseAt(x, z));
 }
-let shelved: ((x: number, z: number) => number) | null = null;
 
-/** The valley's land before Wick's shelf and bay are cut into it (docs/tasks/003-wick.md, rules 4 and 5). */
+/**
+ * The valley's land before Wick's shelf and bay are cut into it (docs/tasks/003-wick.md, rules 4 and 5), roads graded.
+ * valleyHeightAt is the ground the hero walks on: the same roads graded over the land after the shelf, so the shelf's
+ * fade cannot tilt a road.
+ */
 export function landHeightAt(x: number, z: number): number {
+  return landGrade().heightAt(x, z, baseLandAt(x, z));
+}
+
+let shelvedLand: ((x: number, z: number) => number) | null = null;
+/** The ungraded land after Wick's shelf and bay. */
+function shelvedBaseAt(x: number, z: number): number {
+  return (shelvedLand ??= withWickShelf(baseLandAt, WATER_LEVEL, riverDistance))(x, z);
+}
+
+/** The land before road grading: the river, gorge, rim, landings. Grading is built from this, so it never recurses. */
+function baseLandAt(x: number, z: number): number {
   const d = riverDistance(x, z);
   const bank = Math.min(heightSampler(x, z), riverBedAt(x, z) + RIVER_BANK_SLOPE * d);
   return landingAdjust(gorgeAdjust(bank, rimHold(bank, x, z, d), x, z), x, z);
+}
+
+/** Roads the layout names as wide roads (layout.json widths.roads); every other entry in VALLEY_ROADS is a path. */
+export const WIDE_ROADS = new Set(['road_in', 'mill_road', 'east_road', 'soldiers_road']);
+
+/**
+ * Ground that road grading may use and change: the valley side of the gate, outside the rim band (the rim holds and
+ * is never lowered), and not beyond the gate. Inside the rim openings the corridor is graded like the valley floor.
+ */
+function inGradeZone(x: number, z: number): boolean {
+  if (beyondGate(x, z)) return false;
+  return Math.hypot(x, z) < RIM_START || isRimOpening(x, z);
+}
+
+/** Road grading over a given ground. Samples on water, crossings and outside the grade zone do not shape the profile. */
+function buildGrade(base: (x: number, z: number) => number): GradeField {
+  return buildRoadGrade(
+    Object.entries(VALLEY_ROADS).map(([name, points]) => ({
+      name,
+      kind: WIDE_ROADS.has(name) ? 'road' : 'path',
+      points,
+    })),
+    {
+      base,
+      sampleUsable: (x, z) => inGradeZone(x, z) && base(x, z) >= WATER_LEVEL && !isCrossing(x, z),
+      gradable: inGradeZone,
+    },
+  );
+}
+
+let landGrading: GradeField | null = null;
+let valleyGrading: GradeField | null = null;
+/** Grading over the land before the shelf (landHeightAt). */
+function landGrade(): GradeField {
+  return (landGrading ??= buildGrade(baseLandAt));
+}
+/** Grading over the land after the shelf (valleyHeightAt). */
+function valleyGrade(): GradeField {
+  return (valleyGrading ??= buildGrade(shelvedBaseAt));
+}
+
+/** Road profile for tests and probes: each sample's ungraded (after shelf) and graded height, as the hero walks it. */
+export function roadProfile(name: string) {
+  return valleyGrade().profile(name);
 }
 
 /**

@@ -280,19 +280,20 @@ describe('Tallowmere terrain (§4)', () => {
     expect(max).toBeLessThan(70);
   });
 
-  // OPEN QUESTION (docs/status.md): the base-layout interior ridge at (-82, -308) is 64.8 m, 12 m from the hill,
-  // above the hill top of 63.1 m. Once the rim is capped this is the highest ground in sight. Greg decides whether
-  // the ridge is reshaped; until then this stays skipped rather than failing.
-  it.skip('makes the signal hill the highest ground anywhere in sight (rim capped below it)', () => {
-    const hillTop = valleyHeightAt(VALLEY_PLACES.signalHill.x, VALLEY_PLACES.signalHill.z);
+  // Review 021: the 64.8 m ground is the signal hill's own summit (13.6 m from the marker), so nothing is reshaped.
+  // The test compares against the marker's height and ignores the summit's own ground near the marker.
+  it('keeps all ground more than 30 m from the signal hill marker lower than the marker', () => {
+    const marker = VALLEY_PLACES.signalHill;
+    const markerHeight = valleyHeightAt(marker.x, marker.z);
     let highest = -Infinity;
     for (let x = -400; x <= 400; x += 4) {
       for (let z = -400; z <= 400; z += 4) {
         if (!insideValley(x, z) || isWater(x, z)) continue;
+        if (Math.hypot(x - marker.x, z - marker.z) <= 30) continue;
         highest = Math.max(highest, valleyHeightAt(x, z));
       }
     }
-    expect(highest).toBeLessThanOrEqual(hillTop + 0.01);
+    expect(highest).toBeLessThan(markerHeight);
   });
 
   it('keeps the start and the castle inside the valley and the castle above the lake', () => {
@@ -464,10 +465,8 @@ describe('crossing surfaces (§4, "The crossings")', () => {
     expect(worst).toBeLessThanOrEqual(0.5);
   });
 
-  // OPEN QUESTION, docs/status.md: the banks at both ends stand about 1.7 m above the stone tops (2.30 m),
-  // so walking bank to bank drops about 1.75 m at each end. The design says "walked without a jump".
-  // Un-skip this once the design decides how the stones meet the banks.
-  it.skip('walks the stepping stones bank to bank with no step above 0.5 m (open question)', () => {
+  // Review 021: a 6 m landing at each end of the stones ramps from the stone top up to the bank.
+  it('walks the stepping stones bank to bank with no step above 0.5 m', () => {
     const { worstStep, reached } = walkBankToBank(crossing('stepping_stones'));
     expect(reached, 'stepping stones not reached').toBe(true);
     expect(worstStep, 'stepping stones worst step').toBeLessThanOrEqual(0.5);

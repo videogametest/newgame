@@ -45,6 +45,8 @@ for (const t of TIMES) {
   const file = join(outDir, `${t.name}.png`);
   await page.locator('canvas').first().screenshot({ path: file });
   report.push({ shot: file, groundMask: mask, ...state });
+  // Restore the camera after an aimed shot, so a later shot never inherits its aim (review 029).
+  if (t.aim) await page.evaluate(() => window.__valley.aimReset());
   console.log(`captured ${file} x=${state.x.toFixed(1)} z=${state.z.toFixed(1)}`);
 }
 

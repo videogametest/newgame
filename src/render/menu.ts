@@ -1,12 +1,18 @@
-// The pause menu (docs/writing/interface.md, "Pause menu"). Built so far: Resume and Settings. The settings
-// page is a stub until task 009 step 2d; Controls, Copy debug report and Return to title are not built yet.
+// The pause menu (docs/writing/interface.md, "Pause menu"). Built so far: Resume, Settings (a stub until task 009
+// step 2d), and Controls (keyboard and mouse). Copy debug report and Return to title are not built yet.
+import type { Bindings } from '../core/settings/actions';
+import { ControlsPage } from './controls_page';
+
+type Page = 'menu' | 'settings' | 'controls';
 
 export class PauseMenu {
   private readonly root: HTMLElement;
   private readonly menuPage: HTMLElement;
   private readonly settingsPage: HTMLElement;
+  private readonly controlsPage: ControlsPage;
+  private page: Page = 'menu';
 
-  constructor(uiRoot: HTMLElement, onResume: () => void) {
+  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void) {
     this.root = document.createElement('div');
     // .panel does not set pointer-events, so the menu takes its own clicks; otherwise they reach the canvas and re-request the mouse.
     this.root.className = 'panel pause';
@@ -15,11 +21,15 @@ export class PauseMenu {
 
     this.menuPage = document.createElement('div');
     this.menuPage.className = 'card';
-    // A row with a gap keeps the two buttons apart; the row (not the card) takes the flex display so the card's hidden toggle still works.
+    // A row with a gap keeps the buttons apart; the row (not the card) takes the flex display so the card's hidden toggle still works.
     const row = document.createElement('div');
     row.style.display = 'flex';
     row.style.gap = '12px';
-    row.append(button('Resume', onResume), button('Settings', () => this.showSettings()));
+    row.append(
+      button('Resume', onResume),
+      button('Settings', () => this.showSettings()),
+      button('Controls', () => this.showControls()),
+    );
     this.menuPage.append(row);
 
     this.settingsPage = document.createElement('div');
@@ -30,7 +40,9 @@ export class PauseMenu {
     // "Back" is not in docs/writing/interface.md; it is flagged in docs/status.md.
     this.settingsPage.append(heading, button('Back', () => this.showMenu()));
 
-    this.root.append(this.menuPage, this.settingsPage);
+    this.controlsPage = new ControlsPage(onBindings, () => this.showMenu());
+
+    this.root.append(this.menuPage, this.settingsPage, this.controlsPage.el);
     uiRoot.appendChild(this.root);
   }
 
@@ -38,8 +50,14 @@ export class PauseMenu {
     return !this.root.hidden;
   }
 
-  get onSettings(): boolean {
-    return !this.settingsPage.hidden;
+  /** True on Settings or Controls: Esc goes back to the menu page instead of resuming. */
+  get onSubPage(): boolean {
+    return this.page !== 'menu';
+  }
+
+  /** True while a Controls slot is waiting for an input; the game's pause key must not act then. */
+  get isListening(): boolean {
+    return this.controlsPage.isListening;
   }
 
   show(): void {
@@ -53,11 +71,23 @@ export class PauseMenu {
   }
 
   showSettings(): void {
+    this.controlsPage.close();
+    this.page = 'settings';
     this.menuPage.hidden = true;
+    this.controlsPage.el.hidden = true;
     this.settingsPage.hidden = false;
   }
 
+  showControls(): void {
+    this.page = 'controls';
+    this.menuPage.hidden = true;
+    this.settingsPage.hidden = true;
+    this.controlsPage.open();
+  }
+
   showMenu(): void {
+    this.page = 'menu';
+    this.controlsPage.close();
     this.settingsPage.hidden = true;
     this.menuPage.hidden = false;
   }

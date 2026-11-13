@@ -30,7 +30,7 @@ import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
 import { fillPrompt } from '../core/settings/labels';
-import { currentSettings } from './settings_store';
+import { currentSettings, saveSettings } from './settings_store';
 import { lightingAt } from './lighting';
 import { ValleySky } from './valley_sky';
 import { ValleyTerrain } from './valley_terrain';
@@ -60,6 +60,8 @@ export interface ValleyHooks {
   setTod(hours: number): void;
   freeze(on: boolean): void;
   aimAt(body: 'sun' | 'moon'): void;
+  /** Puts the camera back to the pose it had before the last aimAt. Call after each aimed shot. */
+  aimReset(): void;
   placeAt(x: number, z: number): void;
   lookAt(x: number, z: number): void;
   project(name: string): { x: number; y: number; w: number; h: number } | null;
@@ -137,6 +139,8 @@ class Valley {
   private readonly hemi: HemisphericLight;
   private readonly sun: DirectionalLight;
   private readonly shadow: ShadowGenerator;
+  /** The camera pose from before the last aimAt, restored by aimReset. */
+  private savedAim: { yaw: number; pitch: number } | null = null;
   private readonly terrain: ValleyTerrain;
   private readonly sky: ValleySky;
   /** Render proxy for the hero's character model. The authoritative position lives in game.hero. */
@@ -214,7 +218,10 @@ class Valley {
     this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
 
-    this.pauseMenu = new PauseMenu(uiRoot, () => this.resume());
+    this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
+      saveSettings({ ...currentSettings(), bindings: b });
+      this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
+    });
     this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
     this.input.camYaw = this.hero.yaw;
 
@@ -304,11 +311,11 @@ class Valley {
     return typeof counters._drawCalls?.current === 'number' ? counters._drawCalls.current : 0;
   }
 
-  /** Pause key: opens the pause menu, backs out of Settings, or resumes from the menu page (Esc works both ways). */
+  /** Pause key: opens the pause menu, backs out of Settings or Controls, or resumes from the menu page (Esc works both ways). */
   private onPauseKey(): void {
     if (!this.paused) {
       this.setPaused(true);
-    } else if (this.pauseMenu.onSettings) {
+    } else if (this.pauseMenu.onSubPage) {
       this.pauseMenu.showMenu();
     } else {
       this.resume();
@@ -482,9 +489,17 @@ class Valley {
       freeze: (on) => {
         this.frozen = on;
       },
+      aimReset: () => {
+        if (!this.savedAim) return;
+        this.input.camYaw = this.savedAim.yaw;
+        this.input.aimPitch = this.savedAim.pitch;
+        this.savedAim = null;
+      },
       // Capture only: turns the camera to the sun or the moon at the current time. It skips the pitch limit
       // on purpose, because the noon sun sits above the player's look range.
       aimAt: (body) => {
+        // Keep the first pose only: a second aimAt before a reset must not save the sun view as "before".
+        this.savedAim ??= { yaw: this.input.camYaw, pitch: this.input.aimPitch };
         const L = lightingAt(this.game.timeOfDay);
         const a = aimAngles(body === 'sun' ? L.sunSky : L.moonSky);
         this.input.camYaw = a.yaw;

@@ -6,6 +6,26 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 Task 009 step 2c: brightness, quality, Controls scroll hint (Viktor, branch `task-009-brightness`)
+
+- Greg's 17:00 ruling applied: noon shadow closed, no lighting change. Scroll hint added: a 36 px fade at the bottom of the Controls list while more rows remain (`moreBelow` in `controls_rules.ts`, 3 tests).
+- Brightness (`applyBrightness` in `src/render/valley.ts`): exposure = 0.55 + 0.45 × brightness; the scene's ambient lift = max(0, (brightness − 1) × 0.16). Live probe: 0.5 gives exposure 0.775, ambient 0; 1.0 gives 1.0, ambient 0; 1.5 gives 1.225, ambient 0.08.
+- Ground share, midnight `hesper_door` (tod 0), fresh preview server, `scripts/ground_vs_sky.py`: 2.60 at 0.5, 3.05 at 1.0, 3.42 at 1.5. All above the 0.25 floor. Frames: `docs/pr-media/review2c/v2-b0.5|v2-b1|v2-b1.5/hesper_door-0.png`. By eye, 1.5 is lifted and the sky stays dark.
+- Earlier frames (`docs/pr-media/review2c/b0.5|b1|b1.5/`) came out identical (ground share about 3.0 each). Cause not confirmed. Likely a stale preview server still serving an older bundle. Those frames are not used.
+- Quality (`src/render/quality.ts`, my proposal, Greg to decide): low = 1024 shadow map, 220 m fine-land stream; medium = 2048, 340 m (today's values); high = 2048, 420 m. Scenery density is not changed by quality: per-band splits were rejected (about 130 extra draw calls). Arrival view, 18:00, medium, `scripts/quality_budget.mjs` (chunks stable before reading):
+
+| Quality | Chunks | Draw calls (budget 300) | fps (headless SwiftShader, relative only) |
+| --- | --- | --- | --- |
+| low | 47 | 212 | 12 |
+| medium | 76 | 246 | 10 |
+| high | 97 | 272 | 10 |
+
+- Brightness prompt: shows once while `display.brightnessSet` is false. It appears over the live scene, not over a midnight picture; this differs from task 009 step 2 item 3. Decide whether it should be a midnight picture. In the first capture it covered the Controls page; `controls_capture.mjs` now takes `TOUR_SETTINGS` and skips it. Default kept: flag, not changed.
+- Controls check (`node scripts/controls_capture.mjs`, with `brightnessSet: true`): passed. 10 rows shown in full, 0 cut. Frames in `docs/pr-media/review2c/controls-v2/`; the scroll hint shows the Interact row faded.
+- Dark figure in Hesper's yard (task 009 step 2 item 3 asks for one in the brightness picture): not found in the code (`src/village/build.ts`, `src/village/plan.ts`, `src/core/world/valley_layout.ts`, `src/render/characters.ts`; the only CharacterView in `valley.ts` is the hero). Not visible in the 18:00 or midnight `hesper_door` frames. Open: Greg or Claude to say whether it should be added, and where.
+- Tests: `npx vitest run` 847 passed; `npm run typecheck` clean; `npm run build` passed (chunk-size warning only); `node scripts/smoke.mjs` passed on a local preview.
+- Push: see the Slack post and the PR. Any push step that fails is recorded below this line.
+
 ## 2026-11-13 Task 009 step 2b, layout fix (Viktor, branch `task-009-layout`)
 
 - Built, per Greg's 16:25 list: the card is 80% of the screen height (576 px at 1280x720); the scroll area holds whole rows only (`fitRows`, 36 px rows), so no row is cut; "Keyboard and mouse", the title and the Action / Main / Spare header stay fixed above it; action names are centred on their row and left-aligned under "Action"; the listening slot shows "Press…" with a 2 px outline until bound or cancelled.
@@ -118,6 +138,11 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - **Caveat:** the shadow-map pixel readout returned 0 everywhere, so it was not used. The probe's depth values for the hero were negative, which was not explained.
 - **Diagnostic hook:** the uncommitted `__diag` line was removed before this entry; nothing from the probe is committed.
 
+
+## 2026-11-13 Noon shadow: answer to Greg (Viktor, branch `task-009-brightness`)
+- **Answer:** the sun's height. Not range (the sun light follows the hero every frame, `valley.ts` `updateView`), not bias (shadow bias 0.00005, normal bias 0).
+- **Check this session:** `docs/pr-media/review030-retake/hero-noon.png` (12:00) shows the hero's shadow under his feet, short and visible. The 15:00 frame named in the earlier entry (`tod-15.png`) was not found in this sandbox, so the 15:00 result is from the earlier capture, not re-rendered.
+- **Not changed:** `src/render/lighting.ts` is Claude's. Reported in Slack, thread `1794430314.296969`, at 1794607173.
 
 ## Streams
 

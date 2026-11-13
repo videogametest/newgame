@@ -19,6 +19,11 @@ const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'],
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+// Optional: TOUR_SETTINGS='{"display":{"brightness":0.5}}' is written to the settings key before load.
+if (process.env.TOUR_SETTINGS) {
+  const raw = process.env.TOUR_SETTINGS;
+  await page.addInitScript((r) => localStorage.setItem('everylitwindow.settings.v1', r), raw);
+}
 page.on('console', (msg) => { if (msg.type() === 'error') failures.push(`console error: ${msg.text()}`); });
 page.on('pageerror', (err) => failures.push(`page error: ${err.message}`));
 page.on('requestfailed', (req) => failures.push(`request failed: ${req.url()} (${req.failure()?.errorText})`));

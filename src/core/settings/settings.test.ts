@@ -123,7 +123,7 @@ describe('prompts show what the player has bound, on the device in their hands',
   it('names keys, mouse buttons, and each family of controller in its own words', () => {
     expect(inputLabel('Key:KeyW')).toBe('W');
     expect(inputLabel('Key:Digit1')).toBe('1');
-    expect(inputLabel('Key:ShiftLeft')).toBe('Shift');
+    expect(inputLabel('Key:ShiftLeft')).toBe('Left Shift');
     expect(inputLabel('Mouse:2')).toBe('Right mouse');
     expect(inputLabel('Wheel:down')).toBe('Wheel down');
     expect(inputLabel('Pad:0', 'xbox')).toBe('A');

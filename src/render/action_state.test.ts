@@ -32,11 +32,11 @@ describe('ActionState: the default route', () => {
     expect(s.press('Key:KeyX')).toEqual([]);
   });
 
-  it('gives Right Shift no sprint (only Left Shift is bound by default)', () => {
+  it('either Shift sprints: Right Shift is the spare sprint input by default (review 029)', () => {
     const s = fresh();
-    expect(s.isBound('Key:ShiftRight')).toBe(false);
+    expect(s.isBound('Key:ShiftRight')).toBe(true);
     s.press('Key:ShiftRight');
-    expect(s.isDown('sprint')).toBe(false);
+    expect(s.isDown('sprint')).toBe(true);
   });
 
   it('a wheel tick is a one-step press, never held', () => {

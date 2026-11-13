@@ -11,6 +11,24 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
 
+## 2026-11-13 Overnight item 12: standard frames (Viktor, branch `overnight-12-frames`)
+
+- **Frames:** `docs/pr-media/overnight-12/`: `arrival-dusk-19.png`, `noon-12.png`, `night-0.png`, `dawn-6.png`. Taken from the tour's arrival view (`?tour=1`, `arrival`) with `scripts/tour_capture.mjs <url> <dir> arrival 19,12,0,6`.
+- **Ground share [tour capture, 2026-11-13]:** 0.522 at all four times.
+- **Script fixes:** `tour_capture.mjs` takes an optional fourth argument of times. `valley_capture.mjs` now records ground share, and runs the aimed sun and moon shots last, because `aimAt` persists and was tinting the night and dawn frames.
+- **Open from the frames:** the hero is not in the arrival frame (review 024 item 4 and the earlier note on the arrival frame). Trees hide Hesper's house and two others; the keep-out is item 4 in the queue.
+
+## 2026-11-13 Overnight item 11: tour mode (merged, PR #49, squash `bf58841`)
+
+- **Merged:** tour views in `src/core/world/tour.ts` (10 views) and tour mode in `src/render/valley.ts` (`[` and `]` step through). Capture in `scripts/tour_capture.mjs`; 20 frames in `docs/pr-media/overnight/`.
+- **Checks:** tsc clean; vitest 59 files, 719 tests; walk gap PASS, longest walk 97.0 m (limit 100 m); smoke local and live passed; deploy run 43445268880 succeeded.
+- **Ground share at 18:00 [tour capture]:** arrival 0.522, road_in 0.582, wick_square 0.660, landing 0.632, high_lane 0.801, signal_hill_top 0.502, ford 0.675, mill_bridge 0.680, stepping_stones 0.907, gate 1.000 (the gorge wall fills the frame).
+- **Blocker, not fixed:** the forge bridge is not walkable (152, -7), so there is no tour view for it. Not built, per the brief.
+
+## Overnight run: answer to Greg's 00:48 question
+
+- **Not verified.** I have not found a time or turn limit for these runs in the sandbox, and I am not stating one. What I can confirm is only that the run ended at 00:48 and that the queue was not empty. The cause of the stop needs to come from the run platform, not from this sandbox.
+
 ## 2026-11-13 Overnight item 9: trees and rocks on the valley (Viktor, branch `overnight-09-scenery`, PR #48)
 
 - **Change:** scenery is draw-only: no collision, no shadow casters. `src/core/world/scenery.ts` (placement, keep-outs, biomes, 9 tests), `src/render/valley_scenery.ts` (one merged mesh and one thin-instanced mesh per model), one call in `loadWick()`.

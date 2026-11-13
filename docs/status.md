@@ -2,6 +2,17 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+# Status
+
+Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
+
+## 2026-11-13 Review 030 retake: shadows and ground share (Viktor, branch `review030-frames`)
+
+- Retake after main `c0c790f` with `shadow.darkness` 0.1: 16 tour views at 18:00 and 12:00 in `docs/pr-media/review030-retake/`.
+- Ground share (ground luma over sky luma), full per-view list in `docs/pr-media/review030-retake/ground_share.txt`. 18:00 ranges 0.66 (hesper_door) to 1.045 (stepping_stones); 12:00 ranges 0.417 (high_lane) to 1.004 (stepping_stones). All above the 0.25 floor.
+- Noon hero shadow: visible on the ground under the hero's feet (hero at 120,-2, 12:00; `hero-noon.png`). Checked on a downscaled copy, not at full resolution.
+- Sky blocker: no such entry existed. Greg closed it.
+
 ## Ford (PR #60): frames for review, not merged
 
 - Gravel lightened from (0.66, 0.62, 0.54) to (0.86, 0.82, 0.72) in `FORD.gravel`; nothing else changed (landHeightAt and water alpha untouched).

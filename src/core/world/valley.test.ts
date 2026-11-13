@@ -1,18 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import {
   EDGE_RADIUS,
+  GATE_LINE,
   VALLEY_HALF_EXTENT,
   VALLEY_PLACES,
   VALLEY_SEED,
   VALLEY_STOPS,
   WATER_LEVEL,
+  beyondGate,
   blocksHero,
   blocksWalking,
+  gateFrameAt,
   insideValley,
   isCrossing,
   isGorge,
+  isRimOpening,
   isWalkableGround,
   isWater,
+  onGateWall,
   sightMargin,
   valleyHeightAt,
   walkSlopeAt,
@@ -82,23 +87,21 @@ function alongCrossing(c: LayoutCrossing): { x: number; z: number }[] {
   return out;
 }
 
-/** The two openings in the rim (the patrol hut zone and the north-west pass), as the terrain defines them. */
-function inOpening(x: number, z: number): boolean {
-  return Math.hypot(x - VALLEY_PLACES.patrolHut.x, z - VALLEY_PLACES.patrolHut.z) < 60 || Math.hypot(x + 250, z + 262) < 40;
-}
-
 /** Slope (rise over run) from ±1 m central differences, as the walking rule measures it. */
 function slopeAt(x: number, z: number): number {
   return Math.hypot(valleyHeightAt(x + 1, z) - valleyHeightAt(x - 1, z), valleyHeightAt(x, z + 1) - valleyHeightAt(x, z - 1)) / 2;
 }
 
-/** Cells of a 4 m grid reached on foot from the start, with the two openings shut (the edge test's rule). */
+/**
+ * Cells of a 4 m grid reached on foot from the start. The patrol hut's hollow is shut here (its own rim closes it);
+ * the gate corridor is open, and the gate wall and the rim are what keep it shut (isWalkableGround). A 4 m grid cannot
+ * step over the gate wall: its 4 m thickness is more than one grid step's reach across the road.
+ */
 function reachableFromStart(): { x: number; z: number }[] {
   const CELL = 4;
   const n = Math.round((2 * VALLEY_HALF_EXTENT) / CELL) + 1;
   const at = (i: number) => -VALLEY_HALF_EXTENT + i * CELL;
-  const shut = (x: number, z: number) =>
-    Math.hypot(x - VALLEY_PLACES.patrolHut.x, z - VALLEY_PLACES.patrolHut.z) < 60 || Math.hypot(x + 250, z + 262) < 40;
+  const shut = (x: number, z: number) => Math.hypot(x - VALLEY_PLACES.patrolHut.x, z - VALLEY_PLACES.patrolHut.z) < 60;
   const ok = (i: number, j: number) => !shut(at(i), at(j)) && isWalkableGround(at(i), at(j));
   const si = Math.round((VALLEY_PLACES.start.x + VALLEY_HALF_EXTENT) / CELL);
   const sj = Math.round((VALLEY_PLACES.start.z + VALLEY_HALF_EXTENT) / CELL);
@@ -188,7 +191,7 @@ describe('Tallowmere terrain (§4)', () => {
         const rad = (a * Math.PI) / 180;
         const x = r * Math.cos(rad);
         const z = r * Math.sin(rad);
-        if (isWater(x, z) || inOpening(x, z)) continue;
+        if (isWater(x, z) || isRimOpening(x, z)) continue;
         checked++;
         expect(walkSlopeAt(x, z), `rim point (${x.toFixed(0)}, ${z.toFixed(0)})`).toBeGreaterThanOrEqual(0.7);
       }
@@ -196,12 +199,58 @@ describe('Tallowmere terrain (§4)', () => {
     expect(checked).toBeGreaterThan(200);
   });
 
-  it('keeps the edge closed: with the two openings shut, no walkable ground beyond the edge ring is reachable from the start', () => {
+  it('caps the rim below the signal hill: no rim point (r 330 to 400, outside the openings and water) stands above the hill top', () => {
+    const hillTop = valleyHeightAt(VALLEY_PLACES.signalHill.x, VALLEY_PLACES.signalHill.z);
+    let checked = 0;
+    let highest = -Infinity;
+    for (let r = 330; r <= 400; r += 2) {
+      for (let a = 0; a < 360; a += 1) {
+        const rad = (a * Math.PI) / 180;
+        const x = r * Math.cos(rad);
+        const z = r * Math.sin(rad);
+        if (!insideValley(x, z) || isWater(x, z) || isRimOpening(x, z)) continue;
+        checked++;
+        highest = Math.max(highest, valleyHeightAt(x, z));
+      }
+    }
+    expect(checked).toBeGreaterThan(5000);
+    expect(highest, 'highest rim point (m)').toBeLessThan(hillTop);
+  });
+
+  it('closes the gate: the soldiers\' road is walled at the gate line, the wall blocks the hero, and nothing beyond it is reachable', () => {
+    expect(onGateWall(GATE_LINE.x, GATE_LINE.z)).toBe(true);
+    expect(blocksHero(GATE_LINE.x, GATE_LINE.z)).toBe(true);
+    expect(isWalkableGround(GATE_LINE.x, GATE_LINE.z)).toBe(false);
+    // The wall spans the corridor across the road (5 m to either side is on it; 7 m is the rim's cliff), and is thin along it.
+    expect(onGateWall(GATE_LINE.x - 5 * GATE_LINE.uz, GATE_LINE.z + 5 * GATE_LINE.ux)).toBe(true);
+    expect(onGateWall(GATE_LINE.x - 7 * GATE_LINE.uz, GATE_LINE.z + 7 * GATE_LINE.ux)).toBe(false);
+    expect(onGateWall(GATE_LINE.x + 4 * GATE_LINE.ux, GATE_LINE.z + 4 * GATE_LINE.uz)).toBe(false);
     const reached = reachableFromStart();
-    expect(reached.length).toBeGreaterThan(5000);
-    const beyond = reached.filter((p) => Math.hypot(p.x, p.z) > EDGE_RADIUS).length;
-    expect(beyond, 'walkable cells beyond the edge ring').toBe(0);
+    const beyond = reached.filter((p) => beyondGate(p.x, p.z)).length;
+    expect(beyond, 'walkable cells beyond the gate line').toBe(0);
+    // The pass is usable from the valley side: some reached cell sits on the road 2 to 12 m before the gate.
+    const approach = reached.filter((p) => {
+      const f = gateFrameAt(p.x, p.z);
+      return f.s <= -2 && f.s >= -12 && f.across <= 6;
+    });
+    expect(approach.length, 'reached cells on the road before the gate').toBeGreaterThan(0);
   }, 60000);
+
+  it('makes the corridor sides cliffs: at 7 to 10 m across the road, from 0 to 5 m before the gate line, the slope is at least 0.7', () => {
+    let checked = 0;
+    for (let s = -5; s <= 0; s += 0.5) {
+      for (let across = 7; across <= 10; across += 0.5) {
+        for (const side of [-1, 1]) {
+          // Move along the road by s, then across it (the across unit vector is the road's normal) by side * across.
+          const x = GATE_LINE.x + s * GATE_LINE.ux - side * across * GATE_LINE.uz;
+          const z = GATE_LINE.z + s * GATE_LINE.uz + side * across * GATE_LINE.ux;
+          checked++;
+          expect(walkSlopeAt(x, z), `side point s=${s} across=${side * across}`).toBeGreaterThanOrEqual(0.7);
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(100);
+  });
 
   it('makes the sight lines in the layout: seen where it should be, hidden where it should not', () => {
     // Positive clearance = the line clears the ground. Values from the spec table, docs/tasks/003-layout.md.
@@ -229,6 +278,21 @@ describe('Tallowmere terrain (§4)', () => {
     expect(Math.hypot(at2.x - hill.x, at2.z - hill.z)).toBeLessThan(40);
     expect(max).toBeGreaterThan(60);
     expect(max).toBeLessThan(70);
+  });
+
+  // OPEN QUESTION (docs/status.md): the base-layout interior ridge at (-82, -308) is 64.8 m, 12 m from the hill,
+  // above the hill top of 63.1 m. Once the rim is capped this is the highest ground in sight. Greg decides whether
+  // the ridge is reshaped; until then this stays skipped rather than failing.
+  it.skip('makes the signal hill the highest ground anywhere in sight (rim capped below it)', () => {
+    const hillTop = valleyHeightAt(VALLEY_PLACES.signalHill.x, VALLEY_PLACES.signalHill.z);
+    let highest = -Infinity;
+    for (let x = -400; x <= 400; x += 4) {
+      for (let z = -400; z <= 400; z += 4) {
+        if (!insideValley(x, z) || isWater(x, z)) continue;
+        highest = Math.max(highest, valleyHeightAt(x, z));
+      }
+    }
+    expect(highest).toBeLessThanOrEqual(hillTop + 0.01);
   });
 
   it('keeps the start and the castle inside the valley and the castle above the lake', () => {

@@ -5,7 +5,7 @@ import {
   VALLEY_HALF_EXTENT,
   VALLEY_PLACES,
   VALLEY_SEED,
-  VALLEY_SOLIDS,
+  valleySolids,
   VALLEY_STOPS,
   WATER_LEVEL,
   beyondGate,
@@ -146,7 +146,7 @@ describe('Tallowmere terrain (§4)', () => {
       if (name === 'lake' || name === 'castle') continue;
       // A place centre inside a solid footprint (a house, or the well) is walkable only as ground near it: the building
       // stands there (overnight item 6). Such a place must have walkable ground within 6 m.
-      if (blocksHero(p.x, p.z) && solidAt(VALLEY_SOLIDS, p.x, p.z)) {
+      if (blocksHero(p.x, p.z) && solidAt(valleySolids(), p.x, p.z)) {
         let near = false;
         for (let dx = -6; dx <= 6 && !near; dx++) for (let dz = -6; dz <= 6 && !near; dz++) {
           if (Math.hypot(dx, dz) <= 6 && isWalkableGround(p.x + dx, p.z + dz)) near = true;

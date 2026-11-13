@@ -80,6 +80,8 @@ const ROAD_HALF_WIDTH = 4;
 const LANE_HALF_WIDTH = 3;
 const PLACE_RADIUS = 14;
 const HOUSE_RADIUS = 8;
+/** Keep-out radius (m) round the three landmark places that are built up (review 026 item 3). */
+export const LANDMARK_CLEAR = { mill: 30, forge: 30, watchHouse: 26 } as const;
 
 /** Everything scenery must stay clear of, built from the layout and Wick data. */
 export function sceneryKeepOuts(): ExclusionZone[] {
@@ -97,6 +99,11 @@ export function sceneryKeepOuts(): ExclusionZone[] {
   }
   for (const p of Object.values(VALLEY_PLACES)) zones.push({ kind: 'circle', centre: { x: p.x, z: p.z }, radius: PLACE_RADIUS });
   for (const h of wickHouses(VALLEY_SEED)) zones.push({ kind: 'circle', centre: { x: h.x, z: h.z }, radius: HOUSE_RADIUS });
+  // Review 026 item 3: no scenery within 30 m of the Mill or the Forge, or in the Watch-house yard (its 40 m by 32 m
+  // yard fits inside a 26 m circle, the yard's half-diagonal rounded up).
+  zones.push({ kind: 'circle', centre: { x: VALLEY_PLACES.mill.x, z: VALLEY_PLACES.mill.z }, radius: LANDMARK_CLEAR.mill });
+  zones.push({ kind: 'circle', centre: { x: VALLEY_PLACES.forge.x, z: VALLEY_PLACES.forge.z }, radius: LANDMARK_CLEAR.forge });
+  zones.push({ kind: 'circle', centre: { x: VALLEY_PLACES.watchHouse.x, z: VALLEY_PLACES.watchHouse.z }, radius: LANDMARK_CLEAR.watchHouse });
   const box = SHELF_TUNING.box;
   zones.push({ kind: 'rectangle', minX: box.x0, minZ: box.z0, maxX: box.x1, maxZ: box.z1 });
   const sight = hesperSightLine();

@@ -118,11 +118,11 @@ describe('ford ribbon (review 027 item 2)', () => {
   it('is pale gravel in the water and the road\'s earth on the dry banks', () => {
     const gravelRow = wet[Math.floor(wet.length / 2)];
     const k = gravelRow * 4 + 1;
-    expect(ribbon.colors[k * 4]).toBeCloseTo(0.66, 6);
+    expect(ribbon.colors[k * 4]).toBeCloseTo(0.86, 6);
     const dry = ribbon.rows.findIndex((r) => !r.wet);
     expect(dry).toBeGreaterThanOrEqual(0);
     expect(ribbon.colors[(dry * 4 + 1) * 4]).toBeGreaterThan(0.3);
-    expect(ribbon.colors[(dry * 4 + 1) * 4]).not.toBeCloseTo(0.66, 2);
+    expect(ribbon.colors[(dry * 4 + 1) * 4]).not.toBeCloseTo(0.86, 2);
   });
 
   it('is 3.6 m wide, with the road\'s wobble and no more', () => {

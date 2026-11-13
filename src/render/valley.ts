@@ -30,7 +30,7 @@ import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
 import { fillPrompt } from '../core/settings/labels';
-import { currentSettings } from './settings_store';
+import { currentSettings, saveSettings } from './settings_store';
 import { lightingAt } from './lighting';
 import { ValleySky } from './valley_sky';
 import { ValleyTerrain } from './valley_terrain';
@@ -218,7 +218,10 @@ class Valley {
     this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
 
-    this.pauseMenu = new PauseMenu(uiRoot, () => this.resume());
+    this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
+      saveSettings({ ...currentSettings(), bindings: b });
+      this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
+    });
     this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
     this.input.camYaw = this.hero.yaw;
 
@@ -308,11 +311,11 @@ class Valley {
     return typeof counters._drawCalls?.current === 'number' ? counters._drawCalls.current : 0;
   }
 
-  /** Pause key: opens the pause menu, backs out of Settings, or resumes from the menu page (Esc works both ways). */
+  /** Pause key: opens the pause menu, backs out of Settings or Controls, or resumes from the menu page (Esc works both ways). */
   private onPauseKey(): void {
     if (!this.paused) {
       this.setPaused(true);
-    } else if (this.pauseMenu.onSettings) {
+    } else if (this.pauseMenu.onSubPage) {
       this.pauseMenu.showMenu();
     } else {
       this.resume();

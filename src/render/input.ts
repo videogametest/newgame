@@ -2,7 +2,7 @@
 // that does each one comes from the player's bindings (task 009). Edge flags are handed to exactly one sim step.
 
 import { TUNING } from '../config/tuning';
-import type { Action } from '../core/settings/actions';
+import type { Action, Bindings } from '../core/settings/actions';
 import type { BattleInput, WeaponId } from '../core/types';
 import { clamp } from '../core/vec';
 import { ActionState } from './action_state';
@@ -115,6 +115,11 @@ export class PlayerInput {
     this.aimPitch = 0;
     this.weapon = 'sword';
     this.clearHeld();
+  }
+
+  /** New bindings take effect at once: the next press uses them. */
+  setBindings(bindings: Bindings): void {
+    this.actions.setBindings(bindings);
   }
 
   requestLock(): void {

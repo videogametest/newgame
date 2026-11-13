@@ -6,6 +6,17 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 Task 009 step 2b: Controls page (Viktor, branch `task-009-step2`)
+
+- Built: Controls page in the pause menu (Resume, Settings, Controls). Table of every action with Main and Spare slots (keyboard and mouse). Click a slot, then press a key, mouse button or wheel tick. Esc cancels a listening slot without closing the menu. Reserved Esc keeps the slot listening. Back to defaults asks for confirmation first and resets the keyboard page.
+- Pure rules in `src/render/controls_rules.ts` (keys, mouse, wheel, notices), 12 tests in `controls_rules.test.ts`. The core in `src/core/settings/` is unchanged.
+- Gates on the branch: `tsc --noEmit` exit 0; 839 tests pass (`npx vitest run`); `vite build` exit 0; `node scripts/controls_capture.mjs` passes 12 of 12 in headless Chromium (open, rebind J, saved to `everylitwindow.settings.v1`, Esc cancels a slot, Esc back to the menu, Esc resumes, no console errors).
+- Frames at 960x540 in `docs/pr-media/controls/`: `pause_menu.png`, `controls_page.png`, `controls_listening.png`, `resumed.png`.
+- Layout note for the walk-through: at 960x540 the Controls table scrolls inside the card, so the first view shows the top rows only (`controls_page.png`). Looked at by eye, not changed.
+- Not built, on purpose: the Controller tab (task 004 waits); Copy debug report and Return to title (not built yet, as in 2a); Settings "Back" is still the 2a placeholder.
+- Copy gap for Greg or Claude: when a rebind displaces an action that keeps a spare, `docs/writing/interface.md` has no line for it, so no notice is shown. A clean assignment shows "{action} now uses {input}.", composed from the copy's sentence pattern. Decide whether that line is wanted.
+- Saved bindings are read by the game through `saveSettings` (`src/render/settings_store.ts`) and `PlayerInput.setBindings` (`src/render/input.ts`). The valley wires both (`src/render/valley.ts`).
+
 ## 2026-11-13 Task 009 step 2a: pause menu (Viktor, PR #65)
 
 - Step 2 is split per Greg's 15:26 ruling: 2a pause menu (this entry), 2b Controls, 2c Brightness, 2d remaining settings, 2e quality levels. Each is deployed before the next starts.

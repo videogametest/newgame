@@ -20,6 +20,7 @@ import { TRAINING_FIELD } from '../data/arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
 import { buildFarLand } from './valley_far';
+import { buildLandmarks, type Landmarks } from '../landmarks/build';
 import { PROPORTIONS } from './proportions';
 import { buildValleyWater, type ValleyWater } from './valley_water';
 import { buildGate } from './valley_gate';
@@ -59,6 +60,8 @@ export interface ValleyHooks {
   lookAt(x: number, z: number): void;
   project(name: string): { x: number; y: number; w: number; h: number } | null;
   state(): ValleyState;
+  /** For budgets: how many meshes are being drawn this frame, by the start of their name. */
+  meshCounts(): Record<string, number>;
   /** Tour mode (?tour=1): moves the hero and camera to a named view, or to the view at an index. */
   tourTo(nameOrIndex: string | number): boolean;
   tourNames(): string[];
@@ -138,6 +141,7 @@ class Valley {
   private readonly debug = new URLSearchParams(window.location.search).get('debug') === '1';
   private groundY: number;
   private wick?: Wick;
+  private landmarks?: Landmarks;
   private glow?: GlowLayer;
   private accumulator = 0;
   private frozen = false;
@@ -217,6 +221,7 @@ class Valley {
     buildGate(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow });
     buildCrossings(this.scene, { shadow: this.shadow }); // the ford, the mill bridge, the stepping stones (review 025 item 2)
     await buildScenery(this.scene);
+    this.landmarks = await buildLandmarks(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow }); // the Mill, the Forge, the Watch-house, the castle and the rest
     this.glow = new GlowLayer('glow', this.scene);
     this.glow.intensity = 0.3;
   }
@@ -318,6 +323,7 @@ class Valley {
     this.waterSeconds += dt;
     if (this.scene.activeCamera) this.water?.update(L, this.waterSeconds, this.scene.activeCamera.globalPosition, FOG_START, FOG_END);
     this.wick?.light(L, this.game.timeOfDay);
+    this.landmarks?.update(dt, L);
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
 
@@ -438,6 +444,11 @@ class Valley {
         return { x: v.x, y: v.y, w: e.getRenderWidth(), h: e.getRenderHeight() };
       },
       state: () => this.snapshot(),
+      meshCounts: () => {
+        const out: Record<string, number> = {};
+        for (const m of this.scene.getActiveMeshes().data.slice(0, this.scene.getActiveMeshes().length)) { const k = m.name.replace(/[-_]?\d.*$/, '').slice(0, 28); out[k] = (out[k] ?? 0) + 1; }
+        return out;
+      },
     };
   }
 

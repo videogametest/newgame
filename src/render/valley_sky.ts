@@ -7,7 +7,7 @@ import { seededValue } from '../core/world/terrain';
 import { VALLEY_SEED } from '../core/world/valley';
 import { clamp01, mix, PALETTE, type Lighting } from './lighting';
 
-const DOME_DIAMETER = 1700;
+const DOME_DIAMETER = 2300; // wider than the valley corner to corner, so the castle on the far rim is never behind the sky
 const DISC_DISTANCE = 700;
 const STAR_COUNT = 420;
 

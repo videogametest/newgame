@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 36 (controller support, brightness, and rebinding; the settings in full). Supersedes version 35.
+Version 37 (the first evening: a tutorial at Hesper's, in the world). Supersedes version 36.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -713,7 +713,7 @@ A place is not freed when the last defender falls. It is freed when the hero lig
 - Each place has an unlit lantern. After the defenders are cleared, the hero interacts with it (`E`) to light it. Stane's banner comes down, the crows leave, and the place is captured.
 - A short melody plays. It is the same melody every time, with one more instrument for each place freed, so it grows fuller across the game.
 - A lit lantern can be seen from a distance at night, and wolves will not come near it. As the valley is freed, the night fills with lights and becomes safer.
-- Hesper lights the hero's first lantern alongside them, to teach it.
+- Hesper lights the hero's first lantern alongside them, to teach it: the small one at her own gate, on the first evening (see Onboarding).
 
 ### Household stories
 
@@ -811,7 +811,16 @@ After the finale the valley is safe, and a player who has finished the story sti
   - *The way out always works.* `Esc` and the controller's `Menu` always pause and cannot be given to anything else or removed.
   - *Prompts tell the truth.* Every prompt and hint in the game shows what the player has actually bound, on the device in their hands. An action with nothing bound shows no prompt, never the wrong key.
   - "Back to defaults" resets one device and leaves the other alone.
-- **Onboarding without a tutorial level.** A short prompt appears the first time each control is needed (move, look, sprint, crouch, mark, attack, switch weapon, change arrow, dodge, lock on, throw a knife, change view, eat, squad order, map, inventory, skills) and never again once used. Hesper points the hero toward the nearest camp.
+- **The first evening: the tutorial.** The game opens with a lesson, and the lesson is the story's first scene, not a separate level. It takes about ten minutes. Hesper asks for one thing at a time, and each prompt shows what the player has bound on the device in their hands.
+  1. *The road in.* Dusk, at the gate, one lit window ahead. Move, look, sprint. The family stones are passed on the way down.
+  2. *Her door.* Interact, and the first talk. She hands over the bow.
+  3. *The yard.* Three straw targets: draw and loose. Then one far target: hold to steady. Then a second kind of arrow: change arrow.
+  4. *The fence.* Crouch and cross the yard while she stands watch with her back half turned. This teaches being seen and unseen, and marking a target (the scarecrow).
+  5. *The post.* "For when it goes wrong": the blade, the dodge, and lock on, against a practice post.
+  6. *The lantern.* She and the hero light the small lantern at her gate together. The melody plays with its first instrument. She opens the map and points to the nearest camp.
+  - *It cannot be failed.* A miss or being seen earns one dry line and another go. Nothing here hurts the hero.
+  - *It can be skipped.* In the first talk the hero can say they have done this before; she hands over the bow and goes straight to the lantern. A step can also be walked away from: the valley is never locked, and the rest of the lesson waits in her yard.
+  - *It teaches only what the first camp needs.* Everything else (knives, eating, squad orders, inventory, skills, change of view) is taught by a short prompt the first time it matters, shown once and never again once used. Those prompts also cover every control in the lesson, so a player who skipped it is still told.
 - **Difficulty.** Three presets, named for how much light the player is given, changeable at any time in settings with no penalty.
 
   | Preset | For | What changes |

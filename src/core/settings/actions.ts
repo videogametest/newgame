@@ -43,7 +43,7 @@ export function defaultBindings(): Bindings {
   return {
     keyboard: {
       moveForward: ['Key:KeyW', 'Key:ArrowUp'], moveBack: ['Key:KeyS', 'Key:ArrowDown'], moveLeft: ['Key:KeyA', 'Key:ArrowLeft'], moveRight: ['Key:KeyD', 'Key:ArrowRight'],
-      sprint: ['Key:ShiftLeft'], dodge: ['Key:Space'], crouch: ['Key:KeyC'], attack: ['Mouse:0'], aim: ['Mouse:2'], interact: ['Key:KeyE'],
+      sprint: ['Key:ShiftLeft', 'Key:ShiftRight'], dodge: ['Key:Space'], crouch: ['Key:KeyC'], attack: ['Mouse:0'], aim: ['Mouse:2'], interact: ['Key:KeyE'],
       weaponBlade: ['Key:Digit1'], weaponBow: ['Key:Digit2'], weaponSwap: [], arrowNext: ['Wheel:down'], arrowPrev: ['Wheel:up'],
       knife: ['Key:KeyR'], lockOn: ['Key:Tab'], eat: ['Key:KeyF'], squadOrder: ['Key:KeyQ'], takeAlive: ['Key:KeyT'],
       view: ['Key:KeyV'], map: ['Key:KeyM'], inventory: ['Key:KeyI'], skills: ['Key:KeyK'], pause: ['Key:Escape'],

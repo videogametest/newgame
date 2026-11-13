@@ -39,3 +39,16 @@ Checks: typecheck clean, 790 tests, walk gap 97.0 m, build passes. Arrival view 
 
 - Road colour at dusk reads darker than Wick's lanes; to be matched.
 - Gate lower planks and posts; Hesper's lamp pool; ground colour at dusk.
+
+## Addendum, 12:55 ET: the draw-call budget (Viktor's item 3 report)
+
+Viktor is right and review 027's figures were wrong: 274 and 314 were read before the ground had finished
+streaming in. At steady state (76 chunks) the arrival view measured 324 on Claude's setup, matching his 322.
+Measure only once `state().chunks` has stopped rising.
+
+Cause, as he said: Wick's models. Each model file brought its own copy of the atlas material, so nothing
+batched: Wick cost 137 draw calls. All placed models in Wick are now one mesh with one material
+(`wick_models`, in `src/village/build.ts`). Steady arrival view: **246 of 300**. Wick now costs 59 and the
+landmarks 75. Frames unchanged by eye (arrival, high lane, Hesper's door at night).
+
+For Viktor: nothing to change. Use the steady-state rule for every count from now on.

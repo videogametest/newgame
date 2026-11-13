@@ -88,9 +88,11 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
   const straw = pbr('wick_straw', new Color3(0.66, 0.55, 0.3));
   const iron = pbr('wick_iron', new Color3(0.2, 0.2, 0.22), 0.6);
 
+  /** Every placed model. None of them ever moves, so all become one mesh per material once the village is built. */
+  const placed: TransformNode[] = [];
   const place = async (file: string, x: number, z: number, scale: number, yaw = 0, sink = 0): Promise<TransformNode> => {
     const c = await container(scene, file);
-    const e = c.instantiateModelsToScene((n) => `${file}_${Math.round(x)}_${Math.round(z)}_${n}`, false);
+    const e = c.instantiateModelsToScene((n) => `${file}_${Math.round(x)}_${Math.round(z)}_${n}`, false, { doNotInstantiate: true });
     const node = new TransformNode(`${file}_${Math.round(x)}_${Math.round(z)}`, scene);
     for (const n of e.rootNodes) n.parent = node;
     node.position.set(x, ground(x, z) - sink, z);
@@ -100,7 +102,7 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     for (const m of node.getChildMeshes(false)) {
       if (m.material instanceof PBRMaterial) { m.material.roughness = 0.9; m.material.metallic = 0; }
     }
-    cast(node);
+    placed.push(node);
     return node;
   };
   /** Every loose box, merged by material once the village is built: a few draw calls, not hundreds. */
@@ -421,6 +423,18 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     const group = loose.filter((m) => m.material === mat);
     const merged = Mesh.MergeMeshes(group, true, true);
     if (merged) { merged.name = `wick_${mat?.name ?? 'boxes'}`; merged.parent = root; cast(merged); }
+  }
+
+  // The houses and props share one atlas: merged, the whole village's models are a draw call or two, not one per part.
+  {
+    const solid = placed.flatMap((n) => n.getChildMeshes(false)).filter((m): m is Mesh => m instanceof Mesh && m.getTotalVertices() > 0);
+    for (const m of solid) for (const kind of m.getVerticesDataKinds()) if (!['position', 'normal', 'uv'].includes(kind)) m.removeVerticesData(kind);
+    // Each model file brings its own copy of the same atlas material; one copy serves them all.
+    const shared = solid[0]?.material ?? null;
+    for (const m of solid) m.material = shared;
+    const merged = solid.length ? Mesh.MergeMeshes(solid, true, true) : null;
+    if (merged) { merged.name = 'wick_models'; merged.parent = root; cast(merged); }
+    for (const n of placed) n.dispose();
   }
 
   return {

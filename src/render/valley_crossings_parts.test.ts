@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { valleyHeightAt, walkSurfaceAt, WATER_LEVEL, isCrossing } from '../core/world/valley';
 import { VALLEY_CROSSINGS, VALLEY_RIVER_IN, type LayoutCrossing } from '../core/world/valley_layout';
+import { ROADS, roadsData } from './valley_roads';
 import {
-  crossingFrame, crossingParts, crossingPoint, fordParts, plankBridgeParts, steppingStoneParts, upstreamPointOf, upstreamSide,
+  crossingFrame, crossingParts, crossingPoint, fordRibbon, plankBridgeParts, steppingStoneParts, upstreamPointOf, upstreamSide,
   type CrossingPart,
 } from './valley_crossings_parts';
 
@@ -89,35 +90,84 @@ describe('stepping stones (review 025 item 2)', () => {
   });
 });
 
-describe('ford (review 025 item 2)', () => {
-  const gravel = fordParts(ford, valleyHeightAt).filter((p) => p.material === 'gravel');
+describe('ford ribbon (review 027 item 2)', () => {
+  const ribbon = fordRibbon(valleyHeightAt, ford);
+  const at = (row: number, j: number) => {
+    const k = (row * 4 + j) * 3;
+    return { x: ribbon.positions[k], y: ribbon.positions[k + 1], z: ribbon.positions[k + 2] };
+  };
+  const wet = ribbon.rows.map((r, i) => (r.wet ? i : -1)).filter((i) => i >= 0);
 
-  it('lies under the water: the gravel top is below the water level', () => {
-    expect(gravel.length).toBeGreaterThan(5);
-    for (const g of gravel) {
-      const top = g.y + g.h;
-      expect(top).toBeLessThan(WATER_LEVEL);
-      expect(top).toBeGreaterThan(WATER_LEVEL - (ford.water_depth ?? 0.4) - 0.01);
+  it('is one ribbon of rows across the water: wet rows exist and are not the whole run', () => {
+    // The river is narrow here: the road is under water for a few rows (about 2.6 m), not the whole ford.
+    expect(wet.length).toBeGreaterThan(0);
+    expect(ribbon.rows.length).toBeGreaterThan(wet.length);
+    expect(ribbon.positions.length).toBe(ribbon.rows.length * 4 * 3);
+  });
+
+  it('keeps the wet bed under the water and above the stones: 0.4 m deep at the centre', () => {
+    for (const r of wet) {
+      for (const j of [1, 2]) {
+        const v = at(r, j);
+        expect(v.y).toBeLessThan(WATER_LEVEL);
+        expect(v.y).toBeGreaterThanOrEqual(WATER_LEVEL - (ford.water_depth ?? 0.4));
+      }
     }
   });
 
-  it('has its banks stones outside the crossing, not on it', () => {
-    const f = crossingFrame(ford);
-    const banks = fordParts(ford, valleyHeightAt).filter((p) => p.name.startsWith('ford_bank_'));
-    expect(banks.length).toBeGreaterThan(10);
-    for (const b of banks) {
-      const across = (b.x - ford.x) * f.vx + (b.z - ford.z) * f.vz;
-      expect(Math.abs(across)).toBeGreaterThan(ford.width / 2);
+  it('is pale gravel in the water and the road\'s earth on the dry banks', () => {
+    const gravelRow = wet[Math.floor(wet.length / 2)];
+    const k = gravelRow * 4 + 1;
+    expect(ribbon.colors[k * 4]).toBeCloseTo(0.66, 6);
+    const dry = ribbon.rows.findIndex((r) => !r.wet);
+    expect(dry).toBeGreaterThanOrEqual(0);
+    expect(ribbon.colors[(dry * 4 + 1) * 4]).toBeGreaterThan(0.3);
+    expect(ribbon.colors[(dry * 4 + 1) * 4]).not.toBeCloseTo(0.66, 2);
+  });
+
+  it('is 3.6 m wide, with the road\'s wobble and no more', () => {
+    for (let r = 0; r < ribbon.rows.length; r++) {
+      const a = at(r, 0), b = at(r, 3);
+      const w = Math.hypot(b.x - a.x, b.z - a.z);
+      expect(w).toBeGreaterThanOrEqual(ROADS.roadWidth * (1 - ROADS.wander) - 1e-6);
+      expect(w).toBeLessThanOrEqual(ROADS.roadWidth * (1 + ROADS.wander) + 1e-6);
     }
+  });
+
+  it('ends its dry rows on the bank where the terrain is 0.2 m above the water, and its last rows are dry', () => {
+    for (const r of [ribbon.rows[0], ribbon.rows[ribbon.rows.length - 1]]) {
+      expect(r.wet).toBe(false);
+      expect(valleyHeightAt(r.x, r.z)).toBeGreaterThanOrEqual(WATER_LEVEL + ROADS.bankClearance - 1e-9);
+    }
+  });
+
+  it('meets the east road strip at both ends, vertex for vertex', () => {
+    const d = roadsData();
+    const strip = d.strips.find((s) => s.id === 'east_road');
+    if (!strip) throw new Error('no east_road strip');
+    for (const [row, sample] of [[0, ribbon.firstSample], [ribbon.rows.length - 1, ribbon.lastSample]] as const) {
+      for (let j = 0; j < 4; j++) {
+        const v = (strip.from + sample * 4 + j) * 3;
+        const mine = at(row, j);
+        expect(mine.x).toBeCloseTo(d.positions[v], 9);
+        expect(mine.y).toBeCloseTo(d.positions[v + 1], 9);
+        expect(mine.z).toBeCloseTo(d.positions[v + 2], 9);
+      }
+    }
+  });
+
+  it('draws no boxes: the ford is the ribbon, with no gravel slabs or bank stones', () => {
+    expect(PARTS.some((p) => p.name.startsWith('ford'))).toBe(false);
+    expect(PARTS.some((p) => p.material !== 'wood' && p.material !== 'stone')).toBe(false);
   });
 });
 
 describe('all crossings together', () => {
-  it('draws the ford, the mill bridge and the stepping stones, and not the forge bridge', () => {
+  it('draws the mill bridge and the stepping stones, and not the forge bridge or the ford', () => {
     const names = new Set(PARTS.map((p) => p.name.split('_')[0]));
-    expect(names.has('ford')).toBe(true);
     expect(names.has('deck')).toBe(true);
     expect(names.has('stone')).toBe(true);
+    expect(names.has('ford')).toBe(false);
     expect(PARTS.some((p) => p.name.startsWith('forge'))).toBe(false);
   });
 

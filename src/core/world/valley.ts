@@ -4,6 +4,8 @@
 
 import { createHeightAt, type TerrainShape } from './terrain';
 import { withWickShelf } from '../../village/shelf';
+import { WICK_THINGS, wickHouses } from '../../village/plan';
+import { solidAt, type Footprint } from './solids';
 import {
   VALLEY_BASE_HEIGHT,
   VALLEY_CROSSINGS,
@@ -181,8 +183,18 @@ export function blocksWalking(x: number, z: number): boolean {
  * the gorge walls are walls by slope, not by radius.
  */
 export function blocksHero(x: number, z: number): boolean {
-  return onGateWall(x, z) || blocksWalking(x, z) || (!isCrossing(x, z) && walkSlopeAt(x, z) >= MAX_WALK_SLOPE);
+  return onGateWall(x, z) || blocksWalking(x, z) || solidAt(VALLEY_SOLIDS, x, z)
+    || (!isCrossing(x, z) && walkSlopeAt(x, z) >= MAX_WALK_SLOPE);
 }
+
+/** Half the side of the well's square footprint (m). The well is a ring of stone about 2.4 m across. */
+export const WELL_HALF = 1.2;
+
+/** Solid footprints in Wick: every house (9 m square, turned by its facing) and the well. Fences and gate posts are not solid. */
+export const VALLEY_SOLIDS: readonly Footprint[] = [
+  ...wickHouses(VALLEY_SEED).map((h) => ({ x: h.x, z: h.z, facing: h.facing, half: 4.5 })),
+  ...WICK_THINGS.filter((t) => t.id === 'well').map((t) => ({ x: t.x, z: t.z, facing: 0, half: WELL_HALF })),
+];
 
 /** Distance from (x, z) to the segment a-b. */
 function distanceToSegment(x: number, z: number, a: LayoutPoint, b: LayoutPoint): number {
@@ -383,7 +395,7 @@ export function walkSlopeAt(x: number, z: number): number {
  * The walkable crossings' strips are open (walkSurfaceAt gives their height); the forge bridge's strip is not.
  */
 export function isWalkableGround(x: number, z: number): boolean {
-  if (!insideValley(x, z) || onGateWall(x, z)) return false;
+  if (!insideValley(x, z) || onGateWall(x, z) || solidAt(VALLEY_SOLIDS, x, z)) return false;
   if (isCrossing(x, z)) return true;
   if (isWater(x, z)) return false;
   return walkSlopeAt(x, z) < MAX_WALK_SLOPE;

@@ -5,6 +5,7 @@ import {
   VALLEY_HALF_EXTENT,
   VALLEY_PLACES,
   VALLEY_SEED,
+  VALLEY_SOLIDS,
   VALLEY_STOPS,
   WATER_LEVEL,
   beyondGate,
@@ -23,6 +24,7 @@ import {
   walkSlopeAt,
   walkSurfaceAt,
 } from './valley';
+import { solidAt } from './solids';
 import { VALLEY_CROSSINGS, VALLEY_RIVER_IN, VALLEY_RIVER_OUT, type LayoutCrossing } from './valley_layout';
 import { walkStep, type WalkRules } from './walk';
 
@@ -142,6 +144,16 @@ describe('Tallowmere terrain (§4)', () => {
     for (const [name, p] of Object.entries(VALLEY_PLACES)) {
       // The lake is water. The castle is beyond the north-west rim and never walked to (docs/tasks/003-layout.md, places table).
       if (name === 'lake' || name === 'castle') continue;
+      // A place centre inside a solid footprint (a house, or the well) is walkable only as ground near it: the building
+      // stands there (overnight item 6). Such a place must have walkable ground within 6 m.
+      if (blocksHero(p.x, p.z) && solidAt(VALLEY_SOLIDS, p.x, p.z)) {
+        let near = false;
+        for (let dx = -6; dx <= 6 && !near; dx++) for (let dz = -6; dz <= 6 && !near; dz++) {
+          if (Math.hypot(dx, dz) <= 6 && isWalkableGround(p.x + dx, p.z + dz)) near = true;
+        }
+        expect(near, `place ${name} at (${p.x}, ${p.z}) has walkable ground within 6 m`).toBe(true);
+        continue;
+      }
       expect(isWalkableGround(p.x, p.z), `place ${name} at (${p.x}, ${p.z})`).toBe(true);
     }
   });

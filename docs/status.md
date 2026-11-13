@@ -7,9 +7,20 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 | Stream | Doing | Open PR | Blocked |
 | --- | --- | --- | --- |
 | A | Task 002 steps 1–9 merged (PR #12, `659222d`). Done. | none | none |
-| 003 | Step 1 merged (PR #23). Walk-distance check merged (PR #25). Review 016 items 1–3 merged (PR #26, PR #27). Review 018 items 1–2 merged (PR #30, PR #31); item 3 premise not reproduced, width test merged (PR #33). Review 020 item 4 merged (PR #36, `22cda16`). Review 018 item 5 (gorge and rim) merged (PR #37), walk gap 97.0 m (limit 100 m). Next: review 018 items 6 to 9, then open items from 016 and 017. Step 2 not started. | PR #37 merged (`d55926d`), Pages run `43328908024` succeeded, live check passed | Stepping stones bank-to-bank drop of 1.75 m (open question). Road and path grades above review 018 targets (item 6). Tour-mode screenshots not built. Falls frame. Patrol hut opening question (entry 2026-11-12 review 018 item 5) |
+| 003 | Step 1 merged (PR #23). Walk-distance check merged (PR #25). Review 016 items 1–3 merged (PR #26, PR #27). Review 018 items 1–2 merged (PR #30, PR #31); item 3 test merged (PR #33). Review 020 item 4 merged (PR #36, `22cda16`). Review 018 item 5 merged (PR #37, `d55926d`). Review 021 merged (PR #39, `66694be`): signal hill test active, stepping-stone landings in. Next: review 018 item 6 (grades), then items 7 to 9 and open items from 016 and 017. Step 2 not started. | none | Road and path grades above review 018 targets (item 6). Tour-mode screenshots not built. Falls frame. Landings at the stepping stones not yet seen on screen. |
 | B | Task 002b style test rework (review 005), PR #21 merged: items 1–7 checked by eye, frames in `docs/pr-media/styletest/review005/` (see `CHECKLIST.md`). | none | Greg's review of the rework; sign legibility at 1280×720 (open question below); villager-set search not yet done; task 003 waits on these |
 | C–H | Logic streams (world, stealth, combat, items, people, music) | none | Not started; added as capacity allows. Task 003 waits for the survey review. |
+
+## 2026-11-12 Review 021: the signal hill test and the stepping-stone landings (Viktor, merged as PR #39, `66694be`)
+
+- **Signal hill test:** active again as "all ground more than 30 m from the marker is lower than the marker's height". Highest ground outside 30 m of the marker is 60.4 m; the marker is 63.14 m. The 64.8 m summit is 13.6 m from the marker and is excluded by that rule. No reshape; the marker does not move.
+- **Stepping stones:** a 6 m ramped landing at each end of `stepping_stones`, cut down to the stone top (2.30 m). The test that ground meets the stone tops within 0.3 m is un-skipped and passes.
+- **Grade finding:** a 0.3 grade cannot reach the bank within 6 m, because the bank rises about 0.3 m per metre and the ramp runs parallel to it. The landing therefore uses about 0.28 near the stones, rising to about 0.58 at the 6 m mark, under MAX_WALK_SLOPE 0.7. The cut sides are about 1.7 m walls beside the path, so the hero walks the centre line.
+- **Reachability caveat:** the reachability test uses a 4 m grid and can miss thin steps. Checked at 2 m: 0 of 76,863 reached cells lie beyond the gate.
+- **Measured [tests and capture scripts, 2026-11-12]:** walk gap **97.0 m** (limit 100 m, 3 m margin), longest at (304, 66), nearest stop `chest_gorge_ledge` 25.3 m. `gen_valley_layout.mjs --check` PASS.
+- **Gate (worker sandbox, `fix/stepping-stone-landings-and-hill-test`, then PR #39):** tsc exit 0; vitest 50 files, 657 pass, 0 skipped; build ok; `scripts/smoke.mjs` passed against a local `vite preview`.
+- **Deploy and live check:** squash-merged as `66694be`. Pages run `43340016309` succeeded (test, build, smoke, deploy all success). `https://everylitwindow.com/` returned HTTP 200.
+- **Not verified:** the stepping-stone landings have not been seen on screen, and no capture is attached.
 
 ## 2026-11-12 Review 018 item 5: the gorge and the rim (Viktor, merged as PR #37, `d55926d`)
 

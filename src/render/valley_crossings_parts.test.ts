@@ -1,0 +1,135 @@
+import { describe, expect, it } from 'vitest';
+import { valleyHeightAt, walkSurfaceAt, WATER_LEVEL, isCrossing } from '../core/world/valley';
+import { VALLEY_CROSSINGS, VALLEY_RIVER_IN, type LayoutCrossing } from '../core/world/valley_layout';
+import {
+  crossingFrame, crossingParts, crossingPoint, fordParts, plankBridgeParts, steppingStoneParts, upstreamPointOf, upstreamSide,
+  type CrossingPart,
+} from './valley_crossings_parts';
+
+const byName = (c: string): LayoutCrossing => {
+  const found = VALLEY_CROSSINGS.find((x) => x.name === c);
+  if (!found) throw new Error(`no crossing ${c}`);
+  return found;
+};
+const ford = byName('ford');
+const mill = byName('mill_bridge');
+const stones = byName('stepping_stones');
+const PARTS = crossingParts(valleyHeightAt, walkSurfaceAt, WATER_LEVEL);
+const pick = (prefix: string): CrossingPart[] => PARTS.filter((p) => p.name.startsWith(prefix));
+
+describe('mill bridge (review 025 item 2)', () => {
+  const deck = plankBridgeParts(mill, valleyHeightAt, walkSurfaceAt, upstreamPointOf(mill, VALLEY_RIVER_IN))
+    .filter((p) => p.name.startsWith('deck_'));
+
+  it('keeps every deck board at least 1.0 m above the water', () => {
+    expect(deck.length).toBeGreaterThan(10);
+    for (const p of deck) expect(p.y + p.h).toBeGreaterThanOrEqual(WATER_LEVEL + 1.0);
+  });
+
+  it('meets the ground height at each end', () => {
+    const first = deck[0], last = deck[deck.length - 1];
+    expect(Math.abs(first.y + first.h - valleyHeightAt(mill.from.x, mill.from.z))).toBeLessThan(0.2);
+    expect(Math.abs(last.y + last.h - valleyHeightAt(mill.to.x, mill.to.z))).toBeLessThan(0.2);
+  });
+
+  it('follows the walk surface core gives, slice by slice', () => {
+    for (const p of deck) {
+      expect(Math.abs(p.y + p.h - walkSurfaceAt(p.x, p.z))).toBeLessThan(1e-6);
+    }
+  });
+
+  it('puts its rail on the upstream side, which is the side the river comes from', () => {
+    const f = crossingFrame(mill);
+    const up = upstreamPointOf(mill, VALLEY_RIVER_IN);
+    expect(up).toEqual(VALLEY_RIVER_IN[3]); // the river segment nearest the bridge starts at (-215, 22)
+    const rails = pick('rail_post_');
+    expect(rails.length).toBeGreaterThan(2);
+    for (const r of rails) {
+      const across = (r.x - mill.x) * f.vx + (r.z - mill.z) * f.vz;
+      expect(across).toBeGreaterThan(mill.width / 2 - 0.3);
+    }
+    expect(upstreamSide(mill, up)).toBe(1);
+  });
+
+  it('stands each rail post on the deck, one metre high', () => {
+    for (const r of pick('rail_post_')) {
+      expect(r.y).toBeCloseTo(walkSurfaceAt(r.x, r.z), 6);
+      expect(r.h).toBeCloseTo(1, 6);
+    }
+  });
+});
+
+describe('stepping stones (review 025 item 2)', () => {
+  const stoneList = steppingStoneParts(stones, valleyHeightAt, WATER_LEVEL);
+
+  it('has flat tops 0.3 m above the water', () => {
+    expect(stoneList.length).toBeGreaterThanOrEqual(10);
+    for (const s of stoneList) expect(s.y + s.h).toBeCloseTo(WATER_LEVEL + 0.3, 9);
+  });
+
+  it('puts each top where core walks, so the stones and the walk surface agree', () => {
+    for (const s of stoneList) {
+      expect(walkSurfaceAt(s.x, s.z)).toBeCloseTo(s.y + s.h, 9);
+    }
+  });
+
+  it('keeps every stone on the strip, across its width', () => {
+    const f = crossingFrame(stones);
+    for (const s of stoneList) {
+      const across = (s.x - stones.x) * f.vx + (s.z - stones.z) * f.vz;
+      expect(Math.abs(across)).toBeLessThanOrEqual(stones.width / 2 + 1e-9);
+    }
+  });
+
+  it('is walkable from one end to the other', () => {
+    for (let i = 0; i <= 40; i++) {
+      const p = crossingPoint(stones, i / 40, 0);
+      expect(isCrossing(p.x, p.z)).toBe(true);
+    }
+  });
+});
+
+describe('ford (review 025 item 2)', () => {
+  const gravel = fordParts(ford, valleyHeightAt).filter((p) => p.material === 'gravel');
+
+  it('lies under the water: the gravel top is below the water level', () => {
+    expect(gravel.length).toBeGreaterThan(5);
+    for (const g of gravel) {
+      const top = g.y + g.h;
+      expect(top).toBeLessThan(WATER_LEVEL);
+      expect(top).toBeGreaterThan(WATER_LEVEL - (ford.water_depth ?? 0.4) - 0.01);
+    }
+  });
+
+  it('has its banks stones outside the crossing, not on it', () => {
+    const f = crossingFrame(ford);
+    const banks = fordParts(ford, valleyHeightAt).filter((p) => p.name.startsWith('ford_bank_'));
+    expect(banks.length).toBeGreaterThan(10);
+    for (const b of banks) {
+      const across = (b.x - ford.x) * f.vx + (b.z - ford.z) * f.vz;
+      expect(Math.abs(across)).toBeGreaterThan(ford.width / 2);
+    }
+  });
+});
+
+describe('all crossings together', () => {
+  it('draws the ford, the mill bridge and the stepping stones, and not the forge bridge', () => {
+    const names = new Set(PARTS.map((p) => p.name.split('_')[0]));
+    expect(names.has('ford')).toBe(true);
+    expect(names.has('deck')).toBe(true);
+    expect(names.has('stone')).toBe(true);
+    expect(PARTS.some((p) => p.name.startsWith('forge'))).toBe(false);
+  });
+
+  it('gives every part a positive size', () => {
+    for (const p of PARTS) {
+      expect(p.w).toBeGreaterThan(0);
+      expect(p.d).toBeGreaterThan(0);
+      expect(p.h).toBeGreaterThan(0);
+    }
+  });
+
+  it('keeps the deck boards inside the mill bridge strip', () => {
+    for (const d of pick('deck_')) expect(isCrossing(d.x, d.z)).toBe(true);
+  });
+});

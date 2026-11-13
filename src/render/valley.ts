@@ -23,6 +23,7 @@ import { buildFarLand } from './valley_far';
 import { PROPORTIONS } from './proportions';
 import { buildValleyWater, type ValleyWater } from './valley_water';
 import { buildGate } from './valley_gate';
+import { buildCrossings } from './valley_crossings';
 import { buildScenery } from './valley_scenery';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
@@ -214,6 +215,7 @@ class Valley {
   async loadWick(): Promise<void> {
     this.wick = await buildWick(this.scene, { heightAt: valleyHeightAt, seed: VALLEY_SEED, shadow: this.shadow });
     buildGate(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow });
+    buildCrossings(this.scene, { shadow: this.shadow }); // the ford, the mill bridge, the stepping stones (review 025 item 2)
     await buildScenery(this.scene);
     this.glow = new GlowLayer('glow', this.scene);
     this.glow.intensity = 0.3;

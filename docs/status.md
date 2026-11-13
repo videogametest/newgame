@@ -2,6 +2,13 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 Review 025 item 2: the crossings (Viktor, branch `overnight-13-crossings`)
+
+- The ford (gravel slab under 0.4 m of water, worn bank stones at ground level), the mill bridge (deck from `walkSurfaceAt`, piers every 2.5 m, rail on the upstream side with posts every 2 m) and the stepping stones (tops at water + 0.3 m, equal to `walkSurfaceAt`) are drawn in `src/render/valley_crossings.ts`. The geometry is pure, in `src/render/valley_crossings_parts.ts`, with 14 tests. The forge bridge is not drawn (not walkable).
+- Frames: `docs/pr-media/overnight-13-crossings/` (`ford`, `mill_bridge`, `stepping_stones`, at 18:00 and 12:00). The ford frames show the sand gravel crossing between water on both sides. The bank stones sit 0.2 m above the local ground, so the stacked look mid-frame is slope, not hover.
+- Gates: vitest 60 files / 734 tests; walk-gap 97.0 m; build OK; local smoke OK.
+- Ground share from the new tour captures (brightness against sky): ford 0.675, mill bridge 0.683, stepping stones 0.907 (18:00 frames). The noon ford frame is the same view at 12:00.
+
 ## 2026-11-13 — Review 025 item 1: the gate
 
 - Gate is 4 m planks, 5 m posts, bar 3.4 m; the pass floor is level from 10 m before the gate to 2 m beyond it (`passFloor` in `src/core/world/valley.ts`). Continuity test at s = −10 added.

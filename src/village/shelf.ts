@@ -19,6 +19,9 @@ export const SHELF_TUNING = {
   /** How deep the bay is, a few metres out. */
   bayDepth: 1.6,
   bayRun: 6,
+  /** The shelf leaves the rivers alone: no effect within `riverClear` metres of one, full effect beyond `riverFull`. */
+  riverClear: 22,
+  riverFull: 44,
 } as const;
 
 const smooth = (t: number): number => { const c = Math.min(1, Math.max(0, t)); return c * c * (3 - 2 * c); };
@@ -52,16 +55,25 @@ function outsideBox(x: number, z: number, b = SHELF_TUNING.box): number {
   return Math.hypot(dx, dz);
 }
 
-/** Wrap a height function so Wick stands on its shelf. `water` is the water's surface height. */
-export function withWickShelf(heightAt: (x: number, z: number) => number, water: number, t = SHELF_TUNING): (x: number, z: number) => number {
+/**
+ * Wrap a height function so Wick stands on its shelf. `water` is the water's surface height. `riverDistance`, if
+ * given, is the distance (m) to the nearest river's centre line: the shelf fades to nothing near a river, so the
+ * channels and their banks stay exactly as the valley cut them.
+ */
+export function withWickShelf(
+  heightAt: (x: number, z: number) => number, water: number,
+  riverDistance?: (x: number, z: number) => number, t = SHELF_TUNING,
+): (x: number, z: number) => number {
   return (x, z) => {
     const h = heightAt(x, z);
     const out = outsideBox(x, z, t.box);
     if (out >= t.waterFade) return h;
+    const keep = riverDistance ? smooth((riverDistance(x, z) - t.riverClear) / (t.riverFull - t.riverClear)) : 1;
+    if (keep <= 0) return h;
     const target = water + shelfTarget(x, z, t);
     const overWater = shoreDistance(x, z, t.shore) < 0;
     // Land fades back to the valley's own ground quickly. Water keeps its cut for longer, and only ever lowers the ground.
-    if (overWater) return Math.min(h, h + (target - h) * (1 - smooth(out / t.waterFade)));
-    return h + (target - h) * (1 - smooth(out / t.fade));
+    if (overWater) return Math.min(h, h + (target - h) * (1 - smooth(out / t.waterFade)) * keep);
+    return h + (target - h) * (1 - smooth(out / t.fade)) * keep;
   };
 }

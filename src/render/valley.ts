@@ -18,6 +18,7 @@ import { walkStep, type WalkRules } from '../core/world/walk';
 import { TRAINING_FIELD } from '../data/arena';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
+import { buildFarLand } from './valley_far';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
@@ -38,8 +39,8 @@ const WALK_RULES: WalkRules = {
   blocked: blocksHero,
   inside: insideValley,
 };
-const FOG_START = 160;
-const FOG_END = 360;
+const FOG_START = 240;
+const FOG_END = 1100; // the far rim and the castle are meant to be seen across the whole valley
 const SUN_RANGE = 90;
 
 /** Test and capture hooks, read by the screenshot scripts. Not part of play. */
@@ -151,6 +152,7 @@ class Valley {
     this.shadow.darkness = 0.35;
 
     this.terrain = new ValleyTerrain(scene);
+    buildFarLand(scene); // the whole valley, coarse, so nothing past the stream radius is a hole (review 023)
     this.sky = new ValleySky(scene);
     this.buildWater(scene);
 

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import wick from '../../docs/tasks/003-layout/wick.json';
 import { bearingVector, WICK_GATES, WICK_THINGS, WICK_TUNING, wickHouses } from './plan';
-import { shelfTarget, shoreDistance, withWickShelf } from './shelf';
-import { valleyHeightAt, VALLEY_PLACES, WATER_LEVEL } from '../core/world/valley';
+import { shelfTarget, shoreDistance } from './shelf';
+import { landHeightAt, valleyHeightAt, VALLEY_PLACES, WATER_LEVEL } from '../core/world/valley';
 
 const SEED = 1066;
 const houses = wickHouses(SEED);
-const ground = withWickShelf(valleyHeightAt, WATER_LEVEL);
+const ground = valleyHeightAt;
 const FOOT = wick.plot.house_footprint / 2;
 
 describe('Wick, house by house (docs/tasks/003-wick.md)', () => {
@@ -101,7 +101,7 @@ describe('the shelf Wick stands on (rules 4 and 5)', () => {
     expect(reached).toBe(true);
   });
   it('changes nothing far from the village', () => {
-    for (const [x, z] of [[-176, 50], [226, 238], [-78, -296], [300, 70], [0, 0]]) expect(ground(x, z)).toBe(valleyHeightAt(x, z));
+    for (const [x, z] of [[-176, 50], [226, 238], [-78, -296], [300, 70], [0, 0]]) expect(ground(x, z)).toBe(landHeightAt(x, z));
   });
   it('the bank can be walked: no slope on the dry shelf is steeper than the hero can climb', () => {
     let worst = 0;

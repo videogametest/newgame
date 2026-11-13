@@ -5,12 +5,11 @@ import {
   Color3, Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration, Mesh,
   MeshBuilder, PBRMaterial, Scene, ShadowGenerator, StandardMaterial, Vector3, VertexData,
 } from '@babylonjs/core';
-import { valleyHeightAt, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL } from '../core/world/valley';
+import { landHeightAt, valleyHeightAt, VALLEY_PLACES, VALLEY_SEED, WATER_LEVEL } from '../core/world/valley';
 import { lightingAt } from '../render/lighting';
 import { buildChunkMesh, CHUNK_SIZE } from '../render/valley_terrain';
 import { ValleySky } from '../render/valley_sky';
 import { buildWick } from '../village/build';
-import { withWickShelf } from '../village/shelf';
 
 export async function startWickTest(canvas: HTMLCanvasElement): Promise<void> {
   const engine = new Engine(canvas, true, { stencil: true }, true);
@@ -22,7 +21,7 @@ export async function startWickTest(canvas: HTMLCanvasElement): Promise<void> {
   scene.fogEnd = 620;
 
   const flat = new URLSearchParams(location.search).get('shelf') === '0';
-  const heightAt = flat ? valleyHeightAt : withWickShelf(valleyHeightAt, WATER_LEVEL);
+  const heightAt = flat ? landHeightAt : valleyHeightAt;
 
   const hemi = new HemisphericLight('hemi', new Vector3(0, 1, 0), scene);
   const sun = new DirectionalLight('sun', new Vector3(0.4, -1, 0.7), scene);

@@ -3,6 +3,7 @@
 // valley_layout.ts (do not edit that by hand). This file turns them into the terrain and the walking rules.
 
 import { createHeightAt, type TerrainShape } from './terrain';
+import { withWickShelf } from '../../village/shelf';
 import {
   VALLEY_BASE_HEIGHT,
   VALLEY_CROSSINGS,
@@ -89,6 +90,12 @@ const heightSampler = createHeightAt(VALLEY_SEED, VALLEY_SHAPE);
 
 /** Ground height (m) at a valley point. Same answer for the same (x, z) on every call. */
 export function valleyHeightAt(x: number, z: number): number {
+  return (shelved ??= withWickShelf(landHeightAt, WATER_LEVEL, riverDistance))(x, z);
+}
+let shelved: ((x: number, z: number) => number) | null = null;
+
+/** The valley's land before Wick's shelf and bay are cut into it (docs/tasks/003-wick.md, rules 4 and 5). */
+export function landHeightAt(x: number, z: number): number {
   const d = riverDistance(x, z);
   const bank = Math.min(heightSampler(x, z), riverBedAt(x, z) + RIVER_BANK_SLOPE * d);
   return landingAdjust(gorgeAdjust(bank, rimHold(bank, x, z, d), x, z), x, z);

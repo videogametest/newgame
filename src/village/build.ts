@@ -97,6 +97,8 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     cast(node);
     return node;
   };
+  /** Every loose box, merged by material once the village is built: a few draw calls, not hundreds. */
+  const loose: Mesh[] = [];
   /** A box of timber or stone, given by its centre, size, and turn. Sits on the ground unless `y` is given. */
   const box = (name: string, mat: PBRMaterial, x: number, z: number, w: number, h: number, d: number, yaw = 0, y?: number, tilt = 0, roll = 0): Mesh => {
     const b = MeshBuilder.CreateBox(name, { width: w, height: h, depth: d }, scene);
@@ -104,7 +106,7 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     b.rotation.set(tilt, yaw, roll);
     b.material = mat;
     b.parent = root;
-    cast(b);
+    loose.push(b);
     return b;
   };
 
@@ -407,6 +409,11 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
   dry.thinInstanceSetBuffer('matrix', new Float32Array(dryAt), 16, true);
   for (const m of [green, dry]) { m.alwaysSelectAsActiveMesh = true; m.receiveShadows = true; }
   void stone;
+  for (const mat of new Set(loose.map((m) => m.material))) {
+    const group = loose.filter((m) => m.material === mat);
+    const merged = Mesh.MergeMeshes(group, true, true);
+    if (merged) { merged.name = `wick_${mat?.name ?? 'boxes'}`; merged.parent = root; cast(merged); }
+  }
 
   return {
     root, houses, lamp,

@@ -1,6 +1,8 @@
 // Serializable battle types. Nothing here may import Babylon or any render code.
 // Ground plane is (x, z). y is height above the ground. Yaw 0 faces +z; yaw π/2 faces +x.
 
+import type { Footprint } from '../world/solids';
+
 export type Team = 'player' | 'enemy';
 export type FighterKind = 'hero' | 'soldier' | 'archer';
 export type WeaponId = 'sword' | 'bow';
@@ -23,6 +25,8 @@ export interface BattleGround {
   heightAt(x: number, z: number): number;
   /** Fighters farther than this from the hero are frozen: no AI, no movement, no action. */
   simRadius: number;
+  /** Solid footprints (buildings, walls). Arrows stop against them below TUNING.arrow.wallHeight. Absent means none. */
+  solids?: readonly Footprint[];
 }
 
 export interface Fighter {

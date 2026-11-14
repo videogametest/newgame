@@ -130,6 +130,11 @@ const DEFAULTS = {
     radius: 0.15,
     /** Arrows are removed after this many seconds of flight. */
     maxLife: 6,
+    /**
+     * Height (m) of a solid footprint above the ground under it. An arrow below this height stops against the
+     * footprint; above it, the arrow flies over. Two storeys: a placeholder until solids carry their own height.
+     */
+    wallHeight: 6,
   },
 } as const;
 

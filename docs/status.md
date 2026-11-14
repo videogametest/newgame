@@ -6,6 +6,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-14 Task 004 item 6: arrows meet the world (Viktor, PR #76)
+
+- Arrows stop on terrain: an arrow whose `y` is below the ground under it plus the wall height is stopped if its ground is a rise above the arrow. Tests: a 2.5 m rise is passed and the enemy beyond it is hit; a 6 m rise stops the arrow before it reaches the enemy.
+- Arrows stop on solids: `BattleGround.solids` (optional, from `valleySolids()`) stops an arrow inside a footprint widened by the arrow radius, while its `y` is below the ground plus `TUNING.arrow.wallHeight` (6 m, a placeholder until solids carry heights; see the queue's Decisions). Tests: a wall stops the arrow and the enemy is unhurt; a doorway gap lets the arrow through to hit.
+- Stops are checked once per fixed step (0.83 m at 50 m/s), so an arrow can stop up to one step past a face. The test bounds say so.
+- Flat ground changes nothing: a scripted 1,500-step fight (sword, bow, three soldiers) with no ground and with `heightAt: 0`, `simRadius: Infinity` gives the same fighters, events, status, time and projectile count. An arena fight with no ground is unchanged.
+- Gate in the worker sandbox on the branch: `npm ci`; `npm test` 883 passed (73 files), of which 6 are new; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m; Playwright chromium; `node scripts/smoke.mjs` on a local preview passed.
+- Not visible yet: no arrow frames, because nothing renders differently with the arena off. Stopping arrows on the valley's terrain and solids runs in the valley, which the item 8 frames will show.
+
 ## 2026-11-14 Task 004 item 5: fighters on the ground (Viktor, branch `task-004-item5-ground`)
 
 - `BattleGround` (`heightAt`, `simRadius`) is optional on `createBattle`. Each fighter has `y` from the ground, refreshed after movement and collisions.

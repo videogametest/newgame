@@ -279,6 +279,11 @@ export class CharacterView {
     for (const c of this.casters) c.visibility = this.opacity;
   }
 
+  /** Hides or shows the whole character (the brightness picture hides the hero). Its shadow goes with it. */
+  setShown(on: boolean): void {
+    this.root.setEnabled(on);
+  }
+
   dispose(): void {
     for (const m of this.casters) this.shadow.removeShadowCaster(m);
     this.player.dispose();

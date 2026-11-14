@@ -1,5 +1,6 @@
-// The pause menu (docs/writing/interface.md, "Pause menu"). Built so far: Resume, Settings (a stub until task 009
-// step 2d), and Controls (keyboard and mouse). Copy debug report and Return to title are not built yet.
+// The pause menu (docs/writing/interface.md, "Pause menu"). Built: Resume, Settings (Display with brightness, Controls
+// page), and Controls (keyboard and mouse). Sound, Camera, Controller and Play pages, Copy debug report and
+// Return to title are not built yet.
 import type { Bindings } from '../core/settings/actions';
 import { ControlsPage } from './controls_page';
 import { buildDisplaySection } from './display_settings';
@@ -13,7 +14,7 @@ export class PauseMenu {
   private readonly controlsPage: ControlsPage;
   private page: Page = 'menu';
 
-  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void, onBrightness: (b: number) => void = () => {}) {
+  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void, onBrightness: (b: number) => void = () => {}, onAgain: () => void = () => {}) {
     this.root = document.createElement('div');
     // .panel does not set pointer-events, so the menu takes its own clicks; otherwise they reach the canvas and re-request the mouse.
     this.root.className = 'panel pause';
@@ -39,7 +40,7 @@ export class PauseMenu {
     const heading = document.createElement('h2');
     heading.textContent = 'Settings';
     // "Back" is not in docs/writing/interface.md; it is flagged in docs/status.md.
-    this.settingsPage.append(heading, buildDisplaySection(onBrightness), button('Back', () => this.showMenu()));
+    this.settingsPage.append(heading, buildDisplaySection(onBrightness, onAgain), button('Back', () => this.showMenu()));
 
     this.controlsPage = new ControlsPage(onBindings, () => this.showMenu());
 
@@ -69,6 +70,17 @@ export class PauseMenu {
   hide(): void {
     this.root.hidden = true;
     this.showMenu();
+  }
+
+  /** The brightness picture takes the screen: the menu hides but keeps the page it was on. */
+  hideForPicture(): void {
+    this.root.hidden = true;
+  }
+
+  /** The picture is closed: the menu comes back on Settings, where "Set brightness again" was pressed. */
+  reopenSettings(): void {
+    this.root.hidden = false;
+    this.showSettings();
   }
 
   showSettings(): void {

@@ -1,17 +1,32 @@
-// Display settings (task 009 step 2c): the brightness slider and quality choice on the Settings page, and the
-// first-start brightness prompt. Changes are saved through settings_store, so every reader sees the same values.
+// Display settings (task 009 steps 2c and 2d): the brightness slider and quality choice on the Settings page,
+// and the brightness picture (the first-start prompt, and "Set brightness again" from Display).
+// Wording is from docs/writing/interface.md. Changes are saved through settings_store, so every reader sees the same values.
 
 import { RANGES, type Quality, type Settings } from '../core/settings/settings';
 import { currentSettings, saveSettings } from './settings_store';
 
 const QUALITIES: Quality[] = ['low', 'medium', 'high'];
 
-/** The Display section for the Settings page. Brightness applies live; quality is read on the next start. */
-export function buildDisplaySection(onBrightness: (b: number) => void): HTMLElement {
+/** The words of the brightness picture, exactly as docs/writing/interface.md gives them. */
+export const BRIGHTNESS_WORDS = {
+  heading: 'Brightness',
+  hint: 'Move the slider until you can only just see the figure in the yard.',
+  done: "That's right.",
+  again: 'Set brightness again',
+} as const;
+
+/**
+ * The Display section for the Settings page. Brightness applies live; quality is read on the next start.
+ * `onAgain` opens the brightness picture again (the pause menu hands over to it).
+ */
+export function buildDisplaySection(onBrightness: (b: number) => void, onAgain: () => void = () => {}): HTMLElement {
   const section = document.createElement('section');
   const heading = document.createElement('h3');
   heading.textContent = 'Display';
-  section.append(heading, brightnessRow(onBrightness), qualityRow());
+  const again = document.createElement('button');
+  again.textContent = BRIGHTNESS_WORDS.again;
+  again.addEventListener('click', onAgain);
+  section.append(heading, brightnessRow(onBrightness), again, qualityRow());
   return section;
 }
 
@@ -48,27 +63,35 @@ function qualityRow(): HTMLElement {
 }
 
 /**
- * The first-start prompt: shown once, until the player sets brightness. It applies the slider live and saves
- * brightnessSet, so it never comes back.
+ * The brightness picture's card, along the bottom of the screen so it covers neither the figure nor the house.
+ * The slider applies live. "That's right." saves the brightness and brightnessSet, then calls onDone; the caller
+ * closes the picture (time, hero and camera come back there).
  */
-export function showBrightnessPrompt(uiRoot: HTMLElement, onBrightness: (b: number) => void): HTMLElement | null {
-  if (currentSettings().display.brightnessSet) return null;
+export function showBrightnessPrompt(uiRoot: HTMLElement, onBrightness: (b: number) => void, onDone: () => void): HTMLElement {
   const card = document.createElement('div');
   card.className = 'card';
-  card.style.cssText = 'position:absolute;left:50%;top:18px;transform:translateX(-50%);pointer-events:auto;z-index:20;';
+  card.style.cssText = 'position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(560px,92vw);pointer-events:auto;z-index:20;';
   const title = document.createElement('h3');
-  title.textContent = 'Brightness';
+  title.textContent = BRIGHTNESS_WORDS.heading;
   const hint = document.createElement('p');
-  hint.textContent = 'Move the slider until the dark side of the valley is readable, then press Set.';
+  hint.textContent = BRIGHTNESS_WORDS.hint;
+  const row = labelled('');
   const slider = rangeInput(RANGES.brightness, currentSettings().display.brightness);
-  slider.addEventListener('input', () => onBrightness(Number(slider.value)));
-  const set = document.createElement('button');
-  set.textContent = 'Set';
-  set.addEventListener('click', () => {
+  const readout = document.createElement('span');
+  readout.textContent = slider.value;
+  slider.addEventListener('input', () => {
+    readout.textContent = slider.value;
+    onBrightness(Number(slider.value));
+  });
+  row.append(slider, readout);
+  const done = document.createElement('button');
+  done.textContent = BRIGHTNESS_WORDS.done;
+  done.addEventListener('click', () => {
     saveDisplay({ brightness: Number(slider.value), brightnessSet: true });
     card.remove();
+    onDone();
   });
-  card.append(title, hint, slider, set);
+  card.append(title, hint, row, done);
   uiRoot.appendChild(card);
   return card;
 }
@@ -83,9 +106,11 @@ function labelled(text: string): HTMLElement {
   row.style.display = 'flex';
   row.style.gap = '10px';
   row.style.alignItems = 'center';
-  const label = document.createElement('span');
-  label.textContent = text;
-  row.append(label);
+  if (text) {
+    const label = document.createElement('span');
+    label.textContent = text;
+    row.append(label);
+  }
   return row;
 }
 

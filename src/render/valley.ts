@@ -138,6 +138,19 @@ export async function startValley(canvas: HTMLCanvasElement, uiRoot: HTMLElement
   }
 }
 
+/** What the brightness picture saves on open and restores on close. */
+interface PictureSaved {
+  timeOfDay: number;
+  position: { x: number; z: number };
+  groundY: number;
+  heroYaw: number;
+  camYaw: number;
+  aimPitch: number;
+  frozen: boolean;
+  tourIndex: number;
+  tourText: string;
+}
+
 class Valley {
   private readonly input: PlayerInput;
   private readonly camera: FreeCamera;
@@ -168,6 +181,9 @@ class Valley {
   private glow?: GlowLayer;
   private accumulator = 0;
   private frozen = false;
+  /** Set while the brightness picture is open: the hero is hidden, the clock frozen, and his position held. */
+  private picture: { from: 'start' | 'again'; saved: PictureSaved } | null = null;
+  private readonly uiRoot: HTMLElement;
   /** Pause menu open: the clock, the walk and the fixed steps stop. The scene still draws. */
   private paused = false;
   private frame = 0;
@@ -226,11 +242,14 @@ class Valley {
     this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
 
+    this.uiRoot = uiRoot;
     this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
       saveSettings({ ...currentSettings(), bindings: b });
       this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
-    }, (b) => this.applyBrightness(b));
-    showBrightnessPrompt(uiRoot, (b) => this.applyBrightness(b)); // once, until the player sets brightness (task 009 step 2c)
+    }, (b) => this.applyBrightness(b), () => {
+      this.pauseMenu.hideForPicture();
+      this.startBrightnessPicture('again'); // "Set brightness again" (task 009 step 2c, review 031)
+    });
     this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
     this.input.camYaw = this.hero.yaw;
 
@@ -250,6 +269,51 @@ class Valley {
       this.tourTo(0);
     }
     this.installHooks();
+    if (!display.brightnessSet) this.startBrightnessPicture('start'); // first run: the picture comes up once, until brightness is set
+  }
+
+  /**
+   * The brightness picture (review 031): Hesper's door at midnight, the hero hidden, the clock frozen.
+   * Everything it moves is saved here and put back when the player says "That's right."
+   */
+  private startBrightnessPicture(from: 'start' | 'again'): void {
+    if (this.picture) return;
+    const saved: PictureSaved = {
+      timeOfDay: this.game.timeOfDay,
+      position: { ...this.game.hero.position },
+      groundY: this.groundY,
+      heroYaw: this.hero.yaw,
+      camYaw: this.input.camYaw,
+      aimPitch: this.input.aimPitch,
+      frozen: this.frozen,
+      tourIndex: this.tourIndex,
+      tourText: this.tourText.textContent ?? '',
+    };
+    this.picture = { from, saved };
+    this.frozen = true;
+    this.tourTo('hesper_door');
+    this.game.timeOfDay = 0; // midnight, so the lit windows and the lamp read the figure against the dark
+    this.heroView.setShown(false);
+    showBrightnessPrompt(this.uiRoot, (b) => this.applyBrightness(b), () => this.endBrightnessPicture());
+  }
+
+  private endBrightnessPicture(): void {
+    const open = this.picture;
+    if (!open) return;
+    const s = open.saved;
+    this.picture = null;
+    this.game.timeOfDay = s.timeOfDay;
+    this.game.hero.position = { ...s.position };
+    this.syncHeroProxy();
+    this.groundY = s.groundY;
+    this.hero.yaw = s.heroYaw;
+    this.input.camYaw = s.camYaw;
+    this.input.aimPitch = s.aimPitch;
+    this.frozen = s.frozen;
+    this.tourIndex = s.tourIndex;
+    this.tourText.textContent = s.tourText;
+    this.heroView.setShown(true);
+    if (open.from === 'again') this.pauseMenu.reopenSettings();
   }
 
   /** Wick, the village (docs/tasks/003-wick.md). Built once; its light follows the clock every frame. */
@@ -304,7 +368,7 @@ class Valley {
   private tick(): void {
     this.frame += 1;
     const dt = Math.min(this.engine.getDeltaTime() / 1000, 0.1);
-    if (this.input.takePause()) this.onPauseKey();
+    if (this.input.takePause() && !this.picture) this.onPauseKey(); // Esc does nothing while the picture is open
     const next = clockAfterFrame(this.game, dt, VALLEY_CLOCK, clockRuns(this.paused, this.frozen, this.input.isWindowFocused));
     this.game.day = next.day;
     this.game.timeOfDay = next.timeOfDay;
@@ -360,6 +424,10 @@ class Valley {
 
   /** One fixed step of walking. Movement only while the mouse is captured, so Esc pauses the hero. */
   private stepHero(dt: number): void {
+    if (this.picture) {
+      this.input.consumeEdges(); // the hero holds still while the picture is open; presses made then are dropped
+      return;
+    }
     const intent = this.input.takeInput();
     const from = { ...this.game.hero.position };
     let dirX = 0;

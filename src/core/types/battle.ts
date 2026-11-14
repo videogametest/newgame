@@ -18,6 +18,13 @@ export interface Action {
   zoneZ: number;
 }
 
+/** The ground under a battle: fighters stand on heightAt, and only fighters near the hero are simulated. */
+export interface BattleGround {
+  heightAt(x: number, z: number): number;
+  /** Fighters farther than this from the hero are frozen: no AI, no movement, no action. */
+  simRadius: number;
+}
+
 export interface Fighter {
   id: number;
   /** Key into the unit data (src/data/units.ts). Only the render layer reads it. */
@@ -26,6 +33,8 @@ export interface Fighter {
   team: Team;
   x: number;
   z: number;
+  /** Ground height under the fighter, set each step from the battle's ground (0 on flat arenas). */
+  y: number;
   yaw: number;
   radius: number;
   height: number;
@@ -115,6 +124,8 @@ export interface BattleState {
   wave: number;
   /** Seconds the field has been clear of enemies while a later wave is pending. */
   waveTimer: number;
+  /** Not serialized (it holds a function). Absent means flat ground and every fighter is simulated. */
+  ground?: BattleGround;
 }
 
 /** One step of player intent. Edge flags (`*Pressed`, `*Released`, `dodgePressed`) are true for one step only. */

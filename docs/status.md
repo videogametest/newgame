@@ -6,6 +6,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-14 Task 004 item 5: fighters on the ground (Viktor, branch `task-004-item5-ground`)
+
+- `BattleGround` (`heightAt`, `simRadius`) is optional on `createBattle`. Each fighter has `y` from the ground, refreshed after movement and collisions.
+- Fighters beyond `simRadius` of the hero are frozen: zero velocity, no AI, no actions. The hero is always simulated.
+- Arrows are world height. A shot starts at the shooter's ground plus muzzle height; an arrow lands when it reaches the ground under it. A fighter is hit when the arrow is within its body band above its own ground.
+- With no ground, every fighter is simulated and `y` stays 0, so the arena behaviour is unchanged.
+- Tests: new `src/core/battle_ground.test.ts` (8 tests) for flat behaviour, ground height, culling in both directions, and arrows on raised ground. Full suite 877 passing, typecheck and build pass.
+- Not rendered yet and not played in a browser. No frames are attached, because this item has no visual change.
+
 ## 2026-11-14 Task 004 item 4: valley pathfinding (Viktor, branch `task-004-pathfinding`)
 
 - `src/core/world/pathfinding.ts`: the open set is a binary min-heap (ties by first insertion). Same signature and output as before: 2,000 random queries compared, all equal (1,028 with a path).

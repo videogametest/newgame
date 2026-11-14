@@ -220,6 +220,11 @@ export class CharacterView {
     this.poseOverride = pose;
   }
 
+  /** Hides or shows the whole character. The brightness picture hides the hero (task 009 step 2c). */
+  setShown(on: boolean): void {
+    this.root.setEnabled(on);
+  }
+
   /** groundY: terrain height under the fighter (0 on the flat arena). */
   update(f: Fighter, groundY = 0): void {
     this.root.position.set(f.x, groundY, f.z);

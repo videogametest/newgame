@@ -1,17 +1,29 @@
-// Display settings (task 009 step 2c): the brightness slider and quality choice on the Settings page, and the
-// first-start brightness prompt. Changes are saved through settings_store, so every reader sees the same values.
+// Display settings (task 009 steps 2c and 2d): the brightness slider and quality choice on the Settings page, and the
+// brightness picture: at first start once, and from Display as "Set brightness again". Changes are saved through
+// settings_store, so every reader sees the same values.
 
 import { RANGES, type Quality, type Settings } from '../core/settings/settings';
 import { currentSettings, saveSettings } from './settings_store';
+import { PICTURE_AGAIN, PICTURE_BUTTON, PICTURE_TEXT, PICTURE_TITLE, promptDue } from './brightness_picture';
 
 const QUALITIES: Quality[] = ['low', 'medium', 'high'];
 
+/** What the valley does while the picture is open: show the view, apply the slider live, and put everything back. */
+export interface BrightnessPicture {
+  begin(): void;
+  end(): void;
+  apply(brightness: number): void;
+}
+
 /** The Display section for the Settings page. Brightness applies live; quality is read on the next start. */
-export function buildDisplaySection(onBrightness: (b: number) => void): HTMLElement {
+export function buildDisplaySection(onBrightness: (b: number) => void, onSetAgain: () => void): HTMLElement {
   const section = document.createElement('section');
   const heading = document.createElement('h3');
   heading.textContent = 'Display';
-  section.append(heading, brightnessRow(onBrightness), qualityRow());
+  const again = document.createElement('button');
+  again.textContent = PICTURE_AGAIN;
+  again.addEventListener('click', onSetAgain);
+  section.append(heading, brightnessRow(onBrightness), qualityRow(), again);
   return section;
 }
 
@@ -47,28 +59,46 @@ function qualityRow(): HTMLElement {
   return row;
 }
 
-/**
- * The first-start prompt: shown once, until the player sets brightness. It applies the slider live and saves
- * brightnessSet, so it never comes back.
- */
-export function showBrightnessPrompt(uiRoot: HTMLElement, onBrightness: (b: number) => void): HTMLElement | null {
-  if (currentSettings().display.brightnessSet) return null;
+/** The first-start picture: shown once, until the player sets brightness. Saves brightnessSet, so it never comes back. */
+export function showBrightnessPrompt(uiRoot: HTMLElement, picture: BrightnessPicture): HTMLElement | null {
+  if (!promptDue(currentSettings().display)) return null;
+  return brightnessCard(uiRoot, picture, (b) => saveDisplay({ brightness: b, brightnessSet: true }), () => {});
+}
+
+/** The picture again, from Display. onClose runs after the picture has been put back (the pause menu reopens). */
+export function showBrightnessAgain(uiRoot: HTMLElement, picture: BrightnessPicture, onClose: () => void): HTMLElement {
+  return brightnessCard(uiRoot, picture, (b) => saveDisplay({ brightness: b }), onClose);
+}
+
+function brightnessCard(
+  uiRoot: HTMLElement,
+  picture: BrightnessPicture,
+  save: (b: number) => void,
+  onClose: () => void,
+): HTMLElement {
+  picture.begin();
   const card = document.createElement('div');
   card.className = 'card';
-  card.style.cssText = 'position:absolute;left:50%;top:18px;transform:translateX(-50%);pointer-events:auto;z-index:20;';
+  // Along the bottom, so the card never covers the figure in the yard or Hesper's window (review 031 item 3).
+  card.style.cssText = 'position:absolute;left:50%;bottom:18px;transform:translateX(-50%);pointer-events:auto;z-index:20;max-width:560px;';
   const title = document.createElement('h3');
-  title.textContent = 'Brightness';
-  const hint = document.createElement('p');
-  hint.textContent = 'Move the slider until the dark side of the valley is readable, then press Set.';
+  title.textContent = PICTURE_TITLE;
+  const text = document.createElement('p');
+  text.textContent = PICTURE_TEXT;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:12px;align-items:center;';
   const slider = rangeInput(RANGES.brightness, currentSettings().display.brightness);
-  slider.addEventListener('input', () => onBrightness(Number(slider.value)));
-  const set = document.createElement('button');
-  set.textContent = 'Set';
-  set.addEventListener('click', () => {
-    saveDisplay({ brightness: Number(slider.value), brightnessSet: true });
+  slider.addEventListener('input', () => picture.apply(Number(slider.value)));
+  const done = document.createElement('button');
+  done.textContent = PICTURE_BUTTON;
+  done.addEventListener('click', () => {
+    save(Number(slider.value));
     card.remove();
+    picture.end();
+    onClose();
   });
-  card.append(title, hint, slider, set);
+  row.append(slider, done);
+  card.append(title, text, row);
   uiRoot.appendChild(card);
   return card;
 }

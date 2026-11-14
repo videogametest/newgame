@@ -31,7 +31,9 @@ import { Hud } from './hud';
 import { PlayerInput } from './input';
 import { fillPrompt } from '../core/settings/labels';
 import { currentSettings, saveSettings } from './settings_store';
-import { showBrightnessPrompt } from './display_settings';
+import { showBrightnessAgain, showBrightnessPrompt, type BrightnessPicture } from './display_settings';
+import { PICTURE_HOUR, PICTURE_VIEW } from './brightness_picture';
+import { SCARECROW } from '../village/plan';
 import { brightnessCurve } from '../core/settings/settings';
 import { qualityProfile } from './quality';
 import { lightingAt } from './lighting';
@@ -80,6 +82,8 @@ export interface ValleyHooks {
   groundMask(cols?: number, rows?: number): number[];
   /** Capture only: hides the clock, figures, hint and tour label. */
   hideChrome(): void;
+  openPicture(): void;
+  closePicture(): void;
   /** Capture only: the image exposure and the grey ambient lift now in use (brightness, task 009 step 2c). */
   exposure(): { exposure: number; ambient: number };
 }
@@ -168,6 +172,9 @@ class Valley {
   private glow?: GlowLayer;
   private accumulator = 0;
   private frozen = false;
+  /** The brightness picture is open: the saved time, hero and camera to restore on close (task 009 step 2c). */
+  private picture: PictureSave | null = null;
+  private readonly uiRoot: HTMLElement;
   /** Pause menu open: the clock, the walk and the fixed steps stop. The scene still draws. */
   private paused = false;
   private frame = 0;
@@ -185,6 +192,7 @@ class Valley {
     assets: LoadedAssets,
     private readonly game: GameState,
   ) {
+    this.uiRoot = uiRoot;
     const canvas = engine.getRenderingCanvas() as HTMLCanvasElement;
     scene.fogMode = Scene.FOGMODE_LINEAR;
     scene.fogStart = FOG_START;
@@ -229,8 +237,7 @@ class Valley {
     this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
       saveSettings({ ...currentSettings(), bindings: b });
       this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
-    }, (b) => this.applyBrightness(b));
-    showBrightnessPrompt(uiRoot, (b) => this.applyBrightness(b)); // once, until the player sets brightness (task 009 step 2c)
+    }, (b) => this.applyBrightness(b), () => this.setBrightnessAgain());
     this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
     this.input.camYaw = this.hero.yaw;
 
@@ -250,6 +257,7 @@ class Valley {
       this.tourTo(0);
     }
     this.installHooks();
+    showBrightnessPrompt(uiRoot, this.picturePort()); // once, until the player sets brightness (task 009 step 2c)
   }
 
   /** Wick, the village (docs/tasks/003-wick.md). Built once; its light follows the clock every frame. */
@@ -304,7 +312,7 @@ class Valley {
   private tick(): void {
     this.frame += 1;
     const dt = Math.min(this.engine.getDeltaTime() / 1000, 0.1);
-    if (this.input.takePause()) this.onPauseKey();
+    if (this.input.takePause() && !this.picture) this.onPauseKey(); // the picture is open: no pause menu over it
     const next = clockAfterFrame(this.game, dt, VALLEY_CLOCK, clockRuns(this.paused, this.frozen, this.input.isWindowFocused));
     this.game.day = next.day;
     this.game.timeOfDay = next.timeOfDay;
@@ -360,6 +368,11 @@ class Valley {
 
   /** One fixed step of walking. Movement only while the mouse is captured, so Esc pauses the hero. */
   private stepHero(dt: number): void {
+    if (this.picture) {
+      this.hero.vx = 0;
+      this.hero.vz = 0;
+      return; // the brightness picture holds the hero still
+    }
     const intent = this.input.takeInput();
     const from = { ...this.game.hero.position };
     let dirX = 0;
@@ -431,6 +444,59 @@ class Valley {
     box.hidden = !(this.debug || this.tour);
     this.chromeBox = box;
     uiRoot.appendChild(box);
+  }
+
+  private picturePort(): BrightnessPicture {
+    return {
+      begin: () => this.beginPicture(),
+      end: () => this.endPicture(),
+      apply: (b) => this.applyBrightness(b),
+    };
+  }
+
+  /** From Display: the menu steps aside while the picture is open, and comes back on the same page. */
+  private setBrightnessAgain(): void {
+    this.pauseMenu.suspend();
+    showBrightnessAgain(this.uiRoot, this.picturePort(), () => this.pauseMenu.unsuspend());
+  }
+
+  /** The picture: Hesper's yard at midnight, the clock stopped, the hero hidden. Whatever the game's time is. */
+  private beginPicture(): void {
+    if (this.picture) return;
+    this.picture = {
+      hero: { ...this.game.hero.position },
+      groundY: this.groundY,
+      yaw: this.hero.yaw,
+      camYaw: this.input.camYaw,
+      aimPitch: this.input.aimPitch,
+      timeOfDay: this.game.timeOfDay,
+      frozen: this.frozen,
+      tourIndex: this.tourIndex,
+      tourText: this.tourText.textContent ?? '',
+    };
+    this.frozen = true;
+    this.tourTo(PICTURE_VIEW);
+    this.lookAt(SCARECROW.x, SCARECROW.z); // the picture is the figure: turn the camera onto it
+    this.game.timeOfDay = PICTURE_HOUR;
+    this.heroView.setShown(false);
+  }
+
+  /** Puts back the time, the hero, the camera and the tour label the picture found. */
+  private endPicture(): void {
+    const s = this.picture;
+    if (!s) return;
+    this.picture = null;
+    this.game.hero.position = s.hero;
+    this.syncHeroProxy();
+    this.groundY = s.groundY;
+    this.hero.yaw = s.yaw;
+    this.input.camYaw = s.camYaw;
+    this.input.aimPitch = s.aimPitch;
+    this.game.timeOfDay = s.timeOfDay;
+    this.frozen = s.frozen;
+    this.tourIndex = s.tourIndex;
+    this.tourText.textContent = s.tourText;
+    this.heroView.setShown(true);
   }
 
   /** Tour mode: stands the hero at a view, turns the camera to its look point, and sets its clock hour. */
@@ -535,6 +601,9 @@ class Valley {
       hideChrome: () => {
         if (this.chromeBox) this.chromeBox.hidden = true;
       },
+      // Capture only: opens the brightness picture (hero hidden, clock stopped) and closes it again.
+      openPicture: () => this.beginPicture(),
+      closePicture: () => this.endPicture(),
       exposure: () => ({ exposure: this.scene.imageProcessingConfiguration.exposure, ambient: this.scene.ambientColor.r }),
       project: (name) => {
         const m = this.scene.getMeshByName(name);
@@ -571,4 +640,17 @@ class Valley {
       activeMeshes: this.scene.getActiveMeshes().length,
     };
   }
+}
+
+/** What the brightness picture found when it opened (see Valley.beginPicture). */
+interface PictureSave {
+  hero: { x: number; z: number };
+  groundY: number;
+  yaw: number;
+  camYaw: number;
+  aimPitch: number;
+  timeOfDay: number;
+  frozen: boolean;
+  tourIndex: number;
+  tourText: string;
 }

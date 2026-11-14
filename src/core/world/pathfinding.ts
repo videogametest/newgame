@@ -7,103 +7,157 @@ export interface WalkableGrid {
   isBlocked: (x: number, z: number) => boolean;
 }
 
-/** One open-set entry. Stale entries (an older, larger cost) are skipped when popped. */
-interface OpenEntry { score: number; seq: number; id: number; cost: number }
+/**
+ * A grid prepared once for many searches: `blocked[z * width + x]` is 1 where a cell is an obstacle.
+ * Building it calls the (possibly expensive) walk rule once per cell; searching never does.
+ */
+export interface WalkableCells {
+  width: number;
+  depth: number;
+  blocked: Uint8Array;
+}
 
-/** Min-heap on (score, seq): the lowest score wins, and among equal scores the node opened first. */
-class OpenHeap {
-  private items: OpenEntry[] = [];
-  get size(): number { return this.items.length; }
-  push(e: OpenEntry): void {
-    const a = this.items;
-    a.push(e);
-    let i = a.length - 1;
-    while (i > 0) {
-      const parent = (i - 1) >> 1;
-      if (!before(a[i], a[parent])) break;
-      [a[i], a[parent]] = [a[parent], a[i]];
-      i = parent;
+const NO_CELL = -1;
+const UNREACHED = 0x3fffffff;
+/** Four cardinal steps, in the fixed order the tie-breaker depends on: +x, +z, -x, -z. */
+const DX = [1, 0, -1, 0];
+const DZ = [0, 1, 0, -1];
+
+/** Evaluate the walk rule for every cell of `grid` once. Call from outside any search loop. */
+export function buildWalkableCells(grid: WalkableGrid): WalkableCells {
+  assertDimensions(grid.width, grid.depth);
+  const blocked = new Uint8Array(grid.width * grid.depth);
+  for (let z = 0; z < grid.depth; z++) {
+    for (let x = 0; x < grid.width; x++) {
+      blocked[z * grid.width + x] = grid.isBlocked(x, z) ? 1 : 0;
     }
   }
-  pop(): OpenEntry | undefined {
-    const a = this.items;
-    const top = a[0];
-    const last = a.pop();
-    if (a.length && last) {
-      a[0] = last;
+  return { width: grid.width, depth: grid.depth, blocked };
+}
+
+/**
+ * Deterministic four-neighbour A* on prepared cells: the shortest cardinal path including endpoints.
+ * No diagonal corner cutting. null means unreachable or invalid endpoints, never a partial path.
+ * The search runs on typed arrays only: no callbacks, no allocation per step.
+ * Ties on score go to the node opened first, so the same inputs always give the same path.
+ */
+export function findPathCells(cells: WalkableCells, start: Vec2, goal: Vec2): Vec2[] | null {
+  const { width, depth, blocked } = cells;
+  assertDimensions(width, depth);
+  if (!inside(width, depth, start) || !inside(width, depth, goal)) return null;
+  const n = width * depth;
+  const startId = start.z * width + start.x;
+  const goalId = goal.z * width + goal.x;
+  if (blocked[startId] || blocked[goalId]) return null;
+
+  const cost = new Int32Array(n).fill(UNREACHED);
+  const cameFrom = new Int32Array(n).fill(NO_CELL);
+  const seqOf = new Int32Array(n).fill(NO_CELL);
+  const cellOfSeq = new Int32Array(n);
+  const closed = new Uint8Array(n);
+  // Each cell is closed once and pushes at most four entries, so 4n + 1 slots is enough.
+  const heap = new Float64Array(4 * n + 1);
+  let heapSize = 0;
+  let nextSeq = 0;
+
+  // Heap key = score * n + seq. Seq is unique per cell and below n, so this orders by (score, seq).
+  const heuristic = (x: number, z: number) => Math.abs(goal.x - x) + Math.abs(goal.z - z);
+  const push = (key: number) => {
+    let i = heapSize++;
+    heap[i] = key;
+    while (i > 0) {
+      const parent = (i - 1) >> 1;
+      if (heap[parent] <= heap[i]) break;
+      const t = heap[parent];
+      heap[parent] = heap[i];
+      heap[i] = t;
+      i = parent;
+    }
+  };
+  const pop = (): number => {
+    const top = heap[0];
+    heapSize--;
+    if (heapSize > 0) {
+      heap[0] = heap[heapSize];
       let i = 0;
       for (;;) {
         const l = 2 * i + 1;
         const r = l + 1;
         let m = i;
-        if (l < a.length && before(a[l], a[m])) m = l;
-        if (r < a.length && before(a[r], a[m])) m = r;
+        if (l < heapSize && heap[l] < heap[m]) m = l;
+        if (r < heapSize && heap[r] < heap[m]) m = r;
         if (m === i) break;
-        [a[i], a[m]] = [a[m], a[i]];
+        const t = heap[m];
+        heap[m] = heap[i];
+        heap[i] = t;
         i = m;
       }
     }
     return top;
-  }
-}
+  };
 
-function before(x: OpenEntry, y: OpenEntry): boolean {
-  return x.score !== y.score ? x.score < y.score : x.seq < y.seq;
-}
+  cost[startId] = 0;
+  seqOf[startId] = nextSeq;
+  cellOfSeq[nextSeq] = startId;
+  nextSeq++;
+  push(heuristic(start.x, start.z) * n + seqOf[startId]);
 
-/** Deterministic four-neighbour A*: shortest cardinal path including endpoints.
- * No diagonal corner cutting. null means unreachable/invalid endpoints, never a partial path.
- * Grid is finite and supplied from nearby chunks; callers decide when to retry/repath.
- * The open set is a binary heap, so a long route costs about n log n, not n per step.
- */
-export function findPath(grid: WalkableGrid, start: Vec2, goal: Vec2): Vec2[] | null {
-  if (!Number.isSafeInteger(grid.width) || !Number.isSafeInteger(grid.depth) || grid.width <= 0 || grid.depth <= 0) {
-    throw new RangeError('Grid dimensions must be positive integers');
-  }
-  const valid = (p: Vec2) => Number.isInteger(p.x) && Number.isInteger(p.z)
-    && p.x >= 0 && p.z >= 0 && p.x < grid.width && p.z < grid.depth;
-  if (!valid(start) || !valid(goal) || grid.isBlocked(start.x, start.z) || grid.isBlocked(goal.x, goal.z)) return null;
-  const key = (p: Vec2) => p.z * grid.width + p.x;
-  const heuristic = (x: number, z: number) => Math.abs(goal.x - x) + Math.abs(goal.z - z);
-  const startKey = key(start);
-  const goalKey = key(goal);
-  const heap = new OpenHeap();
-  const cost = new Map<number, number>([[startKey, 0]]);
-  const seqOf = new Map<number, number>([[startKey, 0]]);
-  let nextSeq = 1;
-  const cameFrom = new Map<number, number>();
-  const closed = new Set<number>();
-  // Fixed ordering is the tie-breaker; no RNG required.
-  const directions = [{ x: 1, z: 0 }, { x: 0, z: 1 }, { x: -1, z: 0 }, { x: 0, z: -1 }];
-  heap.push({ score: heuristic(start.x, start.z), seq: 0, id: startKey, cost: 0 });
-  while (heap.size) {
-    const entry = heap.pop()!;
-    const bestKey = entry.id;
-    if (closed.has(bestKey) || cost.get(bestKey) !== entry.cost) continue;
-    if (bestKey === goalKey) {
-      const path: Vec2[] = [];
-      let id: number | undefined = goalKey;
-      while (id !== undefined) {
-        path.push({ x: id % grid.width, z: Math.floor(id / grid.width) });
-        id = cameFrom.get(id);
+  while (heapSize > 0) {
+    const key = pop();
+    const seq = key % n;
+    const score = (key - seq) / n;
+    const node = cellOfSeq[seq];
+    if (closed[node]) continue;
+    const x = node % width;
+    const z = (node - x) / width;
+    // A stale entry carries a larger score than the cell's current best; the best one pops first.
+    if (score - heuristic(x, z) !== cost[node]) continue;
+    if (node === goalId) return reconstruct(cameFrom, node, width);
+    closed[node] = 1;
+    for (let d = 0; d < 4; d++) {
+      const nx = x + DX[d];
+      const nz = z + DZ[d];
+      if (nx < 0 || nz < 0 || nx >= width || nz >= depth) continue;
+      const id = nz * width + nx;
+      if (closed[id] || blocked[id]) continue;
+      const nextCost = cost[node] + 1;
+      if (nextCost >= cost[id]) continue;
+      cost[id] = nextCost;
+      cameFrom[id] = node;
+      if (seqOf[id] === NO_CELL) {
+        seqOf[id] = nextSeq;
+        cellOfSeq[nextSeq] = id;
+        nextSeq++;
       }
-      return path.reverse();
-    }
-    closed.add(bestKey);
-    const cx = bestKey % grid.width;
-    const cz = Math.floor(bestKey / grid.width);
-    for (const dir of directions) {
-      const next = { x: cx + dir.x, z: cz + dir.z };
-      if (!valid(next)) continue;
-      const id = key(next);
-      if (closed.has(id) || grid.isBlocked(next.x, next.z)) continue;
-      const nextCost = entry.cost + 1;
-      if (nextCost >= (cost.get(id) ?? Infinity)) continue;
-      cost.set(id, nextCost);
-      cameFrom.set(id, bestKey);
-      if (!seqOf.has(id)) seqOf.set(id, nextSeq++);
-      heap.push({ score: nextCost + heuristic(next.x, next.z), seq: seqOf.get(id)!, id, cost: nextCost });
+      push((nextCost + heuristic(nx, nz)) * n + seqOf[id]);
     }
   }
   return null;
+}
+
+/** Same search on a `WalkableGrid`: prepares the cells once, then searches. For repeated queries use `buildWalkableCells` once. */
+export function findPath(grid: WalkableGrid, start: Vec2, goal: Vec2): Vec2[] | null {
+  assertDimensions(grid.width, grid.depth);
+  return findPathCells(buildWalkableCells(grid), start, goal);
+}
+
+function reconstruct(cameFrom: Int32Array, goalId: number, width: number): Vec2[] {
+  const path: Vec2[] = [];
+  let id = goalId;
+  while (id !== NO_CELL) {
+    const x = id % width;
+    path.push({ x, z: (id - x) / width });
+    id = cameFrom[id];
+  }
+  return path.reverse();
+}
+
+function inside(width: number, depth: number, p: Vec2): boolean {
+  return Number.isInteger(p.x) && Number.isInteger(p.z) && p.x >= 0 && p.z >= 0 && p.x < width && p.z < depth;
+}
+
+function assertDimensions(width: number, depth: number): void {
+  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(depth) || width <= 0 || depth <= 0) {
+    throw new RangeError('Grid dimensions must be positive integers');
+  }
 }

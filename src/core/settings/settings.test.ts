@@ -249,7 +249,10 @@ describe('the settings as a whole', () => {
     expect(brightnessCurve(1)).toEqual({ exposure: 1, shadowLift: 0 });
     expect(brightnessCurve(1.5).exposure).toBeGreaterThan(1);
     expect(brightnessCurve(1.5).shadowLift).toBeGreaterThan(0);
-    expect(brightnessCurve(0.5).exposure).toBeGreaterThan(0.7);
+    // Enough range that the brightness picture changes plainly from end to end (review 032), without blacking out.
+    expect(brightnessCurve(0.5).exposure).toBeGreaterThan(0.5);
+    expect(brightnessCurve(0.5).exposure).toBeLessThan(0.65);
+    expect(brightnessCurve(1.5).exposure).toBeGreaterThan(1.4);
     expect(brightnessCurve(-9)).toEqual(brightnessCurve(0.5));
   });
 });

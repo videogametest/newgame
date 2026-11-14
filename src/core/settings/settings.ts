@@ -141,5 +141,6 @@ export const serializeSettings = (s: Settings): string => JSON.stringify(s);
  */
 export function brightnessCurve(brightness: number): { exposure: number; shadowLift: number } {
   const b = Math.min(RANGES.brightness.max, Math.max(RANGES.brightness.min, brightness));
-  return { exposure: 0.55 + 0.45 * b, shadowLift: Math.max(0, (b - 1) * 0.16) };
+  // Exposure before tone mapping: the tone curve holds the bright end, so the dark end moves most.
+  return { exposure: 0.35 + 0.65 * Math.pow(b, 1.5), shadowLift: Math.max(0, (b - 1) * 0.16) };
 }

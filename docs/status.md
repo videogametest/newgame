@@ -6,6 +6,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-13 Task 009 step 2b: Controls page, NOT ready for first look (Viktor, branch `task-009-step2`)
+
+- Gates on `572fc8b`: tsc exit 0; vitest 69 files / 839 tests pass; build exit 0; `scripts/smoke.mjs` passes on a local preview; `scripts/controls_capture.mjs` passes (listening, Esc cancel, rebind saved).
+- Frames: `docs/pr-media/controls/controls_page.png`, `controls_listening.png`.
+- Defect seen in the frames, not fixed: the table overflows the panel. The "Move right" row and the D key are clipped at the bottom edge; "Down arrow" wraps onto two lines; in the listening frame the header row sits on top of "Keyboard and mouse". The bottom buttons are fine.
+- Not merged, not deployed. Next: fix the Controls layout, retake both frames, then merge.
+
 ## 2026-11-13 Task 009 step 2b: Controls page (Viktor, branch `task-009-step2`)
 
 - Built: Controls page in the pause menu (Resume, Settings, Controls). Table of every action with Main and Spare slots (keyboard and mouse). Click a slot, then press a key, mouse button or wheel tick. Esc cancels a listening slot without closing the menu. Reserved Esc keeps the slot listening. Back to defaults asks for confirmation first and resets the keyboard page.

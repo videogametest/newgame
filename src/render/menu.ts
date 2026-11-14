@@ -2,7 +2,7 @@
 // step 2d), and Controls (keyboard and mouse). Copy debug report and Return to title are not built yet.
 import type { Bindings } from '../core/settings/actions';
 import { ControlsPage } from './controls_page';
-import { buildDisplaySection } from './display_settings';
+import { SettingsPages, type SoundTarget } from './settings_pages';
 
 type Page = 'menu' | 'settings' | 'controls';
 
@@ -11,9 +11,10 @@ export class PauseMenu {
   private readonly menuPage: HTMLElement;
   private readonly settingsPage: HTMLElement;
   private readonly controlsPage: ControlsPage;
+  private readonly settingsPages: SettingsPages;
   private page: Page = 'menu';
 
-  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void, onBrightness: (b: number) => void = () => {}) {
+  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void, onBrightness: (b: number) => void, onBrightnessAgain: () => void, audio: SoundTarget) {
     this.root = document.createElement('div');
     // .panel does not set pointer-events, so the menu takes its own clicks; otherwise they reach the canvas and re-request the mouse.
     this.root.className = 'panel pause';
@@ -38,8 +39,15 @@ export class PauseMenu {
     this.settingsPage.hidden = true;
     const heading = document.createElement('h2');
     heading.textContent = 'Settings';
-    // "Back" is not in docs/writing/interface.md; it is flagged in docs/status.md.
-    this.settingsPage.append(heading, buildDisplaySection(onBrightness), button('Back', () => this.showMenu()));
+    // The tabs: Display, Sound, Camera, Controller, Play, and Controls (its own screen). "Back" is not in
+    // docs/writing/interface.md; it is flagged in docs/status.md.
+    this.settingsPages = new SettingsPages({
+      onBrightness,
+      onBrightnessAgain,
+      onControls: () => this.showControls(),
+      audio,
+    });
+    this.settingsPage.append(heading, this.settingsPages.el, button('Back', () => this.showMenu()));
 
     this.controlsPage = new ControlsPage(onBindings, () => this.showMenu());
 
@@ -77,6 +85,7 @@ export class PauseMenu {
     this.menuPage.hidden = true;
     this.controlsPage.el.hidden = true;
     this.settingsPage.hidden = false;
+    this.settingsPages.show(); // the tab last open
   }
 
   showControls(): void {

@@ -31,7 +31,7 @@ import { Hud } from './hud';
 import { PlayerInput } from './input';
 import { fillPrompt } from '../core/settings/labels';
 import { currentSettings, saveSettings } from './settings_store';
-import { showBrightnessPrompt } from './display_settings';
+import { showBrightnessCard } from './display_settings';
 import { brightnessCurve } from '../core/settings/settings';
 import { qualityProfile } from './quality';
 import { lightingAt } from './lighting';
@@ -41,6 +41,7 @@ import { buildWick, type Wick } from '../village/build';
 import { wickHouses } from '../village/plan';
 import { TUNING as T } from '../config/tuning';
 import { PauseMenu } from './menu';
+import { AudioBank } from './audio';
 import { clockAfterFrame, clockRuns, pausedAfter } from './pause';
 
 const CAMERA_RIG: ValleyCameraRig = {
@@ -168,6 +169,7 @@ class Valley {
   private glow?: GlowLayer;
   private accumulator = 0;
   private frozen = false;
+  private readonly uiRoot: HTMLElement;
   /** Pause menu open: the clock, the walk and the fixed steps stop. The scene still draws. */
   private paused = false;
   private frame = 0;
@@ -184,6 +186,7 @@ class Valley {
     uiRoot: HTMLElement,
     assets: LoadedAssets,
     private readonly game: GameState,
+    audio: AudioBank = new AudioBank(), // the Sound page's volumes; the same saved values the battle uses
   ) {
     const canvas = engine.getRenderingCanvas() as HTMLCanvasElement;
     scene.fogMode = Scene.FOGMODE_LINEAR;
@@ -226,11 +229,11 @@ class Valley {
     this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
 
+    this.uiRoot = uiRoot;
     this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
       saveSettings({ ...currentSettings(), bindings: b });
       this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
-    }, (b) => this.applyBrightness(b));
-    showBrightnessPrompt(uiRoot, (b) => this.applyBrightness(b)); // once, until the player sets brightness (task 009 step 2c)
+    }, (b) => this.applyBrightness(b), () => this.setBrightnessAgain(), audio);
     this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
     this.input.camYaw = this.hero.yaw;
 
@@ -264,7 +267,78 @@ class Valley {
   }
 
   start(): void {
+    // The first-start brightness check waits for the village, so the picture has its figure (review 031).
+    if (!this.tour && !currentSettings().display.brightnessSet) this.startBrightnessCheck(() => {}); // tour mode has its own views
     this.engine.runRenderLoop(() => this.tick());
+  }
+
+  /** The brightness picture (review 031): the state it saved, restored when the card closes. */
+  private picture: {
+    timeOfDay: number;
+    hero: { x: number; z: number };
+    yaw: number;
+    camYaw: number;
+    aimPitch: number;
+    frozen: boolean;
+    /** The camera's yaw while the picture is open: the look at the figure, fixed against the mouse. */
+    lookYaw: number;
+    onClose: () => void;
+  } | null = null;
+
+  /** Opens the brightness picture: midnight at the hesper_door view, clock frozen, hero hidden, camera fixed. */
+  private openBrightnessPicture(onClose: () => void): void {
+    if (this.picture) return;
+    const view = TOUR_VIEWS.find((v) => v.name === 'hesper_door');
+    if (!view) throw new Error('The hesper_door view is missing from the tour');
+    const saved = {
+      timeOfDay: this.game.timeOfDay,
+      hero: { ...this.game.hero.position },
+      yaw: this.hero.yaw,
+      camYaw: this.input.camYaw,
+      aimPitch: this.input.aimPitch,
+      frozen: this.frozen,
+    };
+    this.frozen = true;
+    this.game.timeOfDay = 0;
+    this.placeAt(view.hero.x, view.hero.z);
+    this.lookAt(view.look.x, view.look.z);
+    this.hero.yaw = tourYaw(view);
+    this.heroView.setShown(false);
+    this.picture = { ...saved, lookYaw: this.input.camYaw, onClose };
+  }
+
+  /** Closes the picture and puts the clock, hero and camera back as they were. */
+  private closeBrightnessPicture(): void {
+    const p = this.picture;
+    if (!p) return;
+    this.picture = null;
+    this.frozen = p.frozen;
+    this.game.timeOfDay = p.timeOfDay;
+    this.placeAt(p.hero.x, p.hero.z);
+    this.hero.yaw = p.yaw;
+    this.input.camYaw = p.camYaw;
+    this.input.aimPitch = p.aimPitch;
+    this.heroView.setShown(true);
+    p.onClose();
+  }
+
+  /** The first-start check, and "Set brightness again" from Display (onDone then runs after the picture closes). */
+  private startBrightnessCheck(onDone: () => void): void {
+    this.openBrightnessPicture(onDone);
+    showBrightnessCard(this.uiRoot, {
+      onBrightness: (b) => this.applyBrightness(b),
+      onDone: () => this.closeBrightnessPicture(),
+    });
+  }
+
+  /** From Display: the pause menu steps aside while the picture is up, then comes back on Settings. */
+  private setBrightnessAgain(): void {
+    if (this.picture) return;
+    this.pauseMenu.hide();
+    this.startBrightnessCheck(() => {
+      this.pauseMenu.show();
+      this.pauseMenu.showSettings();
+    });
   }
 
   private water: ValleyWater | null = null;
@@ -361,6 +435,7 @@ class Valley {
   /** One fixed step of walking. Movement only while the mouse is captured, so Esc pauses the hero. */
   private stepHero(dt: number): void {
     const intent = this.input.takeInput();
+    if (this.picture) return; // the figure stays where the picture put it
     const from = { ...this.game.hero.position };
     let dirX = 0;
     let dirZ = 0;
@@ -407,6 +482,10 @@ class Valley {
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
 
+    if (this.picture) {
+      this.input.camYaw = this.picture.lookYaw;
+      this.input.aimPitch = 0;
+    }
     const pose = valleyCameraPose(
       { x: this.hero.x, y: this.groundY, z: this.hero.z },
       this.input.camYaw,

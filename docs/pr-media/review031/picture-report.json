@@ -1,0 +1,55 @@
+{
+  "report": {
+    "picture_b0.5": {
+      "tod": 0,
+      "exposure": {
+        "exposure": 0.5798097038856279,
+        "ambient": 0
+      }
+    },
+    "picture_b1": {
+      "tod": 0,
+      "exposure": {
+        "exposure": 1,
+        "ambient": 0
+      }
+    },
+    "picture_b1.5": {
+      "tod": 0,
+      "exposure": {
+        "exposure": 1.5441262496067996,
+        "ambient": 0.08
+      }
+    },
+    "firstStartSaved": {
+      "brightness": 1.5,
+      "quality": "high",
+      "fullscreen": false,
+      "frameCap": 60,
+      "showFrameRate": false,
+      "brightnessSet": true
+    },
+    "baseline": {
+      "tod": 18.01804,
+      "x": 226,
+      "z": 238,
+      "paused": true
+    },
+    "during": {
+      "tod": 0,
+      "x": 93.3,
+      "z": 107.2
+    },
+    "afterClose": {
+      "tod": 18.01804,
+      "x": 226,
+      "z": 238,
+      "paused": true
+    },
+    "menuOnSettings": {
+      "backButton": true,
+      "heading": true
+    }
+  },
+  "failures": []
+}

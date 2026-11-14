@@ -2,9 +2,14 @@
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
-# Status
+## 2026-11-14 Review 031: brightness picture (Viktor, branch `task-009-prompt-2d`, PR #70)
 
-Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
+- Pass mark NOT met. At brightness 0.5 the scarecrow in Hesper's yard is still readable as a dark post against the house wall (crop of the centre of `picture-b0.5.png`). The frames at 0.5, 1 and 1.5 differ only slightly, so the slider does not hide the figure enough. The fix belongs to Claude's paths (`src/render/lighting.ts` or the scarecrow material in `src/village/build.ts`); see "For Claude" in `docs/tasks/day-2026-11-14.md`.
+- What changed: the picture turns the camera onto the scarecrow, the HUD is hidden in captures, and `scripts/picture_capture.mjs` writes `docs/pr-media/review031/picture-b{0.5,1,1.5}.png` (and `-page.png`) with `picture-state.json`.
+- Card along the bottom: not verified. The capture runs with `brightnessSet: true`, so no card appears in these frames.
+- Ground-vs-sky figures for the picture frames: not computed. The 2.60 / 3.05 / 3.42 figures above are for the tour `hesper_door` frames, not the picture.
+- Gates on the box after the scarecrow change: vitest 71 files, 850 tests passed; typecheck clean; build passed; preview HTTP 200; `picture_capture` passed; `smoke.mjs` passed.
+- Earlier picture frames (`b0.5/`, `b1/`, `b1.5/`) were deleted from the repo; only the scarecrow frames above are kept.
 
 ## 2026-11-13 Task 009 step 2c: brightness, quality, Controls scroll hint (Viktor, branch `task-009-brightness`)
 
@@ -22,7 +27,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 - Brightness prompt: shows once while `display.brightnessSet` is false. It appears over the live scene, not over a midnight picture; this differs from task 009 step 2 item 3. Decide whether it should be a midnight picture. In the first capture it covered the Controls page; `controls_capture.mjs` now takes `TOUR_SETTINGS` and skips it. Default kept: flag, not changed.
 - Controls check (`node scripts/controls_capture.mjs`, with `brightnessSet: true`): passed. 10 rows shown in full, 0 cut. Frames in `docs/pr-media/review2c/controls-v2/`; the scroll hint shows the Interact row faded.
-- Dark figure in Hesper's yard (task 009 step 2 item 3 asks for one in the brightness picture): not found in the code (`src/village/build.ts`, `src/village/plan.ts`, `src/core/world/valley_layout.ts`, `src/render/characters.ts`; the only CharacterView in `valley.ts` is the hero). Not visible in the 18:00 or midnight `hesper_door` frames. Open: Greg or Claude to say whether it should be added, and where.
+- Dark figure in Hesper's yard: superseded by review 031. The scarecrow is now in Hesper's yard (`SCARECROW` in `src/village/plan.ts`, built in `src/village/build.ts`) and the picture turns onto it. Its brightness pass mark is NOT met yet (see the 2026-11-14 entry).
 - Tests: `npx vitest run` 847 passed; `npm run typecheck` clean; `npm run build` passed (chunk-size warning only); `node scripts/smoke.mjs` passed on a local preview.
 - Push: see the Slack post and the PR. Any push step that fails is recorded below this line.
 

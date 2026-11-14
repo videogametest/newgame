@@ -6,10 +6,20 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-14 Task 009 step 2, queue item 1: brightness prompt (Viktor, branch `task-009-brightness-prompt`), NOT MERGED
+
+- Built: first-start brightness check (saves `brightness` and `brightnessSet`); `hesper_door` midnight picture with the hero hidden and the clock frozen; card along the bottom with the exact review 031 copy; "Set brightness again" on Display; close restores clock, hero and camera. Commit `b29b36a`, merged with `origin/main` `defcfd9` as `30f40a5`.
+- Curve (review 032, `src/core/settings/settings.ts`): exposure = 0.35 + 0.65 × b^1.5. From `picture-report.json`: 0.5 gives 0.58, 1 gives 1.00, 1.5 gives 1.54. [capture, 2026-11-14]
+- Gates on the merged tree: typecheck clean; `vitest` 70 files, 847 tests pass; build passes (chunk-size warning only); `scripts/brightness_picture_capture.mjs` failures `[]` (both phases; clock and hero restored exactly on close). Smoke test not yet run, since the PR is not merged.
+- Pass mark (review 032): **not met.** The scarecrow is in none of the three frames (`docs/pr-media/review031/picture-0.5.png`, `picture-1.png`, `picture-1.5.png`). It is built at (85.8, 107.3) (`src/village/build.ts`, `SCARECROW` in `plan.ts`). The `hesper_door` view has the hero at (93.3, 107.2) looking at (86, 98), so the figure is about 52° left of the view axis, outside the frame. Review 032 says it sits near the middle of the frame; these coordinates do not give that.
+- Not changed, per the rule against moving the figure or the view to pass a frame. Decision needed: move the `hesper_door` look point (`src/core/world/tour.ts`) or the figure (`src/village/`, Claude's path).
+- Card: along the bottom; does not cover the house or Hesper's lit window. Exposure steps are visible (dim, lit, brightest) and the ground lit around the house changes with them.
+- Queue item 1 stays unticked. The PR stays open until the figure reads at 1.
+
 ## 2026-11-13 Task 009 step 2c: brightness, quality, Controls scroll hint (Viktor, branch `task-009-brightness`)
 
 - Greg's 17:00 ruling applied: noon shadow closed, no lighting change. Scroll hint added: a 36 px fade at the bottom of the Controls list while more rows remain (`moreBelow` in `controls_rules.ts`, 3 tests).
-- Brightness (`applyBrightness` in `src/render/valley.ts`): exposure = 0.55 + 0.45 × brightness; the scene's ambient lift = max(0, (brightness − 1) × 0.16). Live probe: 0.5 gives exposure 0.775, ambient 0; 1.0 gives 1.0, ambient 0; 1.5 gives 1.225, ambient 0.08.
+- Brightness: superseded by the 2026-11-14 entry above (review 032 curve).
 - Ground share, midnight `hesper_door` (tod 0), fresh preview server, `scripts/ground_vs_sky.py`: 2.60 at 0.5, 3.05 at 1.0, 3.42 at 1.5. All above the 0.25 floor. Frames: `docs/pr-media/review2c/v2-b0.5|v2-b1|v2-b1.5/hesper_door-0.png`. By eye, 1.5 is lifted and the sky stays dark.
 - Earlier frames (`docs/pr-media/review2c/b0.5|b1|b1.5/`) came out identical (ground share about 3.0 each). Cause not confirmed. Likely a stale preview server still serving an older bundle. Those frames are not used.
 - Quality (`src/render/quality.ts`, my proposal, Greg to decide): low = 1024 shadow map, 220 m fine-land stream; medium = 2048, 340 m (today's values); high = 2048, 420 m. Scenery density is not changed by quality: per-band splits were rejected (about 130 extra draw calls). Arrival view, 18:00, medium, `scripts/quality_budget.mjs` (chunks stable before reading):

@@ -3,7 +3,7 @@
     "picture_b0.5": {
       "tod": 0,
       "exposure": {
-        "exposure": 0.775,
+        "exposure": 0.5798097038856279,
         "ambient": 0
       }
     },
@@ -17,7 +17,7 @@
     "picture_b1.5": {
       "tod": 0,
       "exposure": {
-        "exposure": 1.225,
+        "exposure": 1.5441262496067996,
         "ambient": 0.08
       }
     },
@@ -30,7 +30,7 @@
       "brightnessSet": true
     },
     "baseline": {
-      "tod": 18.019739999999995,
+      "tod": 18.01804,
       "x": 226,
       "z": 238,
       "paused": true
@@ -41,7 +41,7 @@
       "z": 107.2
     },
     "afterClose": {
-      "tod": 18.019739999999995,
+      "tod": 18.01804,
       "x": 226,
       "z": 238,
       "paused": true

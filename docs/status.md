@@ -14,7 +14,9 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - Timings (this sandbox, relative only): 400x400 open grid at 1 m 1,145 ms; 200x200 at 1 m 177 ms; valley corner to corner at 1 m 10,301 ms for 1,357 steps. Local 70 m routes: 1 m mean 260 ms, worst 461 ms; 0.5 m mean 1,009 ms, worst 1,731 ms.
 - Corner-to-corner routes across the valley (for example (-300,-300) to (300,300)) return null. The rim and gorge split the walkable ground. Fighters path over nearby chunks, so this is not a requirement.
 - Gate: `npx vitest run` 852 passed (71 files); `npm run typecheck` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m; `node scripts/smoke.mjs` passed on a local preview.
-- Not yet: PR, merge, Pages deploy, live smoke. Recorded here after they happen.
+- PR #73 squash-merged as `6fc076b`. The repo has no PR-level CI (the only workflow runs on push to `main`), so the local gate above was the pre-merge check.
+- Pages run `43634874976` on `6fc076b`: test, build, built-game smoke, and deploy all green.
+- Live smoke: `node scripts/smoke.mjs https://everylitwindow.com/` passed (no console errors, page errors, or failed requests).
 
 ## 2026-11-13 Task 009 step 2c: brightness, quality, Controls scroll hint (Viktor, branch `task-009-brightness`)
 

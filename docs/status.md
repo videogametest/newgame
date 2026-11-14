@@ -6,6 +6,17 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-14 Task 009 step 2 (settings pages) and item 2 (Viktor, branch `task-009-settings-pages`, stacked on #71, NOT MERGED)
+
+- Built: Settings tabs Display, Sound, Camera, Controller, Play, plus Controls. Every page ends with Back to defaults (Yes/No). Rows that the game does not use yet read "Not yet in the game." Pure rules in `src/render/settings_pages_rules.ts` (17 tests). Commit `8953770`.
+- Controls tab bold bug fixed (font weight set on the button outside the tab map).
+- Capture: `scripts/settings_pages_capture.mjs`, failures `[]`. Frames: `docs/pr-media/review032/settings-{display,sound,camera,controller,play}.png`. The Play frame is taller than 720 px, so its Back sits below the fold.
+- Capture fix: `scripts/brightness_picture_capture.mjs` matched two "Back" buttons (Settings and Controls, both in the DOM). It now uses an exact, visible match. Run exit 0, failures `[]`.
+- Gates on the branch: typecheck clean; vitest 71 files, 864 tests pass; build passes; smoke passes against the local preview.
+- Quality budget, arrival view at 18:00, `scripts/quality_budget.mjs`, chunks stable before reading: low 224 draw calls, medium 258, high 284. All under 300. Frame rates are SwiftShader only and relative, so not a budget figure. [capture, 2026-11-14]
+- Brightness pass mark (review 032): **still not met on the recheck frames.** `docs/pr-media/review031-recheck/picture-{0.5,1,1.5}.png`: the card sits along the bottom and the house is clear, but I cannot see the scarecrow in any of the three. Cropped yard (x 250 to 800, y 300 to 520) at 0.5 and 1.5 shows no figure. The hero is at (93.3, 107.2) and the figure at (85.8, 107.3), so it is about 7.5 m away and it may be behind the view axis. Not changed: needs Greg or Claude's decision (look point or figure placement).
+- Queue items 1 and 3 stay unticked. Item 2 is ready to tick once this PR is pushed.
+
 ## 2026-11-14 Task 009 step 2, queue item 1: brightness prompt (Viktor, branch `task-009-brightness-prompt`), NOT MERGED
 
 - Built: first-start brightness check (saves `brightness` and `brightnessSet`); `hesper_door` midnight picture with the hero hidden and the clock frozen; card along the bottom with the exact review 031 copy; "Set brightness again" on Display; close restores clock, hero and camera. Commit `b29b36a`, merged with `origin/main` `defcfd9` as `30f40a5`.

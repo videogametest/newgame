@@ -92,7 +92,8 @@ const after = await page.evaluate(() => window.__valley.state());
 report.afterClose = { tod: after.tod, x: after.x, z: after.z, paused: after.paused };
 if (Math.abs(after.tod - baseline.tod) > 0.01) failures.push(`clock not restored: ${baseline.tod} -> ${after.tod}`);
 if (Math.abs(after.x - baseline.x) > 0.01 || Math.abs(after.z - baseline.z) > 0.01) failures.push('hero not restored');
-const menuBack = await page.getByRole('button', { name: 'Back' }).isVisible();
+// Two Back buttons exist in the DOM (Settings and Controls); only the visible one counts.
+const menuBack = await page.getByRole('button', { name: 'Back', exact: true }).locator('visible=true').count() > 0;
 const settingsHeading = await page.getByRole('heading', { name: 'Settings' }).isVisible();
 report.menuOnSettings = { backButton: menuBack, heading: settingsHeading };
 if (!menuBack || !settingsHeading) failures.push('pause menu did not return to Settings');

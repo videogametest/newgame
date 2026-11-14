@@ -49,6 +49,16 @@ for (const name of PAGES) {
   console.log(`captured ${file} controls=${rows}`);
 }
 
+// The Controls tab is its own screen (keyboard and mouse); capture it too.
+await page.getByRole('button', { name: 'Controls', exact: true }).click();
+await page.waitForTimeout(800);
+const controlsFile = join(outDir, 'settings-controls.png');
+await page.screenshot({ path: controlsFile });
+const controlsRows = await page.locator('button').count();
+report.Controls = { buttons: controlsRows };
+console.log(`captured ${controlsFile} buttons=${controlsRows}`);
+if (controlsRows < 5) failures.push('Controls: fewer than 5 buttons on the page');
+
 // The saved file must still parse after visiting every page.
 const saved = await page.evaluate((k) => localStorage.getItem(k), KEY);
 try { JSON.parse(saved); } catch (e) { failures.push(`settings not valid JSON after visiting pages: ${e.message}`); }

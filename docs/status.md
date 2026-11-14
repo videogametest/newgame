@@ -13,9 +13,17 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - Capture: `scripts/settings_pages_capture.mjs`, failures `[]`. Frames: `docs/pr-media/review032/settings-{display,sound,camera,controller,play}.png`. The Play frame is taller than 720 px, so its Back sits below the fold.
 - Capture fix: `scripts/brightness_picture_capture.mjs` matched two "Back" buttons (Settings and Controls, both in the DOM). It now uses an exact, visible match. Run exit 0, failures `[]`.
 - Gates on the branch: typecheck clean; vitest 71 files, 864 tests pass; build passes; smoke passes against the local preview.
-- Quality budget, arrival view at 18:00, `scripts/quality_budget.mjs`, chunks stable before reading: low 224 draw calls, medium 258, high 284. All under 300. Frame rates are SwiftShader only and relative, so not a budget figure. [capture, 2026-11-14]
+- Quality budget, arrival view at 18:00, `scripts/quality_budget.mjs`, chunks stable before reading. Draw calls (budget 300) and frame time (1000 / fps, headless SwiftShader, relative only, not a budget figure):
+
+| Quality | Chunks | Draw calls | fps | Frame time (SwiftShader) |
+| --- | --- | --- | --- | --- |
+| low | 47 | 224 | 10 | about 100 ms |
+| medium | 76 | 258 | 12 | about 83 ms |
+| high | 97 | 284 | 11 | about 91 ms |
+
+  The table in "Quality" below (212 / 246 / 272) is an earlier run on a different branch state; these numbers supersede it for PR #72. [capture, 2026-11-14]
 - Brightness pass mark (review 032): **still not met on the recheck frames.** `docs/pr-media/review031-recheck/picture-{0.5,1,1.5}.png`: the card sits along the bottom and the house is clear, but I cannot see the scarecrow in any of the three. Cropped yard (x 250 to 800, y 300 to 520) at 0.5 and 1.5 shows no figure. The hero is at (93.3, 107.2) and the figure at (85.8, 107.3), so it is about 7.5 m away and it may be behind the view axis. Not changed: needs Greg or Claude's decision (look point or figure placement).
-- Queue items 1 and 3 stay unticked. Item 2 is ready to tick once this PR is pushed.
+- Queue item 2 ticked (PR #72). Item 3 ticked: every page at 1280x720 (`docs/pr-media/review032/settings-*.png`, Controls included), damaged-settings test in `settings_pages_rules.test.ts`, quality figures above. Item 1 stays unticked: pass mark not met.
 
 ## 2026-11-14 Task 009 step 2, queue item 1: brightness prompt (Viktor, branch `task-009-brightness-prompt`), NOT MERGED
 

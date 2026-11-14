@@ -41,6 +41,7 @@ import { buildWick, type Wick } from '../village/build';
 import { wickHouses } from '../village/plan';
 import { TUNING as T } from '../config/tuning';
 import { PauseMenu } from './menu';
+import { AudioBank } from './audio';
 import { clockAfterFrame, clockRuns, pausedAfter } from './pause';
 
 const CAMERA_RIG: ValleyCameraRig = {
@@ -185,6 +186,7 @@ class Valley {
     uiRoot: HTMLElement,
     assets: LoadedAssets,
     private readonly game: GameState,
+    audio: AudioBank = new AudioBank(), // the Sound page's volumes; the same saved values the battle uses
   ) {
     const canvas = engine.getRenderingCanvas() as HTMLCanvasElement;
     scene.fogMode = Scene.FOGMODE_LINEAR;
@@ -231,7 +233,7 @@ class Valley {
     this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
       saveSettings({ ...currentSettings(), bindings: b });
       this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
-    }, (b) => this.applyBrightness(b), () => this.setBrightnessAgain());
+    }, (b) => this.applyBrightness(b), () => this.setBrightnessAgain(), audio);
     this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
     this.input.camYaw = this.hero.yaw;
 

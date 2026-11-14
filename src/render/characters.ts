@@ -221,6 +221,11 @@ export class CharacterView {
   }
 
   /** groundY: terrain height under the fighter (0 on the flat arena). */
+  /** Hides or shows the whole character. The brightness picture (review 031) hides the hero. */
+  setShown(on: boolean): void {
+    this.root.setEnabled(on);
+  }
+
   update(f: Fighter, groundY = 0): void {
     this.root.position.set(f.x, groundY, f.z);
     this.root.rotation.y = f.yaw + MODEL_YAW_OFFSET;

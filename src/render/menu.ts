@@ -13,7 +13,7 @@ export class PauseMenu {
   private readonly controlsPage: ControlsPage;
   private page: Page = 'menu';
 
-  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void, onBrightness: (b: number) => void = () => {}) {
+  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void, onBrightness: (b: number) => void = () => {}, onBrightnessAgain: () => void = () => {}) {
     this.root = document.createElement('div');
     // .panel does not set pointer-events, so the menu takes its own clicks; otherwise they reach the canvas and re-request the mouse.
     this.root.className = 'panel pause';
@@ -39,7 +39,7 @@ export class PauseMenu {
     const heading = document.createElement('h2');
     heading.textContent = 'Settings';
     // "Back" is not in docs/writing/interface.md; it is flagged in docs/status.md.
-    this.settingsPage.append(heading, buildDisplaySection(onBrightness), button('Back', () => this.showMenu()));
+    this.settingsPage.append(heading, buildDisplaySection(onBrightness, onBrightnessAgain), button('Back', () => this.showMenu()));
 
     this.controlsPage = new ControlsPage(onBindings, () => this.showMenu());
 

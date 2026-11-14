@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-14 Task 004 item 4: valley pathfinding (Viktor, branch `task-004-pathfinding`)
+
+- `src/core/world/pathfinding.ts`: the open set is a binary min-heap (ties by first insertion). Same signature and output as before: 2,000 random queries compared, all equal (1,028 with a path).
+- `src/core/world/pathfinding_valley.test.ts` (5 tests): the ford is wadeable and water is only entered at a crossing; with every crossing closed there is no route across the river; the mill bridge; the stepping stones at 0.5 m; a 70 m local route at 1 m under 1 s.
+- Stepping stones at 1 m: 11 of 29 stone cells are reachable from the west bank, with a diagonal-only gap near (-252, 3). At 0.5 m: 105 of 105. The planner uses 0.5 m cells. This is a planner-resolution issue, not a walk-rule issue.
+- Timings (this sandbox, relative only): 400x400 open grid at 1 m 1,145 ms; 200x200 at 1 m 177 ms; valley corner to corner at 1 m 10,301 ms for 1,357 steps. Local 70 m routes: 1 m mean 260 ms, worst 461 ms; 0.5 m mean 1,009 ms, worst 1,731 ms.
+- Corner-to-corner routes across the valley (for example (-300,-300) to (300,300)) return null. The rim and gorge split the walkable ground. Fighters path over nearby chunks, so this is not a requirement.
+- Gate: `npx vitest run` 852 passed (71 files); `npm run typecheck` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m; `node scripts/smoke.mjs` passed on a local preview.
+- Not yet: PR, merge, Pages deploy, live smoke. Recorded here after they happen.
+
 ## 2026-11-13 Task 009 step 2c: brightness, quality, Controls scroll hint (Viktor, branch `task-009-brightness`)
 
 - Greg's 17:00 ruling applied: noon shadow closed, no lighting change. Scroll hint added: a 36 px fade at the bottom of the Controls list while more rows remain (`moreBelow` in `controls_rules.ts`, 3 tests).

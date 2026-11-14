@@ -6,7 +6,7 @@ import { TUNING } from '../config/tuning';
 import { decideAI } from './ai';
 import { aimedVelocity, applyHit, bowDamage, bowSpeed, inSwingArc, launchVelocity, unitDir } from './combat';
 import type {
-  Action, ArenaDef, BattleEvent, BattleInput, BattleState, DamageSource, Fighter, FighterKind, Projectile, Spawn,
+  Action, ArenaDef, BattleEvent, BattleGround, BattleInput, BattleState, DamageSource, Fighter, FighterKind, Projectile, Spawn,
 } from './types';
 import { forwardOf, rightOf } from './vec';
 
@@ -22,6 +22,18 @@ function statsFor(kind: FighterKind) {
   return TUNING.archer;
 }
 
+function groundY(state: BattleState, x: number, z: number): number {
+  return state.ground ? state.ground.heightAt(x, z) : 0;
+}
+
+/** True if the fighter is simulated this step: the hero always, others within the ground's simRadius of the hero. */
+function isActive(state: BattleState, f: Fighter): boolean {
+  if (f.kind === 'hero' || !state.ground) return true;
+  const hero = state.fighters.find((h) => h.id === state.heroId);
+  if (!hero) return true;
+  return Math.hypot(f.x - hero.x, f.z - hero.z) <= state.ground.simRadius;
+}
+
 /** Builds one fighter from a spawn. Exported for showcase mode, which needs a fighter from any wave. */
 export function makeFighter(state: BattleState, s: Spawn): Fighter {
   const st = statsFor(s.kind);
@@ -32,6 +44,7 @@ export function makeFighter(state: BattleState, s: Spawn): Fighter {
     team: s.team,
     x: s.x,
     z: s.z,
+    y: groundY(state, s.x, s.z),
     yaw: s.yaw,
     radius: st.radius,
     height: st.height,
@@ -55,8 +68,11 @@ export function makeFighter(state: BattleState, s: Spawn): Fighter {
   };
 }
 
-/** Builds a battle from an arena. The arena must contain exactly one hero spawn. */
-export function createBattle(arena: ArenaDef): BattleState {
+/**
+ * Builds a battle from an arena. The arena must contain exactly one hero spawn.
+ * Without a ground, the battle is on flat ground and every fighter is simulated (the arena behaviour).
+ */
+export function createBattle(arena: ArenaDef, ground?: BattleGround): BattleState {
   const state: BattleState = {
     time: 0,
     status: 'fighting',
@@ -67,6 +83,7 @@ export function createBattle(arena: ArenaDef): BattleState {
     projectiles: [],
     wave: 0,
     waveTimer: 0,
+    ground,
   };
   for (const s of arena.spawns) {
     if (waveOf(s) !== 0) continue;
@@ -135,13 +152,22 @@ export function step(state: BattleState, input: BattleInput): BattleEvent[] {
 
   for (const f of state.fighters) {
     if (!f.alive || f.kind === 'hero') continue;
+    if (!isActive(state, f)) {
+      // Frozen: far from the hero, it neither thinks nor walks until the hero comes near.
+      f.vx = 0;
+      f.vz = 0;
+      continue;
+    }
     updateNonHero(state, f, events);
   }
 
-  for (const f of state.fighters) if (f.alive) advanceAction(state, f, events);
+  for (const f of state.fighters) {
+    if (f.alive && (f.kind === 'hero' || isActive(state, f))) advanceAction(state, f, events);
+  }
 
   integrate(state);
   resolveCollisions(state);
+  for (const f of state.fighters) f.y = groundY(state, f.x, f.z);
   updateProjectiles(state, events);
   checkOutcome(state, events);
   return events;
@@ -231,7 +257,7 @@ function fireHeroArrow(state: BattleState, hero: Fighter, input: BattleInput, ev
     team: hero.team,
     ownerId: hero.id,
     x: hero.x + fwd.x * TUNING.bow.muzzleForward,
-    y: TUNING.bow.muzzleHeight,
+    y: hero.y + TUNING.bow.muzzleHeight,
     z: hero.z + fwd.z * TUNING.bow.muzzleForward,
     vx: v.vx,
     vy: v.vy,
@@ -368,7 +394,7 @@ function fireArcherArrow(state: BattleState, f: Fighter, events: BattleEvent[]):
     team: f.team,
     ownerId: f.id,
     x: f.x,
-    y: TUNING.bow.muzzleHeight,
+    y: f.y + TUNING.bow.muzzleHeight,
     z: f.z,
     vx: v.vx,
     vy: v.vy,
@@ -431,7 +457,8 @@ function updateProjectiles(state: BattleState, events: BattleEvent[]): void {
     p.y += p.vy * DT;
     p.z += p.vz * DT;
 
-    if (p.age > A.maxLife || p.y <= 0 || Math.abs(p.x) > halfWidth + 3 || Math.abs(p.z) > halfDepth + 3) {
+    // Projectile y is world height; an arrow lands when it reaches the ground under it.
+    if (p.age > A.maxLife || p.y <= groundY(state, p.x, p.z) || Math.abs(p.x) > halfWidth + 3 || Math.abs(p.z) > halfDepth + 3) {
       stopArrow(p, events);
       continue;
     }
@@ -450,7 +477,7 @@ function updateProjectiles(state: BattleState, events: BattleEvent[]): void {
 
     for (const f of state.fighters) {
       if (!f.alive || f.team === p.team) continue;
-      if (Math.hypot(p.x - f.x, p.z - f.z) < f.radius + A.radius && p.y <= f.height) {
+      if (Math.hypot(p.x - f.x, p.z - f.z) < f.radius + A.radius && p.y - f.y <= f.height) {
         const dir = unitDir(0, 0, p.vx, p.vz);
         damageFighter(f, p.damage, dir.x, dir.z, p.knockback, 'arrow', events);
         stopped = true;

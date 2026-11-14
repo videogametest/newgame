@@ -9,6 +9,7 @@ import type {
   Action, ArenaDef, BattleEvent, BattleGround, BattleInput, BattleState, DamageSource, Fighter, FighterKind, Projectile, Spawn,
 } from './types';
 import { forwardOf, rightOf } from './vec';
+import { insideFootprint } from './world/solids';
 
 const DT = TUNING.fixedDt;
 
@@ -470,7 +471,7 @@ function updateProjectiles(state: BattleState, events: BattleEvent[]): void {
         break;
       }
     }
-    if (stopped) {
+    if (stopped || arrowBlockedBySolid(state, p)) {
       stopArrow(p, events);
       continue;
     }
@@ -487,6 +488,17 @@ function updateProjectiles(state: BattleState, events: BattleEvent[]): void {
     if (stopped) stopArrow(p, events);
   }
   state.projectiles = state.projectiles.filter((p) => p.alive);
+}
+
+/**
+ * True if the arrow is inside a solid footprint (its edge widened by the arrow's radius) and below the wall height
+ * above the ground there. An arrow above the wall flies over it.
+ */
+function arrowBlockedBySolid(state: BattleState, p: Projectile): boolean {
+  const solids = state.ground?.solids;
+  if (!solids || p.y >= groundY(state, p.x, p.z) + TUNING.arrow.wallHeight) return false;
+  const r = TUNING.arrow.radius;
+  return solids.some((s) => insideFootprint({ ...s, half: s.half + r }, p.x, p.z));
 }
 
 function stopArrow(p: Projectile, events: BattleEvent[]): void {

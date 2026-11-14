@@ -6,6 +6,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-14 Task 004 item 4b: fast pathfinding (Viktor, branch `task-004-4b-fast-paths`)
+
+- `src/core/world/pathfinding.ts`: the walkable grid is built once by `buildWalkableCells(grid)`, which calls the walk rule once per cell and nowhere else. `findPathCells` runs A* over typed arrays (cost, parent, closed set, and a Float64Array binary heap) with integer cell indexes, and makes no height or solids calls in the loop. `findPath` keeps its signature and delegates to these.
+- Equivalence (`pathfinding_equivalence.test.ts`, 3 tests): the previous implementation is kept in the test as a reference. 300 seeded random grids × 8 queries (2,400 comparisons, more than 300 with a found route) give identical results. Rejected and trivial endpoints match. In a 30×30 grid the walk rule is called 900 times to build the grid and 0 times during 20 searches.
+- Targets (`pathfinding_valley.test.ts`, valley at 0.5 m, search only, grid prepared): the 200 m route (100,-100) to (100,100) takes about 1.6 ms, and the 70 m route (-40,120) to (-110,120) about 0.05 ms (each the fastest of 5 runs). The tests assert under 50 ms and under 10 ms. The old 1 m "under 1 s" test is removed.
+- Finding for items 7 and 8: building the whole valley grid at 0.5 m (1,083,681 cells) takes about 35 s, because each cell calls `isWalkableGround`. It must be built per region and cached.
+- Gate in the worker sandbox on the working tree: `npm test` 887 passed (74 files; 883 on item 6, net +4); `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m; Playwright chromium; `vite preview` plus `scripts/smoke.mjs` passed.
+- Not visible in a frame: no rendering changed.
+
 ## 2026-11-14 Task 004 item 6: arrows meet the world (Viktor, PR #76)
 
 - Arrows stop on terrain: an arrow whose `y` is below the ground under it plus the wall height is stopped if its ground is a rise above the arrow. Tests: a 2.5 m rise is passed and the enemy beyond it is hit; a 6 m rise stops the arrow before it reaches the enemy.

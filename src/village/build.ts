@@ -175,7 +175,7 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
   const lamp = new PointLight('hesper_lamp', lampAt, scene);
   lamp.diffuse = new Color3(1, 0.62, 0.3);
   lamp.specular = Color3.Black();
-  lamp.range = 13;
+  lamp.range = 8;
   lamp.parent = root;
 
   // Smoke from the one chimney in use.
@@ -454,7 +454,7 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     light(l, tod) {
       const on = tod >= 17 || tod < 1;
       // Brightest once the daylight has gone; present, but not shouting, in the gold hour before.
-      lamp.intensity = on ? 3 + 6 * l.nightness : 0;
+      lamp.intensity = on ? 2 + 3 * l.nightness : 0;
       glow.emissiveColor = on ? new Color3(1, 0.72, 0.36).scale(0.9 + 0.5 * l.nightness) : new Color3(0.1, 0.1, 0.12);
     },
     dispose() { smoke.dispose(); dot.dispose(); root.dispose(false, true); },

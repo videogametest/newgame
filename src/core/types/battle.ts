@@ -2,6 +2,7 @@
 // Ground plane is (x, z). y is height above the ground. Yaw 0 faces +z; yaw π/2 faces +x.
 
 import type { Footprint } from '../world/solids';
+import type { Awareness } from '../stealth';
 
 export type Team = 'player' | 'enemy';
 export type FighterKind = 'hero' | 'soldier' | 'archer';
@@ -45,6 +46,8 @@ export interface Fighter {
   maxHp: number;
   hp: number;
   alive: boolean;
+  /** World fights: unaware until AI activation, alert thereafter. Place sensors will also supply suspicious. */
+  awareness?: Awareness;
   /** Planned walking velocity for this step (m/s). */
   vx: number;
   vz: number;

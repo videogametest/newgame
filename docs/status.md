@@ -6,6 +6,10 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 17:15 UTC Task 004 item 13: alarm rules and valley awareness markers (Viktor, in progress on )
+
+- Following Sunday order: items 8 and 7b are ticked on main. Extending the existing pure bell rules with a delayed, once-only reinforcement roster and drawing real combat activation states above valley fighters. No Mill encounter wiring yet (item 16).
+
 ## 2026-11-15 Task 004 item 14: wildlife rules (Viktor, PR open on `task-004-item14-animals`, commit `16d8b1d`)
 
 - Logic only, shipped dark: `src/core/wildlife/`. `flocks.ts` (sprinting within 14 m startles a flock, which emits a `noise` stimulus of radius 22 m; crouching or walking does not; a flock startles once), `crows.ts` (circling iff the place is `held`), `geese.ts` (sprinting within 12 m returns a `geese` stimulus; creeping does not), `fox.ts` (idle, leading, gone; a quiet hero near the fox leads it toward the secret, sprinting near it sends it away for good, and it returns only after the hero leaves the area). Placeholder tuning in `tuning.ts`. Tests: `wildlife.test.ts`, 13 checks.

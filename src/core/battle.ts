@@ -52,6 +52,7 @@ export function makeFighter(state: BattleState, s: Spawn): Fighter {
     maxHp: st.maxHp,
     hp: st.maxHp,
     alive: true,
+    ...(state.ground ? { awareness: 'unaware' as const } : {}),
     vx: 0,
     vz: 0,
     knockX: 0,
@@ -304,6 +305,9 @@ function updateNonHero(state: BattleState, f: Fighter, events: BattleEvent[]): v
     f.vz = 0;
     return;
   }
+  // The patrol-hut fight still alerts immediately on activation (item 8). Track that real
+  // state for markers; do not claim that the place routines/sensors of item 15 are wired yet.
+  if (f.awareness !== undefined) f.awareness = 'alert';
   const intent = decideAI(state, f);
   f.vx = intent.vx;
   f.vz = intent.vz;

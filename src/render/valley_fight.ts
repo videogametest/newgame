@@ -16,6 +16,7 @@ import { ArrowViews, ImpactBursts } from './effects';
 import type { AudioBank } from './audio';
 import type { Hud } from './hud';
 import { blocksView } from './occlusion';
+import { currentSettings } from './settings_store';
 
 export type FightInput = { locked: boolean; zooming: boolean };
 
@@ -141,6 +142,7 @@ export class ValleyFight {
       state: this.battle,
       hero,
       cards: false,
+      awarenessMarkers: currentSettings().play.awarenessMarkers,
       locked: input.locked,
       weapon: hero.weapon,
       zooming: input.zooming,

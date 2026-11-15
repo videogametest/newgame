@@ -1,0 +1,66 @@
+[
+  {
+    "shot": "docs/pr-media/hut-fight/hut-follow-12.png",
+    "tod": 12,
+    "order": "follow",
+    "hero": {
+      "x": 306,
+      "z": -103
+    },
+    "bram": {
+      "x": 304.93933982822017,
+      "z": -100.52512626584708,
+      "order": "follow",
+      "crouched": false
+    },
+    "drawCalls": 200
+  },
+  {
+    "shot": "docs/pr-media/hut-fight/hut-hold-12.png",
+    "tod": 12,
+    "order": "hold",
+    "hero": {
+      "x": 303,
+      "z": -101
+    },
+    "bram": {
+      "x": 301.93933982822017,
+      "z": -98.52512626584708,
+      "order": "hold",
+      "crouched": false
+    },
+    "drawCalls": 202
+  },
+  {
+    "shot": "docs/pr-media/hut-fight/hut-follow-18.png",
+    "tod": 18,
+    "order": "follow",
+    "hero": {
+      "x": 306,
+      "z": -103
+    },
+    "bram": {
+      "x": 304.93933982822017,
+      "z": -100.52512626584708,
+      "order": "follow",
+      "crouched": false
+    },
+    "drawCalls": 202
+  },
+  {
+    "shot": "docs/pr-media/hut-fight/hut-hold-18.png",
+    "tod": 18,
+    "order": "hold",
+    "hero": {
+      "x": 303,
+      "z": -101
+    },
+    "bram": {
+      "x": 301.93933982822017,
+      "z": -98.52512626584708,
+      "order": "hold",
+      "crouched": false
+    },
+    "drawCalls": 204
+  }
+]

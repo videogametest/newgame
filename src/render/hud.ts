@@ -18,6 +18,8 @@ export interface HudFrame {
   drawFraction: number;
   project: Projector;
   dt: number;
+  /** false hides the prompt card entirely (the valley fight has no arena cards, task 004 item 8). Default: shown. */
+  cards?: boolean;
 }
 
 const MARKUP = `
@@ -139,10 +141,16 @@ export class Hud {
     this.restartHandler = fn;
   }
 
-  /** The valley has no fights yet: hide the hero health bar and the weapon tiles (they return with task 004). */
+  /** Before any fight in the valley: hide the hero health bar and the weapon tiles. */
   hideFightChrome(): void {
     this.heroPanel.style.display = 'none';
     this.weaponPanel.style.display = 'none';
+  }
+
+  /** Shows the hero health bar and the weapon tiles once a valley fight is live (task 004 item 8). */
+  showFightChrome(): void {
+    this.heroPanel.style.display = '';
+    this.weaponPanel.style.display = '';
   }
 
   setBoot(label: string, fraction: number): void {
@@ -188,7 +196,7 @@ export class Hud {
 
   frame(f: HudFrame): void {
     const playing = f.locked && this.outcomeStatus === null;
-    this.prompt.hidden = f.locked || this.outcomeStatus !== null;
+    this.prompt.hidden = f.locked || this.outcomeStatus !== null || f.cards === false;
     this.crosshair.hidden = !playing;
     this.draw.hidden = !(playing && f.weapon === 'bow' && f.drawFraction > 0);
     this.drawFill.style.width = `${Math.round(f.drawFraction * 100)}%`;

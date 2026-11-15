@@ -90,6 +90,7 @@ export function createBattle(arena: ArenaDef, ground?: BattleGround): BattleStat
     if (waveOf(s) !== 0) continue;
     const f = makeFighter(state, s);
     state.fighters.push(f);
+    f.y = groundY(state, f.x, f.z); // on the ground from the first frame, before any step has run (review 036)
     if (s.kind === 'hero') {
       if (state.heroId >= 0) throw new Error(`arena ${arena.id} has more than one hero spawn`);
       state.heroId = f.id;
@@ -126,6 +127,31 @@ function updateWaves(state: BattleState): void {
 
 export function getFighter(state: BattleState, id: number): Fighter | undefined {
   return state.fighters.find((f) => f.id === id);
+}
+
+/**
+ * Stands a downed hero back up where he fell, at full health, with every action and timer cleared.
+ * Returns true when he was dead and is now alive. A living hero is left as he is.
+ */
+export function reviveHero(state: BattleState): boolean {
+  const hero = getHero(state);
+  if (hero.alive) return false;
+  hero.alive = true;
+  hero.hp = hero.maxHp;
+  hero.hitTimer = 0;
+  hero.flashTimer = 0;
+  hero.knockX = 0;
+  hero.knockZ = 0;
+  hero.vx = 0;
+  hero.vz = 0;
+  hero.cooldown = 0;
+  hero.action = idleAction();
+  hero.drawTime = 0;
+  hero.dodgeTime = 0;
+  hero.dodgeCooldown = 0;
+  hero.dodgeX = 0;
+  hero.dodgeZ = 0;
+  return true;
 }
 
 export function getHero(state: BattleState): Fighter {
@@ -386,8 +412,8 @@ function fireArcherArrow(state: BattleState, f: Fighter, events: BattleEvent[]):
   if (!target) return;
   const A = TUNING.archer;
   const v = launchVelocity(
-    f.x, TUNING.bow.muzzleHeight, f.z,
-    target.x, A.aimHeight, target.z,
+    f.x, f.y + TUNING.bow.muzzleHeight, f.z,
+    target.x, target.y + A.aimHeight, target.z,
     A.arrowSpeed, TUNING.gravity,
   );
   if (!v) return;
@@ -564,6 +590,7 @@ function resolveCollisions(state: BattleState): void {
 // ---------- outcome ----------
 
 function checkOutcome(state: BattleState, events: BattleEvent[]): void {
+  if (state.openEnded) return; // the valley's knock-down fight has no win or loss (task 004 item 8)
   const hero = getHero(state);
   let status: BattleState['status'] | null = null;
   if (!hero.alive) status = 'defeat';

@@ -38,8 +38,8 @@ function strikeIncoming(state: BattleState, hero: Fighter): boolean {
 function bowPitch(hero: Fighter, target: Fighter, drawTime: number): number {
   const speed = bowSpeed(drawTime);
   const v = launchVelocity(
-    hero.x, TUNING.bow.muzzleHeight, hero.z,
-    target.x, TUNING.archer.aimHeight, target.z,
+    hero.x, hero.y + TUNING.bow.muzzleHeight, hero.z,
+    target.x, target.y + TUNING.archer.aimHeight, target.z,
     speed, TUNING.gravity,
   );
   if (!v) return 0;

@@ -128,6 +128,11 @@ export interface BattleState {
   wave: number;
   /** Seconds the field has been clear of enemies while a later wave is pending. */
   waveTimer: number;
+  /**
+   * Open-ended fight (the valley's patrol-hut fight, task 004 item 8): no win and no loss. The fight never emits
+   * an outcome; a downed hero is revived by the caller (see reviveHero). Absent means the arena rules apply.
+   */
+  openEnded?: boolean;
   /** Not serialized (it holds a function). Absent means flat ground and every fighter is simulated. */
   ground?: BattleGround;
 }

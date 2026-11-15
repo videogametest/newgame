@@ -1,6 +1,6 @@
 # Every Lit Window: Game Design
 
-Version 37 (the first evening: a tutorial at Hesper's, in the world). Supersedes version 36.
+Version 38 (the game can be installed and played offline). Supersedes version 37.
 
 The game is called **Every Lit Window**. The name is the image the game builds toward: a valley where no window is dark any more. Keep the title in one data constant so it is defined in one place. This document is the source of truth for design decisions. Read it before building anything. If a build task conflicts with it, stop and ask.
 
@@ -29,6 +29,7 @@ These are expensive to change. Do not revisit without asking.
 
 - **Single-player only.** No multiplayer, now or later. No server-authoritative logic needed.
 - **Platform:** desktop browser, played with keyboard and mouse or with a controller. Any controller the browser sees works, wired or Bluetooth. No touch support.
+- **Installable.** The game is an installable web app: the browser offers Install, the game then opens in its own window from a desktop icon, and it plays with no connection after the first visit. Every file is kept on the player's machine once fetched; a new version is fetched quietly and used from the next start, never mid-session, with one line on the title screen saying an update is ready. Saves are untouched by updates. A downloadable desktop build and a store listing are later decisions, not part of this.
 - **Full 3D, third-person by default, with a first-person toggle.** The default is an over-the-shoulder camera that follows the hero; the player can switch to first-person at any time (section 5). Mouse controls the camera in both.
 - **One continuous open world.** No battle arenas, no menu map, no loading screens between places inside a region. Combat happens in the world.
 - **The world is generated from data and a seed, not hand-modelled.** Terrain comes from a seeded height function. Scenery (trees, rocks, grass, flowers) is scattered by seeded rules per biome. Points of interest (village, camps, outposts, chests, ruins, landmarks) are placed by hand in data files. The same seed always produces the same world.

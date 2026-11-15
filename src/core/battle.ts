@@ -52,7 +52,7 @@ export function makeFighter(state: BattleState, s: Spawn): Fighter {
     maxHp: st.maxHp,
     hp: st.maxHp,
     alive: true,
-    ...(state.ground ? { awareness: 'unaware' as const } : {}),
+    ...(state.ground && s.team === 'enemy' ? { awareness: 'unaware' as const } : {}),
     vx: 0,
     vz: 0,
     knockX: 0,

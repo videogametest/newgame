@@ -7,6 +7,7 @@ const idle: BattleInput = { moveX: 0, moveZ: 0, camYaw: 0, aimPitch: 0, sprint: 
 describe('world combat awareness for valley markers', () => {
   it('has real initial awareness and becomes alert only when the world AI acts', () => {
     const b = createBattle(PATROL_HUT_FIGHT, { heightAt: () => 9, simRadius: 25 });
+    expect(getHero(b).awareness).toBeUndefined();
     const enemies = b.fighters.filter(f => f.team === 'enemy');
     expect(enemies.every(f => f.awareness === 'unaware')).toBe(true);
     getHero(b).x = 0;

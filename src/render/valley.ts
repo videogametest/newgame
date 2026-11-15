@@ -29,6 +29,7 @@ import { buildValleyWater, type ValleyWater } from './valley_water';
 import { buildGate } from './valley_gate';
 import { buildCrossings } from './valley_crossings';
 import { buildScenery } from './valley_scenery';
+import { ValleyWildlife } from './valley_wildlife';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
@@ -219,6 +220,9 @@ class Valley {
   private bramOrder: SquadOrder = 'follow';
   /** Bram keeps his spot 2.5 m beside the hero and 1 m behind, crouched or not; crouch changes only the hero's own movement. */
   private crouched = false;
+  /** The hero's movement as the stealth and wildlife rules read it this frame. */
+  private heroMovement: 'still' | 'walking' | 'sprinting' | 'crouched' | 'crouchedStill' = 'still';
+  private wildlife?: ValleyWildlife;
   private bramGroundY = 0;
   /** How many times each order's line has played, so the lines rotate and never repeat back to back. */
   private readonly bramSaid: Record<SquadOrder, number> = { follow: 0, hold: 0 };
@@ -323,6 +327,7 @@ class Valley {
     buildGate(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow });
     buildCrossings(this.scene, { shadow: this.shadow }); // the ford, the mill bridge, the stepping stones (review 025 item 2)
     await buildScenery(this.scene);
+    this.wildlife = new ValleyWildlife(this.scene); // the crows, flocks, geese and fox (GAME_DESIGN section 4)
     this.landmarks = await buildLandmarks(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow }); // the Mill, the Forge, the Watch-house, the castle and the rest
     this.glow = new GlowLayer('glow', this.scene);
     this.glow.intensity = 0.3;
@@ -529,6 +534,10 @@ class Valley {
       ? raw
       : { ...raw, moveX: 0, moveZ: 0, sprint: false, attackPressed: false, attackHeld: false, attackReleased: false, dodgePressed: false };
     if (this.fight.status === 'fighting') this.fight.advance(intent);
+    const moving = live && Math.hypot(intent.moveX, intent.moveZ) > 0.01;
+    this.heroMovement = this.crouched
+      ? (moving ? 'crouched' : 'crouchedStill')
+      : moving ? (intent.sprint ? 'sprinting' : 'walking') : 'still';
     this.game.hero.position = { x: this.hero.x, z: this.hero.z };
     this.groundY = this.hero.y;
   }
@@ -591,6 +600,12 @@ class Valley {
     if (this.scene.activeCamera) this.water?.update(L, this.waterSeconds, this.scene.activeCamera.globalPosition, FOG_START, FOG_END);
     this.wick?.light(L, this.game.timeOfDay);
     this.landmarks?.update(dt, L);
+    this.wildlife?.update({
+      dt,
+      hero: { x: this.hero.x, z: this.hero.z },
+      movement: this.heroMovement,
+      millHeld: this.game.places.some(p => p.id === 'mill' && p.status === 'held'),
+    });
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
     this.bramView.update(this.bram, this.bramGroundY);

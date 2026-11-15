@@ -23,6 +23,9 @@ const DEFAULTS = {
     overheardDwell: 3,
   },
 
+  /** Item 21: three active minutes between browser saves (untuned). */
+  saves: { intervalSeconds: 180 },
+
   camera: {
     fov: 0.9,
     zoomFov: 0.55,

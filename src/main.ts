@@ -10,6 +10,8 @@ import { startRoomTest } from './styletest/room';
 import { startWickTest } from './styletest/wick';
 import { parseShowcaseTime } from './render/showcase_clips';
 import { GAME_TITLE } from './data/title';
+import { LoadFailedError } from './render/load_retry';
+import { describeError, logEvent } from './render/debug_log';
 
 document.title = GAME_TITLE;
 
@@ -27,7 +29,11 @@ if (params.has('styletest')) {
   });
 } else if (params.has('showcase')) {
   startShowcase(canvas, params.get('showcase') ?? '', parseShowcaseTime(params.get('t'))).catch((err: unknown) => {
-    ui.textContent = err instanceof Error ? err.message : String(err);
+    // Plain words on screen; the detail goes to the debug log (task 019).
+    logEvent('showcase_failed', describeError(err).split('\n')[0]);
+    ui.textContent = err instanceof LoadFailedError
+      ? 'The game could not download some of its files. Reload the page to try again.'
+      : 'The showcase could not start. Reload the page to try again.';
     console.error(err);
   });
 } else {

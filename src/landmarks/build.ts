@@ -9,6 +9,7 @@ import {
 import { assetUrl } from '../render/assets';
 import type { Lighting } from '../render/lighting';
 import { landmarkPieces, PLACE_SITES, type BoxPiece, type ModelPiece, type PlaceId, type Stuff } from './plan';
+import { withRetry } from '../render/load_retry';
 
 const HEX = 'assets/kaykit_medieval_hexagon/';
 /** The castle is one flat dark tone, a little bluer and paler by day, nearly black at night. */
@@ -56,7 +57,7 @@ export async function buildLandmarks(scene: Scene, o: LandmarkOptions): Promise<
     if (!c) {
       const url = assetUrl(`${HEX}${file}.gltf`);
       const cut = url.lastIndexOf('/');
-      c = SceneLoader.LoadAssetContainerAsync(url.slice(0, cut + 1), url.slice(cut + 1), scene);
+      c = withRetry(`${HEX}${file}.gltf`, () => SceneLoader.LoadAssetContainerAsync(url.slice(0, cut + 1), url.slice(cut + 1), scene));
       containers.set(file, c);
     }
     return c;

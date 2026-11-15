@@ -6,6 +6,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 004 item 14: wildlife rules (Viktor, PR open on `task-004-item14-animals`, commit `16d8b1d`)
+
+- Logic only, shipped dark: `src/core/wildlife/`. `flocks.ts` (sprinting within 14 m startles a flock, which emits a `noise` stimulus of radius 22 m; crouching or walking does not; a flock startles once), `crows.ts` (circling iff the place is `held`), `geese.ts` (sprinting within 12 m returns a `geese` stimulus; creeping does not), `fox.ts` (idle, leading, gone; a quiet hero near the fox leads it toward the secret, sprinting near it sends it away for good, and it returns only after the hero leaves the area). Placeholder tuning in `tuning.ts`. Tests: `wildlife.test.ts`, 13 checks.
+- Reuses `Stimulus`, `reaches()` and `Observation['movement']` from `src/core/stealth`; nothing duplicated.
+- Gate: `npx vitest run` 79 files, 970 tests pass; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, 97.0 m.
+- Not visible in a frame: no rendering yet. Drawing the animals is the second PR.
+- OPEN QUESTION (not decided): does walking, as well as crouching, past a flock startle it? The design says only sprinting does, so the code says no for walking. Greg or Claude to confirm.
+- OPEN QUESTION: the design does not say how long a startled flock stays alert or what the fox's speed is; both are placeholders.
+
 ## 2026-11-15 Task 004 item 12: noticing and the first strike (Viktor, PR #88, squash `5184660`)
 
 - Logic: `src/core/combat/blade.ts` (`resolveBladeDamage`, `isBehind`). The first-strike multiplier applies to a short-blade hit only when the target is unaware, the hero is behind it, and the target is not `cannotBeSurprised` (Stane). It reuses the arrow's `DEPTH.weakPoints.firstStrike`, so there is one number. Tests: `src/core/combat/blade.test.ts`, 9 checks.

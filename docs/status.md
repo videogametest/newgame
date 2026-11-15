@@ -6,6 +6,17 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 004 item 10: the three places as data (Viktor, PR #84, squash `7919e52`)
+
+- Data: `src/data/bandits.ts` (habit text per bandit, from the writing; schedule notes for Hob, Corwin, Jory and Odo), `src/data/places.ts` (mill: first leader Harl Gadd, retaken leader Maud Kerr; forge: Rafe Dunmore; watch house: Stane; `placeById`, `garrisonMembers`, `defendersOf`, `isRosterLeader`).
+- Loader: `src/data/writing_bandits.ts` reads `docs/writing/bandits.md?raw` (roster, overheard lines with their speakers from the header, yields, stay table, learns). Line text is read from the writing by id, not copied into data.
+- Tests: `src/data/writing_bandits.test.ts`, 16 checks against the writing. Overheard speakers are matched to the header participants.
+- Gate on the branch: `npm test` 76 files, 924 tests passed; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `scripts/smoke.mjs` on a local preview passed. `npm run walk-gap` PASS, longest walk 97.0 m (limit 100 m). The repo has no CI checks on PRs, so the merge was on local gates only.
+- After merge: Pages run `43670498533` success; `node scripts/smoke.mjs https://everylitwindow.com/` passed.
+- Not visible in a frame: no rendering changed. Bell, lantern and banner placement stays in `src/landmarks/plan.ts` (Claude's).
+- Open for review: habit hours in `src/core/places/schedules.ts` (`HABIT_HOURS`) are placeholders (afternoon 14 to 16, midnight 0 to 2, others untuned). Odo Varn has no time in the writing; kept `midday`. See the queue's Decisions.
+- Next: item 11 (a day at a held place, pure schedule logic), then 12 and 14. Item 13 is blocked on item 8.
+
 ## 2026-11-15 Task 004 item 8: a fight in the valley (Viktor, branch `task-004-item8-valley-fight`, pushed, not merged; BLOCKED)
 
 - Built and pushed (commits `d8c57a7`, `f76b361`): patrol hut fight data (`src/data/patrol_hut_fight.ts`), valley battle ground and headless tests (`src/core/world/valley_battle.ts`), the bow aim fix in core (`bowPitch` in `src/core/bot.ts`, `fireArcherArrow` in `src/core/battle.ts`), valley fight wiring (`src/render/valley_fight.ts`, `src/render/valley.ts`, `src/render/hud.ts`), and the capture script `scripts/hut_fight_capture.mjs`.

@@ -170,6 +170,10 @@ export class CharacterView {
     this.player = new ClipPlayer(clips);
 
     for (const m of this.root.getChildMeshes(false)) {
+      if (this.unit.hide?.test(m.name)) {
+        m.setEnabled(false); // a helmet or cape this unit does not wear (the style test does the same)
+        continue;
+      }
       if (m.material && !this.materials.includes(m.material)) {
         this.materials.push(m.material);
         tintMaterial(m.material, this.unit.tint);

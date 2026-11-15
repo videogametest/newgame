@@ -86,6 +86,11 @@ export class PlayerInput {
     return this.actions.takePressed('pause');
   }
 
+  /** True once for each press of an action; reads and clears its edge. Read before takeInput, which clears the edges. */
+  takeActionPressed(action: Action): boolean {
+    return this.actions.takePressed(action);
+  }
+
   /** Builds this step's input and consumes the edge flags. */
   takeInput(): BattleInput {
     const a = this.actions;

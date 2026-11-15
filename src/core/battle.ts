@@ -90,6 +90,7 @@ export function createBattle(arena: ArenaDef, ground?: BattleGround): BattleStat
     if (waveOf(s) !== 0) continue;
     const f = makeFighter(state, s);
     state.fighters.push(f);
+    f.y = groundY(state, f.x, f.z); // on the ground from the first frame, before any step has run (review 036)
     if (s.kind === 'hero') {
       if (state.heroId >= 0) throw new Error(`arena ${arena.id} has more than one hero spawn`);
       state.heroId = f.id;

@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Queue item 19: a failed download must not stop the game (Viktor, branch item19-retry)
+
+- Shipped: PR #98, regular merge `fdb13ad`. Pages run `43750993226` succeeded on that commit. Live smoke `node scripts/smoke.mjs https://everylitwindow.com/` passed.
+- Retries: one try plus four retries, waiting 500, 1000, 2000 and 4000 ms, in `src/render/load_retry.ts`. Used for model loads (assets, scenery, landmarks, village) and sound loads.
+- Screen: while a retry waits the boot text reads "Still loading..." and nothing else. On give-up: plain words plus a "Try again" button (reloads). The file name goes to the debug log only. The showcase route uses the same plain wording (was raw error text).
+- Claude's paths touched at the call sites only: `src/landmarks/build.ts` and `src/village/build.ts` (one-line `withRetry` wrap each).
+- Verified: tests (`load_retry.test.ts`: waits, give-up naming the file, fetch fails twice then succeeds, non-OK retried); tsc; vite build; walk-gap PASS 97.0 m; local and live smoke; browser check with 503s injected on a house model (Still loading shown, recovered, no page errors).
+- Not verified: the give-up screen in a browser (no run forced all four retries to fail). Its "Try again" button is untested by eye.
+- Question for Greg: none.
+
 ## 2026-11-15 Task 009 queue item 15: the Mill, held (Viktor, branch item15-mill)
 
 - Defenders: `src/core/places/defenders.ts` (pure; `defendersAt(placeId, hour, retaken)`), spots in `src/data/mill_spots.ts`, first garrison `garrisonOf('mill', false)` (7). Walks use A* (`findPath`); patrol pace 60 s (placeholder). Tests: `defenders.test.ts`, 13 pass.

@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 004 item 8: a fight in the valley (Viktor, branch `task-004-item8-valley-fight`, pushed, not merged; BLOCKED)
+
+- Built and pushed (commits `d8c57a7`, `f76b361`): patrol hut fight data (`src/data/patrol_hut_fight.ts`), valley battle ground and headless tests (`src/core/world/valley_battle.ts`), the bow aim fix in core (`bowPitch` in `src/core/bot.ts`, `fireArcherArrow` in `src/core/battle.ts`), valley fight wiring (`src/render/valley_fight.ts`, `src/render/valley.ts`, `src/render/hud.ts`), and the capture script `scripts/hut_fight_capture.mjs`.
+- Gate on the branch: `npx vitest run` 76 files, 912 tests pass; `npx tsc --noEmit` clean; `npm run build` passes; `npm run walk-gap` PASS, longest walk 97.0 m; local smoke passes.
+- Blocker (exact, from the frames): in `docs/pr-media/hut-fight/` (`hut-follow-12`, `hut-follow-18`, `hut-hold-12`, `hut-hold-18`) the patrol hut is in view, Bram is a sliver at the far left edge in all four, and no bandits are visible in any of them. Hero HP stayed 140/140 while the fight was held, so the earlier HP drop came from the frozen-capture bug, now fixed.
+- Positions captured: hero (306, -103) following and (303, -101) holding; aim (320, -106) at 12:00 and 18:00. The first try, with the hero at spawn (300, -100), gave the same result.
+- Tried without success: aiming at the hut; aiming at (320, -106); the hero 17 m back. None brought Bram or the three bandits into frame. I have not confirmed where the bandits stand relative to the camera.
+- Not tried: a camera further back, between the hut and Bram. Spawn and enemy placement were left alone to suit the frame.
+- Item 8 stays unticked. Item 9 waits on it. Next item in the queue: 10 (the three places as data).
+
 ## 2026-11-14 Task 009 step 2, item 3b: settings card look (Viktor, PR #81, squash `789b29b`)
 
 - Card: one fixed card for all six pages, `min(760px, 92vw)` wide and 80% of the screen tall, in the same place on every page. Tabs on one row; Controls opens its own screen. Settings scroll under the tabs with the bottom fade. Back and Back to defaults are fixed at the foot.

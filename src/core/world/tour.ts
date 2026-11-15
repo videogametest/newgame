@@ -37,6 +37,10 @@ export const TOUR_VIEWS: readonly TourView[] = [
   { name: 'forge', hero: { x: 62, z: -154 }, look: { x: 38, z: -176 }, tod: 18, note: 'The Forge' },
   { name: 'watch_house', hero: { x: -124, z: -170 }, look: { x: -170, z: -192 }, tod: 18, note: 'The Watch-house' },
   { name: 'family_stones', hero: { x: 196, z: 210 }, look: { x: 110, z: 124 }, tod: 18, note: 'The family stones on the road in' },
+  { name: 'wildlife_crows', hero: { x: -160, z: 115 }, look: { x: -176, z: 50 }, tod: 12, note: 'Crows over the held Mill' },
+  { name: 'wildlife_flock', hero: { x: 120, z: 65 }, look: { x: 120, z: 60 }, tod: 12, note: 'Meadow birds, lifting after a sprint' },
+  { name: 'wildlife_geese', hero: { x: -148, z: 65 }, look: { x: -158, z: 57 }, tod: 12, note: 'The Mill goose pen' },
+  { name: 'wildlife_fox', hero: { x: 139, z: 172 }, look: { x: 140, z: 166 }, tod: 12, note: 'The fox near the family stones' },
 ];
 
 /**

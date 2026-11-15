@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 004 item 14b: stealth animals drawn (Viktor, PR #95)
+
+- Resumed the existing `wildlife-hook` branch (`69aba59`), merged current main, completed it rather than duplicating work. Crows now circle all three held places and leave each independently; meadow flocks lift on a sprint; geese occupy the existing Mill pen; the fox follows the existing quiet-follow/sprint-away rules. Simple shapes, as authorized. No landmark pen edits.
+- Added four named wildlife tour views, read-only wildlife state and an explicit capture-only rule-step hook. The frames exercise actual pure rules, with movement supplied by the capture hook, not a keyboard playthrough. Unit tests cover all held sites, freeing one, walking versus sprinting through birds, reset after departure, geese, and fox visibility.
+- Gate: 1005 tests in 86 files pass; typecheck clean; production build passed (chunk-size warning); walk gap PASS 97.0 m, zero stranded cells; local smoke passed at port 4184.
+- Frames: `docs/pr-media/item14b-wildlife/{crows,flock,geese,fox}-{12,18,0}.png`, script `scripts/wildlife_capture.mjs`, full report alongside. All twelve captured once, no fallbacks or page/console/request errors; not visually judged under unattended rule 1. Reports confirm twelve crows enabled and the first flock startled. The geese are not honking and the fox is idle in these shots; their reactions are covered by integration tests, not captured here.
+- Performance issue, measured after chunk counts stabilized (medium quality): crows 324/324/326; flock 308/308/310; geese 282/286/284; fox 408/408/410 draw calls at noon/dusk/midnight. The 300 budget is not met in three views. No causal attribution to wildlife alone: no same-view main comparison was run. Merge uses the unattended functional gate; performance remains for critique.
+- Not built here: wildlife noise affecting the Mill defenders or audible honks, place capture/save wiring (later queue items). Crows already consume game place state. Fox/flock visual tuning and the orange tail remain simple placeholders.
+- Deploy and live smoke: pending, recorded after merge. Next item: 9, remove the prototype arena.
+
 ## 2026-11-15 Task 004 item 13: alarm rules and valley awareness markers (Viktor, PR #94, merge `3c8b76e`)
 
 - Pure `src/core/places/reinforcements.ts` extends the existing `advanceBell`: an alert volunteer must reach the bell, a stopped runner can be replaced, one ringing schedules one caller-authored outside roster, simulation-time travel pauses with the game, arrival emits one morale gain, freeing the place cancels a pending party. Silencing after ringing does not recall a party already called. No Mill roster, entry coordinates or travel time are invented here; item 16 supplies them.

@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Queue item 20: Mill draw-call budget (Viktor, PR #100)
+
+- Implementation `294c38e`, branch `feat/item20-mill-budget`. First unticked item in current queue order is 20, ahead of the older item 17 block; existing `item17-overheard` WIP was not touched.
+- Same-view, steady, medium-quality draw calls at 08:00 / 13:00 / 18:00 / 00:00: **460 / 460 / 406 / 406 before, 268 / 268 / 256 / 248 after**. All four under 300. Full-page frames and raw reports: `docs/pr-media/item20-mill-budget/`; repeatable script `scripts/mill_budget.mjs`.
+- Diagnosis at 08:00, hiding one group at a time: shadows 320, glow 317, landmarks 417, fighters 169, versus 460 complete. These overlapping deltas are not additive. Fighters repeated across colour/glow/shadow passes dominate this view.
+- Cuts: merge compatible same-rig, same-material defender body pieces in bind space; shared neutral unit materials with independent private hit-flash/occlusion-fade materials; shadow casters only when their world footprint intersects 60 m of the hero. Static landmark batching existed already, but world-wide bounds defeated spatial culling: now one atlas/material batch per site. Wheels, banners and lanterns remain separate. No change to simulation, density or graphics quality; glow stays on.
+- Gate: 1038 tests in 93 files passed; typecheck clean; production build passed (existing chunk-size warning); walk gap PASS 97.0 m with zero stranded cells; built-page local smoke passed at 4187. New tests preserve every skinned vertex and animated pose under the original parent transform, reject incompatible merges, isolate shared-material flash/fade/disposal, and test shadow-footprint boundaries.
+- Capture correction: the first diagnostic incorrectly re-enabled absent defender views. Discarded those baseline frames/counts, fixed restoration, then took the single corrected baseline retake. Final after frames captured once. No fallback or browser errors, no visual judgement. No claim about GPU fps, combat peak budget, every viewpoint or all quality levels; not a keyboard combat playthrough.
+- Deployment and live checks follow merge. Next in current queue order: item 21, saves. Existing 20-minute repeating continuation verified active; quiet/no-other-active-run guard remains.
+
 ## 2026-11-15 Queue item 16 deployed (Viktor)
 
 - PR #99 regular-merged as `40ff4ad`, with the required videogametest noreply author and committer. The merge tree exactly matches the gated branch tree.

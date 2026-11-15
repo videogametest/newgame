@@ -6,6 +6,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Queue item 16 deployed (Viktor)
+
+- PR #99 regular-merged as `40ff4ad`, with the required videogametest noreply author and committer. The merge tree exactly matches the gated branch tree.
+- Final local gate after the ground-height fix: 1034 tests in 90 files pass; typecheck clean; production build passes (chunk-size warning); walk gap PASS 97.0 m, zero stranded cells; local built-page smoke passed on port 4186.
+- Pages run `43756095356` succeeded on `40ff4ad` (tests, build, built-game smoke and deploy). The watch command reached its tool time limit while CI was still running; direct workflow state, then a second watch, confirmed success. This was not a deployment failure.
+- Live: `node scripts/smoke.mjs https://everylitwindow.com/` passed. A separate live browser checked the new `millState` hook after a rendered frame, drove the real geese/sensor/runner rules with combat held, and observed exactly one bell ring and two reinforcements, no page errors or navigation issues. No extra frame was captured, and no audio listening check or keyboard combat playthrough is claimed.
+- The capture/performance qualifications in the next entry still apply. The final ground-height change is verified by the render-call test, not by the earlier frames.
+- Next unticked item: 17. Greg's fifteen-minute quiet guard applies after this deploy/documentation update. Existing every-twenty-minute continuation remains active; no extra wakeup needed.
+
 ## 2026-11-15 Queue item 16: Mill awareness and bell (Viktor, PR #99)
 
 - Implementation: `src/core/places/mill_encounter.ts` shares the seven named Mill defenders with the actual valley battle, retaining routines, health and sensing. Uses item 12 sight/awareness, buildings and terrain for sight obstruction, torch illumination and the geese alarm. A hit raises alert; a suspicious defender investigates. Markers use the existing shape-and-colour HUD and saved switch.

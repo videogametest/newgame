@@ -6,6 +6,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Queue item 17 deployed (Viktor)
+
+- PR #101 regular-merged as `e3734b9`; required videogametest noreply author/committer verified, merge tree identical to the gated branch.
+- Pages run `43772188079` succeeded (tests, build, built-page smoke and deployment). The first watch hit the tool time limit; a direct state check and second watch confirmed success.
+- `node scripts/smoke.mjs https://everylitwindow.com/` passed. The image-free live repeat of `scripts/item17_capture.mjs` passed all 13 assertions: real noon/dusk tell captions in viewport, speech keys, heard id, Notes, second speaker, no replay after departure/return, and midnight silence. No browser errors, capture fallbacks or extra screenshots. Settled medium draw calls: 276 / 274 / 272; full raw live report alongside local report.
+- Browser-save persistence remains item 21; no keyboard stealth playthrough or visual judgement is claimed. Item 18's design/queue conflict is still recorded under Blocked. Next run rechecks for a ruling, then takes the next unblocked queue item (21). No implementation begins inside the quiet window. Every-20-minute continuation verified active.
+
 ## 2026-11-15 Queue item 17: overheard Mill captions (Viktor, PR #101)
 
 - Resumed the existing `item17-overheard` WIP instead of duplicating it, merged fresh main `620d734` without rewriting history, completed its missing speech-log integration. Words are read by id from the writing; real scheduled fighters, proximity and awareness decide when a pair can speak. No invented dialogue.

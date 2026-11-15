@@ -6,6 +6,12 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Queue item 17: overheard lines at the Mill (Viktor, branch item17-overheard, WIP)
+
+- State: work in progress, not deployed. Wiring added: `src/render/valley_fight.ts` passes the words to `MillEncounter` (read from `docs/writing/bandits.md` by id via `writing_bandits.ts`, ids from `src/data/overheard.ts`); `src/render/valley.ts` builds `ValleyOverheard` (`valley_overheard.ts`) and shows the caption over the speaker, hidden while paused, in the picture or with the chrome hidden.
+- Checks: typecheck clean; `vitest run` 1048 tests in 91 files pass. Not yet checked: a rendered caption frame, the "said once" behaviour through `src/core/speech/said.ts` in the valley, a live smoke test, and the PR.
+- Not done: no PR opened, nothing merged, nothing deployed for item 17.
+
 ## 2026-11-15 Queue item 16 deployed (Viktor)
 
 - PR #99 regular-merged as `40ff4ad`, with the required videogametest noreply author and committer. The merge tree exactly matches the gated branch tree.

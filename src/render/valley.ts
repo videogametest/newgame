@@ -32,6 +32,7 @@ import { buildCrossings } from './valley_crossings';
 import { buildScenery } from './valley_scenery';
 import { ValleyWildlife, type WildlifeFrame } from './valley_wildlife';
 import { ValleyDefenders } from './valley_defenders';
+import { ValleyOverheard } from './valley_overheard';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
@@ -228,6 +229,7 @@ class Valley {
   private heroMovement: 'still' | 'walking' | 'sprinting' | 'crouched' | 'crouchedStill' = 'still';
   private wildlife?: ValleyWildlife;
   private defenders?: ValleyDefenders;
+  private overheard?: ValleyOverheard;
   private bramGroundY = 0;
   /** How many times each order's line has played, so the lines rotate and never repeat back to back. */
   private readonly bramSaid: Record<SquadOrder, number> = { follow: 0, hold: 0 };
@@ -280,6 +282,7 @@ class Valley {
     scene.activeCamera = this.camera;
 
     this.fight = new ValleyFight(scene, assets, this.shadow, audio, hud, this.camera, canvas, (line) => this.showLine(line, 4));
+    this.overheard = new ValleyOverheard(uiRoot, (x, y, z) => this.fight.screenOf(x, y, z));
     this.placeHeroAtStart();
     this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
     this.heroView.asDesigned(scene, PROPORTIONS); // overnight item 3
@@ -614,7 +617,9 @@ class Valley {
       movement: this.paused ? 'still' : this.heroMovement,
       heldPlaces: this.game.places.filter(p => p.status === 'held').map(p => p.id),
     });
-    this.defenders?.update(this.fight.mill.snapshot(), this.fight.battle.fighters);
+    const mill = this.fight.mill.snapshot();
+    this.defenders?.update(mill, this.fight.battle.fighters);
+    this.overheard?.update(mill.overheard.caption, !this.picture && !this.paused && !this.chromeHidden);
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
     this.bramView.update(this.bram, this.bramGroundY);

@@ -65,7 +65,10 @@ for (const tod of TIMES) {
     await page.waitForTimeout(1000);
     const state = await page.evaluate(() => window.__valley.state());
     const file = join(outDir, `hut-${shot.name}-${tod}.png`);
-    await page.screenshot({ path: file });
+    // Canvas read, not page.screenshot: under swiftshader the compositor screenshot hangs (review 036 and status).
+    // The engine is created with preserveDrawingBuffer, so the last frame can be read from the canvas. DOM HUD is not in these frames.
+    const dataUrl = await page.evaluate(() => document.querySelector('canvas').toDataURL('image/png'));
+    writeFileSync(file, Buffer.from(dataUrl.split(',')[1], 'base64'));
     const fighters = state.fighters.map((f) => ({ kind: f.kind, team: f.team, x: +f.x.toFixed(1), z: +f.z.toFixed(1), height: +f.bodyHeight.toFixed(2), alive: f.alive }));
     report.push({ shot: file, tod, order: shot.order, hero: shot.at, locked, bram: state.bram, drawCalls: state.drawCalls, fighters });
     console.log(`captured ${file} hero=(${shot.at.x},${shot.at.z}) bram=(${state.bram.x.toFixed(1)},${state.bram.z.toFixed(1)})`);

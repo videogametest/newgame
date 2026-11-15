@@ -26,6 +26,8 @@ export interface Fighter {
   team: Team;
   x: number;
   z: number;
+  /** Height of the ground under this fighter (m). Set from the battle's world each step. */
+  y: number;
   yaw: number;
   radius: number;
   height: number;
@@ -103,10 +105,21 @@ export interface ArenaDef {
   waveGap: number;
 }
 
+/**
+ * The ground a battle is fought on. Fighters stand on heightAt. Only fighters within activeRadius of the
+ * hero are simulated; the others are frozen where they stand until the hero comes near.
+ */
+export interface BattleWorld {
+  heightAt: (x: number, z: number) => number;
+  /** Radius (m) around the hero inside which fighters act. Infinity simulates every fighter. */
+  activeRadius: number;
+}
+
 export interface BattleState {
   time: number;
   status: BattleStatus;
   arena: ArenaDef;
+  world: BattleWorld;
   nextId: number;
   heroId: number;
   fighters: Fighter[];

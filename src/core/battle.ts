@@ -6,7 +6,8 @@ import { TUNING } from '../config/tuning';
 import { decideAI } from './ai';
 import { aimedVelocity, applyHit, bowDamage, bowSpeed, inSwingArc, launchVelocity, unitDir } from './combat';
 import type {
-  Action, ArenaDef, BattleEvent, BattleInput, BattleState, DamageSource, Fighter, FighterKind, Projectile, Spawn,
+  Action, ArenaDef, BattleEvent, BattleInput, BattleState, BattleWorld, DamageSource, Fighter, FighterKind,
+  Projectile, Spawn,
 } from './types';
 import { forwardOf, rightOf } from './vec';
 
@@ -15,6 +16,9 @@ const DT = TUNING.fixedDt;
 function idleAction(): Action {
   return { phase: 'idle', t: 0, struck: false, zoneX: 0, zoneZ: 0 };
 }
+
+/** The arena's flat ground: every fighter is simulated, as the prototype always did. */
+export const FLAT_WORLD: BattleWorld = { heightAt: () => 0, activeRadius: Infinity };
 
 function statsFor(kind: FighterKind) {
   if (kind === 'hero') return TUNING.hero;
@@ -32,6 +36,7 @@ export function makeFighter(state: BattleState, s: Spawn): Fighter {
     team: s.team,
     x: s.x,
     z: s.z,
+    y: state.world.heightAt(s.x, s.z),
     yaw: s.yaw,
     radius: st.radius,
     height: st.height,
@@ -55,12 +60,13 @@ export function makeFighter(state: BattleState, s: Spawn): Fighter {
   };
 }
 
-/** Builds a battle from an arena. The arena must contain exactly one hero spawn. */
-export function createBattle(arena: ArenaDef): BattleState {
+/** Builds a battle from an arena on a world. The arena must contain exactly one hero spawn. */
+export function createBattle(arena: ArenaDef, world: BattleWorld = FLAT_WORLD): BattleState {
   const state: BattleState = {
     time: 0,
     status: 'fighting',
     arena,
+    world,
     nextId: 1,
     heroId: -1,
     fighters: [],
@@ -106,6 +112,20 @@ function updateWaves(state: BattleState): void {
   }
 }
 
+/**
+ * Fighters that act this step: the living hero, and every living fighter within the world's activeRadius
+ * of him. Others stay where they are; they are neither moved, nor decide, nor collide with the moving.
+ */
+export function activeFighters(state: BattleState): Fighter[] {
+  const hero = getFighter(state, state.heroId);
+  const radius = state.world.activeRadius;
+  return state.fighters.filter((f) => {
+    if (!f.alive) return false;
+    if (f.kind === 'hero' || !hero || !hero.alive || radius === Infinity) return true;
+    return Math.hypot(f.x - hero.x, f.z - hero.z) <= radius;
+  });
+}
+
 export function getFighter(state: BattleState, id: number): Fighter | undefined {
   return state.fighters.find((f) => f.id === id);
 }
@@ -128,23 +148,33 @@ export function step(state: BattleState, input: BattleInput): BattleEvent[] {
   if (state.status !== 'fighting') return events;
   state.time += DT;
 
-  for (const f of state.fighters) if (f.alive) tickTimers(f);
   updateWaves(state);
+  const active = activeFighters(state);
+
+  for (const f of active) tickTimers(f);
 
   updateHero(state, input, events);
 
-  for (const f of state.fighters) {
+  for (const f of active) {
     if (!f.alive || f.kind === 'hero') continue;
     updateNonHero(state, f, events);
   }
 
-  for (const f of state.fighters) if (f.alive) advanceAction(state, f, events);
+  for (const f of active) if (f.alive) advanceAction(state, f, events);
 
-  integrate(state);
-  resolveCollisions(state);
+  integrate(active);
+  resolveCollisions(state, new Set(active));
   updateProjectiles(state, events);
+  settleOnGround(state);
   checkOutcome(state, events);
   return events;
+}
+
+/** Every living fighter stands on the ground under it. */
+function settleOnGround(state: BattleState): void {
+  for (const f of state.fighters) {
+    if (f.alive) f.y = state.world.heightAt(f.x, f.z);
+  }
 }
 
 function tickTimers(f: Fighter): void {
@@ -231,7 +261,7 @@ function fireHeroArrow(state: BattleState, hero: Fighter, input: BattleInput, ev
     team: hero.team,
     ownerId: hero.id,
     x: hero.x + fwd.x * TUNING.bow.muzzleForward,
-    y: TUNING.bow.muzzleHeight,
+    y: hero.y + TUNING.bow.muzzleHeight,
     z: hero.z + fwd.z * TUNING.bow.muzzleForward,
     vx: v.vx,
     vy: v.vy,
@@ -359,7 +389,7 @@ function fireArcherArrow(state: BattleState, f: Fighter, events: BattleEvent[]):
   if (!target) return;
   const A = TUNING.archer;
   const v = launchVelocity(
-    f.x, TUNING.bow.muzzleHeight, f.z,
+    f.x, f.y + TUNING.bow.muzzleHeight, f.z,
     target.x, A.aimHeight, target.z,
     A.arrowSpeed, TUNING.gravity,
   );
@@ -368,7 +398,7 @@ function fireArcherArrow(state: BattleState, f: Fighter, events: BattleEvent[]):
     team: f.team,
     ownerId: f.id,
     x: f.x,
-    y: TUNING.bow.muzzleHeight,
+    y: f.y + TUNING.bow.muzzleHeight,
     z: f.z,
     vx: v.vx,
     vy: v.vy,
@@ -450,7 +480,7 @@ function updateProjectiles(state: BattleState, events: BattleEvent[]): void {
 
     for (const f of state.fighters) {
       if (!f.alive || f.team === p.team) continue;
-      if (Math.hypot(p.x - f.x, p.z - f.z) < f.radius + A.radius && p.y <= f.height) {
+      if (Math.hypot(p.x - f.x, p.z - f.z) < f.radius + A.radius && p.y <= f.y + f.height) {
         const dir = unitDir(0, 0, p.vx, p.vz);
         damageFighter(f, p.damage, dir.x, dir.z, p.knockback, 'arrow', events);
         stopped = true;
@@ -469,9 +499,9 @@ function stopArrow(p: Projectile, events: BattleEvent[]): void {
 
 // ---------- movement and collisions ----------
 
-function integrate(state: BattleState): void {
+function integrate(active: Fighter[]): void {
   const decay = Math.exp(-TUNING.combat.knockbackFriction * DT);
-  for (const f of state.fighters) {
+  for (const f of active) {
     if (!f.alive) continue;
     f.x += (f.vx + f.knockX) * DT;
     f.z += (f.vz + f.knockZ) * DT;
@@ -480,8 +510,11 @@ function integrate(state: BattleState): void {
   }
 }
 
-/** Pushes opposing fighters apart, pushes everyone out of obstacles, and keeps them in the arena. */
-function resolveCollisions(state: BattleState): void {
+/**
+ * Pushes opposing fighters apart, pushes moving fighters out of obstacles, and keeps them in the arena.
+ * A frozen fighter (not in `active`) is a fixed obstacle to the moving ones: it never moves itself.
+ */
+function resolveCollisions(state: BattleState, active: Set<Fighter>): void {
   const { halfWidth, halfDepth, obstacles } = state.arena;
   const alive = state.fighters.filter((f) => f.alive);
   for (let iter = 0; iter < 3; iter++) {
@@ -490,6 +523,9 @@ function resolveCollisions(state: BattleState): void {
         const a = alive[i];
         const b = alive[j];
         if (a.team === b.team) continue;
+        const aMoves = active.has(a);
+        const bMoves = active.has(b);
+        if (!aMoves && !bMoves) continue;
         const dx = b.x - a.x;
         const dz = b.z - a.z;
         const d = Math.hypot(dx, dz);
@@ -497,14 +533,19 @@ function resolveCollisions(state: BattleState): void {
         if (d >= minD) continue;
         const nx = d > 1e-6 ? dx / d : 1;
         const nz = d > 1e-6 ? dz / d : 0;
-        const push = (minD - d) / 2;
-        a.x -= nx * push;
-        a.z -= nz * push;
-        b.x += nx * push;
-        b.z += nz * push;
+        const push = aMoves && bMoves ? (minD - d) / 2 : minD - d;
+        if (aMoves) {
+          a.x -= nx * push;
+          a.z -= nz * push;
+        }
+        if (bMoves) {
+          b.x += nx * push;
+          b.z += nz * push;
+        }
       }
     }
     for (const f of alive) {
+      if (!active.has(f)) continue;
       for (const o of obstacles) {
         const dx = f.x - o.x;
         const dz = f.z - o.z;

@@ -7,7 +7,7 @@ import type { Fighter } from './types';
 
 function fighter(overrides: Partial<Fighter> = {}): Fighter {
   return {
-    id: 1, unitId: 'test', kind: 'soldier', team: 'enemy', x: 0, z: 0, yaw: 0,
+    id: 1, unitId: 'test', kind: 'soldier', team: 'enemy', x: 0, z: 0, y: 0, yaw: 0,
     radius: 0.45, height: 1.8, maxHp: 50, hp: 50, alive: true,
     vx: 0, vz: 0, knockX: 0, knockZ: 0, cooldown: 0, hitTimer: 0, flashTimer: 0,
     action: { phase: 'idle', t: 0, struck: false, zoneX: 0, zoneZ: 0 },

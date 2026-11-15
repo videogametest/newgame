@@ -14,6 +14,8 @@ export interface UnitDef {
   weapons: WeaponId[];
   /** Visual scale of the sword model on this unit (the pack has one blade; the hero's is shorter). */
   swordScale?: number;
+  /** Meshes to hide by name: a helmet or cape the model has but this unit does not wear. */
+  hide?: RegExp;
   clips: {
     idle: string;
     run: string;
@@ -68,6 +70,24 @@ export const UNITS: Record<string, UnitDef> = {
     model: 'assets/kaykit_adventurers/characters/Barbarian.glb',
     tint: [0.55, 0.8, 1.0],
     weapons: ['sword'],
+    clips: {
+      idle: 'Idle_A',
+      run: 'Running_A',
+      windup: 'Melee_1H_Attack_Chop',
+      windupRange: [0, 0.4],
+      attack: 'Melee_1H_Attack_Chop',
+      attackRange: [0.4, 0.8],
+      hit: 'Hit_A',
+      death: 'Death_A',
+    },
+  },
+  /** Bram, the companion (docs/tasks/004-places-and-fights.md item 7): the KayKit Knight without its helmet. */
+  ally_bram: {
+    kind: 'soldier',
+    model: 'assets/kaykit_adventurers/characters/Knight.glb',
+    tint: [1, 0.9, 0.7],
+    weapons: ['sword'],
+    hide: /Knight_Helmet|Knight_HelmetVisor/,
     clips: {
       idle: 'Idle_A',
       run: 'Running_A',

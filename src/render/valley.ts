@@ -5,7 +5,7 @@ import {
   Color3, Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
   Matrix, Scene, ShadowGenerator, Vector3,
 } from '@babylonjs/core';
-import { createBattle, getHero } from '../core/battle';
+import { createBattle, getHero, makeFighter } from '../core/battle';
 import type { Fighter } from '../core/types';
 import { forwardOf, rightOf } from '../core/vec';
 import { newGameState } from '../core/state';
@@ -16,6 +16,9 @@ import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
 import { walkStep, type WalkRules } from '../core/world/walk';
 import { TOUR_VIEWS, nextTourIndex, tourIndexOf, tourYaw } from '../core/world/tour';
 import { TRAINING_FIELD } from '../data/arena';
+import { BRAM_FOLLOW_LINES, BRAM_HOLD_LINES, followSpot, nextOrder, stepCompanion } from '../core/world/companion';
+import type { SquadOrder } from '../core/company/conduct';
+import { blocksView } from './occlusion';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
 import { buildFarLand } from './valley_far';
@@ -81,6 +84,8 @@ export interface ValleyHooks {
   groundMask(cols?: number, rows?: number): number[];
   /** Capture only: hides the clock, figures, hint and tour label. */
   hideChrome(): void;
+  /** Capture only: hides Bram, to check what else is in a frame. */
+  hideBram(on: boolean): void;
   /** Capture only: the image exposure and the grey ambient lift now in use (brightness, task 009 step 2c). */
   exposure(): { exposure: number; ambient: number };
 }
@@ -103,6 +108,7 @@ export interface ValleyState {
   fps: number;
   drawCalls: number | null;
   activeMeshes: number;
+  bram: { x: number; z: number; order: SquadOrder; crouched: boolean };
 }
 
 declare global {
@@ -179,6 +185,18 @@ class Valley {
   private lastFrameDrawCalls = 0;
   private fpsFrames = 0;
   private fpsTime = 0;
+  /** Bram (task 004 item 7): outside the battle until item 8. Follows the hero unless ordered to hold. */
+  private readonly bram: Fighter;
+  private readonly bramView: CharacterView;
+  private bramOrder: SquadOrder = 'follow';
+  /** Bram keeps his spot 2.5 m beside the hero and 1 m behind, crouched or not; crouch changes only the hero's own movement. */
+  private crouched = false;
+  private bramGroundY = 0;
+  /** How many times each order's line has played, so the lines rotate and never repeat back to back. */
+  private readonly bramSaid: Record<SquadOrder, number> = { follow: 0, hold: 0 };
+  private readonly captionEl: HTMLElement;
+  private captionTime = 0;
+  private chromeHidden = false;
 
   constructor(
     private readonly engine: Engine,
@@ -218,11 +236,17 @@ class Valley {
     this.sky = new ValleySky(scene);
     this.buildWater(scene);
 
-    this.hero = getHero(createBattle(TRAINING_FIELD));
+    const battle = createBattle(TRAINING_FIELD);
+    this.hero = getHero(battle);
     this.placeHeroAtStart();
     this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
     this.heroView.asDesigned(scene, PROPORTIONS); // overnight item 3
     this.groundY = walkSurfaceAt(this.hero.x, this.hero.z);
+    // Bram joins the battle's fighters in item 8; until then he is only a render-side figure with a sim record.
+    this.bram = makeFighter(battle, { unitId: 'ally_bram', kind: 'soldier', team: 'player', x: 0, z: 0, yaw: 0 });
+    this.bramView = new CharacterView(scene, assets, this.bram, this.shadow, 'bram');
+    this.bramView.asDesigned(scene, PROPORTIONS);
+    this.snapBram();
 
     this.camera = new FreeCamera('valley_cam', new Vector3(0, 10, 0), scene);
     this.camera.minZ = 0.1;
@@ -241,6 +265,10 @@ class Valley {
     this.clockText = document.createElement('div');
     this.figuresText = document.createElement('div');
     this.tourText = document.createElement('div');
+    this.captionEl = document.createElement('div');
+    this.captionEl.hidden = true;
+    this.captionEl.style.cssText = 'position:absolute;left:50%;bottom:16%;transform:translateX(-50%);font:600 18px/1.3 system-ui,sans-serif;color:#f4ead2;text-shadow:0 1px 3px #000;pointer-events:none;';
+    uiRoot.appendChild(this.captionEl);
     this.installHud(uiRoot);
     canvas.addEventListener('pointerdown', () => {
       if (!this.input.isLocked) this.input.requestLock();
@@ -304,6 +332,7 @@ class Valley {
     this.lookAt(view.look.x, view.look.z);
     this.hero.yaw = tourYaw(view);
     this.heroView.setShown(false);
+    this.bramView.setShown(false);
     this.picture = { ...saved, lookYaw: this.input.camYaw, onClose };
   }
 
@@ -316,9 +345,11 @@ class Valley {
     this.game.timeOfDay = p.timeOfDay;
     this.placeAt(p.hero.x, p.hero.z);
     this.hero.yaw = p.yaw;
+    this.snapBram();
     this.input.camYaw = p.camYaw;
     this.input.aimPitch = p.aimPitch;
     this.heroView.setShown(true);
+    this.bramView.setShown(true);
     p.onClose();
   }
 
@@ -392,6 +423,7 @@ class Valley {
     while (this.accumulator >= T.fixedDt) {
       this.accumulator -= T.fixedDt;
       this.stepHero(T.fixedDt);
+      this.stepBram(T.fixedDt);
     }
     this.updateView(dt);
     // The engine's draw-call counter is cumulative, so the frame's own count is the difference across the render.
@@ -434,8 +466,17 @@ class Valley {
 
   /** One fixed step of walking. Movement only while the mouse is captured, so Esc pauses the hero. */
   private stepHero(dt: number): void {
+    // Q and crouch are read before takeInput, which clears the edge flags.
+    const squadPressed = this.input.takeActionPressed('squadOrder');
+    const crouchPressed = this.input.takeActionPressed('crouch');
     const intent = this.input.takeInput();
     if (this.picture) return; // the figure stays where the picture put it
+    if (squadPressed) this.onSquadOrderKey();
+    if (currentSettings().play.crouchToggle) {
+      if (crouchPressed) this.crouched = !this.crouched;
+    } else {
+      this.crouched = this.input.isDown('crouch');
+    }
     const from = { ...this.game.hero.position };
     let dirX = 0;
     let dirZ = 0;
@@ -461,6 +502,42 @@ class Valley {
     this.hero.yaw = Math.atan2(dirX, dirZ);
   }
 
+  /** Bram's step: walks to his spot beside the hero on follow, and stands still on hold. */
+  private stepBram(dt: number): void {
+    if (this.picture) return;
+    const from = { x: this.bram.x, z: this.bram.z };
+    const hp = this.game.hero.position;
+    const next = stepCompanion(from, { x: hp.x, z: hp.z, yaw: this.hero.yaw }, this.bramOrder, T.hero.sprintSpeed, dt, WALK_RULES);
+    this.bram.vx = (next.x - from.x) / dt;
+    this.bram.vz = (next.z - from.z) / dt;
+    this.bram.x = next.x;
+    this.bram.z = next.z;
+    this.bramGroundY = next.y;
+    // Faces the way he walks; when he stands, faces the same way as the hero.
+    this.bram.yaw = next.moving ? Math.atan2(next.x - from.x, next.z - from.z) : this.hero.yaw;
+  }
+
+  /** Puts Bram on his spot beside the hero, facing the hero's way (used after any teleport or camera reset). */
+  private snapBram(): void {
+    const p = followSpot({ x: this.game.hero.position.x, z: this.game.hero.position.z, yaw: this.hero.yaw }, WALK_RULES);
+    this.bram.x = p.x;
+    this.bram.z = p.z;
+    this.bram.yaw = this.hero.yaw;
+    this.bram.vx = 0;
+    this.bram.vz = 0;
+    this.bramGroundY = walkSurfaceAt(p.x, p.z);
+  }
+
+  /** Q: flips Bram between follow and hold, and shows the next line for that order for three seconds. */
+  private onSquadOrderKey(): void {
+    this.bramOrder = nextOrder(this.bramOrder);
+    const lines = this.bramOrder === 'follow' ? BRAM_FOLLOW_LINES : BRAM_HOLD_LINES;
+    const line = lines[this.bramSaid[this.bramOrder] % lines.length];
+    this.bramSaid[this.bramOrder] += 1;
+    this.captionEl.textContent = `Bram: "${line}"`;
+    this.captionTime = 3;
+  }
+
   private updateView(dt: number): void {
     const L = lightingAt(this.game.timeOfDay);
     this.hemi.diffuse = L.hemiColor;
@@ -481,6 +558,7 @@ class Valley {
     this.landmarks?.update(dt, L);
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
+    this.bramView.update(this.bram, this.bramGroundY);
 
     if (this.picture) {
       this.input.camYaw = this.picture.lookYaw;
@@ -496,6 +574,10 @@ class Valley {
     this.camera.position.set(pose.position.x, pose.position.y, pose.position.z);
     this.camera.setTarget(new Vector3(pose.target.x, pose.target.y, pose.target.z));
     this.camera.fov = T.camera.fov;
+    // The fade rule for fighters between the lens and the hero, or too near the lens.
+    this.bramView.fade(blocksView(pose.position, this.hero, this.bram), dt);
+    this.captionTime = this.paused ? this.captionTime : Math.max(0, this.captionTime - dt);
+    this.captionEl.hidden = !(this.captionTime > 0 && !this.picture && !this.paused && !this.chromeHidden);
 
     this.updateHud(dt);
   }
@@ -523,6 +605,7 @@ class Valley {
     this.lookAt(view.look.x, view.look.z);
     // The model must face the look point too; lookAt alone turns only the camera, so the model faced the lens.
     this.hero.yaw = tourYaw(view);
+    this.snapBram();
     this.tourText.textContent = `Tour ${i + 1}/${TOUR_VIEWS.length}: ${view.name} · ${view.note} · [ ] step`;
     return true;
   }
@@ -554,6 +637,7 @@ class Valley {
     this.hero.x = x;
     this.hero.z = z;
     this.groundY = walkSurfaceAt(x, z);
+    this.snapBram();
   }
 
   private lookAt(x: number, z: number): void {
@@ -613,6 +697,10 @@ class Valley {
       groundMask: (cols, rows) => this.groundMask(cols, rows),
       hideChrome: () => {
         if (this.chromeBox) this.chromeBox.hidden = true;
+        this.chromeHidden = true;
+      },
+      hideBram: (on) => {
+        this.bramView.setShown(!on);
       },
       exposure: () => ({ exposure: this.scene.imageProcessingConfiguration.exposure, ambient: this.scene.ambientColor.r }),
       project: (name) => {
@@ -648,6 +736,7 @@ class Valley {
       fps: this.fps,
       drawCalls: this.lastFrameDrawCalls,
       activeMeshes: this.scene.getActiveMeshes().length,
+      bram: { x: this.bram.x, z: this.bram.z, order: this.bramOrder, crouched: this.crouched },
     };
   }
 }

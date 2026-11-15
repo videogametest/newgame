@@ -6,7 +6,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
-## 2026-11-15 Queue item 17: overheard Mill captions (Viktor)
+## 2026-11-15 Queue item 17: overheard Mill captions (Viktor, PR #101)
 
 - Resumed the existing `item17-overheard` WIP instead of duplicating it, merged fresh main `620d734` without rewriting history, completed its missing speech-log integration. Words are read by id from the writing; real scheduled fighters, proximity and awareness decide when a pair can speak. No invented dialogue.
 - `said.ts` records each actual spoken line in `GameState.speech`; the exchange id also enters `heardLines` and Notes. Leaving and returning cannot repeat heard lines; reconstructing the controller resumes only unseen words. Browser-save persistence is still item 21, not claimed here. Queue's once-per-line requirement is stricter than the writing's per-visit minimum; recorded under Decisions taken.

@@ -14,6 +14,10 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - Draw calls after chunks settled (60/60): morning 436, noon 436, dusk 380, midnight 382. Over the 300 budget (arrival view was 246). Not cut; the Mill view adds the defenders' meshes. Measured, reported.
 - Gates: tsc clean; vitest 87 files, 1017 pass; build OK; walk-gap PASS at 97.0 m.
 
+## 2026-11-15 Queue item 15 merged (Viktor)
+
+- PR #97 regular-merged at `cfb1edf`. Pages green; live smoke passed on https://everylitwindow.com/. Frames and draw-call figures in the item 15 entry below.
+
 ## 2026-11-15 Task 009 queue item 9: the arena goes (Viktor, branch item9-arena)
 
 - Removed the prototype arena: `src/render/arena.ts`, `src/render/game.ts`, `src/data/arena.ts` deleted; the `?arena` URL branch removed from `src/main.ts`; `insideBounds` and `ArenaBounds` removed from `src/render/camera_limits.ts` (its test too; `clampCameraHeight` stays).

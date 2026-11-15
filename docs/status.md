@@ -6,6 +6,18 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-14 Task 009 step 2, item 3b: settings card look (Viktor, PR #81, squash `789b29b`)
+
+- Card: one fixed card for all six pages, `min(760px, 92vw)` wide and 80% of the screen tall, in the same place on every page. Tabs on one row; Controls opens its own screen. Settings scroll under the tabs with the bottom fade. Back and Back to defaults are fixed at the foot.
+- Rows: two columns, names left and controls left, each row 60 px. Group headings with a gold rule. Choices and switches use the game's gold.
+- "soon": a dimmed row with a small mark, and one foot line saying what the mark means (wording above in Decisions taken; draft for review).
+- Outside "Settings" heading and outside Back removed from the menu.
+- Gate on the branch: `npx tsc --noEmit` clean; `npx vitest run` all pass (settings rules 20); `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m; `node scripts/smoke.mjs http://localhost:4174/` passed on the branch build, and `https://everylitwindow.com/` after the Pages deploy (new bundle `index-B3U_GW-D.js`).
+- Frames: Before `docs/pr-media/review032/settings-*.png`; After `docs/pr-media/review036-settings-card/1280x720/` and `960x540/` (all six pages plus Controls, `settings-report.json` in each).
+- Measured at 960x540: card 760x432, top 54 px; tab row on one line; Back and Back to defaults at y 432 to 462.
+- Note: the earlier captures were taken on a stale server (port 4173) and are invalid; the frames in the folder above are from the branch build (port 4174).
+- Checks skipped: the repo has no CI checks on PRs, so the merge was on local gates only.
+
 ## 2026-11-14 Task 004 item 7: Bram in the valley (Viktor, PR #78, squash `2c10876`)
 
 - Spot: Bram stands 2.5 m to the clear side of the hero and 1 m behind (`BRAM_SIDE_OFFSET`, `BRAM_BEHIND` in `src/core/world/companion.ts`). He is never placed between the camera and the hero. Crouching does not change his spot.

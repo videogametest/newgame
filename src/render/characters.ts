@@ -4,6 +4,8 @@ import {
   AbstractMesh, Color3, Material, Mesh, MeshBuilder, Nullable, PBRMaterial, Scene, ShadowGenerator,
   StandardMaterial, TransformNode,
 } from '@babylonjs/core';
+import { batchCharacterBody } from './character_batch';
+import { CharacterMaterials } from './character_materials';
 import { TUNING } from '../config/tuning';
 import type { Fighter, WeaponId } from '../core/types';
 import { forwardOf, rightOf } from '../core/vec';
@@ -112,6 +114,8 @@ export class CharacterView {
   /** Each fade material's transparency mode as the asset shipped it (glTF sets it to opaque). */
   private readonly savedModes = new Map<Material, Nullable<number>>();
   private opacity = 1;
+  private flashing = false;
+  private sharedMaterials?: CharacterMaterials;
   /** Showcase mode pins the pose here. When null, the pose comes from the simulation fighter. */
   private poseOverride: Pose | null = null;
   private readonly weapons = new Map<WeaponId, TransformNode>();
@@ -169,6 +173,8 @@ export class CharacterView {
     const clips = bindClips(entries.rootNodes, assets.clips, clipNamesOf(this.unit), tag);
     this.player = new ClipPlayer(clips);
 
+    for (const m of this.root.getChildMeshes(false)) if (this.unit.hide?.test(m.name)) m.setEnabled(false);
+    if (fighter.team === 'enemy') batchCharacterBody(this.root);
     for (const m of this.root.getChildMeshes(false)) {
       if (this.unit.hide?.test(m.name)) {
         m.setEnabled(false); // a helmet or cape this unit does not wear (the style test does the same)
@@ -194,6 +200,7 @@ export class CharacterView {
       this.casters.push(...holder.getChildMeshes(false));
     }
 
+    if (fighter.team === 'enemy') this.sharedMaterials = new CharacterMaterials(scene, fighter.unitId, this.casters);
     for (const m of this.casters) this.shadow.addShadowCaster(m);
 
     for (const m of this.casters) {
@@ -236,7 +243,9 @@ export class CharacterView {
 
     const flash = TUNING.combat.hitFlashTime > 0 ? f.flashTimer / TUNING.combat.hitFlashTime : 0;
     const glow = new Color3(0.95, 0.12, 0.06).scale(clamp(flash, 0, 1) * 0.8);
+    this.flashing = flash > 0;
     for (const m of this.materials) setEmissive(m, glow);
+    this.sharedMaterials?.usePrivate(this.flashing || this.opacity < 1);
 
     this.player.apply(this.poseOverride ?? poseFor(f, this.unit));
 
@@ -268,6 +277,7 @@ export class CharacterView {
     this.opacity += (target - this.opacity) * k;
     if (Math.abs(target - this.opacity) < 0.001) this.opacity = target;
 
+    this.sharedMaterials?.usePrivate(this.flashing || this.opacity < 1);
     if (this.opacity >= 1) {
       for (const m of this.fadeMaterials) {
         m.transparencyMode = this.savedModes.get(m) ?? null;
@@ -293,6 +303,8 @@ export class CharacterView {
     this.player.dispose();
     this.discMaterial?.dispose();
     this.disc?.dispose();
-    this.root.dispose(false, true);
+    this.sharedMaterials?.detach();
+    this.root.dispose(false, false);
+    for (const m of new Set(this.fadeMaterials)) m.dispose(false, false);
   }
 }

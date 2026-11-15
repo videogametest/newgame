@@ -386,8 +386,8 @@ function fireArcherArrow(state: BattleState, f: Fighter, events: BattleEvent[]):
   if (!target) return;
   const A = TUNING.archer;
   const v = launchVelocity(
-    f.x, TUNING.bow.muzzleHeight, f.z,
-    target.x, A.aimHeight, target.z,
+    f.x, f.y + TUNING.bow.muzzleHeight, f.z,
+    target.x, target.y + A.aimHeight, target.z,
     A.arrowSpeed, TUNING.gravity,
   );
   if (!v) return;

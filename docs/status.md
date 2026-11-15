@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-14 Task 004 item 7: Bram in the valley (Viktor, PR #78, squash `2c10876`)
+
+- Spot: Bram stands 2.5 m to the clear side of the hero and 1 m behind (`BRAM_SIDE_OFFSET`, `BRAM_BEHIND` in `src/core/world/companion.ts`). He is never placed between the camera and the hero. Crouching does not change his spot.
+- Fade: when he crosses the camera's line he fades, covering every mesh including cape and sword (`casters` in `src/render/characters.ts`).
+- Orders: `Q` cycles follow and hold, with a caption, and reuses the existing `squadOrder` binding. Key repeat is ignored at keydown.
+- Frames (review 035): `road_in` 18:00 and `family_stones` 12:00 and 18:00 show Bram (red cape) clear of the camera line and not covering the hero (blue cape). The `Q` hold caption frame shows `Bram: "Staying. Shout if you die."` with no page errors.
+- Grey slab: with Bram hidden it is still visible, so it is not Bram. From one frame it looks like the hero's own left-arm gear. Not confirmed. The camera position was not recorded, so it is not reported as a finding.
+- Closed without merge: PRs #70 and #72 (superseded; #71 is merged and holds the settings pages).
+- Gate on the branch: `npx vitest run` 75 files, 905 tests passed; `npx tsc --noEmit` clean; `npm run walk-gap` PASS, longest walk 97.0 m (limit 100 m); live smoke `node scripts/smoke.mjs https://everylitwindow.com/` passed; Pages run `43660412229` success.
+
 ## 2026-11-14 Task 004 item 4b: fast pathfinding (Viktor, branch `task-004-4b-fast-paths`)
 
 - `src/core/world/pathfinding.ts`: the walkable grid is built once by `buildWalkableCells(grid)`, which calls the walk rule once per cell and nowhere else. `findPathCells` runs A* over typed arrays (cost, parent, closed set, and a Float64Array binary heap) with integer cell indexes, and makes no height or solids calls in the loop. `findPath` keeps its signature and delegates to these.

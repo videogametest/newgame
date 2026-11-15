@@ -8,6 +8,7 @@ import {
   DEFAULT_SOUND, parseSoundSettings, serializeSoundSettings, SOUND_STORAGE_KEY, type SoundSettings,
 } from './sound_settings';
 import { assetUrl } from './assets';
+import { fetchBytesWithRetry } from './load_retry';
 
 export class AudioBank {
   private settings: SoundSettings;
@@ -85,9 +86,7 @@ export class AudioBank {
     for (const def of Object.values(SOUNDS)) for (const p of def.files) paths.add(p);
     await Promise.all(
       [...paths].map(async (path) => {
-        const res = await fetch(assetUrl(`assets/${path}`));
-        if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
-        const data = await res.arrayBuffer();
+        const data = await fetchBytesWithRetry(assetUrl(`assets/${path}`));
         const ctx = this.ctx;
         if (!ctx) return;
         this.buffers.set(path, await ctx.decodeAudioData(data));

@@ -8,6 +8,7 @@ import {
 import { assetUrl } from '../render/assets';
 import type { Lighting } from '../render/lighting';
 import { bearingVector, chance, SCARECROW, WICK_GATES, WICK_LANES, WICK_THINGS, wickHouses, type House } from './plan';
+import { withRetry } from '../render/load_retry';
 
 const HEX = 'assets/kaykit_medieval_hexagon/';
 /**
@@ -54,7 +55,7 @@ function container(scene: Scene, file: string): Promise<AssetContainer> {
   if (!c) {
     const url = assetUrl(`${HEX}${file}.gltf`);
     const cut = url.lastIndexOf('/');
-    c = SceneLoader.LoadAssetContainerAsync(url.slice(0, cut + 1), url.slice(cut + 1), scene);
+    c = withRetry(`${HEX}${file}.gltf`, () => SceneLoader.LoadAssetContainerAsync(url.slice(0, cut + 1), url.slice(cut + 1), scene));
     m.set(file, c);
   }
   return c;

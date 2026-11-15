@@ -6,6 +6,8 @@ import type { BattleState, BattleStatus, Fighter, WeaponId } from '../core/types
 import { TUNING } from '../config/tuning';
 import { fillPrompt } from '../core/settings/labels';
 import { currentSettings } from './settings_store';
+import { LoadFailedError, onLoadWaiting } from './load_retry';
+import { describeError, logEvent } from './debug_log';
 
 export type Projector = (x: number, y: number, z: number) => { x: number; y: number; visible: boolean };
 
@@ -107,6 +109,9 @@ export class Hud {
   private readonly popups: Popup[] = [];
   private outcomeStatus: BattleStatus | null = null;
   private restartHandler: (() => void) | null = null;
+  /** The last progress label, kept so "Still loading..." can give way back to it. */
+  private bootLabel = '';
+  private bootWaiting = false;
 
   constructor(root: HTMLElement) {
     root.innerHTML = fillPrompt(MARKUP, currentSettings().bindings, 'keyboard');
@@ -138,6 +143,11 @@ export class Hud {
     this.error = q('.error');
     this.restartButton = q<HTMLButtonElement>('.outcome button');
     this.restartButton.addEventListener('click', () => this.restartHandler?.());
+    // While a download is being retried the loading screen says "Still loading..." and nothing else (task 019).
+    onLoadWaiting((waiting) => {
+      this.bootWaiting = waiting;
+      this.showBootText();
+    });
   }
 
   set onRestart(fn: () => void) {
@@ -158,19 +168,39 @@ export class Hud {
 
   setBoot(label: string, fraction: number): void {
     this.boot.hidden = false;
-    const text = this.boot.querySelector<HTMLElement>('.boot-text');
-    if (text) text.textContent = `Loading ${label}`;
+    this.bootLabel = label;
+    this.showBootText();
     this.bootFill.style.width = `${Math.round(Math.min(1, Math.max(0, fraction)) * 100)}%`;
+  }
+
+  private showBootText(): void {
+    const text = this.boot.querySelector<HTMLElement>('.boot-text');
+    if (text) text.textContent = this.bootWaiting ? 'Still loading...' : `Loading ${this.bootLabel}`;
   }
 
   hideBoot(): void {
     this.boot.hidden = true;
   }
 
+  /**
+   * The give-up screen: plain words and a Try again button that reloads. The file name and the error go to the
+   * debug log only (the tuning panel's Copy debug report), never to the player's screen.
+   */
   showError(err: unknown): void {
     this.boot.hidden = true;
     this.error.hidden = false;
-    this.error.textContent = `Could not start the game.\n\n${err instanceof Error ? err.message : String(err)}`;
+    logEvent('start_failed', describeError(err).split('\n')[0]);
+    const message = err instanceof LoadFailedError
+      ? 'The game could not download some of its files. Check your connection, then try again.'
+      : 'The game could not start. Try again.';
+    const text = document.createElement('div');
+    text.textContent = message;
+    const again = document.createElement('button');
+    again.type = 'button';
+    again.textContent = 'Try again';
+    again.style.cssText = 'pointer-events:auto;margin-top:18px;padding:10px 26px;font-size:16px;font-weight:700;border:0;border-radius:6px;background:#d9a441;color:#1b1407;cursor:pointer';
+    again.addEventListener('click', () => window.location.reload());
+    this.error.replaceChildren(text, again);
   }
 
   showOutcome(status: BattleStatus): void {

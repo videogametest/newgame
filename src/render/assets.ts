@@ -6,6 +6,7 @@ import {
 } from '@babylonjs/core';
 import '@babylonjs/loaders/glTF';
 import { ANIMATION_FILES, UNITS, WEAPON_MODELS } from '../data/units';
+import { withRetry } from './load_retry';
 
 export function assetUrl(path: string): string {
   return `${import.meta.env.BASE_URL}${path}`;
@@ -26,7 +27,7 @@ export type LoadProgress = (done: number, total: number, label: string) => void;
 async function loadContainer(scene: Scene, path: string): Promise<AssetContainer> {
   const url = assetUrl(path);
   const cut = url.lastIndexOf('/');
-  return SceneLoader.LoadAssetContainerAsync(url.slice(0, cut + 1), url.slice(cut + 1), scene);
+  return withRetry(path, () => SceneLoader.LoadAssetContainerAsync(url.slice(0, cut + 1), url.slice(cut + 1), scene));
 }
 
 /** Loads all models and animation rigs. Containers are not added to the scene; instances are. */

@@ -4,6 +4,7 @@
 import { AssetContainer, Matrix, Mesh, Quaternion, SceneLoader, Scene, Vector3 } from '@babylonjs/core';
 import { sceneryPlacements, SCENERY_MODELS, type SceneryModel, type ScenerySpot } from '../core/world/scenery';
 import { assetUrl } from './assets';
+import { withRetry } from './load_retry';
 
 const NATURE = 'assets/kaykit_medieval_hexagon/nature/';
 
@@ -39,7 +40,7 @@ export async function buildScenery(scene: Scene): Promise<SceneryStats> {
 async function sourceMesh(scene: Scene, model: SceneryModel): Promise<Mesh> {
   const url = assetUrl(`${NATURE}${model}.gltf`);
   const cut = url.lastIndexOf('/');
-  const c: AssetContainer = await SceneLoader.LoadAssetContainerAsync(url.slice(0, cut + 1), url.slice(cut + 1), scene);
+  const c: AssetContainer = await withRetry(`${NATURE}${model}.gltf`, () => SceneLoader.LoadAssetContainerAsync(url.slice(0, cut + 1), url.slice(cut + 1), scene));
   const entries = c.instantiateModelsToScene((n) => `${model}_src_${n}`, false);
   const parts = entries.rootNodes.flatMap(n => [n, ...n.getChildMeshes(false)])
     .filter((m): m is Mesh => m instanceof Mesh && m.getTotalVertices() > 0);

@@ -6,6 +6,7 @@ import {
   formatSlider,
   getAt,
   isSoundPath,
+  pageHasSoon,
   resetPage,
   rowsFor,
   settingsPathsOf,
@@ -54,6 +55,22 @@ describe('settings page rows', () => {
       }
     }
     expect(getAt(d, 'display.brightness')).toBe(1);
+  });
+});
+
+describe('the soon mark', () => {
+  it('the Sound page has a soon row (Music), so it shows the foot line; Display has one too', () => {
+    expect(pageHasSoon('sound')).toBe(true);
+    expect(pageHasSoon('display')).toBe(true);
+  });
+
+  it('the Music row carries no note of its own: the mark and the foot line say it', () => {
+    const music = rowsFor('sound').find((r) => r.path === 'sound.music');
+    expect(music?.note).toBeUndefined();
+  });
+
+  it('a page where every row is read now has no foot line', () => {
+    expect(pageHasSoon('controls')).toBe(false);
   });
 });
 

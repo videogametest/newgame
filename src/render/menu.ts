@@ -1,5 +1,5 @@
-// The pause menu (docs/writing/interface.md, "Pause menu"). Built so far: Resume, Settings (a stub until task 009
-// step 2d), and Controls (keyboard and mouse). Copy debug report and Return to title are not built yet.
+// The pause menu (docs/writing/interface.md, "Pause menu"). Built so far: Resume, Settings (six pages), and Controls
+// (keyboard and mouse). Copy debug report and Return to title are not built yet.
 import type { Bindings } from '../core/settings/actions';
 import { ControlsPage } from './controls_page';
 import { SettingsPages, type SoundTarget } from './settings_pages';
@@ -9,7 +9,6 @@ type Page = 'menu' | 'settings' | 'controls';
 export class PauseMenu {
   private readonly root: HTMLElement;
   private readonly menuPage: HTMLElement;
-  private readonly settingsPage: HTMLElement;
   private readonly controlsPage: ControlsPage;
   private readonly settingsPages: SettingsPages;
   private page: Page = 'menu';
@@ -34,24 +33,18 @@ export class PauseMenu {
     );
     this.menuPage.append(row);
 
-    this.settingsPage = document.createElement('div');
-    this.settingsPage.className = 'card';
-    this.settingsPage.hidden = true;
-    const heading = document.createElement('h2');
-    heading.textContent = 'Settings';
-    // The tabs: Display, Sound, Camera, Controller, Play, and Controls (its own screen). "Back" is not in
-    // docs/writing/interface.md; it is flagged in docs/status.md.
+    // The settings card is one fixed card: its tabs, its rows and its Back button are all in settings_pages.ts.
     this.settingsPages = new SettingsPages({
       onBrightness,
       onBrightnessAgain,
       onControls: () => this.showControls(),
+      onBack: () => this.showMenu(),
       audio,
     });
-    this.settingsPage.append(heading, this.settingsPages.el, button('Back', () => this.showMenu()));
 
     this.controlsPage = new ControlsPage(onBindings, () => this.showMenu());
 
-    this.root.append(this.menuPage, this.settingsPage, this.controlsPage.el);
+    this.root.append(this.menuPage, this.settingsPages.el, this.controlsPage.el);
     uiRoot.appendChild(this.root);
   }
 
@@ -84,21 +77,22 @@ export class PauseMenu {
     this.page = 'settings';
     this.menuPage.hidden = true;
     this.controlsPage.el.hidden = true;
-    this.settingsPage.hidden = false;
+    this.settingsPages.el.hidden = false;
     this.settingsPages.show(); // the tab last open
   }
 
   showControls(): void {
     this.page = 'controls';
     this.menuPage.hidden = true;
-    this.settingsPage.hidden = true;
+    this.settingsPages.el.hidden = true;
     this.controlsPage.open();
   }
 
   showMenu(): void {
     this.page = 'menu';
     this.controlsPage.close();
-    this.settingsPage.hidden = true;
+    this.settingsPages.close();
+    this.settingsPages.el.hidden = true;
     this.menuPage.hidden = false;
   }
 }

@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 004 item 13: alarm rules and valley awareness markers (Viktor, PR #94)
+
+- Pure `src/core/places/reinforcements.ts` extends the existing `advanceBell`: an alert volunteer must reach the bell, a stopped runner can be replaced, one ringing schedules one caller-authored outside roster, simulation-time travel pauses with the game, arrival emits one morale gain, freeing the place cancels a pending party. Silencing after ringing does not recall a party already called. No Mill roster, entry coordinates or travel time are invented here; item 16 supplies them.
+- Markers above valley enemies: circle (unaware), question mark (suspicious), exclamation mark (alert), different by shape and colour. Reads actual core state; Play > Awareness markers hides them and is no longer marked soon. Ground height now contributes to HUD-bar/marker projection.
+- Scope: the patrol hut keeps item 8's immediate alert on AI activation. It does not yet run place sensing or investigate suspicious stimuli. All three marker presentations are unit-tested; the played hut captures exercise alert. The hero is not an awareness observer.
+- Functional gate: 997 tests in 84 files (including 19 new tests), typecheck, production build, walk gap PASS at 97.0 m, local `scripts/smoke.mjs` passed. Updated the settings regression's live-row list after its first final run correctly caught the newly working marker switch.
+- Frames: `docs/pr-media/item13-awareness/hut-awareness-{12,18,0}.png`, full page screenshots including the actual DOM markers. `report.json`: three alert markers in viewport with unclipped parents at all three times; marker-off saved setting hides all three; no page/console/request errors; no screenshot fallback. Frames captured once, not judged under unattended rule 1.
+- Deployment and live smoke: pending merge, recorded in the PR after deployment.
+- Next in Sunday's queue: 14b (animals drawn), then 9 (remove the prototype arena).
+
 ## 2026-11-15 Task 004 item 14: wildlife rules (Viktor, PR open on `task-004-item14-animals`, commit `16d8b1d`)
 
 - Logic only, shipped dark: `src/core/wildlife/`. `flocks.ts` (sprinting within 14 m startles a flock, which emits a `noise` stimulus of radius 22 m; crouching or walking does not; a flock startles once), `crows.ts` (circling iff the place is `held`), `geese.ts` (sprinting within 12 m returns a `geese` stimulus; creeping does not), `fox.ts` (idle, leading, gone; a quiet hero near the fox leads it toward the secret, sprinting near it sends it away for good, and it returns only after the hero leaves the area). Placeholder tuning in `tuning.ts`. Tests: `wildlife.test.ts`, 13 checks.

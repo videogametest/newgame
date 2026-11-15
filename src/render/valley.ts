@@ -1,3 +1,4 @@
+import type { Awareness } from '../core/stealth';
 // The valley: open-world slice, step 1. Terrain, sky, water, one hero walking under the day-night clock.
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
 
@@ -106,11 +107,8 @@ export interface FighterState {
   bodyHeight: number;
   alive: boolean;
   hp: number;
-  /**
-   * Awareness is null: the patrol-hut fight does not track it yet (the stealth module is not wired into fights).
-   * No value is invented here.
-   */
-  awareness: null;
+  /** Actual core activation state. The hero has no awareness marker. */
+  awareness: Awareness | null;
 }
 export interface ValleyState {
   x: number;
@@ -791,7 +789,7 @@ class Valley {
         bodyHeight: f.height,
         alive: f.alive,
         hp: f.hp,
-        awareness: null,
+        awareness: f.awareness ?? null,
       })),
     };
   }

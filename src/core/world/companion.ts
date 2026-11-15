@@ -1,11 +1,16 @@
 // Bram, the companion who follows the hero: where he wants to stand and how he walks there. Pure: no Babylon imports.
-// Follow and hold orders are the squad orders from src/core/company/conduct.ts; the distances come from there too.
+// Follow and hold orders are the squad orders from src/core/company/conduct.ts.
 
-import { followDistance, type SquadOrder } from '../company/conduct';
+import type { SquadOrder } from '../company/conduct';
 import { walkStep, type WalkRules } from './walk';
 
 /** Within this many metres of his spot, a companion counts as arrived and stops. */
 export const ARRIVE_DISTANCE = 0.5;
+
+/** Bram stands this far to one side of the hero... */
+export const BRAM_SIDE_OFFSET = 2.5;
+/** ...and this far behind him, so he never stands between the camera and the hero. */
+export const BRAM_BEHIND = 1;
 
 export interface Walker { x: number; z: number }
 export interface HeroPose extends Walker { yaw: number }
@@ -14,10 +19,29 @@ export interface HeroPose extends Walker { yaw: number }
 export const BRAM_FOLLOW_LINES = ['With you.', 'About time.'] as const;
 export const BRAM_HOLD_LINES = ['Staying. Shout if you die.', 'Right here. Not moving. A rock.'] as const;
 
-/** The spot a companion keeps: directly behind the hero, along his facing (forwardOf: sin yaw, cos yaw). */
-export function followSpot(hero: HeroPose, heroCrouched: boolean): Walker {
-  const d = followDistance(heroCrouched);
-  return { x: hero.x - Math.sin(hero.yaw) * d, z: hero.z - Math.cos(hero.yaw) * d };
+/** The spot on one side of the hero: behind him along his facing, and offset along his right (+1) or left (-1). */
+function spotOnSide(hero: HeroPose, side: 1 | -1): Walker {
+  const forward = { x: Math.sin(hero.yaw), z: Math.cos(hero.yaw) };
+  const right = { x: Math.cos(hero.yaw), z: -Math.sin(hero.yaw) };
+  return {
+    x: hero.x - forward.x * BRAM_BEHIND + side * right.x * BRAM_SIDE_OFFSET,
+    z: hero.z - forward.z * BRAM_BEHIND + side * right.z * BRAM_SIDE_OFFSET,
+  };
+}
+
+/**
+ * The spot Bram keeps: 2.5 m to one side of the hero and 1 m behind him. He takes the right side unless that
+ * spot is blocked or outside the valley, then the left. With no rules given, the right side.
+ * Crouching does not change the spot.
+ */
+export function followSpot(hero: HeroPose, rules?: WalkRules): Walker {
+  const right = spotOnSide(hero, 1);
+  if (!rules) return right;
+  const clear = (p: Walker): boolean => rules.inside(p.x, p.z) && !rules.blocked(p.x, p.z);
+  if (clear(right)) return right;
+  const left = spotOnSide(hero, -1);
+  if (clear(left)) return left;
+  return right;
 }
 
 /** The squad order after a Q press: follow becomes hold, hold becomes follow. */
@@ -37,7 +61,6 @@ export interface CompanionStep extends Walker {
 export function stepCompanion(
   pos: Walker,
   hero: HeroPose,
-  heroCrouched: boolean,
   order: SquadOrder,
   maxSpeed: number,
   dt: number,
@@ -45,7 +68,7 @@ export function stepCompanion(
 ): CompanionStep {
   const still = { x: pos.x, z: pos.z, y: rules.heightAt(pos.x, pos.z), moving: false };
   if (order === 'hold' || dt <= 0 || maxSpeed <= 0) return still;
-  const spot = followSpot(hero, heroCrouched);
+  const spot = followSpot(hero, rules);
   const dx = spot.x - pos.x;
   const dz = spot.z - pos.z;
   const dist = Math.hypot(dx, dz);

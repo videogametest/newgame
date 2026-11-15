@@ -84,6 +84,8 @@ export interface ValleyHooks {
   groundMask(cols?: number, rows?: number): number[];
   /** Capture only: hides the clock, figures, hint and tour label. */
   hideChrome(): void;
+  /** Capture only: hides Bram, to check what else is in a frame. */
+  hideBram(on: boolean): void;
   /** Capture only: the image exposure and the grey ambient lift now in use (brightness, task 009 step 2c). */
   exposure(): { exposure: number; ambient: number };
 }
@@ -187,7 +189,7 @@ class Valley {
   private readonly bram: Fighter;
   private readonly bramView: CharacterView;
   private bramOrder: SquadOrder = 'follow';
-  /** Crouch changes Bram's follow distance only; the hero's own movement is unchanged. */
+  /** Bram keeps his spot 2.5 m beside the hero and 1 m behind, crouched or not; crouch changes only the hero's own movement. */
   private crouched = false;
   private bramGroundY = 0;
   /** How many times each order's line has played, so the lines rotate and never repeat back to back. */
@@ -500,12 +502,12 @@ class Valley {
     this.hero.yaw = Math.atan2(dirX, dirZ);
   }
 
-  /** Bram's step: walks to his spot behind the hero on follow, and stands still on hold. */
+  /** Bram's step: walks to his spot beside the hero on follow, and stands still on hold. */
   private stepBram(dt: number): void {
     if (this.picture) return;
     const from = { x: this.bram.x, z: this.bram.z };
     const hp = this.game.hero.position;
-    const next = stepCompanion(from, { x: hp.x, z: hp.z, yaw: this.hero.yaw }, this.crouched, this.bramOrder, T.hero.sprintSpeed, dt, WALK_RULES);
+    const next = stepCompanion(from, { x: hp.x, z: hp.z, yaw: this.hero.yaw }, this.bramOrder, T.hero.sprintSpeed, dt, WALK_RULES);
     this.bram.vx = (next.x - from.x) / dt;
     this.bram.vz = (next.z - from.z) / dt;
     this.bram.x = next.x;
@@ -515,9 +517,9 @@ class Valley {
     this.bram.yaw = next.moving ? Math.atan2(next.x - from.x, next.z - from.z) : this.hero.yaw;
   }
 
-  /** Puts Bram on his spot behind the hero, facing the hero's way (used after any teleport or camera reset). */
+  /** Puts Bram on his spot beside the hero, facing the hero's way (used after any teleport or camera reset). */
   private snapBram(): void {
-    const p = followSpot({ x: this.game.hero.position.x, z: this.game.hero.position.z, yaw: this.hero.yaw }, this.crouched);
+    const p = followSpot({ x: this.game.hero.position.x, z: this.game.hero.position.z, yaw: this.hero.yaw }, WALK_RULES);
     this.bram.x = p.x;
     this.bram.z = p.z;
     this.bram.yaw = this.hero.yaw;
@@ -696,6 +698,9 @@ class Valley {
       hideChrome: () => {
         if (this.chromeBox) this.chromeBox.hidden = true;
         this.chromeHidden = true;
+      },
+      hideBram: (on) => {
+        this.bramView.setShown(!on);
       },
       exposure: () => ({ exposure: this.scene.imageProcessingConfiguration.exposure, ambient: this.scene.ambientColor.r }),
       project: (name) => {

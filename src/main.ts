@@ -1,7 +1,6 @@
-// Page entry: finds the canvas and HUD root, then starts the valley (default), the combat prototype (?arena=1),
-// showcase mode (?showcase=<clip>), or a styletest.
+// Page entry: finds the canvas and HUD root, then starts the valley (default), showcase mode (?showcase=<clip>),
+// or a styletest.
 
-import { startGame } from './render/game';
 import { startValley } from './render/valley';
 import { startShowcase } from './render/showcase';
 import { startStyletest } from './styletest/styletest';
@@ -29,11 +28,6 @@ if (params.has('styletest')) {
 } else if (params.has('showcase')) {
   startShowcase(canvas, params.get('showcase') ?? '', parseShowcaseTime(params.get('t'))).catch((err: unknown) => {
     ui.textContent = err instanceof Error ? err.message : String(err);
-    console.error(err);
-  });
-} else if (params.has('arena')) {
-  // The combat prototype stays reachable until task 004 removes it.
-  startGame(canvas, ui).catch((err: unknown) => {
     console.error(err);
   });
 } else {

@@ -6,6 +6,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 009 queue item 9: the arena goes (Viktor, branch item9-arena)
+
+- Removed the prototype arena: `src/render/arena.ts`, `src/render/game.ts`, `src/data/arena.ts` deleted; the `?arena` URL branch removed from `src/main.ts`; `insideBounds` and `ArenaBounds` removed from `src/render/camera_limits.ts` (its test too; `clampCameraHeight` stays).
+- Balance tests now run on `src/core/fixtures/balance_field.ts` (same data as the old training field). Wave mechanics in core kept (see Decisions taken).
+- `?showcase` uses its own flat stage (`src/render/showcase_stage.ts`), no walls or obstacles. Style tests unchanged.
+- Gates in the worktree: `tsc --noEmit` clean; vitest 86 files, 1004 tests pass; `vite build` exit 0; `npm run walk-gap` PASS at 97.0 m (limit 100); local smoke (`scripts/smoke.mjs`) passed with no console or page errors.
+- Showcase frames rendered locally (sword swing, soldier wind-up, archer draw), ground and sky visible. The first attempt was blank sky: the screenshot was taken before the first seek drew a frame. Fixed by calling `__showcaseSeek` and waiting.
+- Not yet done: PR merge, Pages run, live smoke on https://everylitwindow.com/ (recorded here after merge).
+
 ## 2026-11-15 Task 004 item 14b: stealth animals drawn (Viktor, PR #95)
 
 - Resumed the existing `wildlife-hook` branch (`69aba59`), merged current main, completed it rather than duplicating work. Crows now circle all three held places and leave each independently; meadow flocks lift on a sprint; geese occupy the existing Mill pen; the fox follows the existing quiet-follow/sprint-away rules. Simple shapes, as authorized. No landmark pen edits.

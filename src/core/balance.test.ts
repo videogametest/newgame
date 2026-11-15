@@ -5,13 +5,13 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { botInput, SKILLED_BOT, SWORD_ONLY_BOT, type BotOptions } from './bot';
 import { createBattle, getHero, step } from './battle';
 import { resetTuning } from '../config/tuning';
-import { TRAINING_FIELD } from '../data/arena';
+import { BALANCE_FIELD } from './fixtures/balance_field';
 import type { BattleState } from './types';
 
 const MAX_SECONDS = 900;
 
 function runBattle(options: BotOptions): BattleState {
-  const state = createBattle(TRAINING_FIELD);
+  const state = createBattle(BALANCE_FIELD);
   for (let i = 0; i < 60 * MAX_SECONDS && state.status === 'fighting'; i++) {
     step(state, botInput(state, options));
   }

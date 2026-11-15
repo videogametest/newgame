@@ -68,7 +68,7 @@ export async function buildLandmarks(scene: Scene, o: LandmarkOptions): Promise<
   const wheels: Record<string, TransformNode[]> = {};
   const fires: Record<string, PointLight[]> = {};
   const state: Record<string, 'held' | 'freed'> = {};
-  const loose = new Map<Stuff, Mesh[]>();
+  const loose = new Map<string, Mesh[]>();
   const glow = new StandardMaterial('landmark_lantern_glow', scene);
   glow.emissiveColor = new Color3(1, 0.72, 0.36);
   glow.diffuseColor = Color3.Black();
@@ -76,7 +76,7 @@ export async function buildLandmarks(scene: Scene, o: LandmarkOptions): Promise<
   glow.disableLighting = true;
   let farMat: StandardMaterial | null = null;
   let atlas: PBRMaterial | null = null;
-  const still: Mesh[] = [];
+  const still = new Map<string, Mesh[]>();
   const farStill: Mesh[] = [];
 
   for (const p of pieces) {
@@ -122,7 +122,9 @@ export async function buildLandmarks(scene: Scene, o: LandmarkOptions): Promise<
       if (m.material instanceof PBRMaterial) { atlas ??= m.material; atlas.roughness = 0.9; atlas.metallic = 0; m.material = atlas; }
       m.receiveShadows = true;
       const moves = p.role === 'banner' || p.role === 'gate_door' || (p.role === 'wheel' && /wheel/.test(m.name));
-      if (m instanceof Mesh && !moves) still.push(m); else o.shadow?.addShadowCaster(m);
+      if (m instanceof Mesh && !moves) {
+        const list = still.get(p.site) ?? []; list.push(m); still.set(p.site, list);
+      } else o.shadow?.addShadowCaster(m);
     }
     if (p.role === 'banner') (banners[p.site] ??= []).push(node);
     if (p.role === 'wheel') {
@@ -162,13 +164,14 @@ export async function buildLandmarks(scene: Scene, o: LandmarkOptions): Promise<
       return;
     }
     m.material = mat(p.stuff);
-    let list = loose.get(p.stuff);
-    if (!list) loose.set(p.stuff, (list = []));
+    const key = `${p.site}_${p.stuff}`;
+    let list = loose.get(key);
+    if (!list) loose.set(key, (list = []));
     list.push(m);
   }
 
-  // Every model that never moves becomes one mesh; the castle another.
-  for (const [name, list, casts] of [['landmarks_models', still, true], ['landmarks_castle', farStill, false]] as const) {
+  // One static atlas mesh per site: spatial bounds let distant sites leave the shadow pass.
+  for (const [name, list, casts] of [...[...still].map(([site, list]) => [`landmarks_models_${site}`, list, true] as const), ['landmarks_castle', farStill, false] as const]) {
     if (list.length === 0) continue;
     // Models come with empty holder meshes; only those with geometry can be merged, and all must agree on what they carry.
     const solid = list.filter((m) => m.getTotalVertices() > 0);
@@ -180,7 +183,7 @@ export async function buildLandmarks(scene: Scene, o: LandmarkOptions): Promise<
     merged.receiveShadows = casts;
     if (casts) o.shadow?.addShadowCaster(merged);
   }
-  // Everything loose becomes one mesh per material.
+  // Loose props become one mesh per material per site, with the same spatial culling.
   for (const [stuff, list] of loose) {
     const merged = Mesh.MergeMeshes(list, true, true);
     if (!merged) continue;

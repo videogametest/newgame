@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 004 item 11: a day at a held place (Viktor, PR #86, squash `816566d`)
+
+- Logic: `src/core/places/day.ts` (schedule by time of day, patrol resolution, guard-change detection, missing-guard checks). Tests: `src/core/places/day.test.ts`, 24 checks, hour by hour.
+- Data: `src/data/place_days.ts`. Its header marks every number and spot name as an authored placeholder, not from the writing. Placeholders are listed under Decisions taken in `docs/tasks/day-2026-11-14.md`.
+- Gate on the branch: `npm test` 77 files, 948 tests passed; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m (limit 100 m); local `scripts/smoke.mjs` passed.
+- After merge: Pages run `43671727928` success on `816566d`; `node scripts/smoke.mjs https://everylitwindow.com/` passed.
+- Not visible in a frame: no rendering changed, so no screenshots.
+- No PR checks are reported by the repo, so the merge was on local gates only.
+- Next: item 12 (noticing), then item 14. Item 13 is blocked on item 8; items 8 and 9 are blocked on the hut-fight frames.
+
 ## 2026-11-15 Task 004 item 10: the three places as data (Viktor, PR #84, squash `7919e52`)
 
 - Data: `src/data/bandits.ts` (habit text per bandit, from the writing; schedule notes for Hob, Corwin, Jory and Odo), `src/data/places.ts` (mill: first leader Harl Gadd, retaken leader Maud Kerr; forge: Rafe Dunmore; watch house: Stane; `placeById`, `garrisonMembers`, `defendersOf`, `isRosterLeader`).

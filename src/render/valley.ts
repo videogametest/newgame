@@ -148,7 +148,8 @@ export async function startValley(canvas: HTMLCanvasElement, uiRoot: HTMLElement
   hud.hideFightChrome();
   const params = new URLSearchParams(search);
   try {
-    const engine = new Engine(canvas, true, { stencil: true }, true);
+    // preserveDrawingBuffer lets captures read the canvas (toDataURL) after a frame; see docs/tasks/day-2026-11-14.md 7b.
+    const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: true }, true);
     const scene = new Scene(engine);
     const assets = await loadAssets(scene, (done, total, label) => {
       hud.setBoot(label, total > 0 ? done / total : 0);

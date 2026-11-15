@@ -22,6 +22,7 @@ export class ValleyOverheard {
 
   constructor(uiRoot: HTMLElement, private readonly screenOf: ScreenOf) {
     this.root = document.createElement('div');
+    this.root.className = 'overheard-caption';
     this.root.hidden = true;
     this.root.setAttribute('aria-live', 'off');
     this.root.style.cssText = 'position:absolute;left:0;top:0;max-width:260px;transform:translate(-50%,-100%);font:500 14px/1.35 system-ui,sans-serif;color:#f4ead2;text-shadow:0 1px 3px #000;pointer-events:none;text-align:center;';
@@ -42,6 +43,8 @@ export class ValleyOverheard {
     }
     const p = this.screenOf(caption.x, caption.y + caption.height + 0.35, caption.z);
     this.root.hidden = !p.visible;
+    this.root.dataset.exchange = caption.exchangeId;
+    this.root.dataset.speaker = caption.speakerId;
     if (!p.visible) return;
     const key = `${caption.exchangeId}|${caption.speakerId}|${caption.text}`;
     if (key !== this.shown) {

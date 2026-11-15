@@ -6,11 +6,32 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
-## 2026-11-15 Queue item 17: overheard lines at the Mill (Viktor, branch item17-overheard, WIP)
+## 2026-11-15 Queue item 17: overheard Mill captions (Viktor)
 
-- State: work in progress, not deployed. Wiring added: `src/render/valley_fight.ts` passes the words to `MillEncounter` (read from `docs/writing/bandits.md` by id via `writing_bandits.ts`, ids from `src/data/overheard.ts`); `src/render/valley.ts` builds `ValleyOverheard` (`valley_overheard.ts`) and shows the caption over the speaker, hidden while paused, in the picture or with the chrome hidden.
-- Checks: typecheck clean; `vitest run` 1048 tests in 91 files pass. Not yet checked: a rendered caption frame, the "said once" behaviour through `src/core/speech/said.ts` in the valley, a live smoke test, and the PR.
-- Not done: no PR opened, nothing merged, nothing deployed for item 17.
+- Resumed the existing `item17-overheard` WIP instead of duplicating it, merged fresh main `620d734` without rewriting history, completed its missing speech-log integration. Words are read by id from the writing; real scheduled fighters, proximity and awareness decide when a pair can speak. No invented dialogue.
+- `said.ts` records each actual spoken line in `GameState.speech`; the exchange id also enters `heardLines` and Notes. Leaving and returning cannot repeat heard lines; reconstructing the controller resumes only unseen words. Browser-save persistence is still item 21, not claimed here. Queue's once-per-line requirement is stricter than the writing's per-visit minimum; recorded under Decisions taken.
+- Functional gate: 1056 tests in 94 files passed; typecheck clean; production build passed (existing chunk-size warning); walk gap PASS 97.0 m, zero stranded; built-page local smoke passed on port 4188. Added speech-log reconstruction, no-repeat, zero-time, missing-writing and elapsed-time regressions.
+- Frames and raw report: `docs/pr-media/item17-overheard/`; repeat with `scripts/item17_capture.mjs`. Three full-page captures, no fallback or browser errors, no retake and no visual judgement. Actual Dob/Odo tell shown at noon and 18:06, matching DOM words in viewport; midnight sleeping speakers stay quiet. Medium settled draw calls 276 / 274 / 272, under 300. Browser checks also saw the second speaker's speech key and no replay after departure/return. These are actual sensor/speech-rule hooks with combat held, not a keyboard stealth playthrough.
+- Remaining boundaries: uses the first Mill garrison's existing schedules; those routines do not guarantee every authored pair meets during its eligible hour. No retaken roster, Notes screen, text-speed/size setting or full save system is added by this item.
+- Item 18 was examined first, then skipped as blocked: its automatic freeing conflicts with design section 9's explicit lantern prerequisite and the existing `held/cleared/freed` type. No item 18 implementation was made. Queue Blocked section asks whether 18 means cleared, leaving freeing to 23. This is not a visual gate.
+- Merge/deployment and live smoke follow. Existing every-20-minute continuation stays active. Recheck 18's ruling before moving to the next unblocked item, 21.
+
+## 2026-11-15 Queue item 20 deployed (Viktor)
+
+- PR #100 regular-merged as `e6f0be8`, with the required videogametest noreply author and committer. The merge tree matched the gated branch tree exactly.
+- Pages run `43765038364` succeeded: tests, build, built-page smoke and deploy. The first `gh run watch` hit the tool time limit while the workflow continued; a direct state check and second watch confirmed success, not a deployment failure.
+- `node scripts/smoke.mjs https://everylitwindow.com/` passed. An image-free live repeat of the budget script measured 268 / 268 / 254 / 250 draw calls at 08:00 / 13:00 / 18:00 / 00:00 after stable chunks, medium quality. All under 300; no page, console, HTTP or request errors. Raw live report saved beside the committed before/after reports. The small variation from local samples is left as measured; no extra screenshots or visual judgement.
+- Next is item 21, saves, in current queue order. No next implementation begins during the fifteen-minute quiet window. Existing every-twenty-minute continuation verified active; no additional wakeup.
+
+## 2026-11-15 Queue item 20: Mill draw-call budget (Viktor, PR #100)
+
+- Implementation `294c38e`, branch `feat/item20-mill-budget`. First unticked item in current queue order is 20, ahead of the older item 17 block; existing `item17-overheard` WIP was not touched.
+- Same-view, steady, medium-quality draw calls at 08:00 / 13:00 / 18:00 / 00:00: **460 / 460 / 406 / 406 before, 268 / 268 / 256 / 248 after**. All four under 300. Full-page frames and raw reports: `docs/pr-media/item20-mill-budget/`; repeatable script `scripts/mill_budget.mjs`.
+- Diagnosis at 08:00, hiding one group at a time: shadows 320, glow 317, landmarks 417, fighters 169, versus 460 complete. These overlapping deltas are not additive. Fighters repeated across colour/glow/shadow passes dominate this view.
+- Cuts: merge compatible same-rig, same-material defender body pieces in bind space; shared neutral unit materials with independent private hit-flash/occlusion-fade materials; shadow casters only when their world footprint intersects 60 m of the hero. Static landmark batching existed already, but world-wide bounds defeated spatial culling: now one atlas/material batch per site. Wheels, banners and lanterns remain separate. No change to simulation, density or graphics quality; glow stays on.
+- Gate: 1038 tests in 93 files passed; typecheck clean; production build passed (existing chunk-size warning); walk gap PASS 97.0 m with zero stranded cells; built-page local smoke passed at 4187. New tests preserve every skinned vertex and animated pose under the original parent transform, reject incompatible merges, isolate shared-material flash/fade/disposal, and test shadow-footprint boundaries.
+- Capture correction: the first diagnostic incorrectly re-enabled absent defender views. Discarded those baseline frames/counts, fixed restoration, then took the single corrected baseline retake. Final after frames captured once. No fallback or browser errors, no visual judgement. No claim about GPU fps, combat peak budget, every viewpoint or all quality levels; not a keyboard combat playthrough.
+- Deployment and live checks follow merge. Next in current queue order: item 21, saves. Existing 20-minute repeating continuation verified active; quiet/no-other-active-run guard remains.
 
 ## 2026-11-15 Queue item 16 deployed (Viktor)
 

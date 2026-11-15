@@ -7,7 +7,10 @@ import { TUNING } from '../config/tuning';
 import { MillEncounter } from '../core/places/mill_encounter';
 import type { OverheardWords } from '../core/places/mill_overhear';
 import { writtenOverheard } from '../data/writing_bandits';
-import type { PlaceState } from '../core/types';
+import { gameHour } from '../core/speech/said';
+import { addNote } from '../core/notes/notes';
+import { OVERHEARD } from '../data/overheard';
+import type { GameState, PlaceState } from '../core/types';
 import type { Observation } from '../core/stealth';
 import { createBattle, getHero, reviveHero, step } from '../core/battle';
 import type { BattleEvent, BattleInput, BattleState, Fighter } from '../core/types';
@@ -65,6 +68,7 @@ export class ValleyFight {
     private readonly canvas: HTMLCanvasElement,
     /** Called when the hero is down for long enough and gets back up. The valley shows the line. */
     private readonly onStatus: (line: string) => void,
+    private readonly game?: GameState,
   ) {
     this.battle = this.newBattle();
     this.mill = this.newMill();
@@ -229,7 +233,14 @@ export class ValleyFight {
   }
 
   private newMill(): MillEncounter {
-    return new MillEncounter(this.battle, 12, overheardWords);
+    const game = this.game;
+    return new MillEncounter(this.battle, 12, overheardWords, id => {
+      if (!game) return;
+      if (!game.heardLines.includes(id)) game.heardLines.push(id);
+      game.notes = addNote(game.notes, { lineId: id, kind: 'overheard',
+        speakers: OVERHEARD.find(o => o.id === id)?.speakers ?? [], place: 'mill', day: game.day });
+    }, game ? { read: () => game.speech, write: log => { game.speech = log; },
+      now: () => gameHour(game.day, game.timeOfDay) } : undefined);
   }
 
   /** World point to CSS pixels on the canvas, for the valley's overheard captions (item 17). */

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MillOverhearing, nameOf, resolveLines, type OverhearInput, type OverhearMember, type SpokenLine } from './mill_overhear';
+import { emptySpeechLog, type SpeechLog } from '../speech/said';
 import { OVERHEARD } from '../../data/overheard';
 
 // Midday, Harl and Bran only: overheard.mill.1 is the only exchange that fits.
@@ -51,7 +52,7 @@ describe('Mill overheard lines', () => {
     }
   });
 
-  it('are said once per visit, and again on a later visit', () => {
+  it('are said once, including on a later visit', () => {
     const m = new MillOverhearing(words([{ speaker: '{A}', text: 'one' }]), undefined, 12, 0.1);
     m.advance(input());
     m.advance(input({ dt: 1 }));
@@ -60,7 +61,7 @@ describe('Mill overheard lines', () => {
     m.advance(input({ inVisit: false }));
     expect(m.saidThisVisit).toEqual([]);
     m.advance(input());
-    expect(m.snapshot().caption?.exchangeId).toBe(EXCHANGE);
+    expect(m.snapshot().caption).toBeNull();
   });
 
   it('respect the time of day', () => {
@@ -135,5 +136,51 @@ describe('resolving lines', () => {
   it('names a speaker from the bandit roster', () => {
     expect(nameOf(HARL)).not.toBe(HARL);
     expect(nameOf('nobody_here')).toBe('nobody_here');
+  });
+});
+
+
+describe('saved line memory', () => {
+  it('writes only spoken lines through said.ts and resumes unseen words after reconstruction', () => {
+    let log: SpeechLog = emptySpeechLog();
+    const memory = { read: () => log, write: (next: SpeechLog) => { log = next; }, now: () => 37 };
+    const m = new MillOverhearing(words(), undefined, 12, 3, memory);
+    m.advance(input());
+    expect(log.lines).toEqual({ [`${EXCHANGE}.0#0`]: 37 });
+    expect(log.speakers).toEqual({ [HARL]: 37 });
+    const restored = new MillOverhearing(words(), undefined, 12, 3, memory);
+    restored.advance(input());
+    expect(restored.snapshot().caption?.text).toBe('two');
+    expect(log.lines[`${EXCHANGE}.1#0`]).toBe(37);
+    restored.advance(input({ dt: 3 }));
+    expect(restored.snapshot().caption?.text).toBe('three');
+    restored.advance(input({ dt: 3 }));
+    restored.advance(input({ inVisit: false }));
+    restored.advance(input());
+    expect(restored.snapshot().caption).toBeNull();
+  });
+  it('does not consume a missing written exchange or report it heard', () => {
+    const heard: string[] = [];
+    const m = new MillOverhearing(words([]), id => heard.push(id));
+    m.advance(input());
+    expect(m.saidThisVisit).toEqual([]);
+    expect(heard).toEqual([]);
+  });
+  it('zero time starts or advances nothing', () => {
+    const m = new MillOverhearing(words());
+    m.advance(input({ dt: 0 }));
+    expect(m.snapshot().caption).toBeNull();
+    m.advance(input());
+    const before = m.snapshot();
+    m.advance(input({ dt: 0, inVisit: false }));
+    expect(m.snapshot()).toEqual(before);
+  });
+  it('does not stretch the dwell when a caller advances several seconds', () => {
+    const m = new MillOverhearing(words(), undefined, 12, 3);
+    m.advance(input());
+    m.advance(input({ dt: 6.1 }));
+    expect(m.snapshot().caption?.text).toBe('three');
+    m.advance(input({ dt: 3 }));
+    expect(m.snapshot().caption).toBeNull();
   });
 });

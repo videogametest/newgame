@@ -22,6 +22,7 @@ import type { SquadOrder } from '../core/company/conduct';
 import { blocksView } from './occlusion';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
+import { withinShadowRange } from './shadow_range';
 import { buildFarLand } from './valley_far';
 import { buildRoads } from './valley_roads';
 import { buildLandmarks, type Landmarks } from '../landmarks/build';
@@ -80,10 +81,13 @@ export interface ValleyHooks {
   /** Capture only: runs the real wildlife rules with a specified hero movement and elapsed time. */
   wildlifeStep(movement: WildlifeFrame['movement'], dt: number): void;
   millState(): ReturnType<ValleyFight['mill']['snapshot']>;
+  millSpeechState(): Pick<GameState, 'speech' | 'heardLines' | 'notes'>;
   millStep(movement: WildlifeFrame['movement'], seconds: number): void;
   wildlifeState(): ReturnType<ValleyWildlife['snapshot']> | null;
   /** For budgets: how many meshes are being drawn this frame, by the start of their name. */
   meshCounts(): Record<string, number>;
+  /** Capture diagnostic: independently remove a render group, never simulation. Null restores all. */
+  budgetHide(group: 'shadows' | 'glow' | 'landmarks' | 'fighters' | null): void;
   /** Tour mode (?tour=1): moves the hero and camera to a named view, or to the view at an index. */
   tourTo(nameOrIndex: string | number): boolean;
   tourNames(): string[];
@@ -236,6 +240,7 @@ class Valley {
   private readonly captionEl: HTMLElement;
   private captionTime = 0;
   private chromeHidden = false;
+  private budgetHideFighters = false;
 
   constructor(
     private readonly engine: Engine,
@@ -268,6 +273,7 @@ class Valley {
     this.applyBrightness(display.brightness);
     this.shadow = new ShadowGenerator(quality.shadowMapSize, this.sun);
     this.shadow.usePercentageCloserFiltering = true;
+    this.shadow.customAllowRendering = sub => withinShadowRange(sub.getRenderingMesh(), this.hero);
     this.shadow.darkness = 0.1; // the sky's light already fills shade; the sun's share is nearly all removed
 
     this.terrain = new ValleyTerrain(scene, quality.streamRadius);
@@ -281,7 +287,7 @@ class Valley {
     this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
 
-    this.fight = new ValleyFight(scene, assets, this.shadow, audio, hud, this.camera, canvas, (line) => this.showLine(line, 4));
+    this.fight = new ValleyFight(scene, assets, this.shadow, audio, hud, this.camera, canvas, (line) => this.showLine(line, 4), this.game);
     this.overheard = new ValleyOverheard(uiRoot, (x, y, z) => this.fight.screenOf(x, y, z));
     this.placeHeroAtStart();
     this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
@@ -485,7 +491,12 @@ class Valley {
     this.updateView(dt);
     // The engine's draw-call counter is cumulative, so the frame's own count is the difference across the render.
     const before = this.drawCallCount();
-    this.scene.render();
+    const hidden = this.budgetHideFighters
+      ? this.scene.transformNodes.filter(n => /^(hero|bram|soldier\d+|archer\d+)_root$/.test(n.name)).map(n => [n, n.isEnabled(false)] as const)
+      : [];
+    for (const [n] of hidden) n.setEnabled(false);
+    try { this.scene.render(); }
+    finally { for (const [n, enabled] of hidden) n.setEnabled(enabled); }
     this.lastFrameDrawCalls = this.drawCallCount() - before;
   }
 
@@ -785,6 +796,7 @@ class Valley {
       },
       state: () => this.snapshot(),
       millState: () => this.fight.mill.snapshot(),
+      millSpeechState: () => structuredClone({ speech: this.game.speech, heardLines: this.game.heardLines, notes: this.game.notes }),
       millStep: (movement, seconds) => {
         const place = this.game.places.find(p => p.id === 'mill');
         if (!place) return;
@@ -796,6 +808,12 @@ class Valley {
         hero: { x: this.hero.x, z: this.hero.z },
         heldPlaces: this.game.places.filter(p => p.status === 'held').map(p => p.id),
       }),
+      budgetHide: (group) => {
+        this.scene.shadowsEnabled = group !== 'shadows';
+        if (this.glow) this.glow.isEnabled = group !== 'glow';
+        this.landmarks?.root.setEnabled(group !== 'landmarks');
+        this.budgetHideFighters = group === 'fighters';
+      },
       meshCounts: () => {
         const out: Record<string, number> = {};
         for (const m of this.scene.getActiveMeshes().data.slice(0, this.scene.getActiveMeshes().length)) { const k = m.name.replace(/[-_]?\d.*$/, '').slice(0, 28); out[k] = (out[k] ?? 0) + 1; }

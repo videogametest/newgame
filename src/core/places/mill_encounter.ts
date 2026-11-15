@@ -12,7 +12,7 @@ import { solidAt } from '../world/solids';
 import { buildWalkableCells, findPathCells, type WalkableCells } from '../world/pathfinding';
 import { MILL_GRID, defendersAt, type Defender } from './defenders';
 import { advanceAlarm, newAlarm, type AlarmState } from './reinforcements';
-import { MillOverhearing, type OverheardWords, type OverhearMember } from './mill_overhear';
+import { MillOverhearing, type OverheardWords, type OverhearMember, type OverhearMemory } from './mill_overhear';
 
 const distance = (a: Vec2, b: Vec2) => Math.hypot(a.x - b.x, a.z - b.z);
 let grid: WalkableCells | undefined;
@@ -42,8 +42,8 @@ export class MillEncounter {
   reinforcements = 0;
   /** Item 17: what the Mill men say to someone close and unnoticed. The words come in from the render layer. */
   readonly overhear: MillOverhearing;
-  constructor(battle: BattleState, hour = 12, words: OverheardWords = () => [], onHeard?: (id: string) => void) {
-    this.overhear = new MillOverhearing(words, onHeard);
+  constructor(battle: BattleState, hour = 12, words: OverheardWords = () => [], onHeard?: (id: string) => void, memory?: OverhearMemory) {
+    this.overhear = new MillOverhearing(words, onHeard, undefined, undefined, memory);
     const roster = garrisonOf('mill', false);
     for (const d of defendersAt('mill', hour)) {
       const f = makeFighter(battle, { unitId: d.kind === 'archer' ? 'enemy_archer' : 'enemy_soldier',

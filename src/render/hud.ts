@@ -1,3 +1,4 @@
+import { awarenessMarker } from './awareness_marker';
 // DOM overlay: boot progress, fighter HP bars, damage numbers, hero HP, weapon, prompt and outcome cards.
 // Reads simulation state and draws it. Owns no game state.
 
@@ -9,6 +10,7 @@ import { currentSettings } from './settings_store';
 export type Projector = (x: number, y: number, z: number) => { x: number; y: number; visible: boolean };
 
 export interface HudFrame {
+  awarenessMarkers?: boolean;
   state: BattleState;
   hero: Fighter;
   locked: boolean;
@@ -70,6 +72,7 @@ const DAMAGE_LIFE = TUNING.combat.damageNumberLife;
 interface Bar {
   root: HTMLDivElement;
   fill: HTMLDivElement;
+  marker: HTMLDivElement;
   team: string;
 }
 
@@ -221,8 +224,14 @@ export class Hud {
         bar = this.makeBar(fighter);
         this.barById.set(fighter.id, bar);
       }
-      const p = f.project(fighter.x, fighter.height + 0.35, fighter.z);
+      const p = f.project(fighter.x, fighter.y + fighter.height + 0.35, fighter.z);
       bar.root.hidden = !p.visible;
+      const marker = awarenessMarker(fighter.awareness, fighter.alive, f.awarenessMarkers === true);
+      bar.marker.hidden = marker === null;
+      bar.marker.textContent = marker?.symbol ?? '';
+      bar.marker.setAttribute('aria-label', marker?.label ?? '');
+      bar.marker.dataset.awareness = marker?.label ?? '';
+      bar.marker.style.color = marker?.colour ?? '';
       bar.root.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px)`;
       bar.fill.style.width = `${Math.max(0, (fighter.hp / fighter.maxHp) * 100).toFixed(1)}%`;
     }
@@ -237,11 +246,17 @@ export class Hud {
   private makeBar(fighter: Fighter): Bar {
     const root = document.createElement('div');
     root.className = `bar team-${fighter.team}`;
+    root.style.overflow = 'visible';
     const fill = document.createElement('div');
     fill.className = 'bar-fill';
     root.appendChild(fill);
+    const marker = document.createElement('div');
+    marker.className = 'awareness-marker';
+    marker.hidden = true;
+    marker.style.cssText = 'position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font:bold 22px sans-serif;text-shadow:0 1px 3px #000,0 0 3px #000;line-height:24px;pointer-events:none';
+    root.appendChild(marker);
     this.bars.appendChild(root);
-    return { root, fill, team: fighter.team };
+    return { root, fill, marker, team: fighter.team };
   }
 
   private updatePopups(f: HudFrame): void {

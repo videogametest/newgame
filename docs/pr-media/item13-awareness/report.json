@@ -1,0 +1,337 @@
+{
+  "failures": [],
+  "fallbacks": [],
+  "shots": [
+    {
+      "file": "docs/pr-media/item13-awareness/hut-awareness-12.png",
+      "tod": 12,
+      "method": "page screenshot (world and DOM markers)",
+      "state": {
+        "x": 303,
+        "z": -103,
+        "groundY": 14.866843403236002,
+        "yaw": 1.373400766945016,
+        "tod": 12,
+        "day": 1,
+        "locked": true,
+        "paused": false,
+        "frame": 8,
+        "pausedFrame": null,
+        "chunks": 16,
+        "chunkBuilds": 16,
+        "fps": 0,
+        "drawCalls": 196,
+        "activeMeshes": 44,
+        "bram": {
+          "x": 301.93933982822017,
+          "z": -100.52512626584708,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 303,
+            "z": -103,
+            "groundY": 14.866843403236002,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": "unaware"
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 310.53489786067985,
+            "z": -99.2325510696599,
+            "groundY": 11.307060062750212,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 312.5939482190897,
+            "z": -95.32484142472822,
+            "groundY": 10.000104803625076,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "alert"
+          }
+        ]
+      },
+      "markers": [
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 454.8359375,
+          "y": 595.2999877929688,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 322.9359436035156,
+          "y": 610.7999877929688,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 956.0359497070312,
+          "y": 469.20001220703125,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        }
+      ]
+    },
+    {
+      "file": "docs/pr-media/item13-awareness/hut-awareness-18.png",
+      "tod": 18,
+      "method": "page screenshot (world and DOM markers)",
+      "state": {
+        "x": 303,
+        "z": -103,
+        "groundY": 14.866843403236002,
+        "yaw": 1.373400766945016,
+        "tod": 18,
+        "day": 1,
+        "locked": true,
+        "paused": false,
+        "frame": 9,
+        "pausedFrame": null,
+        "chunks": 18,
+        "chunkBuilds": 18,
+        "fps": 0,
+        "drawCalls": 200,
+        "activeMeshes": 46,
+        "bram": {
+          "x": 301.93933982822017,
+          "z": -100.52512626584708,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 303,
+            "z": -103,
+            "groundY": 14.866843403236002,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": "unaware"
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 310.53489786067985,
+            "z": -99.2325510696599,
+            "groundY": 11.307060062750212,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 312.5939482190897,
+            "z": -95.32484142472822,
+            "groundY": 10.000104803625076,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "alert"
+          }
+        ]
+      },
+      "markers": [
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 454.8359375,
+          "y": 595.2999877929688,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 322.9359436035156,
+          "y": 610.7999877929688,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 956.0359497070312,
+          "y": 469.20001220703125,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        }
+      ]
+    },
+    {
+      "file": "docs/pr-media/item13-awareness/hut-awareness-0.png",
+      "tod": 0,
+      "method": "page screenshot (world and DOM markers)",
+      "state": {
+        "x": 303,
+        "z": -103,
+        "groundY": 14.866843403236002,
+        "yaw": 1.373400766945016,
+        "tod": 0,
+        "day": 1,
+        "locked": true,
+        "paused": false,
+        "frame": 8,
+        "pausedFrame": null,
+        "chunks": 16,
+        "chunkBuilds": 16,
+        "fps": 13,
+        "drawCalls": 198,
+        "activeMeshes": 45,
+        "bram": {
+          "x": 301.93933982822017,
+          "z": -100.52512626584708,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 303,
+            "z": -103,
+            "groundY": 14.866843403236002,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": "unaware"
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 310.53489786067985,
+            "z": -99.2325510696599,
+            "groundY": 11.307060062750212,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 312.5939482190897,
+            "z": -95.32484142472822,
+            "groundY": 10.000104803625076,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "alert"
+          }
+        ]
+      },
+      "markers": [
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 454.8359375,
+          "y": 595.2999877929688,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 322.9359436035156,
+          "y": 610.7999877929688,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "x": 956.0359497070312,
+          "y": 469.20001220703125,
+          "w": 7.328125,
+          "h": 24,
+          "parentOverflow": "visible"
+        }
+      ]
+    }
+  ],
+  "offSettingWorks": true
+}

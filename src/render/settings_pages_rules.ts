@@ -106,7 +106,7 @@ const PLAY_ROWS: Row[] = [
     options: [{ label: 'Lantern', value: 'lantern' }, { label: 'Dusk', value: 'dusk' }, { label: 'Moonless', value: 'moonless' }],
     note: DIFFICULTY_BENEATH,
   },
-  { kind: 'switch', path: 'play.awarenessMarkers', label: 'Awareness markers', group: 'Aids', notYet: true },
+  { kind: 'switch', path: 'play.awarenessMarkers', label: 'Awareness markers', group: 'Aids' },
   { kind: 'switch', path: 'play.minimalHud', label: 'Minimal display', note: 'Hide the compass, health bars, and damage numbers until they matter.', notYet: true },
   {
     kind: 'choice', path: 'play.crouchToggle', label: 'Crouch', notYet: true,

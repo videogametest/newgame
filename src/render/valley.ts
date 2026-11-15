@@ -78,6 +78,8 @@ export interface ValleyHooks {
   state(): ValleyState;
   /** Capture only: runs the real wildlife rules with a specified hero movement and elapsed time. */
   wildlifeStep(movement: WildlifeFrame['movement'], dt: number): void;
+  millState(): ReturnType<ValleyFight['mill']['snapshot']>;
+  millStep(movement: WildlifeFrame['movement'], seconds: number): void;
   wildlifeState(): ReturnType<ValleyWildlife['snapshot']> | null;
   /** For budgets: how many meshes are being drawn this frame, by the start of their name. */
   meshCounts(): Record<string, number>;
@@ -331,7 +333,7 @@ class Valley {
     buildCrossings(this.scene, { shadow: this.shadow }); // the ford, the mill bridge, the stepping stones (review 025 item 2)
     await buildScenery(this.scene);
     this.wildlife = new ValleyWildlife(this.scene); // the crows, flocks, geese and fox (GAME_DESIGN section 4)
-    this.defenders = new ValleyDefenders(this.scene, this.assets, this.shadow); // the mill's first garrison, by the place schedule (item 15)
+    this.defenders = new ValleyDefenders(this.scene); // the mill's first garrison, by the place schedule (item 15)
     this.landmarks = await buildLandmarks(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow }); // the Mill, the Forge, the Watch-house, the castle and the rest
     this.glow = new GlowLayer('glow', this.scene);
     this.glow.intensity = 0.3;
@@ -537,11 +539,13 @@ class Valley {
     const intent: BattleInput = live
       ? raw
       : { ...raw, moveX: 0, moveZ: 0, sprint: false, attackPressed: false, attackHeld: false, attackReleased: false, dodgePressed: false };
-    if (this.fight.status === 'fighting') this.fight.advance(intent);
     const moving = live && Math.hypot(intent.moveX, intent.moveZ) > 0.01;
     this.heroMovement = this.crouched
       ? (moving ? 'crouched' : 'crouchedStill')
       : moving ? (intent.sprint ? 'sprinting' : 'walking') : 'still';
+    const mill = this.game.places.find(p => p.id === 'mill');
+    if (this.fight.status === 'fighting') this.fight.advance(intent, mill
+      ? { hour: this.game.timeOfDay, place: mill, movement: this.heroMovement } : undefined);
     this.game.hero.position = { x: this.hero.x, z: this.hero.z };
     this.groundY = this.hero.y;
   }
@@ -610,7 +614,7 @@ class Valley {
       movement: this.paused ? 'still' : this.heroMovement,
       heldPlaces: this.game.places.filter(p => p.status === 'held').map(p => p.id),
     });
-    this.defenders?.update(this.game.timeOfDay, this.game.places.find(p => p.id === 'mill')?.status === 'held');
+    this.defenders?.update(this.fight.mill.snapshot(), this.fight.battle.fighters);
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
     this.bramView.update(this.bram, this.bramGroundY);
@@ -775,6 +779,13 @@ class Valley {
         return { x: v.x, y: v.y, w: e.getRenderWidth(), h: e.getRenderHeight() };
       },
       state: () => this.snapshot(),
+      millState: () => this.fight.mill.snapshot(),
+      millStep: (movement, seconds) => {
+        const place = this.game.places.find(p => p.id === 'mill');
+        if (!place) return;
+        for (let elapsed = 0; elapsed < seconds; elapsed += T.fixedDt)
+          this.fight.mill.advance(this.fight.battle, this.game.timeOfDay, place, movement, Math.min(T.fixedDt, seconds - elapsed));
+      },
       wildlifeState: () => this.wildlife?.snapshot() ?? null,
       wildlifeStep: (movement, dt) => this.wildlife?.update({ dt, movement,
         hero: { x: this.hero.x, z: this.hero.z },

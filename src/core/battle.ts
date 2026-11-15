@@ -186,11 +186,11 @@ export function step(state: BattleState, input: BattleInput): BattleEvent[] {
       f.vz = 0;
       continue;
     }
-    updateNonHero(state, f, events);
+    if (!f.worldDriven) updateNonHero(state, f, events);
   }
 
   for (const f of state.fighters) {
-    if (f.alive && (f.kind === 'hero' || isActive(state, f))) advanceAction(state, f, events);
+    if (f.alive && !f.worldDriven && (f.kind === 'hero' || isActive(state, f))) advanceAction(state, f, events);
   }
 
   integrate(state);
@@ -541,7 +541,7 @@ function stopArrow(p: Projectile, events: BattleEvent[]): void {
 function integrate(state: BattleState): void {
   const decay = Math.exp(-TUNING.combat.knockbackFriction * DT);
   for (const f of state.fighters) {
-    if (!f.alive) continue;
+    if (!f.alive || f.worldDriven) continue;
     f.x += (f.vx + f.knockX) * DT;
     f.z += (f.vz + f.knockZ) * DT;
     f.knockX *= decay;

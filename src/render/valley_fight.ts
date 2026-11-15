@@ -4,6 +4,9 @@
 
 import { Camera, Matrix, Scene, ShadowGenerator, Vector3 } from '@babylonjs/core';
 import { TUNING } from '../config/tuning';
+import { MillEncounter } from '../core/places/mill_encounter';
+import type { PlaceState } from '../core/types';
+import type { Observation } from '../core/stealth';
 import { createBattle, getHero, reviveHero, step } from '../core/battle';
 import type { BattleEvent, BattleInput, BattleState, Fighter } from '../core/types';
 import { soundsForEvent } from '../core/sound_map';
@@ -32,6 +35,7 @@ export const KNOCK_DOWN_LINE = 'Your hero is down. He gets back up.';
 
 export class ValleyFight {
   battle: BattleState;
+  mill: MillEncounter;
   private readonly views = new Map<number, CharacterView>();
   private arrows: ArrowViews;
   private readonly bursts: ImpactBursts;
@@ -51,6 +55,7 @@ export class ValleyFight {
     private readonly onStatus: (line: string) => void,
   ) {
     this.battle = this.newBattle();
+    this.mill = new MillEncounter(this.battle);
     this.arrows = new ArrowViews(scene, assets.arrow, shadow);
     this.bursts = new ImpactBursts(scene);
     this.spawnEnemyViews();
@@ -78,7 +83,10 @@ export class ValleyFight {
    * One fixed step of the fight. The battle moves the hero from the input; a step onto ground the walk
    * rules forbid (water, a solid, a slope too steep, past the valley edge) is undone.
    */
-  advance(intent: BattleInput): void {
+  advance(intent: BattleInput, context?: { hour: number; place: PlaceState; movement: Observation['movement'] }): void {
+    const rings = this.mill.bellRings;
+    if (context) this.mill.advance(this.battle, context.hour, context.place, context.movement, TUNING.fixedDt);
+    if (this.mill.bellRings > rings) this.audio.ringBell();
     const hero = this.hero;
     const fromX = hero.x;
     const fromZ = hero.z;
@@ -121,6 +129,8 @@ export class ValleyFight {
   sync(dt: number, input: FightInput): void {
     const hero = this.hero;
     const camPos = this.camera.position;
+    const ids = new Set(this.battle.fighters.map(f => f.id));
+    for (const [id, view] of this.views) if (!ids.has(id)) view.setShown(false);
     for (const f of this.battle.fighters) {
       if (f.id === hero.id) continue;
       let view = this.views.get(f.id);
@@ -128,6 +138,7 @@ export class ValleyFight {
         view = this.makeView(f.id);
         this.views.set(f.id, view);
       }
+      view.setShown(true);
       view.update(f);
       // Enemies between the lens and the hero fade out, so they never block the view.
       view.fade(blocksView(camPos, hero, f), dt);
@@ -160,6 +171,7 @@ export class ValleyFight {
     this.arrows = new ArrowViews(this.scene, this.assets.arrow, this.shadow);
     this.bursts.dispose();
     this.battle = this.newBattle();
+    this.mill = new MillEncounter(this.battle);
     this.spawnEnemyViews();
     this.hud.hideOutcome();
     this.downedAt = null;

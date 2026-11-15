@@ -5,17 +5,17 @@ import {
   Color3, Color4, DirectionalLight, Engine, FreeCamera, GlowLayer, HemisphericLight, ImageProcessingConfiguration,
   Matrix, Scene, ShadowGenerator, Vector3,
 } from '@babylonjs/core';
-import { createBattle, getHero, makeFighter } from '../core/battle';
-import type { Fighter } from '../core/types';
-import { forwardOf, rightOf } from '../core/vec';
+import { createBattle, makeFighter } from '../core/battle';
+import type { BattleInput, Fighter } from '../core/types';
 import { newGameState } from '../core/state';
 import type { GameState } from '../core/types';
 import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED } from '../core/world/valley';
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
 import { VALLEY_CLOCK, parseTod } from '../core/world/valley_time';
-import { walkStep, type WalkRules } from '../core/world/walk';
+import type { WalkRules } from '../core/world/walk';
 import { TOUR_VIEWS, nextTourIndex, tourIndexOf, tourYaw } from '../core/world/tour';
-import { TRAINING_FIELD } from '../data/arena';
+import { PATROL_HUT_FIGHT, PATROL_HUT_HERO_SPAWN } from '../data/patrol_hut_fight';
+import { ValleyFight } from './valley_fight';
 import { BRAM_FOLLOW_LINES, BRAM_HOLD_LINES, followSpot, nextOrder, stepCompanion } from '../core/world/companion';
 import type { SquadOrder } from '../core/company/conduct';
 import { blocksView } from './occlusion';
@@ -86,6 +86,10 @@ export interface ValleyHooks {
   hideChrome(): void;
   /** Capture only: hides Bram, to check what else is in a frame. */
   hideBram(on: boolean): void;
+  /** Capture only: sets Bram's order (follow or hold) without the Q key. */
+  setBramOrder(order: SquadOrder): void;
+  /** Capture only: holds the fight simulation (hero and Bram steps) so frames stay still. */
+  holdFight(on: boolean): void;
   /** Capture only: the image exposure and the grey ambient lift now in use (brightness, task 009 step 2c). */
   exposure(): { exposure: number; ambient: number };
 }
@@ -133,7 +137,7 @@ export async function startValley(canvas: HTMLCanvasElement, uiRoot: HTMLElement
     const game = newGameState(VALLEY_SEED);
     const rawTod = params.get('tod');
     if (rawTod !== null) game.timeOfDay = parseTod(rawTod);
-    const valley = new Valley(engine, scene, uiRoot, assets, game);
+    const valley = new Valley(engine, scene, uiRoot, assets, game, hud);
     await valley.loadWick();
     valley.start();
     hud.hideBoot();
@@ -155,9 +159,12 @@ class Valley {
   private savedAim: { yaw: number; pitch: number } | null = null;
   private readonly terrain: ValleyTerrain;
   private readonly sky: ValleySky;
-  /** Render proxy for the hero's character model. The authoritative position lives in game.hero. */
-  private readonly hero: Fighter;
-  private readonly heroView: CharacterView;
+  /** The patrol-hut fight (task 004 item 8). It owns the hero: his position, his hits and his HP. */
+  private readonly fight: ValleyFight;
+  private get hero(): Fighter {
+    return this.fight.hero;
+  }
+  private heroView: CharacterView;
   private readonly hint: HTMLElement;
   private readonly clockText: HTMLElement;
   private readonly figuresText: HTMLElement;
@@ -175,6 +182,7 @@ class Valley {
   private glow?: GlowLayer;
   private accumulator = 0;
   private frozen = false;
+  private fightHeld = false;
   private readonly uiRoot: HTMLElement;
   /** Pause menu open: the clock, the walk and the fixed steps stop. The scene still draws. */
   private paused = false;
@@ -202,8 +210,9 @@ class Valley {
     private readonly engine: Engine,
     private readonly scene: Scene,
     uiRoot: HTMLElement,
-    assets: LoadedAssets,
+    private readonly assets: LoadedAssets,
     private readonly game: GameState,
+    hud: Hud,
     audio: AudioBank = new AudioBank(), // the Sound page's volumes; the same saved values the battle uses
   ) {
     const canvas = engine.getRenderingCanvas() as HTMLCanvasElement;
@@ -236,29 +245,34 @@ class Valley {
     this.sky = new ValleySky(scene);
     this.buildWater(scene);
 
-    const battle = createBattle(TRAINING_FIELD);
-    this.hero = getHero(battle);
-    this.placeHeroAtStart();
-    this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
-    this.heroView.asDesigned(scene, PROPORTIONS); // overnight item 3
-    this.groundY = walkSurfaceAt(this.hero.x, this.hero.z);
-    // Bram joins the battle's fighters in item 8; until then he is only a render-side figure with a sim record.
-    this.bram = makeFighter(battle, { unitId: 'ally_bram', kind: 'soldier', team: 'player', x: 0, z: 0, yaw: 0 });
-    this.bramView = new CharacterView(scene, assets, this.bram, this.shadow, 'bram');
-    this.bramView.asDesigned(scene, PROPORTIONS);
-    this.snapBram();
-
     this.camera = new FreeCamera('valley_cam', new Vector3(0, 10, 0), scene);
     this.camera.minZ = 0.1;
     this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
+
+    this.fight = new ValleyFight(scene, assets, this.shadow, audio, hud, this.camera, canvas, () => this.input.releaseLock());
+    this.placeHeroAtStart();
+    this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
+    this.heroView.asDesigned(scene, PROPORTIONS); // overnight item 3
+    this.groundY = walkSurfaceAt(this.hero.x, this.hero.z);
+    // Bram stays outside the fight (queue decision d): a render-side figure with his own sim record.
+    const bramBattle = createBattle(PATROL_HUT_FIGHT);
+    this.bram = makeFighter(bramBattle, { unitId: 'ally_bram', kind: 'soldier', team: 'player', x: 0, z: 0, yaw: 0 });
+    this.bramView = new CharacterView(scene, assets, this.bram, this.shadow, 'bram');
+    this.bramView.asDesigned(scene, PROPORTIONS);
+    this.snapBram();
+    hud.onRestart = () => this.restartFight();
 
     this.uiRoot = uiRoot;
     this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
       saveSettings({ ...currentSettings(), bindings: b });
       this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
     }, (b) => this.applyBrightness(b), () => this.setBrightnessAgain(), audio);
-    this.input = new PlayerInput(canvas, (locked) => this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost')));
+    // Once the fight is over the outcome card needs the cursor, so losing the lock then does not open the pause menu.
+    this.input = new PlayerInput(canvas, (locked) => {
+      if (!locked && this.fight.status !== 'fighting') return;
+      this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost'));
+    });
     this.input.camYaw = this.hero.yaw;
 
     this.hint = document.createElement('div');
@@ -271,7 +285,7 @@ class Valley {
     uiRoot.appendChild(this.captionEl);
     this.installHud(uiRoot);
     canvas.addEventListener('pointerdown', () => {
-      if (!this.input.isLocked) this.input.requestLock();
+      if (!this.input.isLocked && this.fight.status === 'fighting') this.input.requestLock();
     });
     if (this.tour) {
       window.addEventListener('keydown', (e) => {
@@ -397,13 +411,20 @@ class Valley {
     const hesper = wickHouses(VALLEY_SEED).find((h) => h.id === 'hesper');
     if (!hesper) throw new Error("Hesper's cottage is missing from the Wick plan");
     this.game.hero.position = { x: s.x, z: s.z };
+    this.fight.placeHero(s.x, s.z);
     this.hero.yaw = Math.atan2(hesper.x - s.x, hesper.z - s.z);
-    this.syncHeroProxy();
   }
 
-  private syncHeroProxy(): void {
-    this.hero.x = this.game.hero.position.x;
-    this.hero.z = this.game.hero.position.z;
+  /** The outcome card's restart: a fresh fight with the hero back at its spawn, and the lock taken again. */
+  private restartFight(): void {
+    this.fight.restart();
+    this.game.hero.position = { x: PATROL_HUT_HERO_SPAWN.x, z: PATROL_HUT_HERO_SPAWN.z };
+    this.groundY = this.hero.y;
+    this.heroView.dispose();
+    this.heroView = new CharacterView(this.scene, this.assets, this.hero, this.shadow, 'hero');
+    this.heroView.asDesigned(this.scene, PROPORTIONS);
+    this.snapBram();
+    this.input.requestLock();
   }
 
   private tick(): void {
@@ -417,12 +438,14 @@ class Valley {
       // Presses made while paused are dropped, so a stale attack or dodge does not fire on resume.
       this.accumulator = 0;
       this.input.consumeEdges();
+    } else if (this.fightHeld) {
+      this.accumulator = 0;
     } else {
       this.accumulator += dt;
     }
     while (this.accumulator >= T.fixedDt) {
       this.accumulator -= T.fixedDt;
-      this.stepHero(T.fixedDt);
+      this.stepHero();
       this.stepBram(T.fixedDt);
     }
     this.updateView(dt);
@@ -439,6 +462,7 @@ class Valley {
 
   /** Pause key: opens the pause menu, backs out of Settings or Controls, or resumes from the menu page (Esc works both ways). */
   private onPauseKey(): void {
+    if (!this.paused && this.fight.status !== 'fighting') return; // the outcome card is up
     if (!this.paused) {
       this.setPaused(true);
     } else if (this.pauseMenu.onSubPage) {
@@ -464,12 +488,15 @@ class Valley {
     }
   }
 
-  /** One fixed step of walking. Movement only while the mouse is captured, so Esc pauses the hero. */
-  private stepHero(dt: number): void {
+  /**
+   * One fixed step of the hero. The battle (src/core) moves him from the input, so walking and fighting share one
+   * rule set. Movement only while the mouse is captured, so Esc pauses the hero.
+   */
+  private stepHero(): void {
     // Q and crouch are read before takeInput, which clears the edge flags.
     const squadPressed = this.input.takeActionPressed('squadOrder');
     const crouchPressed = this.input.takeActionPressed('crouch');
-    const intent = this.input.takeInput();
+    const raw = this.input.takeInput();
     if (this.picture) return; // the figure stays where the picture put it
     if (squadPressed) this.onSquadOrderKey();
     if (currentSettings().play.crouchToggle) {
@@ -477,29 +504,13 @@ class Valley {
     } else {
       this.crouched = this.input.isDown('crouch');
     }
-    const from = { ...this.game.hero.position };
-    let dirX = 0;
-    let dirZ = 0;
-    if (this.input.isLocked && this.input.isWindowFocused) {
-      const fwd = forwardOf(intent.camYaw);
-      const right = rightOf(intent.camYaw);
-      dirX = right.x * intent.moveX + fwd.x * intent.moveZ;
-      dirZ = right.z * intent.moveX + fwd.z * intent.moveZ;
-    }
-    if (dirX === 0 && dirZ === 0) {
-      this.hero.vx = 0;
-      this.hero.vz = 0;
-      this.groundY = walkSurfaceAt(from.x, from.z);
-      return;
-    }
-    const speed = intent.sprint ? T.hero.sprintSpeed : T.hero.walkSpeed;
-    const next = walkStep(from, dirX, dirZ, speed, dt, WALK_RULES);
-    this.game.hero.position = { x: next.x, z: next.z };
-    this.syncHeroProxy();
-    this.groundY = next.y;
-    this.hero.vx = (next.x - from.x) / dt;
-    this.hero.vz = (next.z - from.z) / dt;
-    this.hero.yaw = Math.atan2(dirX, dirZ);
+    const live = this.input.isLocked && this.input.isWindowFocused;
+    const intent: BattleInput = live
+      ? raw
+      : { ...raw, moveX: 0, moveZ: 0, sprint: false, attackPressed: false, attackHeld: false, attackReleased: false, dodgePressed: false };
+    if (this.fight.status === 'fighting') this.fight.advance(intent);
+    this.game.hero.position = { x: this.hero.x, z: this.hero.z };
+    this.groundY = this.hero.y;
   }
 
   /** Bram's step: walks to his spot beside the hero on follow, and stands still on hold. */
@@ -549,7 +560,6 @@ class Valley {
     this.scene.fogColor = L.sky;
     this.scene.clearColor = new Color4(L.sky.r, L.sky.g, L.sky.b, 1);
 
-    this.syncHeroProxy();
     this.terrain.update(this.hero);
     this.sky.update(L, this.hero.x, this.hero.z);
     this.waterSeconds += dt;
@@ -574,6 +584,7 @@ class Valley {
     this.camera.position.set(pose.position.x, pose.position.y, pose.position.z);
     this.camera.setTarget(new Vector3(pose.target.x, pose.target.y, pose.target.z));
     this.camera.fov = T.camera.fov;
+    this.fight.sync(dt, { locked: this.input.isLocked, zooming: this.input.isZooming });
     // The fade rule for fighters between the lens and the hero, or too near the lens.
     this.bramView.fade(blocksView(pose.position, this.hero, this.bram), dt);
     this.captionTime = this.paused ? this.captionTime : Math.max(0, this.captionTime - dt);
@@ -633,10 +644,9 @@ class Valley {
   }
 
   private placeAt(x: number, z: number): void {
+    this.fight.placeHero(x, z);
     this.game.hero.position = { x, z };
-    this.hero.x = x;
-    this.hero.z = z;
-    this.groundY = walkSurfaceAt(x, z);
+    this.groundY = this.hero.y;
     this.snapBram();
   }
 
@@ -701,6 +711,12 @@ class Valley {
       },
       hideBram: (on) => {
         this.bramView.setShown(!on);
+      },
+      setBramOrder: (order) => {
+        this.bramOrder = order;
+      },
+      holdFight: (on) => {
+        this.fightHeld = on;
       },
       exposure: () => ({ exposure: this.scene.imageProcessingConfiguration.exposure, ambient: this.scene.ambientColor.r }),
       project: (name) => {

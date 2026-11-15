@@ -139,10 +139,16 @@ export class Hud {
     this.restartHandler = fn;
   }
 
-  /** The valley has no fights yet: hide the hero health bar and the weapon tiles (they return with task 004). */
+  /** Before any fight in the valley: hide the hero health bar and the weapon tiles. */
   hideFightChrome(): void {
     this.heroPanel.style.display = 'none';
     this.weaponPanel.style.display = 'none';
+  }
+
+  /** Shows the hero health bar and the weapon tiles once a valley fight is live (task 004 item 8). */
+  showFightChrome(): void {
+    this.heroPanel.style.display = '';
+    this.weaponPanel.style.display = '';
   }
 
   setBoot(label: string, fraction: number): void {

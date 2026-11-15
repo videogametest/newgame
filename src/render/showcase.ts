@@ -4,12 +4,27 @@
 
 import { Engine, FreeCamera, Scene, Vector3 } from '@babylonjs/core';
 import { createBattle, makeFighter } from '../core/battle';
-import { TRAINING_FIELD } from '../data/arena';
+import type { ArenaDef } from '../core/types';
 import { UNITS } from '../data/units';
-import { buildArena } from './arena';
 import { loadAssets } from './assets';
 import { CharacterView } from './characters';
 import { SHOWCASE_CLIPS, resolveShowcaseClip } from './showcase_clips';
+import { buildShowcaseStage } from './showcase_stage';
+
+/** The showcase's own stage data: one hero, one soldier, one archer, all present from the start. Not a game arena. */
+const SHOWCASE_STAGE: ArenaDef = {
+  id: 'showcase',
+  name: 'Showcase',
+  halfWidth: 6,
+  halfDepth: 6,
+  waveGap: 0,
+  obstacles: [],
+  spawns: [
+    { unitId: 'hero', kind: 'hero', team: 'player', x: 0, z: 0, yaw: 0 },
+    { unitId: 'enemy_soldier', kind: 'soldier', team: 'enemy', x: -3, z: -3, yaw: 0 },
+    { unitId: 'enemy_archer', kind: 'archer', team: 'enemy', x: 3, z: -3, yaw: 0 },
+  ],
+};
 
 /** Hooks the screenshot script calls. Set once the character is ready. */
 export interface ShowcaseWindow {
@@ -23,14 +38,13 @@ export async function startShowcase(canvas: HTMLCanvasElement, clipName: string,
 
   const engine = new Engine(canvas, true, { stencil: true }, true);
   const scene = new Scene(engine);
-  const { shadow } = buildArena(scene, TRAINING_FIELD);
+  const { shadow } = buildShowcaseStage(scene);
   const assets = await loadAssets(scene, () => undefined);
 
-  // The fighter comes from the training field setup, then is moved to the origin facing +z (sim yaw 0).
-  // Archers only spawn in later waves, so take the first matching spawn from the arena data.
-  const state = createBattle(TRAINING_FIELD);
-  const spawn = TRAINING_FIELD.spawns.find((s) => s.unitId === spec.unitId);
-  if (!spawn) throw new Error(`Showcase: no ${spec.unitId} in the training field`);
+  // The fighter comes from the showcase stage setup, then is moved to the origin facing +z (sim yaw 0).
+  const state = createBattle(SHOWCASE_STAGE);
+  const spawn = SHOWCASE_STAGE.spawns.find((s) => s.unitId === spec.unitId);
+  if (!spawn) throw new Error(`Showcase: no ${spec.unitId} on the showcase stage`);
   const fighter = state.fighters.find((f) => f.unitId === spec.unitId) ?? makeFighter(state, spawn);
   if (!state.fighters.includes(fighter)) state.fighters.push(fighter);
   fighter.x = 0;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { TUNING } from '../config/tuning';
-import { TRAINING_FIELD } from '../data/arena';
+import { BALANCE_FIELD } from './fixtures/balance_field';
 import { botInput } from './bot';
 import {
   createBattle, getFighter, getHero, isDodgeInvulnerable, step,
@@ -130,17 +130,17 @@ describe('dodge', () => {
 
 describe('determinism', () => {
   it('the same inputs produce the same battle', () => {
-    const a = createBattle(TRAINING_FIELD);
-    const b = createBattle(TRAINING_FIELD);
+    const a = createBattle(BALANCE_FIELD);
+    const b = createBattle(BALANCE_FIELD);
     run(a, 900, botInput);
     run(b, 900, botInput);
     expect(JSON.stringify(a)).toBe(JSON.stringify(b));
   });
 });
 
-describe('training field with the bot', () => {
-  it('the bot wins the training field and the battle reaches a victory outcome', () => {
-    const state = createBattle(TRAINING_FIELD);
+describe('balance field with the bot', () => {
+  it('the bot wins the balance field and the battle reaches a victory outcome', () => {
+    const state = createBattle(BALANCE_FIELD);
     const events = run(state, 60 * 180, botInput);
     expect(state.status).toBe('victory');
     expect(getHero(state).alive).toBe(true);
@@ -148,7 +148,7 @@ describe('training field with the bot', () => {
   });
 
   it('the hero spawns with a sword equipped and both allies alive at the start', () => {
-    const state = createBattle(TRAINING_FIELD);
+    const state = createBattle(BALANCE_FIELD);
     expect(getHero(state).weapon).toBe('sword');
     expect(state.fighters.filter((f) => f.team === 'player' && f.alive)).toHaveLength(3);
     expect(getFighter(state, state.heroId)).toBe(getHero(state));

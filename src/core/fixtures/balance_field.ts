@@ -1,13 +1,14 @@
-// Arena definitions. Each map node loads one arena. The simulation reads the data; nothing here runs logic.
+// Balance fixture: the field the balance targets are measured on (design section 7, milestone 1).
+// Test-only data. The game has no arena; this keeps the balance guard in src/core/balance.test.ts alive.
 
-import type { ArenaDef } from '../core/types';
+import type { ArenaDef } from '../types';
 
 // Enemy waves: wave 0 starts on the field; each later wave arrives waveGap seconds after the previous one is cleared.
 // Balance targets (checked by src/core/balance.test.ts): the skilled bot wins in 90-180 s with 30-70% HP left,
 // and a sword-only bot that never dodges loses.
-export const TRAINING_FIELD: ArenaDef = {
-  id: 'training_field',
-  name: 'Training Field',
+export const BALANCE_FIELD: ArenaDef = {
+  id: 'balance_field',
+  name: 'Balance Field',
   halfWidth: 14,
   halfDepth: 16,
   waveGap: 3,

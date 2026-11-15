@@ -48,6 +48,8 @@ export interface Fighter {
   alive: boolean;
   /** World fights: unaware until AI activation, alert thereafter. Place sensors will also supply suspicious. */
   awareness?: Awareness;
+  /** A place controller owns routine/investigation/bell movement, not the combat AI. */
+  worldDriven?: boolean;
   /** Planned walking velocity for this step (m/s). */
   vx: number;
   vz: number;

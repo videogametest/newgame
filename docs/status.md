@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Queue item 16: Mill awareness and bell (Viktor, PR #99)
+
+- Implementation: `src/core/places/mill_encounter.ts` shares the seven named Mill defenders with the actual valley battle, retaining routines, health and sensing. Uses item 12 sight/awareness, buildings and terrain for sight obstruction, torch illumination and the geese alarm. A hit raises alert; a suspicious defender investigates. Markers use the existing shape-and-colour HUD and saved switch.
+- Bell: prioritises Pim, or an alert survivor if the runner is stopped. Prepared-grid paths lead to the actual landmark bell; ringing calls the item 13 episode once. One generic soldier and one generic archer arrive at landward entry positions after 15 simulation seconds; morale gains 0.15. Freeing cancels the pending party. Values and roster are authored placeholders in data/tuning, not extra named neighbours. Added an original synthesized bell through the effects/master volume controls.
+- Core change: optional `worldDriven` lets a place own routine, investigation and runner motion without combat AI instantly alerting everyone or moving them twice. Once alert and not running, defenders use the real battle and can be hit. Corrected the shared view to pass each fighter's actual `f.y` rather than the flat-stage default; render-call regression test added.
+- Verification: full functional gate recorded in the following deployment entry. Twelve pure/integration cases include sensing, geese, damage, stopped/replacement runner, route walkability, one ring/party/morale, silence, freeing and zero elapsed time; one also steps the real combat loop through arrival. No full keyboard Mill fight or listening check of the bell was performed.
+- Captures: `docs/pr-media/item16-mill-alarm/`, medium quality, 1280x720, world plus DOM markers. Noon unaware, 18:06 suspicious and midnight alert, respectively 7/2/1 markers in viewport. Stable draw calls 460/360/356, all over 300. No causal attribution without a same-view baseline. Capture script uses the actual sensor/runner rules with combat held, not a keyboard playthrough; one ring, two reinforcements, no navigation issues.
+- Capture correction: the first attempt took images before the render loop had started; its zero-count report is explicitly invalid. Fixed readiness and the tour/time ordering, then made the single allowed retake. Those frames predate the final ground-argument fix; no third capture. No visual judgement; see the critique line.
+- Boundaries: tall-grass cover is still false, no flock-to-Mill hearing is wired (the placed meadow flocks are distant), first garrison only, no bound/yield tools wired here, no encounter-save integration. Existing later queue items and combat-depth tasks own these. Next unticked item: 17, overheard lines.
+
 ## 2026-11-15 Queue item 19: a failed download must not stop the game (Viktor, branch item19-retry)
 
 - Shipped: PR #98, regular merge `fdb13ad`. Pages run `43750993226` succeeded on that commit. Live smoke `node scripts/smoke.mjs https://everylitwindow.com/` passed.

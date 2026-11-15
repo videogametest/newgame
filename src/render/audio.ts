@@ -56,7 +56,21 @@ export class AudioBank {
     if (!this.loading) this.loading = this.loadAll().catch((err: unknown) => console.warn('Sound load failed', err));
   }
 
-  /** Plays one sound effect now. Silent when muted, before unlock, or while the files are still loading. */
+  /** Original synthesized bell, through the same effects/master volume controls. */
+  ringBell(): void {
+    if (!this.ctx || !this.effectsGain) return;
+    const now = this.ctx.currentTime;
+    for (const [frequency, level] of [[523.25, 0.28], [1049, 0.12], [1465, 0.07]]) {
+      const oscillator = this.ctx.createOscillator(), gain = this.ctx.createGain();
+      oscillator.type = 'sine'; oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(level, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+      oscillator.connect(gain); gain.connect(this.effectsGain);
+      oscillator.start(now); oscillator.stop(now + 2.6);
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+    }
+  }
+
+  /** Plays one loaded effect, respecting the same volume controls. */
   play(id: SoundId): void {
     if (!this.ctx || !this.effectsGain) return;
     const def = SOUNDS[id];

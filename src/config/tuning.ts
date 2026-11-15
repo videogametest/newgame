@@ -6,6 +6,18 @@ const DEFAULTS = {
   fixedDt: 1 / 60,
   /** Downward acceleration for arrows (m/s^2). */
   gravity: 9.8,
+  /** Mill integration placeholders, not balanced. */
+  mill: {
+    bellReach: 1.4,
+    alertRadius: 18,
+    activationRadius: 70,
+    runnerSpeed: 5,
+    investigationSpeed: 2,
+    reinforcementTravel: 15,
+    reinforcementMorale: 0.15,
+    sightStep: 0.75,
+    torchReach: 6,
+  },
 
   camera: {
     fov: 0.9,

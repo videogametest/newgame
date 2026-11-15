@@ -6,6 +6,56 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 004 item 14: wildlife rules (Viktor, PR open on `task-004-item14-animals`, commit `16d8b1d`)
+
+- Logic only, shipped dark: `src/core/wildlife/`. `flocks.ts` (sprinting within 14 m startles a flock, which emits a `noise` stimulus of radius 22 m; crouching or walking does not; a flock startles once), `crows.ts` (circling iff the place is `held`), `geese.ts` (sprinting within 12 m returns a `geese` stimulus; creeping does not), `fox.ts` (idle, leading, gone; a quiet hero near the fox leads it toward the secret, sprinting near it sends it away for good, and it returns only after the hero leaves the area). Placeholder tuning in `tuning.ts`. Tests: `wildlife.test.ts`, 13 checks.
+- Reuses `Stimulus`, `reaches()` and `Observation['movement']` from `src/core/stealth`; nothing duplicated.
+- Gate: `npx vitest run` 79 files, 970 tests pass; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, 97.0 m.
+- Not visible in a frame: no rendering yet. Drawing the animals is the second PR.
+- OPEN QUESTION (not decided): does walking, as well as crouching, past a flock startle it? The design says only sprinting does, so the code says no for walking. Greg or Claude to confirm.
+- OPEN QUESTION: the design does not say how long a startled flock stays alert or what the fox's speed is; both are placeholders.
+
+## 2026-11-15 Task 004 item 12: noticing and the first strike (Viktor, PR #88, squash `5184660`)
+
+- Logic: `src/core/combat/blade.ts` (`resolveBladeDamage`, `isBehind`). The first-strike multiplier applies to a short-blade hit only when the target is unaware, the hero is behind it, and the target is not `cannotBeSurprised` (Stane). It reuses the arrow's `DEPTH.weakPoints.firstStrike`, so there is one number. Tests: `src/core/combat/blade.test.ts`, 9 checks.
+- Noticing rules (sight cone, distance, crouch, light, noise, awareness, reaction) were already in `src/core/stealth/` with 26 tests. Checked against item 12's list; no change.
+- Gate on the branch: `npx vitest run` 78 files, 957 tests pass; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m (limit 100 m); local `scripts/smoke.mjs` passed. The repo reported no PR checks, so the merge was on local gates only.
+- After merge: Pages run `43672835566` success on `5184660`; `node scripts/smoke.mjs https://everylitwindow.com/` passed.
+- Not visible in a frame: no rendering changed, so no screenshots.
+- OPEN QUESTION (not decided): the design says throwing knives "count as a strike on an unaware enemy". Item 12 says only "the bonus for striking an unaware enemy". Whether a knife hit also gets the first-strike multiplier is unsettled. Not implemented. Greg or Claude to rule.
+- Next: item 14 (stealth animals, rules first). Then the noon shadow check, review 029 item 1, and task 009 step 2.
+
+## 2026-11-15 Task 004 item 11: a day at a held place (Viktor, PR #86, squash `816566d`)
+
+- Logic: `src/core/places/day.ts` (schedule by time of day, patrol resolution, guard-change detection, missing-guard checks). Tests: `src/core/places/day.test.ts`, 24 checks, hour by hour.
+- Data: `src/data/place_days.ts`. Its header marks every number and spot name as an authored placeholder, not from the writing. Placeholders are listed under Decisions taken in `docs/tasks/day-2026-11-14.md`.
+- Gate on the branch: `npm test` 77 files, 948 tests passed; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m (limit 100 m); local `scripts/smoke.mjs` passed.
+- After merge: Pages run `43671727928` success on `816566d`; `node scripts/smoke.mjs https://everylitwindow.com/` passed.
+- Not visible in a frame: no rendering changed, so no screenshots.
+- No PR checks are reported by the repo, so the merge was on local gates only.
+- Next: item 12 (noticing), then item 14. Item 13 is blocked on item 8; items 8 and 9 are blocked on the hut-fight frames.
+
+## 2026-11-15 Task 004 item 10: the three places as data (Viktor, PR #84, squash `7919e52`)
+
+- Data: `src/data/bandits.ts` (habit text per bandit, from the writing; schedule notes for Hob, Corwin, Jory and Odo), `src/data/places.ts` (mill: first leader Harl Gadd, retaken leader Maud Kerr; forge: Rafe Dunmore; watch house: Stane; `placeById`, `garrisonMembers`, `defendersOf`, `isRosterLeader`).
+- Loader: `src/data/writing_bandits.ts` reads `docs/writing/bandits.md?raw` (roster, overheard lines with their speakers from the header, yields, stay table, learns). Line text is read from the writing by id, not copied into data.
+- Tests: `src/data/writing_bandits.test.ts`, 16 checks against the writing. Overheard speakers are matched to the header participants.
+- Gate on the branch: `npm test` 76 files, 924 tests passed; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `scripts/smoke.mjs` on a local preview passed. `npm run walk-gap` PASS, longest walk 97.0 m (limit 100 m). The repo has no CI checks on PRs, so the merge was on local gates only.
+- After merge: Pages run `43670498533` success; `node scripts/smoke.mjs https://everylitwindow.com/` passed.
+- Not visible in a frame: no rendering changed. Bell, lantern and banner placement stays in `src/landmarks/plan.ts` (Claude's).
+- Open for review: habit hours in `src/core/places/schedules.ts` (`HABIT_HOURS`) are placeholders (afternoon 14 to 16, midnight 0 to 2, others untuned). Odo Varn has no time in the writing; kept `midday`. See the queue's Decisions.
+- Next: item 11 (a day at a held place, pure schedule logic), then 12 and 14. Item 13 is blocked on item 8.
+
+## 2026-11-15 Task 004 item 8: a fight in the valley (Viktor, branch `task-004-item8-valley-fight`, pushed, not merged; BLOCKED)
+
+- Built and pushed (commits `d8c57a7`, `f76b361`): patrol hut fight data (`src/data/patrol_hut_fight.ts`), valley battle ground and headless tests (`src/core/world/valley_battle.ts`), the bow aim fix in core (`bowPitch` in `src/core/bot.ts`, `fireArcherArrow` in `src/core/battle.ts`), valley fight wiring (`src/render/valley_fight.ts`, `src/render/valley.ts`, `src/render/hud.ts`), and the capture script `scripts/hut_fight_capture.mjs`.
+- Gate on the branch: `npx vitest run` 76 files, 912 tests pass; `npx tsc --noEmit` clean; `npm run build` passes; `npm run walk-gap` PASS, longest walk 97.0 m; local smoke passes.
+- Blocker (exact, from the frames): in `docs/pr-media/hut-fight/` (`hut-follow-12`, `hut-follow-18`, `hut-hold-12`, `hut-hold-18`) the patrol hut is in view, Bram is a sliver at the far left edge in all four, and no bandits are visible in any of them. Hero HP stayed 140/140 while the fight was held, so the earlier HP drop came from the frozen-capture bug, now fixed.
+- Positions captured: hero (306, -103) following and (303, -101) holding; aim (320, -106) at 12:00 and 18:00. The first try, with the hero at spawn (300, -100), gave the same result.
+- Tried without success: aiming at the hut; aiming at (320, -106); the hero 17 m back. None brought Bram or the three bandits into frame. I have not confirmed where the bandits stand relative to the camera.
+- Not tried: a camera further back, between the hut and Bram. Spawn and enemy placement were left alone to suit the frame.
+- Item 8 stays unticked. Item 9 waits on it. Next item in the queue: 10 (the three places as data).
+
 ## 2026-11-14 Task 009 step 2, item 3b: settings card look (Viktor, PR #81, squash `789b29b`)
 
 - Card: one fixed card for all six pages, `min(760px, 92vw)` wide and 80% of the screen tall, in the same place on every page. Tabs on one row; Controls opens its own screen. Settings scroll under the tabs with the bottom fade. Back and Back to defaults are fixed at the foot.

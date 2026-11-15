@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 004 item 12: noticing and the first strike (Viktor, PR #88, squash `5184660`)
+
+- Logic: `src/core/combat/blade.ts` (`resolveBladeDamage`, `isBehind`). The first-strike multiplier applies to a short-blade hit only when the target is unaware, the hero is behind it, and the target is not `cannotBeSurprised` (Stane). It reuses the arrow's `DEPTH.weakPoints.firstStrike`, so there is one number. Tests: `src/core/combat/blade.test.ts`, 9 checks.
+- Noticing rules (sight cone, distance, crouch, light, noise, awareness, reaction) were already in `src/core/stealth/` with 26 tests. Checked against item 12's list; no change.
+- Gate on the branch: `npx vitest run` 78 files, 957 tests pass; `npx tsc --noEmit` clean; `npm run build` passed (chunk-size warning only); `npm run walk-gap` PASS, longest walk 97.0 m (limit 100 m); local `scripts/smoke.mjs` passed. The repo reported no PR checks, so the merge was on local gates only.
+- After merge: Pages run `43672835566` success on `5184660`; `node scripts/smoke.mjs https://everylitwindow.com/` passed.
+- Not visible in a frame: no rendering changed, so no screenshots.
+- OPEN QUESTION (not decided): the design says throwing knives "count as a strike on an unaware enemy". Item 12 says only "the bonus for striking an unaware enemy". Whether a knife hit also gets the first-strike multiplier is unsettled. Not implemented. Greg or Claude to rule.
+- Next: item 14 (stealth animals, rules first). Then the noon shadow check, review 029 item 1, and task 009 step 2.
+
 ## 2026-11-15 Task 004 item 11: a day at a held place (Viktor, PR #86, squash `816566d`)
 
 - Logic: `src/core/places/day.ts` (schedule by time of day, patrol resolution, guard-change detection, missing-guard checks). Tests: `src/core/places/day.test.ts`, 24 checks, hour by hour.

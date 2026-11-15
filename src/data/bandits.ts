@@ -28,6 +28,8 @@ export interface BanditDef {
   loyalty: Loyalty;
   /** The trade they had before, and take up again if they stay. */
   formerTrade: string;
+  /** The habit cell exactly as written. Every bandit has one; 'None' means no habit. */
+  habitText: string;
   habit?: Habit;
   /** Rides with the tax cart. */
   cart?: boolean;
@@ -40,8 +42,41 @@ export interface BanditDef {
   replaces?: string;
 }
 
+/** The habit cell exactly as docs/writing/bandits.md has it ("None" where they have none). Tested against the writing. */
+const HABIT_TEXT: Readonly<Record<string, string>> = {
+  harl_gadd: "Walks the whole yard at every guard change",
+  dob_finch: "Feeds the geese at dawn. They are quiet while he does",
+  wyll_carrow: "Fishes alone at the mill pond at dusk",
+  bran_oakes: "Dozes on the night watch, against the woodpile",
+  nessa_roke: "None. She is the one who is always looking",
+  pim: "Goes for the bell",
+  odo_varn: "Eats last, alone, after the others",
+  maud_kerr: "None. She does not have habits",
+  brock_tull: "Stands at the door of the mill and does not move from it",
+  annis_pell: "Keeps to the loft window",
+  col_ware: "Complains, constantly, to anyone",
+  sim_hart: "Goes for the bell",
+  jude_barrow: "None",
+  rafe_dunmore: "Works the anvil himself at midday, badly, with Aldric's hammer",
+  tobin_pike: "Stands at the east fence at dusk, looking toward the village",
+  peg_rudge: "Tends the fire before dawn. Alone with it for an hour",
+  hob_tarn: "Sleeps across the strongroom door",
+  sib_marlowe: "Walks the same circuit, never varying it",
+  jory_flint: "Slips out to hunt rabbits most afternoons",
+  alda_grice: "Watches the road from the roof",
+  ketch: "Goes for the bell",
+  corwin_vale: "Inspects the gate at dusk and dawn",
+  marek_stroud: "Never far from Stane",
+  ilsa_thorn: "On the wall walk, always",
+  gant: "Leads the tax cart",
+  dunstan_lowe: "Dusts the supper table every morning, on Stane's order, and moves nothing",
+  tom_sable: "Takes the midnight watch at the back gate",
+  rikke: "Rides with the tax cart",
+  hew_pollard: "Rides with the tax cart, and hates it",
+};
+
 const b = (id: string, name: string, placeId: PlaceId, unit: UnitType, loyalty: Loyalty, formerTrade: string, extra: Partial<BanditDef> = {}): BanditDef =>
-  ({ id, name, placeId, garrison: 'first', unit, loyalty, formerTrade, ...extra });
+  ({ id, name, placeId, garrison: 'first', unit, loyalty, formerTrade, habitText: HABIT_TEXT[id] ?? '', ...extra });
 
 export const BANDITS: readonly BanditDef[] = [
   // The Mill
@@ -51,7 +86,7 @@ export const BANDITS: readonly BanditDef[] = [
   b('bran_oakes', 'Bran Oakes', 'mill', 'soldier', 'middling', 'A ploughman', { habit: { when: 'night', where: 'woodpile', note: 'Dozes on the night watch, against the woodpile' } }),
   b('nessa_roke', 'Nessa Roke', 'mill', 'archer', 'high', "A guardsman's daughter"),
   b('pim', 'Pim', 'mill', 'runner', 'low', 'An errand boy. The youngest here'),
-  b('odo_varn', 'Odo Varn', 'mill', 'soldier', 'middling', 'A drover', { habit: { when: 'midday', where: 'fire', note: 'Eats last, after the others have gone', alone: true } }),
+  b('odo_varn', 'Odo Varn', 'mill', 'soldier', 'middling', 'A drover', { habit: { when: 'midday', where: 'fire', note: 'Eats last, alone, after the others', alone: true } }),
   // The Mill, retaken
   b('maud_kerr', 'Sergeant Maud Kerr', 'mill', 'shield_bearer', 'high', 'A guardsman', { garrison: 'retaken', leader: true }),
   b('brock_tull', 'Brock Tull', 'mill', 'brute', 'high', 'A quarryman', { garrison: 'retaken', closeTo: ['maud_kerr'], habit: { when: 'always', where: 'mill_door', note: 'Stands at the door of the mill and does not move from it' } }),
@@ -63,13 +98,13 @@ export const BANDITS: readonly BanditDef[] = [
   b('rafe_dunmore', 'Rafe Dunmore', 'forge', 'brute', 'high', "A drill sergeant's corporal", { leader: true, habit: { when: 'midday', where: 'anvil', note: "Works the anvil himself, badly, with Aldric's hammer" } }),
   b('tobin_pike', 'Tobin Pike', 'forge', 'soldier', 'low', "A farmer's son, from Wick", { recruitRole: 'comrade_knowledge', habit: { when: 'dusk', where: 'east_fence', note: 'Stands at the east fence, looking toward the village', alone: true } }),
   b('peg_rudge', 'Peg Rudge', 'forge', 'soldier', 'low', "A smith's striker, at this forge", { habit: { when: 'before_dawn', where: 'forge_fire', note: 'Tends the fire. Alone with it for an hour', alone: true } }),
-  b('hob_tarn', 'Hob Tarn', 'forge', 'brute', 'high', 'A quarryman', { closeTo: ['rafe_dunmore'], habit: { when: 'night', where: 'store_door', note: 'Sleeps across the door of the store' } }),
+  b('hob_tarn', 'Hob Tarn', 'forge', 'brute', 'high', 'A quarryman', { closeTo: ['rafe_dunmore'], habit: { when: 'night', where: 'store_door', note: 'Sleeps across the strongroom door' } }),
   b('sib_marlowe', 'Sib Marlowe', 'forge', 'shield_bearer', 'middling', 'A cooper', { habit: { when: 'always', where: 'circuit', note: 'Walks the same circuit, never varying it' } }),
-  b('jory_flint', 'Jory Flint', 'forge', 'archer', 'middling', "A fletcher's boy", { habit: { when: 'afternoon', where: 'rabbit_run', note: 'Slips out to hunt rabbits', alone: true } }),
+  b('jory_flint', 'Jory Flint', 'forge', 'archer', 'middling', "A fletcher's boy", { habit: { when: 'afternoon', where: 'rabbit_run', note: 'Slips out to hunt rabbits most afternoons', alone: true } }),
   b('alda_grice', 'Alda Grice', 'forge', 'archer', 'high', 'A guardsman', { habit: { when: 'always', where: 'roof', note: 'Watches the road from the roof' } }),
   b('ketch', 'Ketch', 'forge', 'runner', 'low', "A shepherd's lad, who worked for the Sedges", { recruitRole: 'comrade_knowledge', replaces: 'tobin_pike' }),
   // The Watch-house
-  b('corwin_vale', 'Lieutenant Corwin Vale', 'watch_house', 'shield_bearer', 'high', 'A guardsman. One of those who stayed', { habit: { when: 'dusk', where: 'gate', note: 'Inspects the gate at dusk and dawn' } }),
+  b('corwin_vale', 'Lieutenant Corwin Vale', 'watch_house', 'shield_bearer', 'high', 'A guardsman. One of those who stayed', { habit: { when: 'dusk', where: 'gate', note: 'Inspects the gate at dusk and dawn. Only the dusk round is scheduled so far' } }),
   b('marek_stroud', 'Marek Stroud', 'watch_house', 'brute', 'high', 'A guardsman', { habit: { when: 'always', where: 'beside_stane', note: 'Never far from Stane' } }),
   b('ilsa_thorn', 'Ilsa Thorn', 'watch_house', 'archer', 'high', 'A huntsman', { habit: { when: 'always', where: 'wall_walk', note: 'On the wall walk, always' } }),
   b('gant', 'Gant', 'watch_house', 'soldier', 'middling', 'A guardsman', { cart: true }),

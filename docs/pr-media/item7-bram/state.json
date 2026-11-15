@@ -1,0 +1,52 @@
+[
+  {
+    "shot": "docs/pr-media/item7-bram/road_in-follow-18.png",
+    "view": "road_in",
+    "tod": 18,
+    "order": "follow",
+    "x": 176,
+    "z": 186,
+    "yaw": -2.3086113869153615,
+    "bytes": 689342
+  },
+  {
+    "shot": "docs/pr-media/item7-bram/family_stones-follow-12.png",
+    "view": "family_stones",
+    "tod": 12,
+    "order": "follow",
+    "x": 196,
+    "z": 210,
+    "yaw": -2.356194490192345,
+    "bytes": 677613
+  },
+  {
+    "shot": "docs/pr-media/item7-bram/family_stones-follow-18.png",
+    "view": "family_stones",
+    "tod": 18,
+    "order": "follow",
+    "x": 196,
+    "z": 210,
+    "yaw": -2.356194490192345,
+    "bytes": 681032
+  },
+  {
+    "shot": "docs/pr-media/item7-bram/family_stones-hold-12.png",
+    "view": "family_stones",
+    "tod": 12,
+    "order": "hold",
+    "x": 196,
+    "z": 210,
+    "yaw": -2.356194490192345,
+    "bytes": 676682
+  },
+  {
+    "shot": "docs/pr-media/item7-bram/family_stones-hold-18.png",
+    "view": "family_stones",
+    "tod": 18,
+    "order": "hold",
+    "x": 196,
+    "z": 210,
+    "yaw": -2.356194490192345,
+    "bytes": 681165
+  }
+]

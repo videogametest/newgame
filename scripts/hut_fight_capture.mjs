@@ -1,4 +1,4 @@
-// Captures the patrol-hut fight (task 004 item 8) from the hero's side at 12:00 and 18:00:
+// Captures the patrol-hut fight (task 004 item 8) from behind the hero at 12:00 and 18:00:
 // Bram following beside the hero, and Bram holding after the hero steps away.
 // No wall clock plays: the clock is frozen and set by window.__valley before each frame.
 // Usage: node scripts/hut_fight_capture.mjs [baseUrl] [outDir]
@@ -53,11 +53,21 @@ for (const tod of TIMES) {
     await page.evaluate((o) => window.__valley.setBramOrder(o), shot.order);
     await page.evaluate((p) => window.__valley.placeAt(p.x, p.z), shot.at);
     await page.evaluate((h) => window.__valley.lookAt(h.x, h.z), AIM);
-    await page.waitForTimeout(4000);
+    // Take control like a player: the fight runs for ten frames, then it is held for the picture.
+    await page.evaluate(() => window.__valley.holdFight(false));
+    await page.locator('canvas').first().click({ position: { x: 640, y: 360 } });
+    const start = await page.evaluate(() => window.__valley.state().frame);
+    console.log(`shot ${shot.name} ${tod}: waiting for frames from ${start}`);
+    await page.waitForFunction((f) => window.__valley.state().frame >= f + 10, start, { timeout: 240_000 });
+    const locked = await page.evaluate(() => window.__valley.state().locked);
+    await page.evaluate(() => window.__valley.holdFight(true));
+    await page.evaluate((h) => window.__valley.lookAt(h.x, h.z), AIM);
+    await page.waitForTimeout(1000);
     const state = await page.evaluate(() => window.__valley.state());
     const file = join(outDir, `hut-${shot.name}-${tod}.png`);
-    await page.locator('canvas').first().screenshot({ path: file });
-    report.push({ shot: file, tod, order: shot.order, hero: shot.at, bram: state.bram, drawCalls: state.drawCalls });
+    await page.screenshot({ path: file });
+    const fighters = state.fighters.map((f) => ({ kind: f.kind, team: f.team, x: +f.x.toFixed(1), z: +f.z.toFixed(1), height: +f.bodyHeight.toFixed(2), alive: f.alive }));
+    report.push({ shot: file, tod, order: shot.order, hero: shot.at, locked, bram: state.bram, drawCalls: state.drawCalls, fighters });
     console.log(`captured ${file} hero=(${shot.at.x},${shot.at.z}) bram=(${state.bram.x.toFixed(1)},${state.bram.z.toFixed(1)})`);
   }
 }

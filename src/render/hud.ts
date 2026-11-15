@@ -18,6 +18,8 @@ export interface HudFrame {
   drawFraction: number;
   project: Projector;
   dt: number;
+  /** false hides the prompt card entirely (the valley fight has no arena cards, task 004 item 8). Default: shown. */
+  cards?: boolean;
 }
 
 const MARKUP = `
@@ -194,7 +196,7 @@ export class Hud {
 
   frame(f: HudFrame): void {
     const playing = f.locked && this.outcomeStatus === null;
-    this.prompt.hidden = f.locked || this.outcomeStatus !== null;
+    this.prompt.hidden = f.locked || this.outcomeStatus !== null || f.cards === false;
     this.crosshair.hidden = !playing;
     this.draw.hidden = !(playing && f.weapon === 'bow' && f.drawFraction > 0);
     this.drawFill.style.width = `${Math.round(f.drawFraction * 100)}%`;

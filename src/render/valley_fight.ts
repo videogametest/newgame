@@ -4,7 +4,7 @@
 
 import { Camera, Matrix, Scene, ShadowGenerator, Vector3 } from '@babylonjs/core';
 import { TUNING } from '../config/tuning';
-import { createBattle, getHero, step } from '../core/battle';
+import { createBattle, getHero, reviveHero, step } from '../core/battle';
 import type { BattleEvent, BattleInput, BattleState, Fighter } from '../core/types';
 import { soundsForEvent } from '../core/sound_map';
 import { blocksHero, insideValley, walkSurfaceAt } from '../core/world/valley';
@@ -21,6 +21,13 @@ export type FightInput = { locked: boolean; zooming: boolean };
 
 /** The hero's health bar and weapon tiles appear once he is this close to the hut (task 004 item 8). */
 const CHROME_RANGE = 30;
+/** Sim seconds the hero lies down after a fall before he gets back up (placeholder timing, task 004 item 8). */
+const KNOCK_DOWN_SECONDS = 2.5;
+/**
+ * The line shown when he gets back up. PLACEHOLDER: no writing exists for it yet (docs/writing has no knock-down
+ * copy). Replace it when the writing does.
+ */
+export const KNOCK_DOWN_LINE = 'Your hero is down. He gets back up.';
 
 export class ValleyFight {
   battle: BattleState;
@@ -28,6 +35,8 @@ export class ValleyFight {
   private arrows: ArrowViews;
   private readonly bursts: ImpactBursts;
   private chromeShown = false;
+  /** Sim time at which the hero was first seen down, or null while he is up. */
+  private downedAt: number | null = null;
 
   constructor(
     private readonly scene: Scene,
@@ -37,8 +46,8 @@ export class ValleyFight {
     private readonly hud: Hud,
     private readonly camera: Camera,
     private readonly canvas: HTMLCanvasElement,
-    /** Called once when the fight ends (victory or defeat). The valley shows the outcome card. */
-    private readonly onOutcome: (status: BattleState['status']) => void,
+    /** Called when the hero is down for long enough and gets back up. The valley shows the line. */
+    private readonly onStatus: (line: string) => void,
   ) {
     this.battle = this.newBattle();
     this.arrows = new ArrowViews(scene, assets.arrow, shadow);
@@ -90,7 +99,21 @@ export class ValleyFight {
     hero.vx = (hero.x - fromX) / TUNING.fixedDt;
     hero.vz = (hero.z - fromZ) / TUNING.fixedDt;
     hero.y = walkSurfaceAt(hero.x, hero.z);
+    this.handleKnockDown();
     this.handleEvents(events);
+  }
+
+  /** A downed hero stands back up where he fell, at full health, after KNOCK_DOWN_SECONDS of sim time. */
+  private handleKnockDown(): void {
+    const hero = this.hero;
+    if (hero.alive) {
+      this.downedAt = null;
+      return;
+    }
+    if (this.downedAt === null) this.downedAt = this.battle.time;
+    if (this.battle.time - this.downedAt < KNOCK_DOWN_SECONDS) return;
+    if (reviveHero(this.battle)) this.onStatus(KNOCK_DOWN_LINE);
+    this.downedAt = null;
   }
 
   /** Draws the enemies and effects. Visual only: no sim state is written here. */
@@ -117,6 +140,7 @@ export class ValleyFight {
     this.hud.frame({
       state: this.battle,
       hero,
+      cards: false,
       locked: input.locked,
       weapon: hero.weapon,
       zooming: input.zooming,
@@ -136,6 +160,7 @@ export class ValleyFight {
     this.battle = this.newBattle();
     this.spawnEnemyViews();
     this.hud.hideOutcome();
+    this.downedAt = null;
   }
 
   dispose(): void {
@@ -147,6 +172,7 @@ export class ValleyFight {
 
   private newBattle(): BattleState {
     const battle = createBattle(PATROL_HUT_FIGHT, valleyBattleGround());
+    battle.openEnded = true; // no win and no loss in the valley (task 004 item 8)
     const hero = getHero(battle);
     hero.x = PATROL_HUT_HERO_SPAWN.x;
     hero.z = PATROL_HUT_HERO_SPAWN.z;
@@ -162,9 +188,6 @@ export class ValleyFight {
         this.hud.addDamage(e.x, e.z, e.amount);
       } else if (e.type === 'impact') {
         this.bursts.spawn(e.x, e.y, e.z);
-      } else if (e.type === 'outcome') {
-        this.hud.showOutcome(e.status);
-        this.onOutcome(e.status);
       }
     }
   }

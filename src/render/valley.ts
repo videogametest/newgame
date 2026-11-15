@@ -6,7 +6,7 @@ import {
   Matrix, Scene, ShadowGenerator, Vector3,
 } from '@babylonjs/core';
 import { createBattle, makeFighter } from '../core/battle';
-import type { BattleInput, Fighter } from '../core/types';
+import type { BattleInput, Fighter, FighterKind, Team } from '../core/types';
 import { newGameState } from '../core/state';
 import type { GameState } from '../core/types';
 import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED } from '../core/world/valley';
@@ -95,6 +95,23 @@ export interface ValleyHooks {
 }
 /** Meshes that make up the sky. A pick that passes through these is sky. */
 const SKY_MESHES = new Set(['valley_sky', 'valley_stars', 'valley_sun', 'valley_moon']);
+/** One fighter as the fight's sim holds it. Positions are metres; y is height above the ground. */
+export interface FighterState {
+  id: number;
+  kind: FighterKind;
+  team: Team;
+  x: number;
+  z: number;
+  groundY: number;
+  bodyHeight: number;
+  alive: boolean;
+  hp: number;
+  /**
+   * Awareness is null: the patrol-hut fight does not track it yet (the stealth module is not wired into fights).
+   * No value is invented here.
+   */
+  awareness: null;
+}
 export interface ValleyState {
   x: number;
   z: number;
@@ -113,6 +130,8 @@ export interface ValleyState {
   drawCalls: number | null;
   activeMeshes: number;
   bram: { x: number; z: number; order: SquadOrder; crouched: boolean };
+  /** Every fighter in the patrol-hut fight, the hero included (task 004 item 8). */
+  fighters: FighterState[];
 }
 
 declare global {
@@ -250,7 +269,7 @@ class Valley {
     this.camera.maxZ = 1800; // the castle beyond the rim, seen from the far corner
     scene.activeCamera = this.camera;
 
-    this.fight = new ValleyFight(scene, assets, this.shadow, audio, hud, this.camera, canvas, () => this.input.releaseLock());
+    this.fight = new ValleyFight(scene, assets, this.shadow, audio, hud, this.camera, canvas, (line) => this.showLine(line, 4));
     this.placeHeroAtStart();
     this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
     this.heroView.asDesigned(scene, PROPORTIONS); // overnight item 3
@@ -545,8 +564,13 @@ class Valley {
     const lines = this.bramOrder === 'follow' ? BRAM_FOLLOW_LINES : BRAM_HOLD_LINES;
     const line = lines[this.bramSaid[this.bramOrder] % lines.length];
     this.bramSaid[this.bramOrder] += 1;
-    this.captionEl.textContent = `Bram: "${line}"`;
-    this.captionTime = 3;
+    this.showLine(`Bram: "${line}"`, 3);
+  }
+
+  /** Shows a line in the caption for the given seconds. The valley's one text line: Bram's words, fight status. */
+  private showLine(text: string, seconds: number): void {
+    this.captionEl.textContent = text;
+    this.captionTime = seconds;
   }
 
   private updateView(dt: number): void {
@@ -655,6 +679,9 @@ class Valley {
     const a = aimAngles({ x: x - hp.x, y: 0, z: z - hp.z });
     this.input.camYaw = a.yaw;
     this.input.aimPitch = 0;
+    // The hero turns with the camera. The battle sets his yaw from camYaw only on a step, and the capture holds
+    // the fight before any step runs, so without this he keeps his old heading (task 004 item 8, review 036 point 3).
+    this.hero.yaw = a.yaw;
   }
 
   private updateHud(dt: number): void {
@@ -753,6 +780,18 @@ class Valley {
       drawCalls: this.lastFrameDrawCalls,
       activeMeshes: this.scene.getActiveMeshes().length,
       bram: { x: this.bram.x, z: this.bram.z, order: this.bramOrder, crouched: this.crouched },
+      fighters: this.fight.battle.fighters.map((f) => ({
+        id: f.id,
+        kind: f.kind,
+        team: f.team,
+        x: f.x,
+        z: f.z,
+        groundY: f.y,
+        bodyHeight: f.height,
+        alive: f.alive,
+        hp: f.hp,
+        awareness: null,
+      })),
     };
   }
 }

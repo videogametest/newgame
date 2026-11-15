@@ -27,7 +27,9 @@ export type SoundPath = 'sound.master' | 'sound.music' | 'sound.effects' | 'soun
 
 export type RowPath = SettingsPath | SoundPath;
 
-export const NOT_YET = 'Not yet in the game.';
+/** The mark beside a setting that is saved but that nothing in the game reads yet. Said once, in the foot line. */
+export const SOON_MARK = 'soon';
+export const SOON_FOOT = 'A setting marked \u201csoon\u201d is saved, but nothing in the game uses it yet.';
 
 export interface Option { label: string; value: string | number | boolean }
 
@@ -75,7 +77,7 @@ const DISPLAY_ROWS: Row[] = [
 
 const SOUND_ROWS: Row[] = [
   { kind: 'slider', path: 'sound.master', label: 'Master', range: SOUND_RANGE },
-  { kind: 'slider', path: 'sound.music', label: 'Music', range: SOUND_RANGE, notYet: true, note: 'Music is not in the build yet.' },
+  { kind: 'slider', path: 'sound.music', label: 'Music', range: SOUND_RANGE, notYet: true },
   { kind: 'slider', path: 'sound.effects', label: 'Effects', range: SOUND_RANGE },
   { kind: 'switch', path: 'sound.muted', label: 'Mute all sound' },
 ];
@@ -135,6 +137,11 @@ export function rowsFor(page: PageId): Row[] {
     case 'play': return PLAY_ROWS;
     case 'controls': return [];
   }
+}
+
+/** True when a page has a row marked "soon", so its foot line is shown. */
+export function pageHasSoon(page: PageId): boolean {
+  return rowsFor(page).some((r) => r.notYet);
 }
 
 /** The note for the difficulty that is chosen (the rule text is in the row note). */

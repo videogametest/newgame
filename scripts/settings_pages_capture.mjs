@@ -1,13 +1,14 @@
 // Captures each Settings tab (task 009 step 2): Display, Sound, Camera, Controller, Play, from the pause menu.
 // Checks that each page has its heading and rows, and that no console or page error or failed request occurs.
-// Usage: node scripts/settings_pages_capture.mjs [baseUrl] [outDir]
-//   default baseUrl: http://localhost:4173/   default outDir: docs/pr-media/review032
+// Usage: node scripts/settings_pages_capture.mjs [baseUrl] [outDir] [width] [height]
+//   default baseUrl: http://localhost:4173/   default outDir: docs/pr-media/review032   default 1280x720
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const base = process.argv[2] ?? 'http://localhost:4173/';
 const outDir = process.argv[3] ?? 'docs/pr-media/review032';
+const VIEW = { width: Number(process.argv[4] ?? 1280), height: Number(process.argv[5] ?? 720) };
 const KEY = 'everylitwindow.settings.v1';
 const PAGES = ['Display', 'Sound', 'Camera', 'Controller', 'Play'];
 const failures = [];
@@ -17,7 +18,7 @@ mkdirSync(outDir, { recursive: true });
 const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'],
 });
-const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+const context = await browser.newContext({ viewport: VIEW });
 await context.addInitScript(([key]) => {
   if (!sessionStorage.getItem('seeded')) {
     localStorage.setItem(key, JSON.stringify({ version: 1, display: { brightness: 1, quality: 'high', brightnessSet: true } }));

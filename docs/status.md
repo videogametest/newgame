@@ -6,6 +6,14 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Task 009 queue item 15: the Mill, held (Viktor, branch item15-mill)
+
+- Defenders: `src/core/places/defenders.ts` (pure; `defendersAt(placeId, hour, retaken)`), spots in `src/data/mill_spots.ts`, first garrison `garrisonOf('mill', false)` (7). Walks use A* (`findPath`); patrol pace 60 s (placeholder). Tests: `defenders.test.ts`, 13 pass.
+- Render: `src/render/valley_defenders.ts`, shown only while the Mill is held. Wired in `src/render/valley.ts` (Claude's path; see critique).
+- Frames at the mill bridge (`docs/pr-media/mill-mill_{morning-8,noon-13,dusk-18,midnight-0}/`): morning, noon and dusk show the Mill and its defenders near the door and on the bridge. Midnight (tod 0) shows no defenders: the logic puts 2 in the guard-change gap (`off_post`) and 5 on bed spots. I did not confirm the bed spots are in frame; not judged further.
+- Draw calls after chunks settled (60/60): morning 436, noon 436, dusk 380, midnight 382. Over the 300 budget (arrival view was 246). Not cut; the Mill view adds the defenders' meshes. Measured, reported.
+- Gates: tsc clean; vitest 87 files, 1017 pass; build OK; walk-gap PASS at 97.0 m.
+
 ## 2026-11-15 Task 009 queue item 9: the arena goes (Viktor, branch item9-arena)
 
 - Removed the prototype arena: `src/render/arena.ts`, `src/render/game.ts`, `src/data/arena.ts` deleted; the `?arena` URL branch removed from `src/main.ts`; `insideBounds` and `ArenaBounds` removed from `src/render/camera_limits.ts` (its test too; `clampCameraHeight` stays).

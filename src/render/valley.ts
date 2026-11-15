@@ -31,6 +31,7 @@ import { buildGate } from './valley_gate';
 import { buildCrossings } from './valley_crossings';
 import { buildScenery } from './valley_scenery';
 import { ValleyWildlife, type WildlifeFrame } from './valley_wildlife';
+import { ValleyDefenders } from './valley_defenders';
 import { installErrorCapture, logEvent } from './debug_log';
 import { Hud } from './hud';
 import { PlayerInput } from './input';
@@ -224,6 +225,7 @@ class Valley {
   /** The hero's movement as the stealth and wildlife rules read it this frame. */
   private heroMovement: 'still' | 'walking' | 'sprinting' | 'crouched' | 'crouchedStill' = 'still';
   private wildlife?: ValleyWildlife;
+  private defenders?: ValleyDefenders;
   private bramGroundY = 0;
   /** How many times each order's line has played, so the lines rotate and never repeat back to back. */
   private readonly bramSaid: Record<SquadOrder, number> = { follow: 0, hold: 0 };
@@ -329,6 +331,7 @@ class Valley {
     buildCrossings(this.scene, { shadow: this.shadow }); // the ford, the mill bridge, the stepping stones (review 025 item 2)
     await buildScenery(this.scene);
     this.wildlife = new ValleyWildlife(this.scene); // the crows, flocks, geese and fox (GAME_DESIGN section 4)
+    this.defenders = new ValleyDefenders(this.scene, this.assets, this.shadow); // the mill's first garrison, by the place schedule (item 15)
     this.landmarks = await buildLandmarks(this.scene, { heightAt: valleyHeightAt, shadow: this.shadow }); // the Mill, the Forge, the Watch-house, the castle and the rest
     this.glow = new GlowLayer('glow', this.scene);
     this.glow.intensity = 0.3;
@@ -607,6 +610,7 @@ class Valley {
       movement: this.paused ? 'still' : this.heroMovement,
       heldPlaces: this.game.places.filter(p => p.status === 'held').map(p => p.id),
     });
+    this.defenders?.update(this.game.timeOfDay, this.game.places.find(p => p.id === 'mill')?.status === 'held');
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
     this.bramView.update(this.bram, this.bramGroundY);

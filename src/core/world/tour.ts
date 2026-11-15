@@ -41,6 +41,10 @@ export const TOUR_VIEWS: readonly TourView[] = [
   { name: 'wildlife_flock', hero: { x: 120, z: 65 }, look: { x: 120, z: 60 }, tod: 12, note: 'Meadow birds, lifting after a sprint' },
   { name: 'wildlife_geese', hero: { x: -148, z: 65 }, look: { x: -158, z: 57 }, tod: 12, note: 'The Mill goose pen' },
   { name: 'wildlife_fox', hero: { x: 139, z: 172 }, look: { x: 140, z: 166 }, tod: 12, note: 'The fox near the family stones' },
+  { name: 'mill_morning', hero: { x: -191, z: 22 }, look: { x: -191, z: 34 }, tod: 8, note: 'The Mill garrison at morning: the yard waking, guard changed' },
+  { name: 'mill_noon', hero: { x: -191, z: 22 }, look: { x: -191, z: 34 }, tod: 13, note: 'The Mill garrison at noon: patrols out, fire lit' },
+  { name: 'mill_dusk', hero: { x: -191, z: 22 }, look: { x: -191, z: 34 }, tod: 18, note: 'The Mill garrison at dusk: the watch on the gate' },
+  { name: 'mill_midnight', hero: { x: -191, z: 22 }, look: { x: -191, z: 34 }, tod: 0, note: 'The Mill garrison at midnight: night watch and guard change' },
 ];
 
 /**

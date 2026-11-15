@@ -13,7 +13,8 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 - `?showcase` uses its own flat stage (`src/render/showcase_stage.ts`), no walls or obstacles. Style tests unchanged.
 - Gates in the worktree: `tsc --noEmit` clean; vitest 86 files, 1004 tests pass; `vite build` exit 0; `npm run walk-gap` PASS at 97.0 m (limit 100); local smoke (`scripts/smoke.mjs`) passed with no console or page errors.
 - Showcase frames rendered locally (sword swing, soldier wind-up, archer draw), ground and sky visible. The first attempt was blank sky: the screenshot was taken before the first seek drew a frame. Fixed by calling `__showcaseSeek` and waiting.
-- Not yet done: PR merge, Pages run, live smoke on https://everylitwindow.com/ (recorded here after merge).
+- PR #96 merged (regular merge) at `586b714`. Pages run green (test, build, smoke, deploy). Live smoke `node scripts/smoke.mjs https://everylitwindow.com/` passed.
+- The PR body said the showcase sheet was attached in the thread; it was posted to the thread after the merge, not in the PR. The sheet shows the three showcase clips (sword swing, soldier wind-up, archer draw) rendered locally, not from the live site.
 
 ## 2026-11-15 Task 004 item 14b: stealth animals drawn (Viktor, PR #95)
 

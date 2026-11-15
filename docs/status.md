@@ -6,6 +6,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Queue item 20 deployed (Viktor)
+
+- PR #100 regular-merged as `e6f0be8`, with the required videogametest noreply author and committer. The merge tree matched the gated branch tree exactly.
+- Pages run `43765038364` succeeded: tests, build, built-page smoke and deploy. The first `gh run watch` hit the tool time limit while the workflow continued; a direct state check and second watch confirmed success, not a deployment failure.
+- `node scripts/smoke.mjs https://everylitwindow.com/` passed. An image-free live repeat of the budget script measured 268 / 268 / 254 / 250 draw calls at 08:00 / 13:00 / 18:00 / 00:00 after stable chunks, medium quality. All under 300; no page, console, HTTP or request errors. Raw live report saved beside the committed before/after reports. The small variation from local samples is left as measured; no extra screenshots or visual judgement.
+- Next is item 21, saves, in current queue order. No next implementation begins during the fifteen-minute quiet window. Existing every-twenty-minute continuation verified active; no additional wakeup.
+
 ## 2026-11-15 Queue item 20: Mill draw-call budget (Viktor, PR #100)
 
 - Implementation `294c38e`, branch `feat/item20-mill-budget`. First unticked item in current queue order is 20, ahead of the older item 17 block; existing `item17-overheard` WIP was not touched.

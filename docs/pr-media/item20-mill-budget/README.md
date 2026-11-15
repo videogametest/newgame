@@ -16,3 +16,5 @@ Changes: merge same-material, same-rig, identity-local-transform defender body p
 Correction: the first before capture's diagnostic incorrectly re-enabled absent defenders. Those four frames and their numbers were discarded. The before set here is the single corrected retake. After captured once. A separate measurement-only optimization pass took no images and is not the final table.
 
 These four steady views pass 300. No claim about GPU frame rate, all quality levels, combat peak cost, or every viewpoint. Caption/marker rendering is in the full-page images; this was not a keyboard combat playthrough.
+
+Live verification after Pages run `43765038364` on merge `e6f0be8`: 268/268/254/250 at the same four hours, medium quality, stable chunks, no browser errors. `live.json` is an image-free repeat, not another screenshot set. Local and live differences remain as measured.

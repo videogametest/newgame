@@ -1,6 +1,6 @@
 // The valley's wildlife, drawn (GAME_DESIGN.md section 4). The rules are pure and live in src/core/wildlife: this file
 // feeds them the hero and the Mill's state, and draws what they say. Simple shapes only (queue item 14b).
-// Crows circle the Mill while it is held; a songbird flock lifts when the hero sprints through it; the Mill's geese
+// Crows circle every held place; a songbird flock lifts when the hero sprints through it; the Mill's geese
 // honk when he runs near their pen; the fox leads a quiet hero toward the Fairlow stones and is gone if he sprints.
 
 import { Color3, Mesh, MeshBuilder, Scene, StandardMaterial, TransformNode } from '@babylonjs/core';
@@ -231,7 +231,7 @@ function gooseShape(scene: Scene, m: StandardMaterial): Mesh {
   return merged;
 }
 
-/** The fox: an orange body, a head, and a white-tipped tail. Simple shapes (queue item 14b). */
+/** The fox: an orange body, a head, and a matching orange tail. Simple shapes (queue item 14b). */
 function foxShape(scene: Scene, m: StandardMaterial): Mesh {
   const b = MeshBuilder.CreateBox('fox_body', { width: 0.4, height: 0.4, depth: 0.9 }, scene);
   b.position.y = 0.5;

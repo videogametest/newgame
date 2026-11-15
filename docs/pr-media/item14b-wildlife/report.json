@@ -1,0 +1,2250 @@
+{
+  "failures": [],
+  "fallbacks": [],
+  "shots": [
+    {
+      "name": "crows",
+      "tod": 12,
+      "file": "docs/pr-media/item14b-wildlife/crows-12.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": -160,
+        "z": 115,
+        "groundY": 10.67799065761976,
+        "yaw": -2.9002371630143893,
+        "tod": 12,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 65,
+        "pausedFrame": null,
+        "chunks": 100,
+        "chunkBuilds": 100,
+        "fps": 10,
+        "drawCalls": 324,
+        "activeMeshes": 185,
+        "bram": {
+          "x": -162.1885181502145,
+          "z": 116.56856249674078,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -160,
+            "z": 115,
+            "groundY": 10.67799065761976,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -175.38468841579325,
+            "y": 27.764035662221357,
+            "z": 58.97894156648438
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.97894156648437,
+            "y": 26.41956357840131,
+            "z": 50.61531158420676
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -176.61531158420675,
+            "y": 26.12306260839845,
+            "z": 41.02105843351562
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.02105843351563,
+            "y": 27.14713437664913,
+            "z": 49.38468841579324
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 38.61531158420676,
+            "y": 34.66322222123026,
+            "z": -167.02105843351563
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.02105843351562,
+            "y": 33.318750137410206,
+            "z": -175.38468841579325
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 37.38468841579324,
+            "y": 33.02224916740735,
+            "z": -184.97894156648437
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.97894156648438,
+            "y": 34.04632093565803,
+            "z": -176.61531158420675
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -169.38468841579325,
+            "y": 39.18381107561824,
+            "z": -183.02105843351563
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.97894156648437,
+            "y": 37.839338991798186,
+            "z": -191.38468841579325
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -170.61531158420675,
+            "y": 37.54283802179533,
+            "z": -200.97894156648437
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.02105843351563,
+            "y": 38.56690979004601,
+            "z": -192.61531158420675
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "crows",
+      "tod": 18,
+      "file": "docs/pr-media/item14b-wildlife/crows-18.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": -160,
+        "z": 115,
+        "groundY": 10.67799065761976,
+        "yaw": -2.9002371630143893,
+        "tod": 18,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 65,
+        "pausedFrame": null,
+        "chunks": 100,
+        "chunkBuilds": 100,
+        "fps": 12,
+        "drawCalls": 324,
+        "activeMeshes": 185,
+        "bram": {
+          "x": -162.1885181502145,
+          "z": 116.56856249674078,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -160,
+            "z": 115,
+            "groundY": 10.67799065761976,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -174.99413892236274,
+            "y": 27.892598148788398,
+            "z": 58.94361467710312
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.9436146771031,
+            "y": 26.508758623648227,
+            "z": 51.00586107763727
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -177.0058610776373,
+            "y": 26.090884699069257,
+            "z": 41.05638532289688
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.0563853228969,
+            "y": 27.023167734185055,
+            "z": 48.99413892236272
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 39.00586107763727,
+            "y": 34.7917847077973,
+            "z": -167.0563853228969
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.05638532289688,
+            "y": 33.40794518265713,
+            "z": -174.99413892236274
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 36.99413892236272,
+            "y": 32.99007125807816,
+            "z": -184.9436146771031
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.94361467710312,
+            "y": 33.922354293193955,
+            "z": -177.0058610776373
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -168.99413892236274,
+            "y": 39.31237356218528,
+            "z": -183.0563853228969
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.9436146771031,
+            "y": 37.92853403704511,
+            "z": -190.99413892236274
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -171.0058610776373,
+            "y": 37.51066011246614,
+            "z": -200.9436146771031
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.0563853228969,
+            "y": 38.442943147581936,
+            "z": -193.0058610776373
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "crows",
+      "tod": 0,
+      "file": "docs/pr-media/item14b-wildlife/crows-0.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": -160,
+        "z": 115,
+        "groundY": 10.67799065761976,
+        "yaw": -2.9002371630143893,
+        "tod": 0,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 65,
+        "pausedFrame": null,
+        "chunks": 100,
+        "chunkBuilds": 100,
+        "fps": 11,
+        "drawCalls": 326,
+        "activeMeshes": 186,
+        "bram": {
+          "x": -162.1885181502145,
+          "z": 116.56856249674078,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -160,
+            "z": 115,
+            "groundY": 10.67799065761976,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -174.89778706763724,
+            "y": 27.924050364548187,
+            "z": 58.93225204815293
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.93225204815295,
+            "y": 26.532082584941502,
+            "z": 51.10221293236275
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -177.10221293236273,
+            "y": 26.084636463446937,
+            "z": 41.06774795184707
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.06774795184705,
+            "y": 26.99309190066309,
+            "z": 48.89778706763725
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 39.10221293236275,
+            "y": 34.82323692355709,
+            "z": -167.06774795184705
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.067747951847064,
+            "y": 33.4312691439504,
+            "z": -174.89778706763724
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 36.89778706763725,
+            "y": 32.98382302245584,
+            "z": -184.93225204815295
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.93225204815293,
+            "y": 33.89227845967199,
+            "z": -177.10221293236273
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -168.89778706763724,
+            "y": 39.34382577794507,
+            "z": -183.06774795184705
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.93225204815295,
+            "y": 37.95185799833838,
+            "z": -190.89778706763724
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -171.10221293236273,
+            "y": 37.50441187684382,
+            "z": -200.93225204815295
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.06774795184705,
+            "y": 38.41286731405997,
+            "z": -193.10221293236273
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "flock",
+      "tod": 12,
+      "file": "docs/pr-media/item14b-wildlife/flock-12.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": 120,
+        "z": 65,
+        "groundY": 5.00203754145959,
+        "yaw": 3.141592653589793,
+        "tod": 12,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 70,
+        "pausedFrame": null,
+        "chunks": 110,
+        "chunkBuilds": 110,
+        "fps": 10,
+        "drawCalls": 308,
+        "activeMeshes": 137,
+        "bram": {
+          "x": 117.5,
+          "z": 66,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 120,
+            "z": 65,
+            "groundY": 5.00203754145959,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -179.69890114989616,
+            "y": 26.435389262512277,
+            "z": 58.20476265855978
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.2047626585598,
+            "y": 26.11629688151247,
+            "z": 46.30109885010385
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -172.30109885010384,
+            "y": 27.123997616863424,
+            "z": 41.79523734144022
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.7952373414402,
+            "y": 28.532016059733515,
+            "z": 53.69890114989615
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 34.30109885010385,
+            "y": 33.33457582152118,
+            "z": -167.7952373414402
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.79523734144022,
+            "y": 33.01548344052137,
+            "z": -179.69890114989616
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 41.69890114989615,
+            "y": 34.02318417587232,
+            "z": -184.2047626585598
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.20476265855978,
+            "y": 35.43120261874241,
+            "z": -172.30109885010384
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -173.69890114989616,
+            "y": 37.85516467590916,
+            "z": -183.7952373414402
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.2047626585598,
+            "y": 37.53607229490935,
+            "z": -195.69890114989616
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -166.30109885010384,
+            "y": 38.543773030260304,
+            "z": -200.2047626585598
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.7952373414402,
+            "y": 39.95179147313039,
+            "z": -188.30109885010384
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": true,
+            "lifted": 0.9997000000000117
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "flock",
+      "tod": 18,
+      "file": "docs/pr-media/item14b-wildlife/flock-18.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": 120,
+        "z": 65,
+        "groundY": 5.00203754145959,
+        "yaw": 3.141592653589793,
+        "tod": 18,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 70,
+        "pausedFrame": null,
+        "chunks": 110,
+        "chunkBuilds": 110,
+        "fps": 13,
+        "drawCalls": 308,
+        "activeMeshes": 137,
+        "bram": {
+          "x": 117.5,
+          "z": 66,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 120,
+            "z": 65,
+            "groundY": 5.00203754145959,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -178.978749958981,
+            "y": 26.622455342374412,
+            "z": 58.49276448995677
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.49276448995676,
+            "y": 26.06749632689656,
+            "z": 47.02125004101899
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -173.021250041019,
+            "y": 26.88419743262805,
+            "z": 41.50723551004323
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.50723551004324,
+            "y": 28.32168742936947,
+            "z": 52.978749958981005
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 35.02125004101899,
+            "y": 33.52164190138331,
+            "z": -167.50723551004324
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.507235510043234,
+            "y": 32.96668288590546,
+            "z": -178.978749958981
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 40.978749958981005,
+            "y": 33.78338399163695,
+            "z": -184.49276448995676
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.49276448995677,
+            "y": 35.220873988378365,
+            "z": -173.021250041019
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -172.978749958981,
+            "y": 38.04223075577129,
+            "z": -183.50723551004324
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.49276448995676,
+            "y": 37.487271740293444,
+            "z": -194.978749958981
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -167.021250041019,
+            "y": 38.303972846024934,
+            "z": -200.49276448995676
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.50723551004324,
+            "y": 39.741462842766346,
+            "z": -189.021250041019
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": true,
+            "lifted": 0.9157999999999302
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "flock",
+      "tod": 0,
+      "file": "docs/pr-media/item14b-wildlife/flock-0.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": 120,
+        "z": 65,
+        "groundY": 5.00203754145959,
+        "yaw": 3.141592653589793,
+        "tod": 0,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 70,
+        "pausedFrame": null,
+        "chunks": 110,
+        "chunkBuilds": 110,
+        "fps": 10,
+        "drawCalls": 310,
+        "activeMeshes": 138,
+        "bram": {
+          "x": 117.5,
+          "z": 66,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 120,
+            "z": 65,
+            "groundY": 5.00203754145959,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -179.48460013922326,
+            "y": 26.48847203845521,
+            "z": 58.29804566568088
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.2980456656809,
+            "y": 26.097000330975717,
+            "z": 46.51539986077675
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -172.51539986077674,
+            "y": 27.05006289941987,
+            "z": 41.70195433431911
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.7019543343191,
+            "y": 28.471418413633344,
+            "z": 53.48460013922325
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 34.515399860776746,
+            "y": 33.38765859746411,
+            "z": -167.7019543343191
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.701954334319115,
+            "y": 32.99618688998462,
+            "z": -179.48460013922326
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 41.48460013922325,
+            "y": 33.949249458428774,
+            "z": -184.2980456656809
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.29804566568089,
+            "y": 35.37060497264224,
+            "z": -172.51539986077674
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -173.48460013922326,
+            "y": 37.90824745185209,
+            "z": -183.7019543343191
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.2980456656809,
+            "y": 37.5167757443726,
+            "z": -195.48460013922326
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -166.51539986077674,
+            "y": 38.469838312816755,
+            "z": -200.2980456656809
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.7019543343191,
+            "y": 39.89119382703022,
+            "z": -188.51539986077674
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": true,
+            "lifted": 1
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "geese",
+      "tod": 12,
+      "file": "docs/pr-media/item14b-wildlife/geese-12.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": -148,
+        "z": 65,
+        "groundY": 9.496245496245958,
+        "yaw": -2.2455372690184494,
+        "tod": 12,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 69,
+        "pausedFrame": null,
+        "chunks": 107,
+        "chunkBuilds": 107,
+        "fps": 10,
+        "drawCalls": 282,
+        "activeMeshes": 115,
+        "bram": {
+          "x": -148.78086880944304,
+          "z": 67.576867071162,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -148,
+            "z": 65,
+            "groundY": 9.496245496245958,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -179.39057006229996,
+            "y": 26.512490574592004,
+            "z": 58.33690797913923
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.33690797913923,
+            "y": 26.089829894423385,
+            "z": 46.60942993770004
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -172.60942993770004,
+            "y": 27.018295956476464,
+            "z": 41.66309202086077
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.66309202086077,
+            "y": 28.44426134514027,
+            "z": 53.39057006229995
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 34.60942993770004,
+            "y": 33.411677133600904,
+            "z": -167.66309202086077
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.663092020860773,
+            "y": 32.989016453432285,
+            "z": -179.39057006229996
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 41.39057006229996,
+            "y": 33.91748251548536,
+            "z": -184.33690797913923
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.33690797913923,
+            "y": 35.343447904149166,
+            "z": -172.60942993770004
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -173.39057006229996,
+            "y": 37.932265987988885,
+            "z": -183.66309202086077
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.33690797913923,
+            "y": 37.509605307820266,
+            "z": -195.39057006229996
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -166.60942993770004,
+            "y": 38.43807136987334,
+            "z": -200.33690797913923
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.66309202086077,
+            "y": 39.86403675853715,
+            "z": -188.60942993770004
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "geese",
+      "tod": 18,
+      "file": "docs/pr-media/item14b-wildlife/geese-18.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": -148,
+        "z": 65,
+        "groundY": 9.496245496245958,
+        "yaw": -2.2455372690184494,
+        "tod": 18,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 69,
+        "pausedFrame": null,
+        "chunks": 107,
+        "chunkBuilds": 107,
+        "fps": 11,
+        "drawCalls": 286,
+        "activeMeshes": 117,
+        "bram": {
+          "x": -148.78086880944304,
+          "z": 67.576867071162,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -148,
+            "z": 65,
+            "groundY": 9.496245496245958,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -179.05590971490292,
+            "y": 26.601292720178357,
+            "z": 58.46530659895801
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.465306598958,
+            "y": 26.070573837310317,
+            "z": 46.944090285097076
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -172.94409028509708,
+            "y": 26.908685626769874,
+            "z": 41.53469340104199
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.534693401042,
+            "y": 28.34507197447846,
+            "z": 53.05590971490292
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 34.944090285097076,
+            "y": 33.50047927918726,
+            "z": -167.534693401042
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.534693401041995,
+            "y": 32.96976039631922,
+            "z": -179.05590971490292
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 41.05590971490292,
+            "y": 33.80787218577878,
+            "z": -184.465306598958
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.46530659895801,
+            "y": 35.24425853348736,
+            "z": -172.94409028509708
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -173.05590971490292,
+            "y": 38.02106813357524,
+            "z": -183.534693401042
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.465306598958,
+            "y": 37.4903492507072,
+            "z": -195.05590971490292
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -166.94409028509708,
+            "y": 38.32846104016676,
+            "z": -200.465306598958
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.534693401042,
+            "y": 39.76484738787534,
+            "z": -188.94409028509708
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "geese",
+      "tod": 0,
+      "file": "docs/pr-media/item14b-wildlife/geese-0.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": -148,
+        "z": 65,
+        "groundY": 9.496245496245958,
+        "yaw": -2.2455372690184494,
+        "tod": 0,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 69,
+        "pausedFrame": null,
+        "chunks": 107,
+        "chunkBuilds": 107,
+        "fps": 12,
+        "drawCalls": 284,
+        "activeMeshes": 116,
+        "bram": {
+          "x": -148.78086880944304,
+          "z": 67.576867071162,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -148,
+            "z": 65,
+            "groundY": 9.496245496245958,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -179.01647074576755,
+            "y": 26.612079005489793,
+            "z": 58.47944009000173
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.47944009000173,
+            "y": 26.068937893568737,
+            "z": 46.98352925423245
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -172.98352925423245,
+            "y": 26.896131533106747,
+            "z": 41.52055990999827
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.52055990999827,
+            "y": 28.333141906711496,
+            "z": 53.016470745767556
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 34.98352925423245,
+            "y": 33.51126556449869,
+            "z": -167.52055990999827
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.52055990999827,
+            "y": 32.96812445257764,
+            "z": -179.01647074576755
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 41.016470745767556,
+            "y": 33.79531809211565,
+            "z": -184.47944009000173
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.47944009000173,
+            "y": 35.23232846572039,
+            "z": -172.98352925423245
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -173.01647074576755,
+            "y": 38.031854418886674,
+            "z": -183.52055990999827
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.47944009000173,
+            "y": 37.48871330696562,
+            "z": -195.01647074576755
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -166.98352925423245,
+            "y": 38.31590694650363,
+            "z": -200.47944009000173
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.52055990999827,
+            "y": 39.752917320108374,
+            "z": -188.98352925423245
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 140,
+            "z": 166
+          }
+        }
+      }
+    },
+    {
+      "name": "fox",
+      "tod": 12,
+      "file": "docs/pr-media/item14b-wildlife/fox-12.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": 139,
+        "z": 172,
+        "groundY": 12.74577184333332,
+        "yaw": 2.976443976175166,
+        "tod": 12,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 63,
+        "pausedFrame": null,
+        "chunks": 96,
+        "chunkBuilds": 96,
+        "fps": 10,
+        "drawCalls": 408,
+        "activeMeshes": 195,
+        "bram": {
+          "x": 136.36961620311428,
+          "z": 172.57539645556875,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 139,
+            "z": 172,
+            "groundY": 12.74577184333332,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -175.29703978119156,
+            "y": 27.793015934655653,
+            "z": 58.97250505325981
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.9725050532598,
+            "y": 26.438822706138183,
+            "z": 50.70296021880845
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -176.70296021880844,
+            "y": 26.114893838214638,
+            "z": 41.02749494674019
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.0274949467402,
+            "y": 27.119048038179418,
+            "z": 49.29703978119155
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 38.70296021880845,
+            "y": 34.69220249366455,
+            "z": -167.0274949467402
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.02749494674019,
+            "y": 33.33800926514708,
+            "z": -175.29703978119156
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 37.29703978119155,
+            "y": 33.01408039722354,
+            "z": -184.9725050532598
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.97250505325981,
+            "y": 34.01823459718832,
+            "z": -176.70296021880844
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -169.29703978119156,
+            "y": 39.212791348052534,
+            "z": -183.0274949467402
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.9725050532598,
+            "y": 37.85859811953506,
+            "z": -191.29703978119156
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -170.70296021880844,
+            "y": 37.53466925161152,
+            "z": -200.9725050532598
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.0274949467402,
+            "y": 38.5388234515763,
+            "z": -192.70296021880844
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 142.85963528443747,
+            "z": 163.71229177245004
+          }
+        }
+      }
+    },
+    {
+      "name": "fox",
+      "tod": 18,
+      "file": "docs/pr-media/item14b-wildlife/fox-18.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": 139,
+        "z": 172,
+        "groundY": 12.74577184333332,
+        "yaw": 2.976443976175166,
+        "tod": 18,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 63,
+        "pausedFrame": null,
+        "chunks": 96,
+        "chunkBuilds": 96,
+        "fps": 10,
+        "drawCalls": 408,
+        "activeMeshes": 195,
+        "bram": {
+          "x": 136.36961620311428,
+          "z": 172.57539645556875,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 139,
+            "z": 172,
+            "groundY": 12.74577184333332,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -175.16522465705458,
+            "y": 27.83647062980712,
+            "z": 58.96120249334933
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.96120249334933,
+            "y": 26.46861854402738,
+            "z": 50.83477534294542
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -176.83477534294542,
+            "y": 26.103636662896783,
+            "z": 41.03879750665067
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.03879750665067,
+            "y": 27.07708764472662,
+            "z": 49.16522465705458
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 38.83477534294542,
+            "y": 34.73565718881602,
+            "z": -167.03879750665067
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.038797506650667,
+            "y": 33.367805103036275,
+            "z": -175.16522465705458
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 37.16522465705458,
+            "y": 33.002823221905686,
+            "z": -184.96120249334933
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.96120249334933,
+            "y": 33.97627420373552,
+            "z": -176.83477534294542
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -169.16522465705458,
+            "y": 39.256246043204,
+            "z": -183.03879750665067
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.96120249334933,
+            "y": 37.888393957424256,
+            "z": -191.16522465705458
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -170.83477534294542,
+            "y": 37.52341207629367,
+            "z": -200.96120249334933
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.03879750665067,
+            "y": 38.4968630581235,
+            "z": -192.83477534294542
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 142.78748300644483,
+            "z": 163.77001359484416
+          }
+        }
+      }
+    },
+    {
+      "name": "fox",
+      "tod": 0,
+      "file": "docs/pr-media/item14b-wildlife/fox-0.png",
+      "method": "page screenshot",
+      "valley": {
+        "x": 139,
+        "z": 172,
+        "groundY": 12.74577184333332,
+        "yaw": 2.976443976175166,
+        "tod": 0,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 63,
+        "pausedFrame": null,
+        "chunks": 96,
+        "chunkBuilds": 96,
+        "fps": 12,
+        "drawCalls": 410,
+        "activeMeshes": 196,
+        "bram": {
+          "x": 136.36961620311428,
+          "z": 172.57539645556875,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 139,
+            "z": 172,
+            "groundY": 12.74577184333332,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "wildlife": {
+        "crows": [
+          {
+            "name": "crow_mill_0",
+            "shown": true,
+            "x": -174.94031691355556,
+            "y": 27.91018240557191,
+            "z": 58.937397370392766
+          },
+          {
+            "name": "crow_mill_1",
+            "shown": true,
+            "x": -184.93739737039277,
+            "y": 26.521724171110716,
+            "z": 51.05968308644445
+          },
+          {
+            "name": "crow_mill_2",
+            "shown": true,
+            "x": -177.05968308644447,
+            "y": 26.087311072667397,
+            "z": 41.062602629607234
+          },
+          {
+            "name": "crow_mill_3",
+            "shown": true,
+            "x": -167.06260262960723,
+            "y": 27.006340509552093,
+            "z": 48.94031691355555
+          },
+          {
+            "name": "crow_forge_0",
+            "shown": true,
+            "x": 39.05968308644445,
+            "y": 34.809368964580806,
+            "z": -167.06260262960723
+          },
+          {
+            "name": "crow_forge_1",
+            "shown": true,
+            "x": 29.062602629607234,
+            "y": 33.420910730119616,
+            "z": -174.94031691355553
+          },
+          {
+            "name": "crow_forge_2",
+            "shown": true,
+            "x": 36.94031691355555,
+            "y": 32.9864976316763,
+            "z": -184.93739737039277
+          },
+          {
+            "name": "crow_forge_3",
+            "shown": true,
+            "x": 46.937397370392766,
+            "y": 33.90552706856099,
+            "z": -177.05968308644447
+          },
+          {
+            "name": "crow_watch_house_0",
+            "shown": true,
+            "x": -168.94031691355556,
+            "y": 39.329957818968786,
+            "z": -183.06260262960723
+          },
+          {
+            "name": "crow_watch_house_1",
+            "shown": true,
+            "x": -178.93739737039277,
+            "y": 37.941499584507596,
+            "z": -190.94031691355553
+          },
+          {
+            "name": "crow_watch_house_2",
+            "shown": true,
+            "x": -171.05968308644447,
+            "y": 37.50708648606428,
+            "z": -200.93739737039277
+          },
+          {
+            "name": "crow_watch_house_3",
+            "shown": true,
+            "x": -161.06260262960723,
+            "y": 38.42611592294897,
+            "z": -193.05968308644447
+          }
+        ],
+        "flocks": [
+          {
+            "id": "meadow_east",
+            "startled": false,
+            "lifted": null
+          },
+          {
+            "id": "meadow_south",
+            "startled": false,
+            "lifted": null
+          }
+        ],
+        "geeseHonking": false,
+        "fox": {
+          "mode": "idle",
+          "position": {
+            "x": 142.8103312278093,
+            "z": 163.7517350177526
+          }
+        }
+      }
+    }
+  ]
+}

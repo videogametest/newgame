@@ -10,15 +10,15 @@ import { advanceFox, type FoxState } from '../core/wildlife/fox';
 import { startleFlock, type Flock } from '../core/wildlife/flocks';
 import { geeseHonk } from '../core/wildlife/geese';
 import { crowsCircling } from '../core/wildlife/crows';
-import { FLOCKS, FOX_SECRET, FOX_START, GEESE_COUNT, GEESE_PEN, MILL_CENTRE } from '../data/wildlife';
+import { FLOCKS, FOX_SECRET, FOX_START, GEESE_COUNT, GEESE_PEN, CROW_CENTRES } from '../data/wildlife';
 import { walkSurfaceAt } from '../core/world/valley';
 
 export interface WildlifeFrame {
   dt: number;
   hero: Vec2;
   movement: Observation['movement'];
-  /** Whether the Mill is still held (the crows circle only while it is). */
-  millHeld: boolean;
+  /** Authoritative held places: crows leave each freed site independently. */
+  heldPlaces: readonly string[];
 }
 
 const CROW_COUNT = 4;
@@ -61,7 +61,11 @@ export class ValleyWildlife {
     const gooseMat = mat(scene, '#ece8de');
     const foxMat = mat(scene, '#c4612b');
 
-    for (let i = 0; i < CROW_COUNT; i++) this.crows.push(this.made(crowShape(scene, crowMat)));
+    for (const site of CROW_CENTRES) for (let i = 0; i < CROW_COUNT; i++) {
+      const crow = this.made(crowShape(scene, crowMat));
+      crow.name = `crow_${site.id}_${i}`;
+      this.crows.push(crow);
+    }
 
     for (const f of FLOCKS) {
       const offsets = Array.from({ length: FLOCK_BIRDS }, (_, i) => ({ x: (i % 3) * 1.6 - 1.6, z: Math.floor(i / 3) * 1.8 - 0.9 }));
@@ -80,10 +84,20 @@ export class ValleyWildlife {
     const dt = Math.max(0, f.dt);
     this.time += dt;
     const hero = { position: f.hero, movement: f.movement };
-    this.updateCrows(f.millHeld);
+    this.updateCrows(f.heldPlaces);
     this.updateFlocks(dt, hero);
     this.updateGeese(dt, hero);
     this.updateFox(dt, hero);
+  }
+
+  /** Read-only capture/debug state, not a second simulation. */
+  snapshot() {
+    return {
+      crows: this.crows.map(c => ({ name: c.name, shown: c.isEnabled(), x: c.position.x, y: c.position.y, z: c.position.z })),
+      flocks: this.flocks.map(v => ({ id: v.state.id, startled: v.state.startled, lifted: v.lifted })),
+      geeseHonking: this.honkLeft > 0,
+      fox: { mode: this.fox.state.mode, position: { ...this.fox.state.position } },
+    };
   }
 
   private made<T extends TransformNode>(m: T): T {
@@ -91,13 +105,15 @@ export class ValleyWildlife {
     return m;
   }
 
-  private updateCrows(millHeld: boolean): void {
-    const ground = walkSurfaceAt(MILL_CENTRE.x, MILL_CENTRE.z);
-    this.crows.forEach((c, i) => {
-      c.setEnabled(crowsCircling({ status: millHeld ? 'held' : 'freed' }));
+  private updateCrows(heldPlaces: readonly string[]): void {
+    this.crows.forEach((c, index) => {
+      const site = CROW_CENTRES[Math.floor(index / CROW_COUNT)];
+      const i = index % CROW_COUNT;
+      const ground = walkSurfaceAt(site.x, site.z);
+      c.setEnabled(crowsCircling({ status: heldPlaces.includes(site.id) ? 'held' : 'freed' }));
       const a = this.time * 0.35 + (i * Math.PI) / 2;
-      const x = MILL_CENTRE.x + CROW_RADIUS * Math.cos(a);
-      const z = MILL_CENTRE.z + CROW_RADIUS * Math.sin(a);
+      const x = site.x + CROW_RADIUS * Math.cos(a);
+      const z = site.z + CROW_RADIUS * Math.sin(a);
       c.position.set(x, ground + CROW_ALTITUDE + Math.sin(this.time * 0.7 + i) * 1.5, z);
       // Flying anticlockwise round the Mill: the nose points along the tangent.
       c.rotation.y = Math.atan2(-Math.sin(a), Math.cos(a));

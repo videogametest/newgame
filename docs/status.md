@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-15 Queue item 17: overheard Mill captions (Viktor, PR #101)
+
+- Resumed the existing `item17-overheard` WIP instead of duplicating it, merged fresh main `620d734` without rewriting history, completed its missing speech-log integration. Words are read by id from the writing; real scheduled fighters, proximity and awareness decide when a pair can speak. No invented dialogue.
+- `said.ts` records each actual spoken line in `GameState.speech`; the exchange id also enters `heardLines` and Notes. Leaving and returning cannot repeat heard lines; reconstructing the controller resumes only unseen words. Browser-save persistence is still item 21, not claimed here. Queue's once-per-line requirement is stricter than the writing's per-visit minimum; recorded under Decisions taken.
+- Functional gate: 1056 tests in 94 files passed; typecheck clean; production build passed (existing chunk-size warning); walk gap PASS 97.0 m, zero stranded; built-page local smoke passed on port 4188. Added speech-log reconstruction, no-repeat, zero-time, missing-writing and elapsed-time regressions.
+- Frames and raw report: `docs/pr-media/item17-overheard/`; repeat with `scripts/item17_capture.mjs`. Three full-page captures, no fallback or browser errors, no retake and no visual judgement. Actual Dob/Odo tell shown at noon and 18:06, matching DOM words in viewport; midnight sleeping speakers stay quiet. Medium settled draw calls 276 / 274 / 272, under 300. Browser checks also saw the second speaker's speech key and no replay after departure/return. These are actual sensor/speech-rule hooks with combat held, not a keyboard stealth playthrough.
+- Remaining boundaries: uses the first Mill garrison's existing schedules; those routines do not guarantee every authored pair meets during its eligible hour. No retaken roster, Notes screen, text-speed/size setting or full save system is added by this item.
+- Item 18 was examined first, then skipped as blocked: its automatic freeing conflicts with design section 9's explicit lantern prerequisite and the existing `held/cleared/freed` type. No item 18 implementation was made. Queue Blocked section asks whether 18 means cleared, leaving freeing to 23. This is not a visual gate.
+- Merge/deployment and live smoke follow. Existing every-20-minute continuation stays active. Recheck 18's ruling before moving to the next unblocked item, 21.
+
 ## 2026-11-15 Queue item 20 deployed (Viktor)
 
 - PR #100 regular-merged as `e6f0be8`, with the required videogametest noreply author and committer. The merge tree matched the gated branch tree exactly.

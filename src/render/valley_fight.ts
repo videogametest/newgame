@@ -5,7 +5,12 @@
 import { Camera, Matrix, Scene, ShadowGenerator, Vector3 } from '@babylonjs/core';
 import { TUNING } from '../config/tuning';
 import { MillEncounter } from '../core/places/mill_encounter';
-import type { PlaceState } from '../core/types';
+import type { OverheardWords } from '../core/places/mill_overhear';
+import { writtenOverheard } from '../data/writing_bandits';
+import { gameHour } from '../core/speech/said';
+import { addNote } from '../core/notes/notes';
+import { OVERHEARD } from '../data/overheard';
+import type { GameState, PlaceState } from '../core/types';
 import type { Observation } from '../core/stealth';
 import { createBattle, getHero, reviveHero, step } from '../core/battle';
 import type { BattleEvent, BattleInput, BattleState, Fighter } from '../core/types';
@@ -22,6 +27,16 @@ import { blocksView } from './occlusion';
 import { currentSettings } from './settings_store';
 
 export type FightInput = { locked: boolean; zooming: boolean };
+
+/** Item 17: the words of each overheard exchange, from the writing (docs/writing/bandits.md), as the sim reads them. */
+const overheardWords: OverheardWords = (id) => {
+  try {
+    return writtenOverheard(id).lines.map(l => ({ speaker: l.speaker, text: l.text }));
+  } catch (err) {
+    console.warn(`Overheard exchange ${id} has no written lines`, err);
+    return [];
+  }
+};
 
 /** The hero's health bar and weapon tiles appear once he is this close to the hut (task 004 item 8). */
 const CHROME_RANGE = 30;
@@ -53,9 +68,10 @@ export class ValleyFight {
     private readonly canvas: HTMLCanvasElement,
     /** Called when the hero is down for long enough and gets back up. The valley shows the line. */
     private readonly onStatus: (line: string) => void,
+    private readonly game?: GameState,
   ) {
     this.battle = this.newBattle();
-    this.mill = new MillEncounter(this.battle);
+    this.mill = this.newMill();
     this.arrows = new ArrowViews(scene, assets.arrow, shadow);
     this.bursts = new ImpactBursts(scene);
     this.spawnEnemyViews();
@@ -171,7 +187,7 @@ export class ValleyFight {
     this.arrows = new ArrowViews(this.scene, this.assets.arrow, this.shadow);
     this.bursts.dispose();
     this.battle = this.newBattle();
-    this.mill = new MillEncounter(this.battle);
+    this.mill = this.newMill();
     this.spawnEnemyViews();
     this.hud.hideOutcome();
     this.downedAt = null;
@@ -214,6 +230,22 @@ export class ValleyFight {
     const fighter = this.battle.fighters.find((f) => f.id === id);
     if (!fighter) throw new Error(`No fighter with id ${id}`);
     return new CharacterView(this.scene, this.assets, fighter, this.shadow, `${fighter.kind}${id}`);
+  }
+
+  private newMill(): MillEncounter {
+    const game = this.game;
+    return new MillEncounter(this.battle, 12, overheardWords, id => {
+      if (!game) return;
+      if (!game.heardLines.includes(id)) game.heardLines.push(id);
+      game.notes = addNote(game.notes, { lineId: id, kind: 'overheard',
+        speakers: OVERHEARD.find(o => o.id === id)?.speakers ?? [], place: 'mill', day: game.day });
+    }, game ? { read: () => game.speech, write: log => { game.speech = log; },
+      now: () => gameHour(game.day, game.timeOfDay) } : undefined);
+  }
+
+  /** World point to CSS pixels on the canvas, for the valley's overheard captions (item 17). */
+  screenOf(x: number, y: number, z: number): { x: number; y: number; visible: boolean } {
+    return this.project(x, y, z);
   }
 
   /** World point to CSS pixels on the canvas. visible is false when the point is behind the camera or off-depth. */

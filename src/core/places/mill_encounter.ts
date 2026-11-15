@@ -2,7 +2,7 @@
 import { TUNING } from '../../config/tuning';
 import { garrisonOf } from '../../data/bandits';
 import { MILL_BELL, MILL_REINFORCEMENTS } from '../../data/mill_alarm';
-import { GEESE_PEN } from '../../data/wildlife';
+import { GEESE_PEN, MILL_CENTRE } from '../../data/wildlife';
 import { getHero, makeFighter } from '../battle';
 import { advanceAwareness, type AwarenessState, type Observation, type Stimulus } from '../stealth';
 import { geeseHonk } from '../wildlife/geese';
@@ -12,6 +12,7 @@ import { solidAt } from '../world/solids';
 import { buildWalkableCells, findPathCells, type WalkableCells } from '../world/pathfinding';
 import { MILL_GRID, defendersAt, type Defender } from './defenders';
 import { advanceAlarm, newAlarm, type AlarmState } from './reinforcements';
+import { MillOverhearing, type OverheardWords, type OverhearMember, type OverhearMemory } from './mill_overhear';
 
 const distance = (a: Vec2, b: Vec2) => Math.hypot(a.x - b.x, a.z - b.z);
 let grid: WalkableCells | undefined;
@@ -39,7 +40,10 @@ export class MillEncounter {
   private readonly outsideIds = new Set<number>();
   bellRings = 0;
   reinforcements = 0;
-  constructor(battle: BattleState, hour = 12) {
+  /** Item 17: what the Mill men say to someone close and unnoticed. The words come in from the render layer. */
+  readonly overhear: MillOverhearing;
+  constructor(battle: BattleState, hour = 12, words: OverheardWords = () => [], onHeard?: (id: string) => void, memory?: OverhearMemory) {
+    this.overhear = new MillOverhearing(words, onHeard, undefined, undefined, memory);
     const roster = garrisonOf('mill', false);
     for (const d of defendersAt('mill', hour)) {
       const f = makeFighter(battle, { unitId: d.kind === 'archer' ? 'enemy_archer' : 'enemy_soldier',
@@ -59,6 +63,7 @@ export class MillEncounter {
       const ids = new Set([...this.members.values()].map(m => m.fighter.id).concat([...this.outsideIds]));
       battle.fighters = battle.fighters.filter(f => !ids.has(f.id));
       this.alarm = advanceAlarm(this.alarm, place, { volunteer: null, runnerCanAct: false, runnerAtBell: false }, dt, plan).state;
+      this.overhear.stop();
       return;
     }
     const routines = defendersAt('mill', hour);
@@ -97,6 +102,8 @@ export class MillEncounter {
         else if (d.moving) { f.vx = Math.sin(d.yaw) * TUNING.soldier.moveSpeed; f.vz = Math.cos(d.yaw) * TUNING.soldier.moveSpeed; }
       }
     }
+    this.overhear.advance({ hour, retaken: place.timesFreed > 1, hero: { x: hero.x, z: hero.z }, dt,
+      inVisit: distance(hero, MILL_CENTRE) <= t.activationRadius, members: this.overhearMembers(hour) });
     const canRun = (m: Member) => m.fighter.alive && m.fighter.hitTimer <= 0 && battle.fighters.includes(m.fighter);
     const current = this.alarm.bell.runnerId ? this.members.get(this.alarm.bell.runnerId) : undefined;
     // Prefer the authored runner, then an alert survivor. A stopped runner is replaced on the next step.
@@ -122,6 +129,14 @@ export class MillEncounter {
     }
     place.morale = Math.min(1, place.morale + result.moraleDelta);
   }
+  private overhearMembers(hour: number): OverhearMember[] {
+    const routines = defendersAt('mill', hour);
+    return [...this.members].map(([id, m]) => {
+      const d = routines.find(r => r.id === id) ?? m.routine;
+      return { id, x: m.fighter.x, z: m.fighter.z, alive: m.fighter.alive, present: d.present,
+        sleeping: d.activity === 'sleep', unaware: m.sense.awareness === 'unaware' };
+    });
+  }
   private walk(f: Fighter, goal: Vec2, speed: number, dt: number): void {
     const toCell = (p: Vec2) => ({ x: Math.round(p.x - MILL_GRID.originX), z: Math.round(p.z - MILL_GRID.originZ) });
     const end = toCell(goal), key = `${end.x},${end.z}`;
@@ -145,9 +160,16 @@ export class MillEncounter {
     f.y = walkSurfaceAt(f.x, f.z);
   }
   snapshot() {
+    const overheard = this.overhear.snapshot();
+    const speaker = overheard.caption && this.members.get(overheard.caption.speakerId);
+    const caption = overheard.caption && speaker
+      ? { ...overheard.caption, x: speaker.fighter.x, y: speaker.fighter.y, z: speaker.fighter.z, height: speaker.fighter.height }
+      : null;
     return { alarm: this.alarm, bell: MILL_BELL, bellRings: this.bellRings, reinforcements: this.reinforcements,
-      issues: [...this.issues], defenders: [...this.members].map(([id, m]) => ({ id, fighterId: m.fighter.id,
+      issues: [...this.issues], overheard: { saidThisVisit: overheard.saidThisVisit, caption },
+      defenders: [...this.members].map(([id, m]) => ({ id, fighterId: m.fighter.id,
         x: m.fighter.x, y: m.fighter.y, z: m.fighter.z, yaw: m.fighter.yaw, alive: m.fighter.alive, hp: m.fighter.hp,
-        awareness: m.fighter.awareness, notice: m.sense.notice, activity: m.routine.activity, torch: m.routine.torch })) };
+        awareness: m.fighter.awareness, notice: m.sense.notice, activity: m.routine.activity, torch: m.routine.torch,
+        present: m.routine.present, height: m.fighter.height })) };
   }
 }

@@ -17,6 +17,10 @@ const DEFAULTS = {
     reinforcementMorale: 0.15,
     sightStep: 0.75,
     torchReach: 6,
+    /** PLACEHOLDER, not balanced (item 17): how close a Mill man must be for the hero to hear him. Hearing ignores walls. */
+    earshot: 12,
+    /** PLACEHOLDER, not balanced (item 17): seconds each overheard line stays as a caption. */
+    overheardDwell: 3,
   },
 
   camera: {

@@ -36,6 +36,7 @@ export class MillEncounter {
   readonly members = new Map<string, Member>();
   readonly routes = new Map<number, Route>();
   readonly issues = new Set<string>();
+  private readonly outsideIds = new Set<number>();
   bellRings = 0;
   reinforcements = 0;
   constructor(battle: BattleState, hour = 12) {
@@ -55,7 +56,7 @@ export class MillEncounter {
     const hero = getHero(battle), t = TUNING.mill;
     const plan = { travelSeconds: t.reinforcementTravel, moraleGain: t.reinforcementMorale, spawns: MILL_REINFORCEMENTS };
     if (place.status !== 'held') {
-      const ids = new Set([...this.members.values()].map(m => m.fighter.id));
+      const ids = new Set([...this.members.values()].map(m => m.fighter.id).concat([...this.outsideIds]));
       battle.fighters = battle.fighters.filter(f => !ids.has(f.id));
       this.alarm = advanceAlarm(this.alarm, place, { volunteer: null, runnerCanAct: false, runnerAtBell: false }, dt, plan).state;
       return;
@@ -71,6 +72,7 @@ export class MillEncounter {
       if (present && !included) battle.fighters.push(f);
       if (!present && included) battle.fighters = battle.fighters.filter(other => other !== f);
       if (!f.alive || !present) continue;
+      if (!f.worldDriven || m.sense.awareness === 'unaware') this.routes.delete(f.id);
       if (m.sense.awareness === 'unaware') {
         f.x = d.x; f.z = d.z; f.yaw = d.yaw; f.y = walkSurfaceAt(f.x, f.z);
       }
@@ -115,7 +117,7 @@ export class MillEncounter {
     this.alarm = result.state;
     if (result.bellRang) this.bellRings++;
     for (const spawn of result.spawns) {
-      const f = makeFighter(battle, spawn); f.awareness = 'alert'; battle.fighters.push(f);
+      const f = makeFighter(battle, spawn); f.awareness = 'alert'; battle.fighters.push(f); this.outsideIds.add(f.id);
       this.reinforcements++;
     }
     place.morale = Math.min(1, place.morale + result.moraleDelta);
@@ -145,7 +147,7 @@ export class MillEncounter {
   snapshot() {
     return { alarm: this.alarm, bell: MILL_BELL, bellRings: this.bellRings, reinforcements: this.reinforcements,
       issues: [...this.issues], defenders: [...this.members].map(([id, m]) => ({ id, fighterId: m.fighter.id,
-        x: m.fighter.x, y: m.fighter.y, z: m.fighter.z, alive: m.fighter.alive, hp: m.fighter.hp,
+        x: m.fighter.x, y: m.fighter.y, z: m.fighter.z, yaw: m.fighter.yaw, alive: m.fighter.alive, hp: m.fighter.hp,
         awareness: m.fighter.awareness, notice: m.sense.notice, activity: m.routine.activity, torch: m.routine.torch })) };
   }
 }

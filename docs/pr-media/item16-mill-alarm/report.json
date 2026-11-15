@@ -1,0 +1,1113 @@
+{
+  "failures": [],
+  "fallbacks": [],
+  "shots": [
+    {
+      "file": "docs/pr-media/item16-mill-alarm/mill-unaware-12.png",
+      "scenario": "unaware",
+      "tod": 12,
+      "method": "page screenshot including DOM markers",
+      "world": {
+        "x": -191,
+        "z": 22,
+        "groundY": 3.649753175715005,
+        "yaw": 0,
+        "tod": 12,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 64,
+        "pausedFrame": null,
+        "chunks": 99,
+        "chunkBuilds": 103,
+        "fps": 10,
+        "drawCalls": 460,
+        "activeMeshes": 189,
+        "bram": {
+          "x": -188.5,
+          "z": 21,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -191,
+            "z": 22,
+            "groundY": 3.649753175715005,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -186,
+            "z": 47,
+            "groundY": 3.7647571499474277,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168,
+            "z": 70,
+            "groundY": 7.03393801214289,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "mill": {
+        "alarm": {
+          "bell": {
+            "runnerId": null,
+            "rung": false
+          },
+          "remaining": null,
+          "arrived": false
+        },
+        "bell": {
+          "x": -172,
+          "z": 70
+        },
+        "bellRings": 0,
+        "reinforcements": 0,
+        "issues": [],
+        "defenders": [
+          {
+            "id": "harl_gadd",
+            "fighterId": 5,
+            "x": -186,
+            "y": 3.7647571499474277,
+            "z": 47,
+            "yaw": 1.5707963267948966,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "patrol",
+            "torch": false
+          },
+          {
+            "id": "dob_finch",
+            "fighterId": 6,
+            "x": -151.59176349071697,
+            "y": 8.947474825792233,
+            "z": 64.80208662405529,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "eat",
+            "torch": false
+          },
+          {
+            "id": "wyll_carrow",
+            "fighterId": 7,
+            "x": -168,
+            "y": 7.03393801214289,
+            "z": 70,
+            "yaw": -1.5707963267948966,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "patrol",
+            "torch": false
+          },
+          {
+            "id": "bran_oakes",
+            "fighterId": 8,
+            "x": -152.88873179291798,
+            "y": 8.53395978089424,
+            "z": 63.858028875271074,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "eat",
+            "torch": false
+          },
+          {
+            "id": "nessa_roke",
+            "fighterId": 9,
+            "x": -168.27659958298057,
+            "y": 6.9548840274336055,
+            "z": 69.14355813349944,
+            "yaw": 1.929566997065469,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "watch",
+            "torch": false
+          },
+          {
+            "id": "pim",
+            "fighterId": 10,
+            "x": -151.36219720313787,
+            "y": 8.775717261915783,
+            "z": 63.365013706986645,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "eat",
+            "torch": false
+          },
+          {
+            "id": "odo_varn",
+            "fighterId": 11,
+            "x": -151.14479066723732,
+            "y": 8.99581871170229,
+            "z": 64.28038722716204,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "habit",
+            "torch": false
+          }
+        ]
+      },
+      "markers": [
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": true
+        }
+      ]
+    },
+    {
+      "file": "docs/pr-media/item16-mill-alarm/mill-suspicious-18.1.png",
+      "scenario": "suspicious",
+      "tod": 18.1,
+      "method": "page screenshot including DOM markers",
+      "world": {
+        "x": -166.40394122784247,
+        "z": 68.44131125032266,
+        "groundY": 7.070708078489355,
+        "yaw": -1.2120256565243261,
+        "tod": 18.1,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 66,
+        "pausedFrame": null,
+        "chunks": 103,
+        "chunkBuilds": 107,
+        "fps": 10,
+        "drawCalls": 360,
+        "activeMeshes": 95,
+        "bram": {
+          "x": -163.90394122784247,
+          "z": 67.44131125032266,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -166.40394122784247,
+            "z": 68.44131125032266,
+            "groundY": 7.070708078489355,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -167.74660681233092,
+            "z": 69.08395857390606,
+            "groundY": 6.985797015552928,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "suspicious"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "mill": {
+        "alarm": {
+          "bell": {
+            "runnerId": null,
+            "rung": false
+          },
+          "remaining": null,
+          "arrived": false
+        },
+        "bell": {
+          "x": -172,
+          "z": 70
+        },
+        "bellRings": 0,
+        "reinforcements": 0,
+        "issues": [],
+        "defenders": [
+          {
+            "id": "harl_gadd",
+            "fighterId": 5,
+            "x": -177.1,
+            "y": 7.76268226067945,
+            "z": 74,
+            "yaw": 1.9513027039072617,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0.5661792659326904,
+            "activity": "patrol",
+            "torch": false
+          },
+          {
+            "id": "dob_finch",
+            "fighterId": 6,
+            "x": -151.59176349071697,
+            "y": 8.947474825792233,
+            "z": 64.80208662405529,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "eat",
+            "torch": false
+          },
+          {
+            "id": "wyll_carrow",
+            "fighterId": 7,
+            "x": -190.52965100552981,
+            "y": 2.340685485788139,
+            "z": 40.72764676343763,
+            "yaw": 1.0074800653029286,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "habit",
+            "torch": false
+          },
+          {
+            "id": "bran_oakes",
+            "fighterId": 8,
+            "x": -152.88873179291798,
+            "y": 8.53395978089424,
+            "z": 63.858028875271074,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "eat",
+            "torch": false
+          },
+          {
+            "id": "nessa_roke",
+            "fighterId": 9,
+            "x": -167.74660681233092,
+            "y": 6.985797015552928,
+            "z": 69.08395857390606,
+            "yaw": 1.6827794028609846,
+            "alive": true,
+            "hp": 50,
+            "awareness": "suspicious",
+            "notice": 1.043176633681377,
+            "activity": "watch",
+            "torch": false
+          },
+          {
+            "id": "pim",
+            "fighterId": 10,
+            "x": -151.36219720313787,
+            "y": 8.775717261915783,
+            "z": 63.365013706986645,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "eat",
+            "torch": false
+          },
+          {
+            "id": "odo_varn",
+            "fighterId": 11,
+            "x": -151.14479066723732,
+            "y": 8.99581871170229,
+            "z": 64.28038722716204,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "eat",
+            "torch": false
+          }
+        ]
+      },
+      "markers": [
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "suspicious",
+          "symbol": "?",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        }
+      ]
+    },
+    {
+      "file": "docs/pr-media/item16-mill-alarm/mill-alert-0.png",
+      "scenario": "alert",
+      "tod": 0,
+      "method": "page screenshot including DOM markers",
+      "world": {
+        "x": -170,
+        "z": 82,
+        "groundY": 8.867620879475195,
+        "yaw": -2.819842099193151,
+        "tod": 0,
+        "day": 1,
+        "locked": false,
+        "paused": false,
+        "frame": 65,
+        "pausedFrame": null,
+        "chunks": 102,
+        "chunkBuilds": 106,
+        "fps": 11,
+        "drawCalls": 356,
+        "activeMeshes": 166,
+        "bram": {
+          "x": -167.64740443714757,
+          "z": 83.30969237519619,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -170,
+            "z": 82,
+            "groundY": 8.867620879475195,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.59176349071697,
+            "z": 76.80208662405529,
+            "groundY": 9.80959145870862,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -148.52965100552981,
+            "z": 76.72764676343763,
+            "groundY": 9.781778973077296,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "alert"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.4345236732405,
+            "z": 75.32362136268318,
+            "groundY": 9.803458884820975,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.14479066723732,
+            "z": 76.28038722716204,
+            "groundY": 9.818753652215783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert"
+          }
+        ]
+      },
+      "mill": {
+        "alarm": {
+          "bell": {
+            "runnerId": "pim",
+            "rung": false
+          },
+          "remaining": null,
+          "arrived": false
+        },
+        "bell": {
+          "x": -172,
+          "z": 70
+        },
+        "bellRings": 0,
+        "reinforcements": 0,
+        "issues": [],
+        "defenders": [
+          {
+            "id": "harl_gadd",
+            "fighterId": 5,
+            "x": -177.1,
+            "y": 7.76268226067945,
+            "z": 74,
+            "yaw": 1.9379701606131159,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert",
+            "notice": 3,
+            "activity": "habit",
+            "torch": false
+          },
+          {
+            "id": "dob_finch",
+            "fighterId": 6,
+            "x": -147.59176349071697,
+            "y": 9.80959145870862,
+            "z": 76.80208662405529,
+            "yaw": -2.819842099193151,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert",
+            "notice": 3,
+            "activity": "sleep",
+            "torch": false
+          },
+          {
+            "id": "wyll_carrow",
+            "fighterId": 7,
+            "x": -148.52965100552981,
+            "y": 9.781778973077296,
+            "z": 76.72764676343763,
+            "yaw": -2.819842099193151,
+            "alive": true,
+            "hp": 50,
+            "awareness": "alert",
+            "notice": 3,
+            "activity": "sleep",
+            "torch": false
+          },
+          {
+            "id": "bran_oakes",
+            "fighterId": 8,
+            "x": -152.88873179291798,
+            "y": 8.53395978089424,
+            "z": 63.858028875271074,
+            "yaw": 0,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "guard_change",
+            "torch": false
+          },
+          {
+            "id": "nessa_roke",
+            "fighterId": 9,
+            "x": -168.27659958298057,
+            "y": 6.9548840274336055,
+            "z": 69.14355813349944,
+            "yaw": 1.929566997065469,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware",
+            "notice": 0,
+            "activity": "guard_change",
+            "torch": false
+          },
+          {
+            "id": "pim",
+            "fighterId": 10,
+            "x": -147.4345236732405,
+            "y": 9.803458884820975,
+            "z": 75.32362136268318,
+            "yaw": -2.0905981329216914,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert",
+            "notice": 3,
+            "activity": "sleep",
+            "torch": false
+          },
+          {
+            "id": "odo_varn",
+            "fighterId": 11,
+            "x": -147.14479066723732,
+            "y": 9.818753652215783,
+            "z": 76.28038722716204,
+            "yaw": -2.819842099193151,
+            "alive": true,
+            "hp": 70,
+            "awareness": "alert",
+            "notice": 3,
+            "activity": "sleep",
+            "torch": false
+          }
+        ]
+      },
+      "markers": [
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "unaware",
+          "symbol": "○",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "inViewport": true
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "inViewport": false
+        },
+        {
+          "state": "alert",
+          "symbol": "!",
+          "hidden": false,
+          "inViewport": false
+        }
+      ]
+    }
+  ],
+  "alarm": {
+    "alarm": {
+      "bell": {
+        "runnerId": null,
+        "rung": true
+      },
+      "remaining": null,
+      "arrived": true
+    },
+    "bell": {
+      "x": -172,
+      "z": 70
+    },
+    "bellRings": 1,
+    "reinforcements": 2,
+    "issues": [],
+    "defenders": [
+      {
+        "id": "harl_gadd",
+        "fighterId": 5,
+        "x": -177.1,
+        "y": 7.76268226067945,
+        "z": 74,
+        "yaw": 1.9379701606131159,
+        "alive": true,
+        "hp": 70,
+        "awareness": "alert",
+        "notice": 3,
+        "activity": "habit",
+        "torch": false
+      },
+      {
+        "id": "dob_finch",
+        "fighterId": 6,
+        "x": -147.59176349071697,
+        "y": 9.80959145870862,
+        "z": 76.80208662405529,
+        "yaw": -2.819842099193151,
+        "alive": true,
+        "hp": 70,
+        "awareness": "alert",
+        "notice": 3,
+        "activity": "sleep",
+        "torch": false
+      },
+      {
+        "id": "wyll_carrow",
+        "fighterId": 7,
+        "x": -148.52965100552981,
+        "y": 9.781778973077296,
+        "z": 76.72764676343763,
+        "yaw": -2.819842099193151,
+        "alive": true,
+        "hp": 50,
+        "awareness": "alert",
+        "notice": 3,
+        "activity": "sleep",
+        "torch": false
+      },
+      {
+        "id": "bran_oakes",
+        "fighterId": 8,
+        "x": -152.88873179291798,
+        "y": 8.53395978089424,
+        "z": 63.858028875271074,
+        "yaw": 0,
+        "alive": true,
+        "hp": 70,
+        "awareness": "unaware",
+        "notice": 0,
+        "activity": "guard_change",
+        "torch": false
+      },
+      {
+        "id": "nessa_roke",
+        "fighterId": 9,
+        "x": -168.27659958298057,
+        "y": 6.9548840274336055,
+        "z": 69.14355813349944,
+        "yaw": 1.929566997065469,
+        "alive": true,
+        "hp": 50,
+        "awareness": "unaware",
+        "notice": 0,
+        "activity": "guard_change",
+        "torch": false
+      },
+      {
+        "id": "pim",
+        "fighterId": 10,
+        "x": -172,
+        "y": 7.075522987444364,
+        "z": 71.31819890877533,
+        "yaw": 3.141592653589793,
+        "alive": true,
+        "hp": 70,
+        "awareness": "alert",
+        "notice": 3,
+        "activity": "sleep",
+        "torch": false
+      },
+      {
+        "id": "odo_varn",
+        "fighterId": 11,
+        "x": -147.14479066723732,
+        "y": 9.818753652215783,
+        "z": 76.28038722716204,
+        "yaw": -2.819842099193151,
+        "alive": true,
+        "hp": 70,
+        "awareness": "alert",
+        "notice": 3,
+        "activity": "sleep",
+        "torch": false
+      }
+    ]
+  }
+}

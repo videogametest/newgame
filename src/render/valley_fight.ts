@@ -139,7 +139,7 @@ export class ValleyFight {
         this.views.set(f.id, view);
       }
       view.setShown(true);
-      view.update(f);
+      view.update(f, f.y);
       // Enemies between the lens and the hero fade out, so they never block the view.
       view.fade(blocksView(camPos, hero, f), dt);
     }

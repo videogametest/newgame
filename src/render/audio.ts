@@ -56,7 +56,6 @@ export class AudioBank {
     if (!this.loading) this.loading = this.loadAll().catch((err: unknown) => console.warn('Sound load failed', err));
   }
 
-  /** Plays one sound effect now. Silent when muted, before unlock, or while the files are still loading. */
   /** Original synthesized bell, through the same effects/master volume controls. */
   ringBell(): void {
     if (!this.ctx || !this.effectsGain) return;
@@ -71,6 +70,7 @@ export class AudioBank {
     }
   }
 
+  /** Plays one loaded effect, respecting the same volume controls. */
   play(id: SoundId): void {
     if (!this.ctx || !this.effectsGain) return;
     const def = SOUNDS[id];

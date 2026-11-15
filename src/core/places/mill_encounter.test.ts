@@ -89,6 +89,22 @@ describe('Mill place integration', () => {
     expect(s.p.morale).toBeCloseTo(0.65);
     advance(s, 30); expect(s.c.bellRings).toBe(1); expect(s.c.reinforcements).toBe(2);
   });
+  it('the actual combat step does not move a bell runner twice or overwrite sensing', () => {
+    const s = setup(); alert(s.c);
+    s.hero.x = -170; s.hero.z = 82;
+    const runner = s.c.members.get('pim')!.fighter;
+    const start = { x: runner.x, z: runner.z };
+    s.c.advance(s.b, 12, s.p, 'still', TUNING.fixedDt);
+    const prepared = { x: runner.x, z: runner.z };
+    step(s.b, idle);
+    expect({ x: runner.x, z: runner.z }).toEqual(prepared);
+    expect(Math.hypot(runner.x - start.x, runner.z - start.z)).toBeLessThanOrEqual(TUNING.mill.runnerSpeed * TUNING.fixedDt + 1e-9);
+    for (let i = 0; i < 1800 && !s.c.reinforcements; i++) {
+      s.c.advance(s.b, 12, s.p, 'still', TUNING.fixedDt); step(s.b, idle);
+    }
+    expect(s.c.bellRings).toBe(1); expect(s.c.reinforcements).toBe(2);
+    expect(s.c.issues.size).toBe(0);
+  });
   it('a stopped runner is replaced and a dead runner never rings', () => {
     const s = setup(); alert(s.c); advance(s, 1/60);
     const pim = s.c.members.get('pim')!.fighter; pim.alive = false; pim.hp = 0;

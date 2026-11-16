@@ -1,10 +1,14 @@
+import { gateLanternLit } from '../tutorial/lantern';
 import type { GameState, Household } from '../types';
 
 export type PeopleWorld = Pick<GameState,
-  'day' | 'places' | 'households' | 'bandits' | 'stolenGoodsReturned' | 'projectsBuilt' | 'storyMoments'>;
+  'day' | 'places' | 'households' | 'bandits' | 'stolenGoodsReturned' | 'projectsBuilt' | 'storyMoments'>
+  & { tutorial?: Pick<GameState['tutorial'], 'lantern'> };
 
 export type Trigger =
   | { kind: 'always' }
+  /** Writing: "The first lantern is lit." Hesper's gate lantern on the first evening, or any place's lantern. */
+  | { kind: 'firstLantern' }
   | { kind: 'place'; id: string }
   | { kind: 'returned'; id: string }
   | { kind: 'household'; id: string }
@@ -21,7 +25,7 @@ export interface HouseholdDef {
   /** Exact descriptions, including unnamed relatives, live in this source. */
   source: string;
   members: readonly string[];
-  /** House identity, not invented map coordinates. */
+  /** The building's id in the seeded Wick plan (docs/tasks/003-layout/wick.json, src/village/plan.ts). */
   houseId: string;
   /** Maren is physically present before her window becomes progress. */
   presentFromStart: boolean;
@@ -34,19 +38,24 @@ const project = (id: string): Trigger => ({ kind: 'project', id });
 const windows = (count: number): Trigger => ({ kind: 'windows', count });
 
 function household(id: string, name: string, trade: string, members: string[],
-  trigger: Trigger, presentFromStart = false): HouseholdDef {
-  return { id, villageId: 'wick', name, trade, members, houseId: `${id}_house`,
+  trigger: Trigger, presentFromStart = false, houseId = HOUSE_OF[id] ?? id): HouseholdDef {
+  return { id, villageId: 'wick', name, trade, members, houseId,
     source: 'docs/writing/households.md', presentFromStart, trigger };
 }
+
+/** Household ids are plural, the plan's building ids singular; this joins them (checked in people.test.ts). */
+const HOUSE_OF: Readonly<Record<string, string>> = {
+  hesper: 'hesper', maren: 'old_maren', marrins: 'marrin', aldrics: 'aldric', sedges: 'sedge', pikes: 'pike',
+  wains: 'wain', kettles: 'kettle', brands: 'brand', oona: 'oona', hollins: 'hollin', tolleys: 'tolley',
+  ashbys: 'ashby', loomises: 'loomis', dunns: 'dunn', rudds: 'rudd',
+};
 
 /** §9. IDs are local integration keys, not names added to the writing.
  * House positions and unnamed members: TODO not in design; no fabricated coordinates or names.
  */
 export const HOUSEHOLDS: readonly HouseholdDef[] = [
   household('hesper', 'Hesper', 'Lamplighter', ['Hesper'], { kind: 'always' }, true),
-  household('maren', 'Old Maren', 'None now', ['Old Maren'], {
-    kind: 'any', conditions: [place('mill'), place('forge'), place('watch_house')],
-  }, true),
+  household('maren', 'Old Maren', 'None now', ['Old Maren'], { kind: 'firstLantern' }, true),
   household('marrins', 'The Marrins', 'Millers', ['Ansa Marrin', 'Corin'], place('mill')),
   household('aldrics', 'The Aldrics', 'Smiths', ['Bertram Aldric', 'Garrick'], returned('aldrics')),
   household('sedges', 'The Sedges', 'Shepherds', ['Hale Sedge', 'Tamsin', 'Bracken'], {
@@ -79,7 +88,10 @@ export function homeCount(households: readonly Household[], villageId = 'wick',
 export function meetsTrigger(trigger: Trigger, world: PeopleWorld): boolean {
   switch (trigger.kind) {
     case 'always': return true;
-    case 'place': return world.places.some(p => p.id === trigger.id && p.status === 'freed');
+    case 'firstLantern': return (world.tutorial ? gateLanternLit(world.tutorial.lantern) : false)
+      || world.places.some(p => p.status === 'freed' || p.timesFreed > 0);
+    // Once freed is enough: a place retaken before this pass ran still brought its household home (§9, The turn).
+    case 'place': return world.places.some(p => p.id === trigger.id && (p.status === 'freed' || p.timesFreed > 0));
     case 'returned': return world.stolenGoodsReturned.includes(trigger.id);
     case 'household': return world.households.some(h => h.id === trigger.id && h.home);
     case 'project': return world.projectsBuilt.includes(trigger.id);

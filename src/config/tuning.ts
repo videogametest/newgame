@@ -25,6 +25,12 @@ const DEFAULTS = {
     overheardDwell: 3,
   },
 
+  /** Item 28 placeholders, none in the writing: the day of Wick's people (src/core/people/daily.ts). Hours are the
+   * game clock; dawn 6 and windows 19 to 1 are the design's clock; work hours, the dusk gather and walk speed (m/s
+   * real time) are guesses. Hesper's lamp keeps the existing gold-hour start (17) and burns to dawn. */
+  wickPeople: { wake: 6, atWork: 8, workEnd: 17, atWell: 18, leaveWell: 18.5, home: 19,
+    windowsOn: 19, windowsOff: 1, hesperFrom: 17, walkSpeed: 1.3, doorStep: 5.6, spacing: 1.3, wellRing: 2.6 },
+
   /** Item 21: three active minutes between browser saves (untuned). */
   saves: { intervalSeconds: 180 },
   /** Item 25 placeholders: opening line seconds on screen, seconds walked before the sprint prompt, look pixels that count. */

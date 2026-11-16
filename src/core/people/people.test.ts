@@ -23,6 +23,7 @@ const member = (id: CompanionId) => ({
 function satisfy(trigger: Trigger, w: PeopleWorld): void {
   switch (trigger.kind) {
     case 'always': break;
+    case 'firstLantern': w.tutorial = { lantern: { phase: 'lit' } }; break;
     case 'place': w.places.push(free(trigger.id)); break;
     case 'returned': w.stolenGoodsReturned.push(trigger.id); break;
     case 'household': w.households.push({ id: trigger.id, home: true }); break;
@@ -50,7 +51,7 @@ describe('§9 households', () => {
   });
   it('clearing a place is not lighting it', () => {
     const w = world();
-    w.places = [{ ...free('mill'), status: 'cleared' }];
+    w.places = [{ ...free('mill'), status: 'cleared', timesFreed: 0 }];
     expect(meetsTrigger(HOUSEHOLDS[2].trigger, w)).toBe(false);
   });
   it('permits lantern projects to make the east road safe independently of the Forge', () => {

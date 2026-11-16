@@ -6,6 +6,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 Queue item 28: people in Wick (Viktor, PR pending)
+
+- Branch `feat/item28-wick-people` from `ead39f7`. Guards checked by the parent at activation 09:25:12 UTC. Item 18 untouched (recorded conflict).
+- Built: existing `src/core/people/households.ts` stays the one owner of the sixteen households; `houseId` now joins each to its building in the seeded Wick plan (plural household ids, singular plan ids). Old Maren's trigger is the writing's "The first lantern is lit" (the first-evening gate lantern, or any place's lantern); a place freed once still counts after it is retaken. New pure `src/core/people/daily.ts` (plan in `src/data/wick_days.ts`, numbers in `TUNING.wickPeople`): wake at 6 and walk to work, work 8 to 17, walk to the well, gather 18 to 18:30, walk home, indoors 19 to 6. Walks use grid A* on a 1 m Wick grid over the hero's walkable ground (round houses, the well, water). A window is lit only when its household is home, one of them is indoors and the clock allows (19 to 1; Hesper's lamp keeps its existing 17:00 start and now burns to dawn). Window boards come down for households home. Villagers drawn by `src/render/wick_people.ts` with the loaded CC0 Barbarian, unarmed, homespun tint; nobody drawn indoors. Item 23's Marrin pane generalised to every house.
+- Gates (raw `docs/pr-media/item28-wick-people/gate/`): full vitest, typecheck, build, walk gap, local built smoke on 4193; `scripts/item28_capture.mjs` image-free and with frames; image-free regressions for items 23, 25, 26, 27. Fixtures: saves written from the page's own new game (gate lantern lit; Mill freed once then retaken, Forge freed), setTod/freeze, placeAt/lookAt. Not a played return of any household.
+- Gate results: 1197 tests, typecheck clean, build passed (existing chunk warning), walk gap PASS 97.0 m, smoke passed, item28 capture 26/26 both runs, regressions item23 11/11, item25 39, item26 passed, item27 55/55, no failures or fallbacks. Settled medium draw calls noon 146 (76 chunks), dusk-well 620 (109), night 373 (109); over 300 at dusk and night, no same-view baseline, no causal claim.
+
 ## 2026-11-16 09:05 UTC Queue item 27 deployed (Viktor)
 
 - PR #108 regular-merged as `faadc71`; required videogametest noreply author/committer verified, merge tree identical to the gated branch. Pages `43834274737` succeeded on that commit.

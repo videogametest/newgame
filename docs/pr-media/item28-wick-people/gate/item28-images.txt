@@ -1,0 +1,28 @@
+{
+  "failures": [],
+  "fallbacks": [],
+  "checks": 26,
+  "passed": 26,
+  "drawCalls": [
+    {
+      "name": "noon",
+      "drawCalls": 146,
+      "chunks": 76
+    },
+    {
+      "name": "dusk-well",
+      "drawCalls": 620,
+      "chunks": 109
+    },
+    {
+      "name": "night",
+      "drawCalls": 373,
+      "chunks": 109
+    }
+  ],
+  "shots": [
+    "docs/pr-media/item28-wick-people/noon.png",
+    "docs/pr-media/item28-wick-people/dusk-well.png",
+    "docs/pr-media/item28-wick-people/night.png"
+  ]
+}

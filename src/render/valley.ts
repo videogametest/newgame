@@ -47,6 +47,10 @@ import type { SquadOrder } from '../core/company/conduct';
 import { blocksView } from './occlusion';
 import { loadAssets, type LoadedAssets } from './assets';
 import { CharacterView } from './characters';
+import { WickPeopleView } from './wick_people';
+import { updateHouseholds } from '../core/people/households';
+import { litWindows, openHouses, wickVillagers, type Villager } from '../core/people/daily';
+import { WICK_DAYS } from '../data/wick_days';
 import { withinShadowRange } from './shadow_range';
 import { buildFarLand } from './valley_far';
 import { buildRoads } from './valley_roads';
@@ -135,6 +139,9 @@ export interface ValleyHooks {
   exposure(): { exposure: number; ambient: number };
   lanternState(): { position: { x: number; z: number }; available: boolean; windowHouse: string; windowOn: boolean; windowRendered: boolean; lanternIntensity: number; cue: string };
   interactLantern(): boolean;
+  /** Item 28: who is home, who is drawn where, and which windows are lit, as the frame just drew them. */
+  peopleState(): { hour: number; home: string[]; villagers: Villager[]; drawn: string[]; lit: string[]; rendered: string[];
+    boards: boolean; hesperLamp: number };
   talkingState(): { position: { x: number; z: number }; available: boolean; line: string | null; text: string | null;
     answers: string[]; selected: number };
   tutorialState(): { tutorial: GameState['tutorial']; stepNumber: number; pending: string | null; opening: string | null;
@@ -312,6 +319,9 @@ class Valley {
   private readonly conversationBox: ConversationBox;
   private readonly hesper: Fighter;
   private readonly hesperView: CharacterView;
+  private readonly people: WickPeopleView;
+  private villagers: Villager[] = [];
+  private litNow: string[] = [];
   private readonly openingEl: HTMLElement;
   private readonly promptEl: HTMLElement;
   private openingTime = 0;
@@ -409,6 +419,7 @@ class Valley {
     this.hesper.y = walkSurfaceAt(HESPER.x, HESPER.z);
     this.hesperView = new CharacterView(scene, assets, this.hesper, this.shadow, 'hesper');
     this.hesperView.asDesigned(scene, PROPORTIONS);
+    this.people = new WickPeopleView(scene, assets, this.shadow, bramBattle);
     this.conversation = new Conversation(line => {
       const said = nextLine(this.game.speech, { speaker: line.speaker, group: line.id, count: 1,
         now: gameHour(this.game.day, this.game.timeOfDay), urgent: true });
@@ -1169,6 +1180,22 @@ class Valley {
     this.captionTime = seconds;
   }
 
+  /** Item 28: households come home by their written triggers; who is out, where, and which windows are lit. */
+  private updatePeople(dt: number, L: ReturnType<typeof lightingAt>): void {
+    const next = updateHouseholds(this.game);
+    for (const h of next) {
+      const was = this.game.households.find(x => x.id === h.id);
+      if (h.home && !was?.home) logEvent('people', `household ${h.id} home on day ${this.game.day}`);
+    }
+    if (next.some(h => h.home !== this.game.households.find(x => x.id === h.id)?.home)) this.game.households = next;
+    const tod = this.game.timeOfDay;
+    const lit = litWindows(this.game, tod, WICK_DAYS);
+    this.litNow = [...lit].sort();
+    this.wick?.light(L, tod, { lit, open: openHouses(this.game) });
+    this.villagers = wickVillagers(this.game, tod, WICK_DAYS);
+    this.people.update(this.villagers, this.paused || this.titleActive ? 0 : dt, !this.picture && !this.titleActive);
+  }
+
   private updateView(dt: number): void {
     if (!this.hero.alive || Math.hypot(this.hero.x - HESPER.x, this.hero.z - HESPER.z) > T.talking.leaveReach)
       this.conversation.stop();
@@ -1198,7 +1225,7 @@ class Valley {
     this.sky.update(L, this.hero.x, this.hero.z);
     this.waterSeconds += dt;
     if (this.scene.activeCamera) this.water?.update(L, this.waterSeconds, this.scene.activeCamera.globalPosition, FOG_START, FOG_END);
-    this.wick?.light(L, this.game.timeOfDay, this.game.places.some(p => p.id === 'mill' && p.timesFreed > 0));
+    this.updatePeople(dt, L);
     this.wick?.gateLantern(gateLanternLit(this.game.tutorial.lantern), L.nightness);
     for (const p of this.game.places) {
       if (p.id === 'mill' || p.id === 'forge' || p.id === 'watch_house')
@@ -1404,6 +1431,13 @@ class Valley {
         windowRendered: this.scene.getMeshByName(`${MILL_WINDOW_HOUSE}_recovery_window`)?.isEnabled() ?? false,
         lanternIntensity: this.scene.getLightByName('mill_lantern')?.intensity ?? 0, cue: this.lanternCue }),
       interactLantern: () => this.interactLantern(),
+      peopleState: () => ({ hour: this.game.timeOfDay, home: this.game.households.filter(h => h.home).map(h => h.id),
+        villagers: structuredClone(this.villagers), drawn: this.people.shownNow(), lit: [...this.litNow],
+        rendered: wickHouses(VALLEY_SEED).filter(h => h.id === 'hesper'
+          ? (this.scene.getLightByName('hesper_lamp')?.intensity ?? 0) > 0
+          : this.scene.getMeshByName(`${h.id}_recovery_window`)?.isEnabled() ?? false).map(h => h.id).sort(),
+        boards: !!this.scene.getMeshByName('wick_window_boards'),
+        hesperLamp: this.scene.getLightByName('hesper_lamp')?.intensity ?? 0 }),
       talkingState: () => ({ position: { x: HESPER.x, z: HESPER.z }, available: this.canTalk(),
         line: this.conversation.current?.id ?? null, text: this.conversation.current?.text ?? null,
         answers: (this.conversation.current?.answers ?? []).map(a => a.id), selected: this.conversation.selected }),

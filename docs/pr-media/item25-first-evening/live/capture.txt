@@ -1,0 +1,9 @@
+{
+  "failures": [],
+  "fallbacks": [],
+  "walk": {
+    "remainingMetres": 1.5598987322546303,
+    "walked": true
+  },
+  "checks": 37
+}

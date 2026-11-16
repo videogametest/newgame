@@ -6,6 +6,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 04:22 UTC Queue item 25 deployed (Viktor)
+
+- PR #106 regular-merged as `b1bf0cc`; required videogametest noreply author/committer verified on both branch commits and merge. Merge tree identical to the gated branch. Pages `43802555427` succeeded on that exact commit.
+- Live `scripts/smoke.mjs https://everylitwindow.com/` passed. Image-free live `scripts/item25_capture.mjs` passed all 37 checks, no failures/fallbacks or extra screenshots: rebound input, a real held-key road walk to her door, nonmodal clock, pause/resume, both choices, saved v4 state and Continue without repeats. Skip path again used synthetic door placement after New game. Raw live report: `docs/pr-media/item25-first-evening/live/`.
+- Live settled medium samples: 414/480/460/418, over 300; no same-view baseline/causal claim. Yard, lantern lesson, map and controller wording remain later work.
+- Every-20-minute continuation remains active. Next activation rechecks item 18/current queue, then 26 after quiet and ownership guards.
+
 ## 2026-11-16 Queue item 25: first evening, road and door (Viktor, PR #106)
 
 - Implementation `925a651`, branch `feat/item25-first-evening`, fresh base `355bdab`, design v38 and newest review 036. At activation 03:41:38 UTC: main thread idle, no other queue run; newest repository push 03:03:20 UTC, 38m18s earlier. No existing item-25 PR/branch. Item 18 remains its recorded design conflict and was not implemented.

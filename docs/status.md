@@ -6,6 +6,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 00:09 UTC Queue item 21 deployed (Viktor)
+
+- PR #102 regular-merged as `e8067df`; required videogametest noreply author and committer verified on every branch commit and the merge. Merge tree identical to the gated branch.
+- Pages run `43777900377` succeeded on `e8067df`: tests, build, built-page smoke, deployment. First watch hit the tool's time limit while CI continued; direct state plus a second watch confirmed success, not a deployment failure.
+- `node scripts/smoke.mjs https://everylitwindow.com/` passed. All 18 image-free live persistence assertions passed: restored and re-saved hero/clock, GameState contents, Notes/non-repeat speech, separate settings, visible damaged-save/quota notices, previous-save retention and tour isolation. No page/console/request/HTTP errors or capture fallback, and no extra frames. Raw live report committed beside the local reports.
+- Rest is still a completed-action persistence hook, not a built rest interaction; title screen is item 22. Capture producers and the item 18 conflict remain as recorded below. Existing every-20-minute continuation remains active. Next run rechecks 18 and takes 22 if still the next unblocked item, after quiet/ownership guards; no new implementation starts now.
+
 ## 2026-11-15 Queue item 21: versioned browser saves (Viktor, PR #102)
 
 - Implemented `src/core/saves/codec.ts`, `src/render/game_store.ts`, and `src/core/saves/autosave.ts`. Own `everylitwindow.save` key; version 3 uses the existing GameState and v1/v2 migrations. Runtime validation checks every top-level field and nested shape before accepting JSON; invalid/future saves start a new game with one plain line. Unavailable storage/quota errors do not crash play or overwrite the last good save, and display the interface writing's failure line.

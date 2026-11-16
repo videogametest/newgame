@@ -11,6 +11,13 @@ const report = { checks: [], failures: [], fallbacks: [], shots: [], snapshots: 
 const check = (ok, message) => { report.checks.push({ passed: !!ok, message }); if (!ok) report.failures.push(message); };
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 async function ready(page) {
+  await page.waitForFunction(() => window.__valley?.state().frame > 0, null, { timeout: 180000 });
+  if (await page.evaluate(() => window.__valley.state().title)) {
+    const title = page.locator('[data-screen="title"]');
+    const resume = title.getByRole('button', { name: 'Continue', exact: true });
+    if (await resume.count()) await resume.click();
+    else await title.getByRole('button', { name: 'New game', exact: true }).click();
+  }
   await page.waitForFunction(() => window.__valley?.state().frame > 0 && window.__valley.state().drawCalls > 0, null, { timeout: 180000 });
   await page.evaluate(() => { window.__valley.freeze(true); window.__valley.holdFight(true); });
   await page.evaluate(() => new Promise((resolve, reject) => {

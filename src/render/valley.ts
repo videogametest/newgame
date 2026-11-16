@@ -11,6 +11,9 @@ import type { BattleInput, Fighter, FighterKind, Team } from '../core/types';
 import { newGameState } from '../core/state';
 import { Autosave, type SaveReason } from '../core/saves/autosave';
 import { readGame, writeGame } from './game_store';
+import type { SaveRead } from '../core/saves/codec';
+import { TitleScreen } from './title_screen';
+import { titleYaw, type TitleChoice } from './title_rules';
 import type { GameState } from '../core/types';
 import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED } from '../core/world/valley';
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
@@ -135,6 +138,7 @@ export interface ValleyState {
   tod: number;
   day: number;
   locked: boolean;
+  title: boolean;
   paused: boolean;
   /** Frame counter, and the frame on which the pause last took effect (null before the first pause). */
   frame: number;
@@ -178,14 +182,12 @@ export async function startValley(canvas: HTMLCanvasElement, uiRoot: HTMLElement
       logEvent('save', 'saved hero is outside the playable region');
       loaded = { state: newGameState(VALLEY_SEED), status: 'damaged' };
     }
-    const game = loaded.state;
+    const game = newGameState(VALLEY_SEED);
     const rawTod = params.get('tod');
     if (rawTod !== null) game.timeOfDay = parseTod(rawTod);
-    const valley = new Valley(engine, scene, uiRoot, assets, game, hud, loaded.status === 'loaded', persistent);
+    const valley = new Valley(engine, scene, uiRoot, assets, game, hud, false, persistent, undefined, persistent ? loaded : null);
     await valley.loadWick();
     valley.start();
-    if (loaded.status === 'damaged') valley.notice("Your saved game couldn't be read. A new game has started.");
-    if (loaded.status === 'unavailable') valley.notice("Couldn't save. Your progress is safe for now, but don't close the page. Copy a debug report from the pause menu.");
     hud.hideBoot();
     logEvent('valley', 'ready');
   } catch (err) {
@@ -257,7 +259,11 @@ class Valley {
   private captionTime = 0;
   private chromeHidden = false;
   private budgetHideFighters = false;
-  private readonly autosave: Autosave;
+  private autosave: Autosave;
+  private titleScreen?: TitleScreen;
+  private titleActive = false;
+  private titleSeconds = 0;
+  private titleBaseYaw = 0;
   private saveFailed = false;
 
   constructor(
@@ -270,7 +276,9 @@ class Valley {
     resumed = false,
     private readonly persistent = true,
     audio: AudioBank = new AudioBank(), // the Sound page's volumes; the same saved values the battle uses
+    private titleSave: SaveRead | null = null,
   ) {
+    this.titleActive = titleSave !== null;
     const canvas = engine.getRenderingCanvas() as HTMLCanvasElement;
     scene.fogMode = Scene.FOGMODE_LINEAR;
     scene.fogStart = FOG_START;
@@ -331,12 +339,13 @@ class Valley {
     this.pauseMenu = new PauseMenu(uiRoot, () => this.resume(), (b) => {
       saveSettings({ ...currentSettings(), bindings: b });
       this.input.setBindings(b); // the input is created just below; the callback only runs from the menu, after that
-    }, (b) => this.applyBrightness(b), () => this.setBrightnessAgain(), audio);
+    }, (b) => this.applyBrightness(b), () => this.setBrightnessAgain(), audio, () => this.returnToTitle());
     // Once the fight is over the outcome card needs the cursor, so losing the lock then does not open the pause menu.
     this.input = new PlayerInput(canvas, (locked) => {
+      if (this.titleActive) return;
       if (!locked && this.fight.status !== 'fighting') return;
       this.setPaused(pausedAfter(locked ? 'lockGained' : 'lockLost'));
-    });
+    }, () => !this.titleActive && !this.picture);
     this.input.camYaw = this.hero.yaw;
 
     this.hint = document.createElement('div');
@@ -349,7 +358,7 @@ class Valley {
     uiRoot.appendChild(this.captionEl);
     this.installHud(uiRoot);
     canvas.addEventListener('pointerdown', () => {
-      if (!this.input.isLocked && this.fight.status === 'fighting') this.input.requestLock();
+      if (!this.titleActive && !this.picture && !this.input.isLocked && this.fight.status === 'fighting') this.input.requestLock();
     });
     if (this.tour) {
       window.addEventListener('keydown', (e) => {
@@ -358,8 +367,18 @@ class Valley {
       });
       this.tourTo(0);
     }
-    this.autosave = new Autosave(game, () => {
-      if (!this.persistent || this.picture) return false;
+    this.autosave = this.makeAutosave();
+    window.addEventListener('pagehide', () => { if (this.persistent && !this.picture && !this.titleActive) this.autosave.save('leave'); });
+    if (this.titleActive) this.openTitle(audio);
+    window.addEventListener('keydown', e => {
+      if (this.titleActive && !this.picture && e.code === 'Escape') this.titleScreen?.back();
+    });
+    this.installHooks();
+  }
+
+  private makeAutosave(): Autosave {
+    return new Autosave(this.game, () => {
+      if (!this.persistent || this.picture || this.titleActive) return false;
       this.syncSaveHero();
       return writeGame(this.game);
     }, (ok, reason) => {
@@ -368,8 +387,51 @@ class Valley {
       if (ok) this.showLine('Saved.', 2);
       this.saveFailed = !ok;
     });
-    window.addEventListener('pagehide', () => { if (this.persistent && !this.picture) this.autosave.save('leave'); });
-    this.installHooks();
+  }
+
+  private openTitle(audio: AudioBank): void {
+    if (!this.titleSave) return;
+    this.titleBaseYaw = this.hero.yaw;
+    this.titleScreen = new TitleScreen(this.uiRoot, this.titleSave.status, choice => this.beginGame(choice), {
+      audio,
+      onBrightness: b => this.applyBrightness(b),
+      onBrightnessAgain: () => {
+        this.titleScreen?.hide();
+        this.startBrightnessCheck(() => { this.titleScreen?.show(); this.titleScreen?.showSettings(); });
+      },
+    }, b => { saveSettings({ ...currentSettings(), bindings: b }); this.input.setBindings(b); });
+  }
+
+  private beginGame(choice: TitleChoice): void {
+    if (!this.titleActive || !this.titleSave || (choice === 'continue' && this.titleSave.status !== 'loaded')) return;
+    const previousStatus = this.titleSave.status;
+    const next = choice === 'continue' ? structuredClone(this.titleSave.state) : newGameState(VALLEY_SEED);
+    Object.assign(this.game, next);
+    this.input.reset();
+    this.fight.restart(); // reconstructs named outcomes and speech from the selected GameState
+    this.heroView.dispose();
+    this.heroView = new CharacterView(this.scene, this.assets, this.hero, this.shadow, 'hero');
+    this.heroView.asDesigned(this.scene, PROPORTIONS);
+    if (choice === 'continue') {
+      this.fight.placeHero(next.hero.position.x, next.hero.position.z);
+      this.hero.maxHp = next.hero.maxHp; this.hero.hp = next.hero.hp; this.hero.alive = next.hero.hp > 0;
+    } else this.placeHeroAtStart();
+    this.groundY = this.hero.y; this.snapBram(); this.input.camYaw = this.hero.yaw;
+    this.heroView.setShown(true); this.bramView.setShown(true);
+    this.titleScreen?.hide(); this.titleActive = false; this.accumulator = 0;
+    this.syncSaveHero(); this.autosave = this.makeAutosave();
+    // A confirmed New game replaces the old save only now, after the playable world has loaded.
+    this.autosave.save('interval');
+    if (previousStatus === 'damaged') this.notice("Your saved game couldn't be read. A new game has started.");
+    if (!currentSettings().display.brightnessSet) this.startBrightnessCheck(() => this.resume());
+    else this.resume();
+  }
+
+  private returnToTitle(): void {
+    if (!this.persistent || this.titleActive) return;
+    // Keep playing if storage refuses the final save: a reload must not discard live progress silently.
+    if (!this.autosave.save('leave')) { this.setPaused(false); return; }
+    window.location.reload();
   }
 
   /** Wick, the village (docs/tasks/003-wick.md). Built once; its light follows the clock every frame. */
@@ -387,7 +449,7 @@ class Valley {
 
   start(): void {
     // The first-start brightness check waits for the village, so the picture has its figure (review 031).
-    if (!this.tour && !currentSettings().display.brightnessSet) this.startBrightnessCheck(() => {}); // tour mode has its own views
+    if (!this.titleActive && !this.tour && !currentSettings().display.brightnessSet) this.startBrightnessCheck(() => {}); // tour mode has its own views
     this.engine.runRenderLoop(() => this.tick());
   }
 
@@ -507,11 +569,11 @@ class Valley {
   private tick(): void {
     this.frame += 1;
     const dt = Math.min(this.engine.getDeltaTime() / 1000, 0.1);
-    if (this.input.takePause()) this.onPauseKey();
-    const next = clockAfterFrame(this.game, dt, VALLEY_CLOCK, clockRuns(this.paused, this.frozen, this.input.isWindowFocused));
+    if (this.input.takePause() && !this.titleActive) this.onPauseKey();
+    const next = clockAfterFrame(this.game, dt, VALLEY_CLOCK, clockRuns(this.paused || this.titleActive, this.frozen, this.input.isWindowFocused));
     this.game.day = next.day;
     this.game.timeOfDay = next.timeOfDay;
-    if (this.paused) {
+    if (this.paused || this.titleActive) {
       // Presses made while paused are dropped, so a stale attack or dodge does not fire on resume.
       this.accumulator = 0;
       this.input.consumeEdges();
@@ -525,10 +587,10 @@ class Valley {
       this.stepHero();
       this.stepBram(T.fixedDt);
     }
-    if (this.persistent && !this.picture && !this.tour) {
+    if (this.persistent && !this.picture && !this.tour && !this.titleActive) {
       this.syncSaveHero();
       const wick = VALLEY_PLACES.wick;
-      this.autosave.advance(this.game, clockRuns(this.paused, this.frozen, this.input.isWindowFocused) ? dt : 0,
+      this.autosave.advance(this.game, clockRuns(this.paused || this.titleActive, this.frozen, this.input.isWindowFocused) ? dt : 0,
         Math.hypot(this.hero.x - wick.x, this.hero.z - wick.z) < 25);
     }
     this.updateView(dt);
@@ -679,14 +741,14 @@ class Valley {
     }
     this.landmarks?.update(dt, L);
     this.wildlife?.update({
-      dt: this.paused ? 0 : dt,
+      dt: this.paused || this.titleActive ? 0 : dt,
       hero: { x: this.hero.x, z: this.hero.z },
       movement: this.paused ? 'still' : this.heroMovement,
       heldPlaces: this.game.places.filter(p => p.status === 'held').map(p => p.id),
     });
     const mill = this.fight.mill.snapshot();
     this.defenders?.update(mill, this.fight.battle.fighters);
-    this.overheard?.update(mill.overheard.caption, !this.picture && !this.paused && !this.chromeHidden);
+    this.overheard?.update(mill.overheard.caption, !this.picture && !this.paused && !this.chromeHidden && !this.titleActive);
     if (this.glow) this.glow.intensity = 0.3 + 0.9 * L.nightness;
     this.heroView.update(this.hero, this.groundY);
     this.bramView.update(this.bram, this.bramGroundY);
@@ -694,6 +756,12 @@ class Valley {
     if (this.picture) {
       this.input.camYaw = this.picture.lookYaw;
       this.input.aimPitch = 0;
+    }
+    if (this.titleActive && !this.picture) {
+      if (this.input.isWindowFocused) this.titleSeconds += dt;
+      this.input.camYaw = titleYaw(this.titleBaseYaw, this.titleSeconds);
+      this.input.aimPitch = 0;
+      this.heroView.setShown(false); this.bramView.setShown(false);
     }
     const pose = valleyCameraPose(
       { x: this.hero.x, y: this.groundY, z: this.hero.z },
@@ -709,7 +777,7 @@ class Valley {
     // The fade rule for fighters between the lens and the hero, or too near the lens.
     this.bramView.fade(blocksView(pose.position, this.hero, this.bram), dt);
     this.captionTime = this.paused ? this.captionTime : Math.max(0, this.captionTime - dt);
-    this.captionEl.hidden = !(this.captionTime > 0 && !this.picture && !this.paused && !this.chromeHidden);
+    this.captionEl.hidden = !(this.captionTime > 0 && !this.picture && !this.paused && !this.chromeHidden && !this.titleActive);
 
     this.updateHud(dt);
   }
@@ -889,6 +957,7 @@ class Valley {
       tod: this.game.timeOfDay,
       day: this.game.day,
       locked: this.input.isLocked,
+      title: this.titleActive,
       paused: this.paused,
       frame: this.frame,
       pausedFrame: this.pausedFrame,

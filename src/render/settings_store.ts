@@ -36,5 +36,5 @@ export function saveSettings(next: Settings, store: { setItem(key: string, value
 }
 
 function browserStore(): Storage | null {
-  return typeof localStorage === 'undefined' ? null : localStorage;
+  try { return typeof localStorage === 'undefined' ? null : localStorage; } catch { return null; }
 }

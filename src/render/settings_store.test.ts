@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readSettings } from './settings_store';
+import { readSettings, currentSettings, saveSettings } from './settings_store';
 import { defaultSettings, SETTINGS_KEY } from '../core/settings/settings';
 import { defaultBindings } from '../core/settings/actions';
 
@@ -41,4 +41,17 @@ describe('readSettings', () => {
     expect(Array.isArray(bindings.keyboard.moveForward)).toBe(true);
     expect(bindings.keyboard.moveForward.length).toBeGreaterThan(0);
   });
+});
+
+// Some browsers deny the localStorage property itself, before any getItem call.
+it('settings still open when access to browser storage itself is denied', () => {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, get() { throw new Error('SecurityError'); } });
+  try {
+    expect(() => currentSettings()).not.toThrow();
+    expect(() => saveSettings(defaultSettings())).not.toThrow();
+  } finally {
+    if (previous) Object.defineProperty(globalThis, 'localStorage', previous);
+    else delete (globalThis as { localStorage?: unknown }).localStorage;
+  }
 });

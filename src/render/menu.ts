@@ -1,5 +1,5 @@
 // The pause menu (docs/writing/interface.md, "Pause menu"). Built so far: Resume, Settings (six pages), and Controls
-// (keyboard and mouse). Copy debug report and Return to title are not built yet.
+// (keyboard and mouse), and Return to title. Copy debug report is not built yet.
 import type { Bindings } from '../core/settings/actions';
 import { ControlsPage } from './controls_page';
 import { SettingsPages, type SoundTarget } from './settings_pages';
@@ -13,7 +13,7 @@ export class PauseMenu {
   private readonly settingsPages: SettingsPages;
   private page: Page = 'menu';
 
-  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void, onBrightness: (b: number) => void, onBrightnessAgain: () => void, audio: SoundTarget) {
+  constructor(uiRoot: HTMLElement, onResume: () => void, onBindings: (b: Bindings) => void, onBrightness: (b: number) => void, onBrightnessAgain: () => void, audio: SoundTarget, onTitle?: () => void) {
     this.root = document.createElement('div');
     // .panel does not set pointer-events, so the menu takes its own clicks; otherwise they reach the canvas and re-request the mouse.
     this.root.className = 'panel pause';
@@ -31,6 +31,8 @@ export class PauseMenu {
       button('Settings', () => this.showSettings()),
       button('Controls', () => this.showControls()),
     );
+    if (onTitle) row.append(button('Return to title', onTitle));
+    row.style.flexWrap = 'wrap';
     this.menuPage.append(row);
 
     // The settings card is one fixed card: its tabs, its rows and its Back button are all in settings_pages.ts.

@@ -124,6 +124,11 @@ export class ValleyFight {
     hero.vx = (hero.x - fromX) / TUNING.fixedDt;
     hero.vz = (hero.z - fromZ) / TUNING.fixedDt;
     hero.y = walkSurfaceAt(hero.x, hero.z);
+    // Named outcomes are durable GameState, not render-only dead fighters. Mercy actions arrive in item 30.
+    if (this.game) for (const [id, member] of this.mill.members) {
+      if (!member.fighter.alive && !this.game.bandits[id]) this.game.bandits[id] = 'dead';
+      else if (!member.fighter.alive && this.game.bandits[id] === 'alive') this.game.bandits[id] = 'dead';
+    }
     this.handleKnockDown();
     this.handleEvents(events);
   }
@@ -234,13 +239,20 @@ export class ValleyFight {
 
   private newMill(): MillEncounter {
     const game = this.game;
-    return new MillEncounter(this.battle, 12, overheardWords, id => {
+    const encounter = new MillEncounter(this.battle, game?.timeOfDay ?? 12, overheardWords, id => {
       if (!game) return;
       if (!game.heardLines.includes(id)) game.heardLines.push(id);
       game.notes = addNote(game.notes, { lineId: id, kind: 'overheard',
         speakers: OVERHEARD.find(o => o.id === id)?.speakers ?? [], place: 'mill', day: game.day });
     }, game ? { read: () => game.speech, write: log => { game.speech = log; },
       now: () => gameHour(game.day, game.timeOfDay) } : undefined);
+    if (game) for (const [id, member] of encounter.members) {
+      const outcome = game.bandits[id];
+      if (outcome && outcome !== 'alive') {
+        member.fighter.alive = false; member.fighter.hp = 0;
+      }
+    }
+    return encounter;
   }
 
   /** World point to CSS pixels on the canvas, for the valley's overheard captions (item 17). */

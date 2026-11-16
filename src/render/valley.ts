@@ -9,6 +9,8 @@ import {
 import { createBattle, makeFighter } from '../core/battle';
 import type { BattleInput, Fighter, FighterKind, Team } from '../core/types';
 import { newGameState } from '../core/state';
+import { Autosave, type SaveReason } from '../core/saves/autosave';
+import { readGame, writeGame } from './game_store';
 import type { GameState } from '../core/types';
 import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED } from '../core/world/valley';
 import { aimAngles, valleyCameraPose, type ValleyCameraRig } from '../core/world/valley_camera';
@@ -78,6 +80,9 @@ export interface ValleyHooks {
   lookAt(x: number, z: number): void;
   project(name: string): { x: number; y: number; w: number; h: number } | null;
   state(): ValleyState;
+  /** Persistence verification hooks. Normal play uses the autosave loop. */
+  savedState(): GameState;
+  saveNow(reason?: SaveReason): boolean;
   /** Capture only: runs the real wildlife rules with a specified hero movement and elapsed time. */
   wildlifeStep(movement: WildlifeFrame['movement'], dt: number): void;
   millState(): ReturnType<ValleyFight['mill']['snapshot']>;
@@ -164,12 +169,23 @@ export async function startValley(canvas: HTMLCanvasElement, uiRoot: HTMLElement
     const assets = await loadAssets(scene, (done, total, label) => {
       hud.setBoot(label, total > 0 ? done / total : 0);
     });
-    const game = newGameState(VALLEY_SEED);
+    // Tour captures are isolated: they neither consume nor overwrite the player's game.
+    const persistent = params.get('tour') !== '1';
+    let loaded = persistent ? readGame(VALLEY_SEED) : { state: newGameState(VALLEY_SEED), status: 'new' as const };
+    if (loaded.status === 'loaded' && (loaded.state.seed !== VALLEY_SEED || loaded.state.hero.regionId !== 'tallowmere'
+      || !insideValley(loaded.state.hero.position.x, loaded.state.hero.position.z)
+      || blocksHero(loaded.state.hero.position.x, loaded.state.hero.position.z))) {
+      logEvent('save', 'saved hero is outside the playable region');
+      loaded = { state: newGameState(VALLEY_SEED), status: 'damaged' };
+    }
+    const game = loaded.state;
     const rawTod = params.get('tod');
     if (rawTod !== null) game.timeOfDay = parseTod(rawTod);
-    const valley = new Valley(engine, scene, uiRoot, assets, game, hud);
+    const valley = new Valley(engine, scene, uiRoot, assets, game, hud, loaded.status === 'loaded', persistent);
     await valley.loadWick();
     valley.start();
+    if (loaded.status === 'damaged') valley.notice("Your saved game couldn't be read. A new game has started.");
+    if (loaded.status === 'unavailable') valley.notice("Couldn't save. Your progress is safe for now, but don't close the page. Copy a debug report from the pause menu.");
     hud.hideBoot();
     logEvent('valley', 'ready');
   } catch (err) {
@@ -241,6 +257,8 @@ class Valley {
   private captionTime = 0;
   private chromeHidden = false;
   private budgetHideFighters = false;
+  private readonly autosave: Autosave;
+  private saveFailed = false;
 
   constructor(
     private readonly engine: Engine,
@@ -249,6 +267,8 @@ class Valley {
     private readonly assets: LoadedAssets,
     private readonly game: GameState,
     hud: Hud,
+    resumed = false,
+    private readonly persistent = true,
     audio: AudioBank = new AudioBank(), // the Sound page's volumes; the same saved values the battle uses
   ) {
     const canvas = engine.getRenderingCanvas() as HTMLCanvasElement;
@@ -289,7 +309,13 @@ class Valley {
 
     this.fight = new ValleyFight(scene, assets, this.shadow, audio, hud, this.camera, canvas, (line) => this.showLine(line, 4), this.game);
     this.overheard = new ValleyOverheard(uiRoot, (x, y, z) => this.fight.screenOf(x, y, z));
-    this.placeHeroAtStart();
+    if (resumed) {
+      this.fight.placeHero(game.hero.position.x, game.hero.position.z);
+      this.hero.maxHp = game.hero.maxHp; this.hero.hp = game.hero.hp; this.hero.alive = game.hero.hp > 0;
+    } else {
+      this.placeHeroAtStart();
+      this.syncSaveHero();
+    }
     this.heroView = new CharacterView(scene, assets, this.hero, this.shadow, 'hero');
     this.heroView.asDesigned(scene, PROPORTIONS); // overnight item 3
     this.groundY = walkSurfaceAt(this.hero.x, this.hero.z);
@@ -332,6 +358,17 @@ class Valley {
       });
       this.tourTo(0);
     }
+    this.autosave = new Autosave(game, () => {
+      if (!this.persistent || this.picture) return false;
+      this.syncSaveHero();
+      return writeGame(this.game);
+    }, (ok, reason) => {
+      logEvent('save', `${reason}: ${ok ? 'saved' : 'failed'}`);
+      if (!ok && !this.saveFailed) this.showLine("Couldn't save. Your progress is safe for now, but don't close the page. Copy a debug report from the pause menu.", 10);
+      if (ok) this.showLine('Saved.', 2);
+      this.saveFailed = !ok;
+    });
+    window.addEventListener('pagehide', () => { if (this.persistent && !this.picture) this.autosave.save('leave'); });
     this.installHooks();
   }
 
@@ -488,6 +525,12 @@ class Valley {
       this.stepHero();
       this.stepBram(T.fixedDt);
     }
+    if (this.persistent && !this.picture && !this.tour) {
+      this.syncSaveHero();
+      const wick = VALLEY_PLACES.wick;
+      this.autosave.advance(this.game, clockRuns(this.paused, this.frozen, this.input.isWindowFocused) ? dt : 0,
+        Math.hypot(this.hero.x - wick.x, this.hero.z - wick.z) < 25);
+    }
     this.updateView(dt);
     // The engine's draw-call counter is cumulative, so the frame's own count is the difference across the render.
     const before = this.drawCallCount();
@@ -499,6 +542,15 @@ class Valley {
     finally { for (const [n, enabled] of hidden) n.setEnabled(enabled); }
     this.lastFrameDrawCalls = this.drawCallCount() - before;
   }
+
+  /** State projection is shared by interval, completed actions and page-exit saves. */
+  private syncSaveHero(): void {
+    this.game.hero.position = { x: this.hero.x, z: this.hero.z };
+    this.game.hero.hp = this.hero.hp;
+    this.game.hero.maxHp = this.hero.maxHp;
+  }
+
+  notice(line: string): void { this.showLine(line, 10); }
 
   private drawCallCount(): number {
     const counters = this.engine as unknown as { _drawCalls?: { current?: number } };
@@ -621,6 +673,10 @@ class Valley {
     this.waterSeconds += dt;
     if (this.scene.activeCamera) this.water?.update(L, this.waterSeconds, this.scene.activeCamera.globalPosition, FOG_START, FOG_END);
     this.wick?.light(L, this.game.timeOfDay);
+    for (const p of this.game.places) {
+      if (p.id === 'mill' || p.id === 'forge' || p.id === 'watch_house')
+        this.landmarks?.setPlace(p.id, p.status === 'freed' ? 'freed' : 'held');
+    }
     this.landmarks?.update(dt, L);
     this.wildlife?.update({
       dt: this.paused ? 0 : dt,
@@ -795,6 +851,8 @@ class Valley {
         return { x: v.x, y: v.y, w: e.getRenderWidth(), h: e.getRenderHeight() };
       },
       state: () => this.snapshot(),
+      savedState: () => { this.syncSaveHero(); return structuredClone(this.game); },
+      saveNow: (reason = 'interval') => this.autosave.save(reason),
       millState: () => this.fight.mill.snapshot(),
       millSpeechState: () => structuredClone({ speech: this.game.speech, heardLines: this.game.heardLines, notes: this.game.notes }),
       millStep: (movement, seconds) => {

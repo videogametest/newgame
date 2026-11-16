@@ -6,6 +6,12 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 06:00 UTC Queue item 26 deployed (Viktor)
+
+- PR #107 regular-merged as `771aa15`; required videogametest noreply author/committer verified, merge tree identical to the gated branch. Pages `43813058370` succeeded (build and deploy) on that commit.
+- Live `scripts/smoke.mjs https://everylitwindow.com/` passed. Image-free live `scripts/item26_capture.mjs` passed all 22 checks, no failures/fallbacks or extra screenshots: real left-mouse arrows, flight hits on all four targets, miss lines by id, rebound B/N/J prompts, old wheel refused, v5 save/Continue resume, and step 4 pending item 27. Placements and held aim remain explicit fixtures, not a walked lesson. Raw: `docs/pr-media/item26-bow-lesson/live/`.
+- Miss lines rotate on one lesson-wide miss count, so the first far miss after a straw miss uses `evening.far.miss.1`. Every-20-minute continuation remains active; next run rechecks guards, item 18, then 27.
+
 ## 2026-11-16 Queue item 26: first evening, the yard and the bow lesson (Viktor, PR #107)
 
 - Branch `feat/item26-bow-lesson` from fresh `9f9a0a1`. Guards checked by the parent at activation 05:02:17 UTC (main idle, prior crons idle, last push 04:23:10 UTC, no item-26 branch/PR). Item 18 remains its recorded design conflict, not implemented. Item 27 (fence, post, lantern, map) not started.

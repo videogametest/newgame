@@ -1,0 +1,14 @@
+{
+  "failures": [],
+  "fallbacks": [],
+  "fixtures": [
+    "Aim held during each shot by re-applying aimBowAt after every mousemove (headless pointer lock reports movement on button events)",
+    "Settings seeded: interact=J, weaponBow=B, arrowNext=N (keyboard); text speed instant; brightness set.",
+    "placeAt her door (synthetic placement; the road is item 25)",
+    "placeAt yard mark (synthetic placement)",
+    "placeAt her door after Continue (synthetic placement; the mark is outside talking reach)",
+    "placeAt yard mark (synthetic placement)"
+  ],
+  "checks": 22,
+  "arrows": 7
+}

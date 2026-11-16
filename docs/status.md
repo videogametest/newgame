@@ -6,6 +6,12 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 09:05 UTC Queue item 27 deployed (Viktor)
+
+- PR #108 regular-merged as `faadc71`; required videogametest noreply author/committer verified, merge tree identical to the gated branch. Pages `43834274737` succeeded on that commit.
+- Live `scripts/smoke.mjs https://everylitwindow.com/` passed. Image-free live `scripts/item27_capture.mjs` passed all 55 checks, no failures/fallbacks or extra screenshots. Settled medium live calls 464/446/270/252/252 (fence views over 300; no same-view baseline/causal claim). Raw: `docs/pr-media/item27-evening-finish/live/`.
+- Fixtures as in the entry below (v5 step-4 save handoff, placeAt/lookAt/aimBowAt); not a walked keyboard playthrough. Item 18 conflict unchanged. Every-20-minute continuation remains active; next run rechecks guards, item 18, then 28.
+
 ## 2026-11-16 Queue item 27: first evening steps 4 to 6 (Viktor, PR pending)
 
 - Branch `feat/item27-evening-finish` from `b733d62`. Guards passed by the parent at activation 06:41:38 UTC. Item 18 untouched (recorded conflict).

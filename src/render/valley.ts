@@ -171,7 +171,13 @@ export async function startValley(canvas: HTMLCanvasElement, uiRoot: HTMLElement
     });
     // Tour captures are isolated: they neither consume nor overwrite the player's game.
     const persistent = params.get('tour') !== '1';
-    const loaded = persistent ? readGame(VALLEY_SEED) : { state: newGameState(VALLEY_SEED), status: 'new' as const };
+    let loaded = persistent ? readGame(VALLEY_SEED) : { state: newGameState(VALLEY_SEED), status: 'new' as const };
+    if (loaded.status === 'loaded' && (loaded.state.seed !== VALLEY_SEED || loaded.state.hero.regionId !== 'tallowmere'
+      || !insideValley(loaded.state.hero.position.x, loaded.state.hero.position.z)
+      || blocksHero(loaded.state.hero.position.x, loaded.state.hero.position.z))) {
+      logEvent('save', 'saved hero is outside the playable region');
+      loaded = { state: newGameState(VALLEY_SEED), status: 'damaged' };
+    }
     const game = loaded.state;
     const rawTod = params.get('tod');
     if (rawTod !== null) game.timeOfDay = parseTod(rawTod);

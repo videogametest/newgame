@@ -21,3 +21,24 @@ describe('local game storage', () => {
     const g = populatedGame(); g.hero.hp = NaN; expect(writeGame(g, store)).toBe(false); expect(text).toBe('previous');
   });
 });
+
+// Real encounter reconstruction, no Babylon scene required.
+import { ValleyFight } from './valley_fight';
+import { createBattle } from '../core/battle';
+import { PATROL_HUT_FIGHT } from '../data/patrol_hut_fight';
+import { valleyBattleGround } from '../core/world/valley_battle';
+import { TUNING } from '../config/tuning';
+describe('live save adapters', () => {
+  it('reconstructed Mill starts at the saved hour and cannot resurrect saved outcomes', () => {
+    const game = populatedGame(); game.places[0].status = 'held'; game.bandits.dob_finch = 'dead';
+    const fight = Object.create(ValleyFight.prototype) as ValleyFight;
+    Object.assign(fight, { game, battle: createBattle(PATROL_HUT_FIGHT, valleyBattleGround()) });
+    const mill = fight['newMill']();
+    expect(mill.members.get('dob_finch')!.fighter.alive).toBe(false);
+    expect(mill.members.get('dob_finch')!.fighter.hp).toBe(0);
+    expect(mill.members.get('odo_varn')!.fighter.alive).toBe(true);
+    mill.advance(fight.battle, game.timeOfDay, game.places[0], 'still', TUNING.fixedDt);
+    expect(mill.members.get('dob_finch')!.fighter.alive).toBe(false);
+    expect(game.speech.lines['overheard.mill.3.0#0']).toBe(130);
+  });
+});

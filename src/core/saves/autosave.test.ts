@@ -31,3 +31,10 @@ describe('autosave triggers', () => {
     a.save('leave'); expect(result).toHaveBeenLastCalledWith(true, 'leave');
   });
 });
+
+it('does not call unrelated clearing or retaking a new capture', () => {
+  const g = newGameState(1); g.places[0].status = 'freed';
+  const write = vi.fn(() => true), a = new Autosave(g, write, vi.fn());
+  g.places[1].status = 'cleared'; a.advance(g, 0); expect(write).not.toHaveBeenCalled();
+  g.places[0].status = 'held'; a.advance(g, 0); expect(write).not.toHaveBeenCalled();
+});

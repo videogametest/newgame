@@ -65,7 +65,9 @@ export function decodeSave(text: string | null, seed: number): SaveRead {
   try {
     const raw: unknown = JSON.parse(text);
     // A current save must be complete. Earlier versions use the existing migration defaults.
-    const candidate = obj(raw) && raw.version === SAVE_VERSION ? raw : migrateSave(raw);
+    if (!obj(raw) || !Number.isSafeInteger(raw.version) || (raw.version as number) < 1 || (raw.version as number) > SAVE_VERSION)
+      return { state: newGameState(seed), status: 'damaged' };
+    const candidate = raw.version === SAVE_VERSION ? raw : migrateSave(raw);
     const state = checkedState(candidate);
     if (state) return { state, status: 'loaded' };
   } catch { /* malformed JSON or invalid older state: recover as a whole, never half-load */ }

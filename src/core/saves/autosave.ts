@@ -22,7 +22,9 @@ export class Autosave {
   /** Rest UI is not built yet. Its completed action calls save('rest'); no pretend rest happens here. */
   advance(state: GameState, dt: number, inTown = false): void {
     const signature = this.captured(state);
-    const capture = signature !== this.signature && state.places.some(p => p.status === 'freed');
+    const previous = signature === this.signature ? null : new Map<string, string>(
+      (JSON.parse(this.signature) as [string, string, number][]).map(([id, status, times]) => [id, `${status}:${times}`]));
+    const capture = previous !== null && state.places.some(p => p.status === 'freed' && previous.get(p.id) !== `freed:${p.timesFreed}`);
     const town = inTown && !this.wasInTown;
     this.wasInTown = inTown;
     if (Number.isFinite(dt) && dt > 0) this.elapsed += dt;

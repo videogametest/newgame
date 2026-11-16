@@ -10,7 +10,7 @@ describe('versioned save boundary', () => {
   });
   it('new game and missing save are distinct from a damaged save', () => {
     expect(decodeSave(null, 3)).toEqual({ state: newGameState(3), status: 'new' });
-    for (const text of ['', '{', 'null', '[]', '42', '{}', '{"version":999,"seed":1}'])
+    for (const text of ['', '{', 'null', '[]', '42', '{}', '{"version":999,"seed":1}', '{"version":0,"seed":1}', '{"version":1.5,"seed":1}'])
       expect(decodeSave(text, 3)).toEqual({ state: newGameState(3), status: 'damaged' });
   });
   it('rejects invalid nested shapes, not just broken JSON', () => {

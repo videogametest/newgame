@@ -6,6 +6,12 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 Queue item 27: first evening steps 4 to 6 (Viktor, PR pending)
+
+- Branch `feat/item27-evening-finish` from `b733d62`. Guards passed by the parent at activation 06:41:38 UTC. Item 18 untouched (recorded conflict).
+- Built: step 4 fence (stealth-core sight/hearing with Hesper as observer, seen lines and restart, marking the existing scarecrow with the marking rule), step 5 post (blade strikes via the battle's strike event + swing arc, harmless thrown turnips dodged by rolling, lesson-local lock on), step 6 gate lantern (lit by interact, melody's first instrument via existing `playLantern`, `hesper.lantern.first`, `evening.map`), and a minimal map on the `map` key (Wick + discovered places + hero; she points at the Mill). Walking away/back with `evening.left`/`evening.back`, skip straight to the lantern, save v6 with v5 migration. Lines by id from docs/writing; prompts from interface.md first-time rows filled with actual keyboard bindings. Hero never hurt (checked in capture). PENDING table now empty.
+- Gates (raw logs `docs/pr-media/item27-evening-finish/gate/`): full vitest, typecheck, build, walk gap, local built smoke on 4193; item25 and item26 captures image-free with v6/step-4/skip-door expectations updated; `scripts/item27_capture.mjs` image-free and with frames. See queue "Decisions taken" and "For the critique" for decisions and shortcomings. Fixtures: a v5 save written from the page's own new game at step 4, placeAt/lookAt/aimBowAt positioning; real remapped keys (Z crouch, B bow, O look closer, U blade, G dodge, L lock, J interact, P map) and real left-mouse strikes; old defaults (C, 1, Space, Tab, E, M) checked to do nothing.
+
 ## 2026-11-16 06:00 UTC Queue item 26 deployed (Viktor)
 
 - PR #107 regular-merged as `771aa15`; required videogametest noreply author/committer verified, merge tree identical to the gated branch. Pages `43813058370` succeeded (build and deploy) on that commit.

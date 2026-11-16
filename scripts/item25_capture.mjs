@@ -172,15 +172,21 @@ try {
   check((await talk()).selected === 1 && await page.locator('.conversation-answers [data-selected="true"]').innerText().then(s => s.includes("I've held")), 'D (move right) selects the second answer');
   await page.keyboard.press('KeyJ'); await lineIs('evening.skip.0');
   check((await talk()).text.startsWith('Have you.') && await page.locator('.conversation-name').innerText() === 'Hesper', 'Skip answer gets evening.skip from Hesper');
-  t = await tut(); check(t.tutorial.choice === 'skip' && t.stepNumber === 6 && /27/.test(t.pending ?? ''), `Skip routes to step 6, pending: ${t.pending}`);
+  t = await tut(); check(t.tutorial.choice === 'skip' && t.stepNumber === 6 && t.pending === null && t.tutorial.lantern.phase === 'intro', `Skip routes to step 6, the lantern (built by item 27): ${t.pending}`);
   await snap('door-skip');
   await page.keyboard.press('KeyJ'); await page.waitForFunction(() => !window.__valley.talkingState().line);
   await V(() => window.__valley.saveNow());
   const saved = await V(() => JSON.parse(localStorage.getItem('everylitwindow.save')));
-  check(saved.version === 5 && saved.tutorial.choice === 'skip' && saved.tutorial.step === 'lantern', 'Saved game (v5) carries the evening');
+  check(saved.version === 6 && saved.tutorial.choice === 'skip' && saved.tutorial.step === 'lantern', 'Saved game (v6) carries the evening');
   await page.reload({ waitUntil: 'load', timeout: 120000 }); await boot();
   await title().getByRole('button', { name: 'Continue', exact: true }).click(); await playing(); await frames(20);
-  t = await tut(); check(t.opening === null && t.tutorial.choice === 'skip' && !(await talk()).available, 'Continue after skip: no opening, no second choice');
+  t = await tut(); check(t.opening === null && t.tutorial.choice === 'skip' && t.choiceOpen === false, 'Continue after skip: no opening, choice closed');
+  // Item 27: at her door after the skip she may repeat the lantern ask, never the arrival or the choice.
+  { await placeAtDoor(); await frames(5); const k0 = await talk();
+    if (k0.available) { await page.keyboard.press('KeyJ'); await frames(3); }
+    const k = await talk(); check(!k.available || (k.line === 'evening.lantern.0' && k.answers.length === 0) || (k0.available === false),
+      `Continue after skip: no second choice; door talk at most repeats evening.lantern (${k.line}, answers ${JSON.stringify(k.answers)})`);
+    check(!k.line || !/^hesper\.arrival|^evening\.choice/.test(k.line), 'No arrival or choice line reopened after skip'); }
 } catch (error) { report.failures.push(String(error.stack ?? error)); }
 finally { await browser.close(); writeFileSync(join(out, images ? 'report.json' : 'report-no-images.json'), JSON.stringify(report, null, 2)); console.log(JSON.stringify({ failures: report.failures, fallbacks: report.fallbacks, walk: report.walk, checks: report.checks.length }, null, 2)); }
 if (report.failures.length) process.exitCode = 1;

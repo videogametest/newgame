@@ -167,7 +167,7 @@ export interface HeroState {
 }
 
 /** Save format version. Bump with a migration when the shape changes (design section 7). */
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 /**
  * The single serialisable game state (design section 7). Terrain and scenery are NOT stored: they come from the seed.

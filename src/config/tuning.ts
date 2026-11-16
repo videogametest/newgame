@@ -28,7 +28,17 @@ const DEFAULTS = {
   /** Item 21: three active minutes between browser saves (untuned). */
   saves: { intervalSeconds: 180 },
   /** Item 25 placeholders: opening line seconds on screen, seconds walked before the sprint prompt, look pixels that count. */
-  tutorial: { openSeconds: 6, sprintAfter: 4, lookPixels: 40 },
+  tutorial: { openSeconds: 6, sprintAfter: 4, lookPixels: 40,
+    /** Item 27 placeholders, none balanced. The fence: metres and seconds (src/core/tutorial/fence.ts). */
+    fence: { startDistance: 6, reach: 1.6, hearing: 9, away: 6, glance: 1.5 },
+    /** The post: strikes and dodges asked for, turnip radius (m), flight and gap (s), lock-on range (m). */
+    post: { strikes: 3, dodges: 3, turnipRadius: 0.8, turnipFlight: 1.1, throwEvery: 2.2, lockRange: 9 },
+    /** Mark: the aim counts as on the scarecrow within this angle (radians) and range (m). */
+    markAngle: 0.12, markRange: 24,
+    /** The yard, as walking away and back sees it: within this many metres of its middle (src/village/yard.ts). */
+    yardRadius: 24,
+    /** Seconds each of her non-modal lines stays up: a base, plus per character. */
+    lineSeconds: 2.2, lineSecondsPerChar: 0.045 },
   /** Item 24 placeholders: metres, radians/second and revealed characters/second. */
   talking: { reach: 3, leaveReach: 6, doorOffset: 5.4, cameraRate: 2.5,
     slow: 24, medium: 42, fast: 72 },

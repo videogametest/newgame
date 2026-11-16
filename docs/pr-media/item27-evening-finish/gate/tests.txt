@@ -1,0 +1,160 @@
+
+ RUN  v2.1.9 /workspace/newgame
+
+ ✓ src/core/combat/enemies.test.ts (29 tests) 9ms
+ ✓ src/core/combat/bandits.test.ts (20 tests) 14ms
+ ✓ src/core/stealth/stealth.test.ts (26 tests) 8ms
+ ✓ src/core/combat/archery.test.ts (17 tests) 7ms
+ ✓ src/core/places/places.test.ts (26 tests) 8ms
+ ✓ src/core/settings/settings.test.ts (30 tests) 16ms
+ ✓ src/core/places/mill_overhear.test.ts (18 tests) 8ms
+ ✓ src/core/progression/perks.test.ts (24 tests) 13ms
+ ✓ src/core/battle_ground.test.ts (14 tests) 66ms
+ ✓ src/data/writing_bandits.test.ts (16 tests) 22ms
+ ✓ src/core/progression/skills.test.ts (27 tests) 29ms
+ ✓ src/core/items/items.test.ts (47 tests) 55ms
+ ✓ src/core/people/people.test.ts (69 tests) 22ms
+ ✓ src/core/tutorial/yard.test.ts (11 tests) 6ms
+ ✓ src/core/world/companion.test.ts (18 tests) 11ms
+ ✓ src/core/economy/economy.test.ts (18 tests) 28ms
+ ✓ src/render/settings_pages_rules.test.ts (20 tests) 24ms
+ ✓ src/core/tutorial/evening_finish.test.ts (19 tests) 16ms
+ ✓ src/audio/music/music.test.ts (17 tests) 39ms
+ ✓ src/core/valley/learns.test.ts (18 tests) 8ms
+ ✓ src/core/world/pathfinding_equivalence.test.ts (3 tests) 153ms
+ ✓ src/core/battle.test.ts (8 tests) 113ms
+ ✓ src/core/stories/stories.test.ts (42 tests) 313ms
+ ✓ src/core/saves/codec.test.ts (8 tests) 14ms
+ ✓ src/core/combat/mercy.test.ts (10 tests) 6ms
+ ✓ src/core/places/reinforcements.test.ts (15 tests) 7ms
+ ✓ src/render/action_state.test.ts (13 tests) 8ms
+ ✓ src/render/controls_rules.test.ts (15 tests) 6ms
+ ✓ src/core/wildlife/wildlife.test.ts (13 tests) 5ms
+ ✓ src/landmarks/landmarks.test.ts (14 tests) 280ms
+ ✓ src/village/village.test.ts (11 tests) 354ms
+ ✓ src/core/combat.test.ts (9 tests) 7ms
+ ✓ src/core/combat/quiver.test.ts (11 tests) 12ms
+ ✓ src/data/evening_finish.test.ts (4 tests) 6ms
+ ✓ src/data/ids.test.ts (8 tests) 9ms
+ ✓ src/core/world/scatter.test.ts (8 tests) 31ms
+ ✓ src/core/places/overheard.test.ts (9 tests) 6ms
+ ✓ src/core/speech/said.test.ts (7 tests) 10ms
+ ✓ src/core/valley/watch.test.ts (6 tests) 5ms
+ ✓ src/core/progression/playthrough.test.ts (20 tests) 69ms
+ ✓ src/core/tutorial/lesson.test.ts (9 tests) 5ms
+ ✓ src/core/types/shared.test.ts (7 tests) 8ms
+ ✓ src/render/valley_gate_parts.test.ts (5 tests) 14ms
+ ✓ src/core/places/day.test.ts (24 tests) 958ms
+   ✓ schedules stay valid > every routine location and every spot used by a schedule is a spot of its place 757ms
+ ✓ src/render/pause.test.ts (7 tests) 9ms
+ ✓ src/data/evening_yard.test.ts (3 tests) 5ms
+ ✓ src/core/open_ended.test.ts (4 tests) 4ms
+ ✓ src/core/world/grading.test.ts (17 tests) 411ms
+ ✓ src/core/world/valley_camera.test.ts (6 tests) 4ms
+ ✓ src/core/notes/notes.test.ts (5 tests) 5ms
+ ✓ src/core/world/walk_gap.test.ts (5 tests) 135ms
+ ✓ src/core/economy/purse-model.test.ts (19 tests) 6ms
+ ✓ src/core/saves/autosave.test.ts (5 tests) 6ms
+ ✓ src/core/world/scenery.test.ts (10 tests) 293ms
+ ✓ src/render/showcase_clips.test.ts (7 tests) 9ms
+ ✓ src/core/sound_map.test.ts (6 tests) 4ms
+ ✓ src/render/lighting.test.ts (13 tests) 20ms
+ ✓ src/core/world/village_solid.test.ts (8 tests) 755ms
+   ✓ Wick is solid > every house is 9 m square and every point inside it blocks the hero 427ms
+ ✓ src/village/yard.test.ts (5 tests) 240ms
+ ✓ src/core/world/clock.test.ts (6 tests) 4ms
+ ✓ src/render/settings_store.test.ts (5 tests) 9ms
+ ✓ src/core/places/lantern.test.ts (13 tests) 7ms
+ ✓ src/core/world/tour.test.ts (6 tests) 231ms
+ ✓ src/core/speech/conversation.test.ts (5 tests) 4ms
+ ✓ src/core/world/pathfinding.test.ts (7 tests) 5ms
+ ✓ src/core/world/terrain.test.ts (6 tests) 4ms
+ ✓ src/data/perks/tallowmere.test.ts (9 tests) 7ms
+ ✓ src/core/progression/pacing.test.ts (4 tests) 4ms
+ ✓ src/render/title_rules.test.ts (5 tests) 18ms
+ ✓ src/render/load_retry.test.ts (4 tests) 10ms
+ ✓ src/core/world/chunks.test.ts (7 tests) 9ms
+ ✓ src/core/combat/blade.test.ts (9 tests) 3ms
+ ✓ src/core/world/valley_battle.test.ts (4 tests) 405ms
+ ✓ src/core/progression/lessons.test.ts (4 tests) 4ms
+ ✓ src/core/world/solids.test.ts (4 tests) 3ms
+ ✓ src/data/evening.test.ts (3 tests) 4ms
+ ✓ src/render/valley_crossings_parts.test.ts (19 tests) 622ms
+   ✓ ford ribbon (review 027 item 2) > meets the east road strip at both ends, vertex for vertex 596ms
+ ✓ src/render/input_rules.test.ts (4 tests) 4ms
+stdout | src/render/character_batch.test.ts > defender body batching > retains every skinned vertex, rig, parent transform and animated pose
+BJS - [08:16:56]: Babylon.js v9.35.0 - Null engine
+
+stdout | src/render/character_batch.test.ts > defender body batching > never joins hidden parts, other rigs, other materials or transformed mounts
+BJS - [08:16:56]: Babylon.js v9.35.0 - Null engine
+
+ ✓ src/core/company/conduct.test.ts (4 tests) 3ms
+ ✓ src/render/sound_settings.test.ts (6 tests) 3ms
+ ✓ src/render/character_batch.test.ts (2 tests) 27ms
+ ✓ src/data/talking.test.ts (4 tests) 251ms
+ ✓ src/core/places/defenders.test.ts (13 tests) 1893ms
+   ✓ patrol legs > every leg of both Mill routes has a walking path 1222ms
+ ✓ src/core/world/valley_markers.test.ts (2 tests) 4ms
+ ✓ src/data/wildlife.test.ts (4 tests) 236ms
+ ✓ src/core/balance.test.ts (2 tests) 158ms
+ ✓ src/render/quality.test.ts (5 tests) 3ms
+ ✓ src/render/occlusion.test.ts (7 tests) 3ms
+ ✓ src/render/valley_sky.test.ts (5 tests) 113ms
+ ✓ src/core/vec.test.ts (4 tests) 3ms
+ ✓ src/render/debug_log.test.ts (2 tests) 3ms
+ ✓ src/core/world/valley_time.test.ts (4 tests) 2ms
+ ✓ src/render/awareness_marker.test.ts (2 tests) 2ms
+ ✓ src/render/game_store.test.ts (4 tests) 241ms
+ ✓ src/core/world/landmark_solid.test.ts (3 tests) 264ms
+ ✓ src/data/mill_lantern.test.ts (3 tests) 261ms
+ ✓ src/render/camera_limits.test.ts (3 tests) 2ms
+stdout | src/render/valley_wildlife.test.ts > valley wildlife integration > circles every held site and hides only a freed site
+BJS - [08:16:57]: Babylon.js v9.35.0 - Null engine
+
+stdout | src/render/valley_wildlife.test.ts > valley wildlife integration > walkers leave birds grounded; a sprint lifts them and leaving resets them
+BJS - [08:16:57]: Babylon.js v9.35.0 - Null engine
+
+stdout | src/render/valley_wildlife.test.ts > valley wildlife integration > geese react to running but not creeping
+BJS - [08:16:57]: Babylon.js v9.35.0 - Null engine
+
+stdout | src/render/valley_wildlife.test.ts > valley wildlife integration > the fox leads quietly, vanishes on sprint and returns only after departure
+BJS - [08:16:57]: Babylon.js v9.35.0 - Null engine
+
+ ✓ src/render/valley_wildlife.test.ts (4 tests) 355ms
+ ✓ src/render/audio_lantern.test.ts (6 tests) 6ms
+ ✓ src/core/world/valley.test.ts (29 tests) 2653ms
+   ✓ Tallowmere terrain (§4) > closes the gate: the soldiers' road is walled at the gate line, the wall blocks the hero, and nothing beyond it is reachable 714ms
+   ✓ Tallowmere terrain (§4) > makes the signal hill the highest ground the hero can stand on, close to its marked top (the rim is higher, and not walkable) 814ms
+   ✓ Tallowmere terrain (§4) > keeps all ground more than 30 m from the signal hill marker lower than the marker 427ms
+ ✓ src/core/world/scenery_landmarks.test.ts (3 tests) 4ms
+stdout | src/render/character_materials.test.ts > shares neutral defender materials, isolates flash/fade, and preserves peers on disposal
+BJS - [08:16:57]: Babylon.js v9.35.0 - Null engine
+
+ ✓ src/render/character_materials.test.ts (1 test) 17ms
+ ✓ src/render/valley_roads.test.ts (9 tests) 718ms
+   ✓ the roads and paths are drawn > every drawn vertex sits just above the ground as the terrain draws it 582ms
+stdout | src/render/shadow_range.test.ts > cuts casters beyond 60 m by world footprint, not a merged origin pivot
+BJS - [08:16:58]: Babylon.js v9.35.0 - Null engine
+
+ ✓ src/render/shadow_range.test.ts (1 test) 11ms
+ ✓ src/render/valley_fight_height.test.ts (1 test) 195ms
+ ✓ src/render/clip_names.test.ts (2 tests) 3ms
+ ✓ src/render/valley_far.test.ts (2 tests) 5ms
+ ✓ src/render/valley_water.test.ts (2 tests) 12ms
+ ✓ src/core/places/mill_encounter.test.ts (12 tests) 4725ms
+   ✓ Mill place integration > keeps the exact seven named defenders, unaware on the ground from creation 641ms
+   ✓ Mill place integration > builds notice through suspicious to alert, using actual sight and heading 1827ms
+   ✓ Mill place integration > the actual combat step does not move a bell runner twice or overwrite sensing 2095ms
+ ✓ src/core/world/pathfinding_valley.test.ts (6 tests) 6795ms
+   ✓ valley paths cross water only at a crossing > wades the ford, the only way over that stretch 740ms
+   ✓ valley paths cross water only at a crossing > has no route across the river when every crossing is closed 966ms
+   ✓ valley paths cross water only at a crossing > crosses the mill bridge 562ms
+   ✓ valley paths cross water only at a crossing > crosses the stepping stones at 0.5 m, where the stones join 324ms
+   ✓ valley path time budget (0.5 m cells, search only) > a route 200 m long is found in under 50 ms 3469ms
+   ✓ valley path time budget (0.5 m cells, search only) > a route 70 m long is found in under 10 ms 733ms
+
+ Test Files  110 passed (110)
+      Tests  1164 passed (1164)
+   Start at  08:16:54
+   Duration  7.59s (transform 4.77s, setup 0ms, collect 26.76s, tests 25.04s, environment 21ms, prepare 5.33s)
+

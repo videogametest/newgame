@@ -5,10 +5,19 @@ import { HESPER, conversationPages } from '../data/talking';
 import { addNote } from '../core/notes/notes';
 import { gameHour, nextLine } from '../core/speech/said';
 import { ConversationBox } from './conversation_box';
-import { advance as advanceEvening, choiceFromAnswer, choiceOpen, roadPrompts, PENDING, STEP_NUMBER, type TutorialEvent } from '../core/tutorial/lesson';
-import { EVENING_CHOICE, EVENING_OPEN, ROAD_PROMPTS, eveningSkipPages, roadPrompt, YARD_MISS_COUNTS, yardIntroPages, yardPage, yardPrompt as yardPromptText } from '../data/evening';
+import { advance as advanceEvening, awaySays, choiceFromAnswer, choiceOpen, currentAsk, IN_YARD, roadPrompts, PENDING, STEP_NUMBER, type TutorialEvent } from '../core/tutorial/lesson';
+import { EVENING_CHOICE, EVENING_OPEN, ROAD_PROMPTS, bramEveningLine, eveningPage, eveningSkipPages, LESSON_LINE_COUNTS, lessonPrompt, roadPrompt, YARD_MISS_COUNTS, yardIntroPages, yardPage, yardPrompt as yardPromptText } from '../data/evening';
 import { arrowStrikes, flightStep, PHASE_LINE, yardPrompt, yardSays, type YardEvent, type YardTarget } from '../core/tutorial/yard';
-import { YARD_MARK, YARD_TARGETS } from '../village/yard';
+import { GATE_LANTERN, HESPER_LOOKS_AWAY, PRACTICE_POST, YARD_MARK, YARD_MIDDLE, YARD_TARGETS } from '../village/yard';
+import { SCARECROW } from '../village/plan';
+import { fencePrompt, fenceSays, glancing, watchYaw, type FenceFrame } from '../core/tutorial/fence';
+import { canLock, postPrompt, postSays, shouldThrow, stepTurnip, turnipAt, type Turnip } from '../core/tutorial/post';
+import { gateLanternLit, lanternSays } from '../core/tutorial/lantern';
+import { mapEntries, nearestHeld, type MapView } from '../core/tutorial/map';
+import { MAP_EXTENT, MAP_SITES } from '../data/map_sites';
+import { MapPanel } from './map_view';
+import { angleDelta } from '../core/vec';
+import { MeshBuilder, StandardMaterial, type Mesh } from '@babylonjs/core';
 import type { Awareness } from '../core/stealth';
 // The valley: open-world slice, step 1. Terrain, sky, water, one hero walking under the day-night clock.
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
@@ -131,10 +140,21 @@ export interface ValleyHooks {
   tutorialState(): { tutorial: GameState['tutorial']; stepNumber: number; pending: string | null; opening: string | null;
     prompts: string[]; choiceOpen: boolean;
     /** Item 26: the yard's targets as the hit test sees them, the arrows being watched, and the last line she said. */
-    yard: { mark: { x: number; z: number }; targets: YardTarget[]; watching: number; lastMiss: { x: number; y: number; z: number } | null; lastLines: string[]; arrow: string } };
+    yard: { mark: { x: number; z: number }; targets: YardTarget[]; watching: number; lastMiss: { x: number; y: number; z: number } | null; lastLines: string[]; arrow: string };
+    /** Item 27: steps 4 to 6 as the game sees them, read by scripts/item27_capture.mjs. */
+    lesson: LessonSnapshot };
+  /** Item 27: the map as drawn now (null while closed), with the sites it shows. */
+  mapState(): { open: boolean; view: MapView; drawnSites: string[]; drawnPoint: string | null };
   /** Capture only: turn the camera and the bow's aim to a point (pitch from height), as moving the mouse would. */
   aimBowAt(x: number, y: number, z: number): void;
 
+}
+export interface LessonSnapshot {
+  scarecrow: { x: number; z: number }; post: { x: number; z: number; radius: number }; gateLantern: { x: number; z: number };
+  yardMiddle: { x: number; z: number }; yardRadius: number; hesper: { x: number; z: number; yaw: number; glancing: boolean };
+  crouched: boolean; movement: string; weapon: string; zooming: boolean; aimOnScarecrow: boolean; locked: boolean;
+  turnip: (Turnip & { at: { x: number; z: number; lift: number } }) | null; turnipsThrown: number;
+  lastLines: string[]; queued: string[]; caption: string | null; gateLanternLit: boolean; gateLanternGlow: number; cue: string; heroHp: number;
 }
 /** Meshes that make up the sky. A pick that passes through these is sky. */
 const SKY_MESHES = new Set(['valley_sky', 'valley_stars', 'valley_sun', 'valley_moon']);
@@ -301,6 +321,20 @@ class Valley {
   /** Where the last watched arrow was last seen before it came down (evidence for a miss). */
   private yardLastMiss: { x: number; y: number; z: number } | null = null;
   private yardLastLines: string[] = [];
+  /** Item 27: her lines away from her door are non-modal captions, one after another; the world never waits. */
+  private readonly lessonQueue: ConversationPage[] = [];
+  private lessonLastLines: string[] = [];
+  private lessonShowing: string | null = null;
+  private turnip: Turnip | null = null;
+  private turnipSince = 0;
+  private turnipsThrown = 0;
+  private turnipMesh: Mesh | null = null;
+  private lessonLocked = false;
+  private aimOnScarecrow = false;
+  private gateCue = 'none';
+  private mapOpen = false;
+  private mapPointed: string | null = null;
+  private mapPanel!: MapPanel;
 
 
   constructor(
@@ -414,6 +448,7 @@ class Valley {
     this.promptEl.className = 'evening-prompts'; this.promptEl.hidden = true;
     this.promptEl.style.cssText = 'position:absolute;left:50%;bottom:24%;transform:translateX(-50%);font:600 17px/1.5 system-ui,sans-serif;color:#ffd98a;text-shadow:0 1px 3px #000;pointer-events:none;text-align:center;white-space:pre-line;';
     uiRoot.append(this.openingEl, this.promptEl);
+    this.mapPanel = new MapPanel(uiRoot);
     this.installHud(uiRoot);
     canvas.addEventListener('pointerdown', () => {
       if (!this.titleActive && !this.picture && !this.input.isLocked && this.fight.status === 'fighting') this.input.requestLock();
@@ -722,6 +757,8 @@ class Valley {
     const interactPressed = this.input.takeActionPressed('interact');
     const arrowNext = this.input.takeActionPressed('arrowNext');
     const arrowPrev = this.input.takeActionPressed('arrowPrev');
+    const lockPressed = this.input.takeActionPressed('lockOn');
+    const mapPressed = this.input.takeActionPressed('map');
     const previousAnswer = this.conversation.current && this.input.takeActionPressed('moveLeft');
     const nextAnswer = this.conversation.current && this.input.takeActionPressed('moveRight');
     const raw = this.input.takeInput();
@@ -749,12 +786,162 @@ class Valley {
     this.game.hero.position = { x: this.hero.x, z: this.hero.z };
     this.groundY = this.hero.y;
     this.stepEvening(live, moving);
+    this.stepLesson(live, lockPressed, mapPressed);
     if (live && previousAnswer) this.conversation.select(-1);
     if (live && nextAnswer) this.conversation.select(1);
     if (live && interactPressed) {
       if (this.conversation.current) this.onAnswer(this.conversation.interact());
-      else if (!this.startTalking()) this.interactLantern();
+      else if (!this.startTalking() && !this.interactGateLantern()) this.interactLantern();
     }
+  }
+
+  // ---------- item 27: the fence, the post, the gate lantern, the map; walking away and back ----------
+  /** One fixed step of steps 4 to 6, from what the hero and the battle actually did this step. */
+  private stepLesson(live: boolean, lockPressed: boolean, mapPressed: boolean): void {
+    if (this.tour || this.titleActive || this.paused || this.picture || !live) return;
+    if (mapPressed) this.mapOpen = !this.mapOpen;
+    const dt = T.fixedDt, hero = { x: this.hero.x, z: this.hero.z };
+    const t = this.game.tutorial;
+    if (IN_YARD.includes(t.step)) {
+      const out = Math.hypot(hero.x - YARD_MIDDLE.x, hero.z - YARD_MIDDLE.z) > T.tutorial.yardRadius;
+      this.lessonEvent({ type: out ? 'leftYard' : 'cameBack' });
+    }
+    this.hesper.yaw = HESPER.yaw;
+    if (this.game.tutorial.away || this.conversation.current) { this.dropTurnip(); return; }
+    const step = this.game.tutorial.step;
+    if (step === 'fence') {
+      if (this.game.tutorial.fence.phase === 'intro') this.lessonEvent({ type: 'fenceOpened' });
+      const frame = this.fenceFrame();
+      this.aimOnScarecrow = frame.aimOnScarecrow;
+      if (this.game.tutorial.fence.phase === 'cross') this.hesper.yaw = watchYaw(this.game.tutorial.fence, frame, T.tutorial.fence);
+      this.lessonEvent({ type: 'fenceStep', frame });
+    } else this.aimOnScarecrow = false;
+    if (this.game.tutorial.step === 'post') {
+      if (this.game.tutorial.post.phase === 'intro') this.lessonEvent({ type: 'postOpened' });
+      const post = { x: PRACTICE_POST.x, z: PRACTICE_POST.z, radius: PRACTICE_POST.radius };
+      if (lockPressed) this.lessonLocked = !this.lessonLocked && canLock(hero, post, T.tutorial.post);
+      if (this.lessonLocked && !canLock(hero, post, T.tutorial.post)) this.lessonLocked = false;
+      if (this.lessonLocked) {
+        // Lock on keeps the eyes on the post: the camera, and so the hero, turn to it.
+        const target = Math.atan2(post.x - hero.x, post.z - hero.z);
+        this.input.camYaw += angleDelta(this.input.camYaw, target) * (1 - Math.exp(-10 * dt));
+      }
+      for (const e of this.fight.lastEvents) if (e.type === 'strike' && e.fighterId === this.hero.id)
+        this.lessonEvent({ type: 'bladeStrike', hero, yaw: this.hero.yaw, post, range: T.sword.range, arc: T.sword.arcHalfAngle, locked: this.lessonLocked });
+      this.stepTurnip(hero, dt);
+    } else { this.lessonLocked = false; this.dropTurnip(); }
+    if (this.game.tutorial.step === 'lantern' && this.game.tutorial.lantern.phase === 'intro') this.lessonEvent({ type: 'lanternAsked' });
+  }
+  private fenceFrame(): FenceFrame {
+    const glanceYaw = Math.atan2(SCARECROW.x - HESPER.x, SCARECROW.z - HESPER.z);
+    const hero = { x: this.hero.x, z: this.hero.z };
+    // The mark rule's focus: the bow out, look-closer held, the aim on the scarecrow and within sight range.
+    const a = aimAngles({ x: SCARECROW.x - hero.x, y: 0, z: SCARECROW.z - hero.z });
+    const aimOn = this.input.isZooming && Math.abs(angleDelta(this.input.camYaw, a.yaw)) <= T.tutorial.markAngle
+      && Math.hypot(SCARECROW.x - hero.x, SCARECROW.z - hero.z) <= T.tutorial.markRange;
+    return { dt: T.fixedDt, hero, movement: this.heroMovement, hesper: { x: HESPER.x, z: HESPER.z },
+      awayYaw: glanceYaw + HESPER_LOOKS_AWAY, glanceYaw, scarecrow: { x: SCARECROW.x, z: SCARECROW.z }, aimOnScarecrow: aimOn };
+  }
+  /** Her turnips: thrown from her door at where the hero stands; harmless, and only while the dodge is asked for. */
+  private stepTurnip(hero: { x: number; z: number }, dt: number): void {
+    const R = T.tutorial.post;
+    const rolling = this.hero.dodgeTime > 0;
+    if (this.turnip) {
+      const r = stepTurnip(this.turnip, dt, rolling, R);
+      this.turnip = r.turnip;
+      if (r.landed) {
+        const landed = this.turnip; this.turnip = null; this.turnipSince = 0;
+        this.lessonEvent({ type: 'turnipLanded', hero, rolling, turnip: landed });
+      }
+    } else if (this.game.tutorial.post.phase === 'dodge') {
+      this.turnipSince += dt;
+      if (shouldThrow(this.game.tutorial.post, false, this.turnipSince, R)) {
+        this.turnip = { from: { x: HESPER.x, z: HESPER.z }, to: { ...hero }, t: 0, rolled: false };
+        this.turnipsThrown++;
+      }
+    }
+    if (this.turnip) this.hesper.yaw = Math.atan2(hero.x - HESPER.x, hero.z - HESPER.z);
+  }
+  private dropTurnip(): void { this.turnip = null; this.turnipSince = 0; }
+  private updateTurnipView(): void {
+    if (!this.turnip) { this.turnipMesh?.setEnabled(false); return; }
+    if (!this.turnipMesh) {
+      this.turnipMesh = MeshBuilder.CreateSphere('lesson_turnip', { diameter: 0.18, segments: 6 }, this.scene);
+      const m = new StandardMaterial('lesson_turnip', this.scene);
+      m.diffuseColor = new Color3(0.85, 0.78, 0.82); m.specularColor = Color3.Black();
+      this.turnipMesh.material = m;
+    }
+    const p = turnipAt(this.turnip, T.tutorial.post);
+    this.turnipMesh.position.set(p.x, walkSurfaceAt(p.x, p.z) + 1.3 + p.lift, p.z);
+    this.turnipMesh.setEnabled(true);
+  }
+  /** One lesson event for steps 4 to 6 or walking away: the state moves, she says what the writing gives her for it. */
+  private lessonEvent(e: TutorialEvent): void {
+    const before = this.game.tutorial;
+    const after = advanceEvening(before, e);
+    if (after === before) return;
+    this.game.tutorial = after;
+    const C = LESSON_LINE_COUNTS;
+    const says = [...awaySays(before, after, C.back), ...fenceSays(before.fence, after.fence, C.fenceSeen),
+      ...postSays(before.post, after.post, C.postHit), ...lanternSays(before.lantern, after.lantern, C.lanternFirst)];
+    const pages = says.map(l => eveningPage(l.group, l.index));
+    // Coming back, she says what she is asking for now.
+    if (before.away && !after.away) { const ask = currentAsk(after); if (ask) pages.push(eveningPage(ask.group, ask.index)); }
+    // A miss or being seen is said at once, ahead of anything waiting.
+    if (says.length && /\.(seen|hit)$/.test(says[0].group)) { this.lessonQueue.length = 0; this.captionTime = 0; }
+    for (const p of pages) this.lessonQueue.push(p);
+    const bram = before.fence.phase !== 'done' && after.fence.phase === 'done' ? bramEveningLine('fence')
+      : before.post.phase !== 'done' && after.post.phase === 'done' ? bramEveningLine('post') : null;
+    // Bram, from the fence: one line for the step, after hers, only on a success.
+    if (bram) this.lessonQueue.push({ id: 'bram.evening', speaker: 'bram', name: 'Bram', text: bram });
+    if (pages.length) {
+      this.lessonLastLines = pages.map(p => p.id);
+      logEvent('tutorial', `lesson ${e.type}: ${this.lessonLastLines.join(', ')}`);
+    }
+    const moved = before.step !== after.step || before.away !== after.away || before.fence.phase !== after.fence.phase
+      || before.post.phase !== after.post.phase || before.lantern.phase !== after.lantern.phase;
+    if (moved && this.persistent && !this.tour) this.autosave.save('interval');
+  }
+  /** Her waiting lines, one at a time, each for a while that grows with its length. Held while a talk is open. */
+  private updateLessonLines(): void {
+    if (this.conversation.current || this.captionTime > 0 || !this.lessonQueue.length) {
+      if (this.captionTime <= 0) this.lessonShowing = null;
+      return;
+    }
+    const page = this.lessonQueue.shift()!;
+    this.lessonShowing = page.id;
+    this.showLine(`${page.name}: "${page.text}"`, T.tutorial.lineSeconds + page.text.length * T.tutorial.lineSecondsPerChar);
+    const said = nextLine(this.game.speech, { speaker: page.speaker, group: page.id, count: 1,
+      now: gameHour(this.game.day, this.game.timeOfDay), urgent: true });
+    if (said) this.game.speech = said.log;
+    if (page.id === 'evening.map.0') this.openMapForHer();
+  }
+  /** "Here's the valley as it was. The Mill is nearest." She opens the map and points to the nearest held place. */
+  private openMapForHer(): void {
+    const near = nearestHeld({ x: GATE_LANTERN.x, z: GATE_LANTERN.z }, this.game, MAP_SITES);
+    for (const id of ['wick', ...(near ? [near.id] : [])])
+      if (!this.game.discoveredPlaces.includes(id)) this.game.discoveredPlaces = [...this.game.discoveredPlaces, id];
+    this.mapPointed = near?.id ?? null;
+    this.mapOpen = true;
+    this.lessonEvent({ type: 'mapShown' });
+    if (this.persistent && !this.tour) this.autosave.save('interval');
+  }
+  private mapView(): MapView {
+    return { hero: { x: this.hero.x, z: this.hero.z }, entries: mapEntries(this.game, MAP_SITES), pointed: this.mapPointed, extent: MAP_EXTENT };
+  }
+  /** Step 6: the hero lights the small lantern at her gate; the melody's first instrument, or its caption. */
+  private interactGateLantern(): boolean {
+    if (this.titleActive || this.paused || this.picture || this.conversation.current || !this.hero.alive) return false;
+    const before = this.game.tutorial.lantern;
+    this.lessonEvent({ type: 'lanternLit', hero: { x: this.hero.x, z: this.hero.z }, lantern: GATE_LANTERN, reach: T.mill.lanternReach });
+    if (this.game.tutorial.lantern === before) return false;
+    logEvent('tutorial', 'gate lantern lit');
+    this.gateCue = 'loading';
+    void this.audio.playLantern().then(played => { this.gateCue = played ? 'harp' : 'caption'; });
+    return true;
+  }
+  private nearGateLantern(): boolean {
+    return Math.hypot(this.hero.x - GATE_LANTERN.x, this.hero.z - GATE_LANTERN.z) <= T.mill.lanternReach;
   }
 
   /** Item 25: road-in events from what the player actually did this step. */
@@ -787,6 +974,11 @@ class Valley {
       conversationPages({ source: 'hesper', group }, HESPER.id, HESPER.name));
     const unheard = all.filter(l => this.game.speech.lines[`${l.id}#0`] === undefined);
     if (!choiceOpen(this.game.tutorial) && this.game.tutorial.step === 'yard' && !this.tour) return this.yardPages();
+    if (!choiceOpen(this.game.tutorial) && ['fence', 'post', 'lantern'].includes(this.game.tutorial.step) && !this.tour) {
+      // Steps 4 to 6 are said where they happen (non-modal lines); at her door she repeats what she is asking for.
+      const ask = currentAsk(this.game.tutorial);
+      return ask && !this.lessonQueue.length && !this.lessonShowing ? [eveningPage(ask.group, ask.index)] : [];
+    }
     if (!choiceOpen(this.game.tutorial) || this.tour) return unheard;
     // Everything heard but the choice unanswered (left mid-talk, or an older save): her last line asks again.
     const pages = unheard.length ? unheard : all.slice(-1);
@@ -884,9 +1076,43 @@ class Valley {
       const line = kind && yardPromptText(kind, b, 'keyboard');
       return line ? [line] : [];
     }
+    const t = this.game.tutorial;
+    if (t.away) return [];
+    if (t.step === 'fence') {
+      const kind = fencePrompt(t.fence, this.hero.weapon === 'bow', this.crouched);
+      const line = kind === 'bow' ? yardPromptText('bow', b, 'keyboard') : kind ? lessonPrompt(kind, b, 'keyboard') : null;
+      return line ? [line] : [];
+    }
+    if (t.step === 'post') {
+      const kind = postPrompt(t.post, this.hero.weapon === 'sword', this.lessonLocked);
+      const line = kind ? lessonPrompt(kind, b, 'keyboard') : null;
+      return line ? [line] : [];
+    }
+    if (t.step === 'lantern') {
+      if (t.lantern.phase !== 'light' || !this.nearGateLantern()) return [];
+      const key = fillPrompt('{interact}', b, 'keyboard');
+      return [key ? `${key} ${LANTERN_WORDS.prompt}` : LANTERN_WORDS.prompt];
+    }
+    if (t.step === 'done' && this.mapOpen) { const line = lessonPrompt('map', b, 'keyboard'); return line ? [line] : []; }
     return roadPrompts(this.game.tutorial, T.tutorial.sprintAfter)
       .map(k => k === 'look' ? ROAD_PROMPTS.look : roadPrompt(k, b, 'keyboard'))
       .filter((l): l is string => !!l);
+  }
+
+  private lessonSnapshot(): LessonSnapshot {
+    const f = this.game.tutorial.fence, R = T.tutorial.fence;
+    const glow = (this.scene.getMaterialByName('wick_gate_lantern_glow') as StandardMaterial | null)?.emissiveColor;
+    return {
+      scarecrow: { x: SCARECROW.x, z: SCARECROW.z }, post: { x: PRACTICE_POST.x, z: PRACTICE_POST.z, radius: PRACTICE_POST.radius },
+      gateLantern: { x: GATE_LANTERN.x, z: GATE_LANTERN.z }, yardMiddle: { ...YARD_MIDDLE }, yardRadius: T.tutorial.yardRadius,
+      hesper: { x: HESPER.x, z: HESPER.z, yaw: this.hesper.yaw, glancing: this.game.tutorial.step === 'fence' && f.phase === 'cross' && glancing(f.clock, R) },
+      crouched: this.crouched, movement: this.heroMovement, weapon: this.hero.weapon, zooming: this.input.isZooming,
+      aimOnScarecrow: this.aimOnScarecrow, locked: this.lessonLocked,
+      turnip: this.turnip ? { ...this.turnip, at: turnipAt(this.turnip, T.tutorial.post) } : null, turnipsThrown: this.turnipsThrown,
+      lastLines: [...this.lessonLastLines], queued: this.lessonQueue.map(p => p.id),
+      caption: this.captionEl.hidden ? null : this.captionEl.textContent, gateLanternLit: gateLanternLit(this.game.tutorial.lantern),
+      gateLanternGlow: glow ? glow.r + glow.g + glow.b : 0, cue: this.gateCue, heroHp: this.hero.hp,
+    };
   }
 
   private interactLantern(): boolean {
@@ -953,6 +1179,10 @@ class Valley {
       fillPrompt('{interact}', currentSettings().bindings, 'keyboard'), text.textSize);
     this.hesperView.setShown(!this.picture && !this.titleActive);
     this.updateEvening(dt, talkAllowed);
+    if (talkAllowed && !this.tour) this.updateLessonLines();
+    this.updateTurnipView();
+    this.mapPanel.update(this.mapView(), this.mapOpen && talkAllowed && !this.chromeHidden && !this.tour,
+      lessonPrompt('map', currentSettings().bindings, 'keyboard') ?? '');
     this.hesperView.update(this.hesper, this.hesper.y);
     const L = lightingAt(this.game.timeOfDay);
     this.hemi.diffuse = L.hemiColor;
@@ -969,6 +1199,7 @@ class Valley {
     this.waterSeconds += dt;
     if (this.scene.activeCamera) this.water?.update(L, this.waterSeconds, this.scene.activeCamera.globalPosition, FOG_START, FOG_END);
     this.wick?.light(L, this.game.timeOfDay, this.game.places.some(p => p.id === 'mill' && p.timesFreed > 0));
+    this.wick?.gateLantern(gateLanternLit(this.game.tutorial.lantern), L.nightness);
     for (const p of this.game.places) {
       if (p.id === 'mill' || p.id === 'forge' || p.id === 'watch_house')
         this.landmarks?.setPlace(p.id, p.status === 'freed' ? 'freed' : 'held');
@@ -1180,7 +1411,13 @@ class Valley {
         pending: PENDING[this.game.tutorial.step] ?? null, opening: this.openingEl.hidden ? null : this.openingEl.textContent,
         prompts: this.promptEl.hidden ? [] : this.eveningPrompts(), choiceOpen: choiceOpen(this.game.tutorial),
         yard: { mark: { ...YARD_MARK }, targets: this.yardTargets.map(t => ({ ...t })), watching: this.yardArrows.size, lastMiss: this.yardLastMiss,
-          lastLines: [...this.yardLastLines], arrow: this.game.tutorial.yard.arrow } }),
+          lastLines: [...this.yardLastLines], arrow: this.game.tutorial.yard.arrow },
+        lesson: this.lessonSnapshot() }),
+      mapState: () => {
+        const drawn = [...this.mapPanel.el.querySelectorAll('[data-map-site]')].map(n => n.getAttribute('data-map-site') ?? '');
+        const point = this.mapPanel.el.querySelector('[data-map-point]')?.getAttribute('data-map-point') ?? null;
+        return { open: !this.mapPanel.el.hidden, view: this.mapView(), drawnSites: this.mapPanel.el.hidden ? [] : drawn, drawnPoint: this.mapPanel.el.hidden ? null : point };
+      },
       aimBowAt: (x, y, z) => {
         const hp = this.hero;
         const a = aimAngles({ x: x - hp.x, y: y - (hp.y + T.bow.muzzleHeight), z: z - hp.z });

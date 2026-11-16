@@ -16,3 +16,13 @@ export const STRAW_TARGETS: readonly YardSpot[] = [
 /** By the wall, about 17 m from the mark. */
 export const FAR_TARGET: YardSpot = { id: FAR_ID, x: 107.5, z: 102.5, radius: 0.45, height: 1.8 };
 export const YARD_TARGETS: readonly YardSpot[] = [...STRAW_TARGETS, FAR_TARGET];
+
+// Item 27, steps 4 to 6. The scarecrow (step 4) is already placed: SCARECROW in ./plan.ts.
+/** Step 5: the practice post, a bare stake east of her door, clear of the straw men and the line to the far one. */
+export const PRACTICE_POST = { id: 'post', x: 94.5, z: 101.5, radius: 0.15, height: 1.6 } as const;
+/** Step 6: the small lantern at her gate, on a post where the yard meets the lane to the south gate. */
+export const GATE_LANTERN = { x: 91.6, z: 108.6, height: 1.5 } as const;
+/** Her yard, for walking away and coming back: everything within TUNING.tutorial.yardRadius of this point. */
+export const YARD_MIDDLE = { x: 93, z: 104 } as const;
+/** Her watch during the fence: she looks this far round from the scarecrow (radians), and glances back at it. */
+export const HESPER_LOOKS_AWAY = Math.PI * 0.8;

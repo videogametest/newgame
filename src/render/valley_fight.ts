@@ -5,6 +5,7 @@
 import { Camera, Matrix, Scene, ShadowGenerator, Vector3 } from '@babylonjs/core';
 import { TUNING } from '../config/tuning';
 import { MillEncounter } from '../core/places/mill_encounter';
+import { clearPlaceIfGarrisonDown } from '../core/places/clearing';
 import type { OverheardWords } from '../core/places/mill_overhear';
 import { writtenOverheard } from '../data/writing_bandits';
 import { gameHour } from '../core/speech/said';
@@ -98,6 +99,18 @@ export class ValleyFight {
   }
 
   /**
+   * Every frame, battle or not: named outcomes become durable GameState, and the Mill is cleared once
+   * every defender is down. Lighting its lantern is what frees it. Mercy actions arrive in item 30.
+   */
+  settleBandits(): void {
+    if (!this.game) return;
+    for (const [id, member] of this.mill.members) {
+      if (!member.fighter.alive && this.game.bandits[id] !== 'dead') this.game.bandits[id] = 'dead';
+    }
+    clearPlaceIfGarrisonDown(this.game, 'mill');
+  }
+
+  /**
    * One fixed step of the fight. The battle moves the hero from the input; a step onto ground the walk
    * rules forbid (water, a solid, a slope too steep, past the valley edge) is undone.
    */
@@ -127,11 +140,6 @@ export class ValleyFight {
     hero.vx = (hero.x - fromX) / TUNING.fixedDt;
     hero.vz = (hero.z - fromZ) / TUNING.fixedDt;
     hero.y = walkSurfaceAt(hero.x, hero.z);
-    // Named outcomes are durable GameState, not render-only dead fighters. Mercy actions arrive in item 30.
-    if (this.game) for (const [id, member] of this.mill.members) {
-      if (!member.fighter.alive && !this.game.bandits[id]) this.game.bandits[id] = 'dead';
-      else if (!member.fighter.alive && this.game.bandits[id] === 'alive') this.game.bandits[id] = 'dead';
-    }
     this.handleKnockDown();
     this.handleEvents(events);
   }

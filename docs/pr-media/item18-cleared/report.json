@@ -1,0 +1,29 @@
+{
+  "checks": [
+    {
+      "passed": true,
+      "message": "six down and one alive keeps the Mill held (got held)"
+    },
+    {
+      "passed": true,
+      "message": "all seven down: the real loop clears the Mill"
+    },
+    {
+      "passed": true,
+      "message": "cleared Mill: the lantern is available from the hero position"
+    },
+    {
+      "passed": true,
+      "message": "interactLantern lights the cleared Mill"
+    },
+    {
+      "passed": true,
+      "message": "lit lantern frees the Mill (got freed, timesFreed 1)"
+    },
+    {
+      "passed": true,
+      "message": "after reload the Mill is still freed (got freed, timesFreed 1)"
+    }
+  ],
+  "failures": []
+}

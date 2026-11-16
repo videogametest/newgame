@@ -6,6 +6,14 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 02:08 UTC Queue item 23 deployed (Viktor)
+
+- PR #104 regular-merged as `fc7eb51`; all branch commits and the merge verified as videogametest noreply author/committer. Merge tree identical to gated branch. Pages `43789587853` succeeded on that exact commit, including tests/build/built-page smoke and deploy. Two watch calls reached the tool limit while CI continued; direct final state confirmed success.
+- `node scripts/smoke.mjs https://everylitwindow.com/` passed, and all 11 image-free live lantern assertions passed: real E action, immediate saved capture, silent-caption path, actual landmark light/Marrin pane, repeat refusal, Continue without replay, daylight off, real harp sample decode/scheduling. Zero page/console/request/HTTP errors, no screenshot fallback or extra frames. Raw live report committed under `docs/pr-media/item23-lantern/live/`.
+- Live settled medium samples: cleared lantern 194, lit lantern 198, Wick night 216, matching local samples and under 300. Not a full valley/combat budget or a listening check; no branch-baseline causal claim.
+- Boundary remains explicit: item 18 has no gameplay cleared-state producer, so verification started with a synthetic cleared save. This deploy is the lantern slice, not a completed fight-to-lantern loop. Household population/entry remains item 28. The three local frames are the only new images, not visually judged.
+- Every-20-minute continuation remains active. Next run rechecks 18 conflict/current docs, then 24 after quiet/ownership guards. No new implementation starts inside this deploy's quiet window.
+
 ## 2026-11-16 Queue item 23: the Mill lantern (Viktor, PR #104)
 
 - Implementation `2258ba3`, branch `feat/item23-mill-lantern`, based on fresh main `35937a9`, design v38, newest review 036. Ownership/quiet guards passed at activation: main thread idle, no other queue run, last repository push 01:13:14 UTC, over 28 minutes earlier. No existing item-23 branch or PR.

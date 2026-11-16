@@ -1,0 +1,1085 @@
+{
+  "fixture": "Synthetic cleared place; queue 18 producer absent. No keyboard combat playthrough.",
+  "checks": [
+    {
+      "passed": true,
+      "message": "Cleared fixture has an available unlit lantern, no recovered window"
+    },
+    {
+      "passed": true,
+      "message": "Actual nearest recovery pane belongs to the Marrins"
+    },
+    {
+      "passed": true,
+      "message": "Actual E input captures once and autosaves immediately"
+    },
+    {
+      "passed": true,
+      "message": "Muted music uses the authored visible freed caption"
+    },
+    {
+      "passed": true,
+      "message": "Actual nighttime window pane and landmark light turn on"
+    },
+    {
+      "passed": true,
+      "message": "A second interaction cannot recapture or replay the cue"
+    },
+    {
+      "passed": true,
+      "message": "Continue reconstructs the lit landmark and window without replaying music"
+    },
+    {
+      "passed": true,
+      "message": "Continue keeps the capture count"
+    },
+    {
+      "passed": true,
+      "message": "Recovered window switches off during daylight"
+    },
+    {
+      "passed": true,
+      "message": "Sound-enabled fixture accepts the same ritual"
+    },
+    {
+      "passed": true,
+      "message": "Existing CC0 harp samples decode and written score schedules in real Web Audio (not a listening check)"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [],
+  "snapshots": [
+    {
+      "name": "cleared",
+      "world": {
+        "x": -170.65,
+        "z": 63,
+        "groundY": 5.933802441595586,
+        "yaw": -1.9138202672156002,
+        "tod": 22.007581999999996,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 82,
+        "pausedFrame": null,
+        "chunks": 104,
+        "chunkBuilds": 116,
+        "fps": 14,
+        "drawCalls": 194,
+        "activeMeshes": 85,
+        "bram": {
+          "x": -168.15,
+          "z": 62,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -170.65,
+            "z": 63,
+            "groundY": 5.933802441595586,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 100,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "lantern": {
+        "position": {
+          "x": -170.65,
+          "z": 63
+        },
+        "available": true,
+        "windowHouse": "marrin",
+        "windowOn": false,
+        "windowRendered": false,
+        "lanternIntensity": 0,
+        "cue": "none"
+      },
+      "game": {
+        "version": 3,
+        "seed": 1066,
+        "timeOfDay": 22.007581999999996,
+        "day": 1,
+        "hero": {
+          "position": {
+            "x": -170.65,
+            "z": 63
+          },
+          "hp": 100,
+          "maxHp": 100,
+          "regionId": "tallowmere"
+        },
+        "progression": {
+          "skills": {
+            "archery": {
+              "level": 1,
+              "xp": 0
+            },
+            "melee": {
+              "level": 1,
+              "xp": 0
+            },
+            "toughness": {
+              "level": 1,
+              "xp": 0
+            },
+            "stealth": {
+              "level": 1,
+              "xp": 0
+            },
+            "leadership": {
+              "level": 1,
+              "xp": 0
+            },
+            "gathering": {
+              "level": 1,
+              "xp": 0
+            },
+            "fletching": {
+              "level": 1,
+              "xp": 0
+            },
+            "cooking": {
+              "level": 1,
+              "xp": 0
+            },
+            "smithing": {
+              "level": 1,
+              "xp": 0
+            }
+          },
+          "rank": "apprentice",
+          "regionCap": 20,
+          "perks": {},
+          "equipped": [],
+          "sets": [],
+          "repeats": {},
+          "overflowBank": {
+            "archery": 0,
+            "melee": 0,
+            "toughness": 0,
+            "stealth": 0,
+            "leadership": 0,
+            "gathering": 0,
+            "fletching": 0,
+            "cooking": 0,
+            "smithing": 0
+          }
+        },
+        "inventory": {
+          "carried": [],
+          "stored": [],
+          "unseen": [],
+          "soldStolen": [],
+          "recipes": [
+            "arrows_bronze",
+            "arrow_blunt",
+            "shafts",
+            "smoked_perch",
+            "charcoal",
+            "bronze",
+            "bronze_blade",
+            "bronze_helmet",
+            "bronze_jerkin",
+            "bronze_shield"
+          ]
+        },
+        "purse": {
+          "carried": 0,
+          "stored": 0
+        },
+        "incomePaidThrough": 1,
+        "gatheredOn": {},
+        "lastCartStopped": false,
+        "quiver": {
+          "capacity": 24,
+          "arrows": {
+            "standard": 0,
+            "fire": 0,
+            "blunt": 0,
+            "whistling": 0
+          }
+        },
+        "arrowsInWorld": [],
+        "company": [],
+        "places": [
+          {
+            "id": "mill",
+            "status": "cleared",
+            "timesFreed": 0,
+            "bellSilenced": false,
+            "morale": 1
+          },
+          {
+            "id": "forge",
+            "status": "held",
+            "timesFreed": 0,
+            "bellSilenced": false,
+            "morale": 1
+          },
+          {
+            "id": "watch_house",
+            "status": "held",
+            "timesFreed": 0,
+            "bellSilenced": false,
+            "morale": 1
+          }
+        ],
+        "households": [
+          {
+            "id": "hesper",
+            "home": true,
+            "homeSince": 0
+          },
+          {
+            "id": "maren",
+            "home": false
+          },
+          {
+            "id": "marrins",
+            "home": false
+          },
+          {
+            "id": "aldrics",
+            "home": false
+          },
+          {
+            "id": "sedges",
+            "home": false
+          },
+          {
+            "id": "pikes",
+            "home": false
+          },
+          {
+            "id": "wains",
+            "home": false
+          },
+          {
+            "id": "kettles",
+            "home": false
+          },
+          {
+            "id": "brands",
+            "home": false
+          },
+          {
+            "id": "oona",
+            "home": false
+          },
+          {
+            "id": "hollins",
+            "home": false
+          },
+          {
+            "id": "tolleys",
+            "home": false
+          },
+          {
+            "id": "ashbys",
+            "home": false
+          },
+          {
+            "id": "loomises",
+            "home": false
+          },
+          {
+            "id": "dunns",
+            "home": false
+          },
+          {
+            "id": "rudds",
+            "home": false
+          }
+        ],
+        "openedChests": [],
+        "discoveredPlaces": [],
+        "fragmentsFound": [],
+        "bandits": {
+          "harl_gadd": "dead",
+          "dob_finch": "dead",
+          "wyll_carrow": "dead",
+          "bran_oakes": "dead",
+          "nessa_roke": "dead",
+          "pim": "dead",
+          "odo_varn": "dead"
+        },
+        "lostPeople": [],
+        "trialsPassed": [],
+        "stolenGoodsReturned": [],
+        "projectsBuilt": [],
+        "campfiresFound": [],
+        "storyMoments": [],
+        "heardLines": [],
+        "takings": [],
+        "stories": {
+          "miller": {
+            "stage": "closed",
+            "since": 0
+          },
+          "striker": {
+            "stage": "closed",
+            "since": 0
+          },
+          "tally": {
+            "stage": "closed",
+            "since": 0
+          },
+          "thatcher": {
+            "stage": "closed",
+            "since": 0
+          },
+          "maren": {
+            "stage": "closed",
+            "since": 0
+          }
+        },
+        "lastThread": null,
+        "notes": [],
+        "speech": {
+          "lines": {},
+          "speakers": {},
+          "last": null
+        },
+        "boundBandits": [],
+        "lessonsTaken": [],
+        "watch": {
+          "won": 0,
+          "lastDay": null,
+          "tonight": null
+        }
+      }
+    },
+    {
+      "name": "lit",
+      "world": {
+        "x": -170.65,
+        "z": 63,
+        "groundY": 5.933802441595586,
+        "yaw": -1.9138202672156002,
+        "tod": 22.007581999999996,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 96,
+        "pausedFrame": null,
+        "chunks": 104,
+        "chunkBuilds": 116,
+        "fps": 11,
+        "drawCalls": 198,
+        "activeMeshes": 87,
+        "bram": {
+          "x": -168.444306629105,
+          "z": 62.4527511546809,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": -170.65,
+            "z": 63,
+            "groundY": 5.933802441595586,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 100,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "lantern": {
+        "position": {
+          "x": -170.65,
+          "z": 63
+        },
+        "available": false,
+        "windowHouse": "marrin",
+        "windowOn": true,
+        "windowRendered": true,
+        "lanternIntensity": 9,
+        "cue": "caption"
+      },
+      "game": {
+        "version": 3,
+        "seed": 1066,
+        "timeOfDay": 22.007581999999996,
+        "day": 1,
+        "hero": {
+          "position": {
+            "x": -170.65,
+            "z": 63
+          },
+          "hp": 100,
+          "maxHp": 100,
+          "regionId": "tallowmere"
+        },
+        "progression": {
+          "skills": {
+            "archery": {
+              "level": 1,
+              "xp": 0
+            },
+            "melee": {
+              "level": 1,
+              "xp": 0
+            },
+            "toughness": {
+              "level": 1,
+              "xp": 0
+            },
+            "stealth": {
+              "level": 1,
+              "xp": 0
+            },
+            "leadership": {
+              "level": 1,
+              "xp": 0
+            },
+            "gathering": {
+              "level": 1,
+              "xp": 0
+            },
+            "fletching": {
+              "level": 1,
+              "xp": 0
+            },
+            "cooking": {
+              "level": 1,
+              "xp": 0
+            },
+            "smithing": {
+              "level": 1,
+              "xp": 0
+            }
+          },
+          "rank": "apprentice",
+          "regionCap": 20,
+          "perks": {},
+          "equipped": [],
+          "sets": [],
+          "repeats": {},
+          "overflowBank": {
+            "archery": 0,
+            "melee": 0,
+            "toughness": 0,
+            "stealth": 0,
+            "leadership": 0,
+            "gathering": 0,
+            "fletching": 0,
+            "cooking": 0,
+            "smithing": 0
+          }
+        },
+        "inventory": {
+          "carried": [],
+          "stored": [],
+          "unseen": [],
+          "soldStolen": [],
+          "recipes": [
+            "arrows_bronze",
+            "arrow_blunt",
+            "shafts",
+            "smoked_perch",
+            "charcoal",
+            "bronze",
+            "bronze_blade",
+            "bronze_helmet",
+            "bronze_jerkin",
+            "bronze_shield"
+          ]
+        },
+        "purse": {
+          "carried": 0,
+          "stored": 0
+        },
+        "incomePaidThrough": 1,
+        "gatheredOn": {},
+        "lastCartStopped": false,
+        "quiver": {
+          "capacity": 24,
+          "arrows": {
+            "standard": 0,
+            "fire": 0,
+            "blunt": 0,
+            "whistling": 0
+          }
+        },
+        "arrowsInWorld": [],
+        "company": [],
+        "places": [
+          {
+            "id": "mill",
+            "status": "freed",
+            "timesFreed": 1,
+            "bellSilenced": false,
+            "morale": 1,
+            "freedDay": 1
+          },
+          {
+            "id": "forge",
+            "status": "held",
+            "timesFreed": 0,
+            "bellSilenced": false,
+            "morale": 1
+          },
+          {
+            "id": "watch_house",
+            "status": "held",
+            "timesFreed": 0,
+            "bellSilenced": false,
+            "morale": 1
+          }
+        ],
+        "households": [
+          {
+            "id": "hesper",
+            "home": true,
+            "homeSince": 0
+          },
+          {
+            "id": "maren",
+            "home": false
+          },
+          {
+            "id": "marrins",
+            "home": false
+          },
+          {
+            "id": "aldrics",
+            "home": false
+          },
+          {
+            "id": "sedges",
+            "home": false
+          },
+          {
+            "id": "pikes",
+            "home": false
+          },
+          {
+            "id": "wains",
+            "home": false
+          },
+          {
+            "id": "kettles",
+            "home": false
+          },
+          {
+            "id": "brands",
+            "home": false
+          },
+          {
+            "id": "oona",
+            "home": false
+          },
+          {
+            "id": "hollins",
+            "home": false
+          },
+          {
+            "id": "tolleys",
+            "home": false
+          },
+          {
+            "id": "ashbys",
+            "home": false
+          },
+          {
+            "id": "loomises",
+            "home": false
+          },
+          {
+            "id": "dunns",
+            "home": false
+          },
+          {
+            "id": "rudds",
+            "home": false
+          }
+        ],
+        "openedChests": [],
+        "discoveredPlaces": [],
+        "fragmentsFound": [],
+        "bandits": {
+          "harl_gadd": "dead",
+          "dob_finch": "dead",
+          "wyll_carrow": "dead",
+          "bran_oakes": "dead",
+          "nessa_roke": "dead",
+          "pim": "dead",
+          "odo_varn": "dead"
+        },
+        "lostPeople": [],
+        "trialsPassed": [],
+        "stolenGoodsReturned": [],
+        "projectsBuilt": [],
+        "campfiresFound": [],
+        "storyMoments": [],
+        "heardLines": [],
+        "takings": [],
+        "stories": {
+          "miller": {
+            "stage": "closed",
+            "since": 0
+          },
+          "striker": {
+            "stage": "closed",
+            "since": 0
+          },
+          "tally": {
+            "stage": "closed",
+            "since": 0
+          },
+          "thatcher": {
+            "stage": "closed",
+            "since": 0
+          },
+          "maren": {
+            "stage": "closed",
+            "since": 0
+          }
+        },
+        "lastThread": null,
+        "notes": [],
+        "speech": {
+          "lines": {},
+          "speakers": {},
+          "last": null
+        },
+        "boundBandits": [],
+        "lessonsTaken": [],
+        "watch": {
+          "won": 0,
+          "lastDay": null,
+          "tonight": null
+        }
+      }
+    },
+    {
+      "name": "wick-night",
+      "world": {
+        "x": 41.322302018622125,
+        "z": 91.73775861057281,
+        "groundY": 4.638798673798491,
+        "yaw": 0,
+        "tod": 22,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 101,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 154,
+        "fps": 10,
+        "drawCalls": 216,
+        "activeMeshes": 78,
+        "bram": {
+          "x": 41.42320293772157,
+          "z": 94.42844978655806,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 41.322302018622125,
+            "z": 91.73775861057281,
+            "groundY": 4.638798673798491,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 100,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "lantern": {
+        "position": {
+          "x": -170.65,
+          "z": 63
+        },
+        "available": false,
+        "windowHouse": "marrin",
+        "windowOn": true,
+        "windowRendered": true,
+        "lanternIntensity": 9,
+        "cue": "none"
+      },
+      "game": {
+        "version": 3,
+        "seed": 1066,
+        "timeOfDay": 22,
+        "day": 1,
+        "hero": {
+          "position": {
+            "x": 41.322302018622125,
+            "z": 91.73775861057281
+          },
+          "hp": 100,
+          "maxHp": 100,
+          "regionId": "tallowmere"
+        },
+        "progression": {
+          "skills": {
+            "archery": {
+              "level": 1,
+              "xp": 0
+            },
+            "melee": {
+              "level": 1,
+              "xp": 0
+            },
+            "toughness": {
+              "level": 1,
+              "xp": 0
+            },
+            "stealth": {
+              "level": 1,
+              "xp": 0
+            },
+            "leadership": {
+              "level": 1,
+              "xp": 0
+            },
+            "gathering": {
+              "level": 1,
+              "xp": 0
+            },
+            "fletching": {
+              "level": 1,
+              "xp": 0
+            },
+            "cooking": {
+              "level": 1,
+              "xp": 0
+            },
+            "smithing": {
+              "level": 1,
+              "xp": 0
+            }
+          },
+          "rank": "apprentice",
+          "regionCap": 20,
+          "perks": {},
+          "equipped": [],
+          "sets": [],
+          "repeats": {},
+          "overflowBank": {
+            "archery": 0,
+            "melee": 0,
+            "toughness": 0,
+            "stealth": 0,
+            "leadership": 0,
+            "gathering": 0,
+            "fletching": 0,
+            "cooking": 0,
+            "smithing": 0
+          }
+        },
+        "inventory": {
+          "carried": [],
+          "stored": [],
+          "unseen": [],
+          "soldStolen": [],
+          "recipes": [
+            "arrows_bronze",
+            "arrow_blunt",
+            "shafts",
+            "smoked_perch",
+            "charcoal",
+            "bronze",
+            "bronze_blade",
+            "bronze_helmet",
+            "bronze_jerkin",
+            "bronze_shield"
+          ]
+        },
+        "purse": {
+          "carried": 0,
+          "stored": 0
+        },
+        "incomePaidThrough": 1,
+        "gatheredOn": {},
+        "lastCartStopped": false,
+        "quiver": {
+          "capacity": 24,
+          "arrows": {
+            "standard": 0,
+            "fire": 0,
+            "blunt": 0,
+            "whistling": 0
+          }
+        },
+        "arrowsInWorld": [],
+        "company": [],
+        "places": [
+          {
+            "id": "mill",
+            "status": "freed",
+            "timesFreed": 1,
+            "bellSilenced": false,
+            "morale": 1,
+            "freedDay": 1
+          },
+          {
+            "id": "forge",
+            "status": "held",
+            "timesFreed": 0,
+            "bellSilenced": false,
+            "morale": 1
+          },
+          {
+            "id": "watch_house",
+            "status": "held",
+            "timesFreed": 0,
+            "bellSilenced": false,
+            "morale": 1
+          }
+        ],
+        "households": [
+          {
+            "id": "hesper",
+            "home": true,
+            "homeSince": 0
+          },
+          {
+            "id": "maren",
+            "home": false
+          },
+          {
+            "id": "marrins",
+            "home": false
+          },
+          {
+            "id": "aldrics",
+            "home": false
+          },
+          {
+            "id": "sedges",
+            "home": false
+          },
+          {
+            "id": "pikes",
+            "home": false
+          },
+          {
+            "id": "wains",
+            "home": false
+          },
+          {
+            "id": "kettles",
+            "home": false
+          },
+          {
+            "id": "brands",
+            "home": false
+          },
+          {
+            "id": "oona",
+            "home": false
+          },
+          {
+            "id": "hollins",
+            "home": false
+          },
+          {
+            "id": "tolleys",
+            "home": false
+          },
+          {
+            "id": "ashbys",
+            "home": false
+          },
+          {
+            "id": "loomises",
+            "home": false
+          },
+          {
+            "id": "dunns",
+            "home": false
+          },
+          {
+            "id": "rudds",
+            "home": false
+          }
+        ],
+        "openedChests": [],
+        "discoveredPlaces": [],
+        "fragmentsFound": [],
+        "bandits": {
+          "harl_gadd": "dead",
+          "dob_finch": "dead",
+          "wyll_carrow": "dead",
+          "bran_oakes": "dead",
+          "nessa_roke": "dead",
+          "pim": "dead",
+          "odo_varn": "dead"
+        },
+        "lostPeople": [],
+        "trialsPassed": [],
+        "stolenGoodsReturned": [],
+        "projectsBuilt": [],
+        "campfiresFound": [],
+        "storyMoments": [],
+        "heardLines": [],
+        "takings": [],
+        "stories": {
+          "miller": {
+            "stage": "closed",
+            "since": 0
+          },
+          "striker": {
+            "stage": "closed",
+            "since": 0
+          },
+          "tally": {
+            "stage": "closed",
+            "since": 0
+          },
+          "thatcher": {
+            "stage": "closed",
+            "since": 0
+          },
+          "maren": {
+            "stage": "closed",
+            "since": 0
+          }
+        },
+        "lastThread": null,
+        "notes": [],
+        "speech": {
+          "lines": {},
+          "speakers": {},
+          "last": null
+        },
+        "boundBandits": [],
+        "lessonsTaken": [],
+        "watch": {
+          "won": 0,
+          "lastDay": null,
+          "tonight": null
+        }
+      }
+    }
+  ]
+}

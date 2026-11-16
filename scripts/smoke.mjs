@@ -22,6 +22,17 @@ page.on('response', (res) => {
 await page.goto(base, { waitUntil: 'load', timeout: 120_000 });
 // Wait for the boot overlay to finish loading assets.
 await page.waitForFunction(() => !document.body.innerText.includes('Loading'), null, { timeout: 180_000 }).catch(() => {});
+// The default route starts at title, not directly in a live save. Tour/showcase stay direct.
+if (!new URL(base).searchParams.has('tour') && !new URL(base).searchParams.has('showcase') && !new URL(base).searchParams.has('styletest')) {
+  await page.waitForFunction(() => window.__valley?.state().frame > 0, null, { timeout: 180000 });
+  const title = page.locator('[data-screen="title"]');
+  const resume = title.getByRole('button', { name: 'Continue', exact: true });
+  if (await resume.count()) await resume.click();
+  else await title.getByRole('button', { name: 'New game', exact: true }).click();
+  const brightness = page.getByRole('button', { name: "That's right.", exact: true });
+  if (await brightness.isVisible()) await brightness.click();
+  await page.waitForFunction(() => window.__valley?.state().title === false, null, { timeout: 30000 });
+}
 // The first click starts audio and asks for pointer lock; the battle then runs.
 await page.click('canvas', { timeout: 60_000 });
 await page.waitForTimeout(5000);

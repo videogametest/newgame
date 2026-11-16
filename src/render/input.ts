@@ -21,6 +21,7 @@ export class PlayerInput {
   constructor(
     private readonly canvas: HTMLCanvasElement,
     private readonly onLockChange: (locked: boolean) => void,
+    private readonly enabled: () => boolean = () => true,
   ) {
     this.on(window, 'keydown', (e) => this.onKeyDown(e as KeyboardEvent));
     this.on(window, 'keyup', (e) => this.actions.release(`Key:${(e as KeyboardEvent).code}`));
@@ -43,6 +44,7 @@ export class PlayerInput {
       window,
       'wheel',
       (e) => {
+        if (!this.enabled()) return;
         e.preventDefault();
         const dy = (e as WheelEvent).deltaY;
         if (dy !== 0) this.actions.tick(dy > 0 ? 'Wheel:down' : 'Wheel:up');
@@ -128,7 +130,7 @@ export class PlayerInput {
   }
 
   requestLock(): void {
-    this.canvas.requestPointerLock();
+    if (this.enabled()) this.canvas.requestPointerLock();
   }
 
   releaseLock(): void {
@@ -140,6 +142,7 @@ export class PlayerInput {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
+    if (!this.enabled()) return;
     const input = `Key:${e.code}`;
     if (isSuppressedKey(e.code) || this.actions.isBound(input)) e.preventDefault();
     // Ctrl, Alt and Cmd chords belong to the browser or OS; they never reach the game.
@@ -149,6 +152,7 @@ export class PlayerInput {
   }
 
   private onMouseDown(e: MouseEvent): void {
+    if (!this.enabled()) return;
     const input = `Mouse:${e.button}`;
     const acts = this.actions.press(input);
     // A click on the view first takes the pointer; the attack it would make is not played.

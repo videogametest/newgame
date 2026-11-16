@@ -1,3 +1,5 @@
+import { canLightLantern, lightLantern, millWindowOn } from '../core/places/lantern';
+import { LANTERN_WORDS, MILL_LANTERN, MILL_WINDOW_HOUSE } from '../data/mill_lantern';
 import type { Awareness } from '../core/stealth';
 // The valley: open-world slice, step 1. Terrain, sky, water, one hero walking under the day-night clock.
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
@@ -113,6 +115,8 @@ export interface ValleyHooks {
   holdFight(on: boolean): void;
   /** Capture only: the image exposure and the grey ambient lift now in use (brightness, task 009 step 2c). */
   exposure(): { exposure: number; ambient: number };
+  lanternState(): { position: { x: number; z: number }; available: boolean; windowHouse: string; windowOn: boolean; windowRendered: boolean; lanternIntensity: number; cue: string };
+  interactLantern(): boolean;
 }
 /** Meshes that make up the sky. A pick that passes through these is sky. */
 const SKY_MESHES = new Set(['valley_sky', 'valley_stars', 'valley_sun', 'valley_moon']);
@@ -265,6 +269,7 @@ class Valley {
   private titleSeconds = 0;
   private titleBaseYaw = 0;
   private saveFailed = false;
+  private lanternCue = 'none';
 
   constructor(
     private readonly engine: Engine,
@@ -275,7 +280,7 @@ class Valley {
     hud: Hud,
     resumed = false,
     private readonly persistent = true,
-    audio: AudioBank = new AudioBank(), // the Sound page's volumes; the same saved values the battle uses
+    private readonly audio: AudioBank = new AudioBank(), // the Sound page's volumes; the same saved values the battle uses
     private titleSave: SaveRead | null = null,
   ) {
     this.titleActive = titleSave !== null;
@@ -373,6 +378,10 @@ class Valley {
     window.addEventListener('keydown', e => {
       if (this.titleActive && !this.picture && e.code === 'Escape') this.titleScreen?.back();
     });
+    // Web Audio must be unlocked in a real gesture, not a later fixed simulation step.
+    const unlockAudio = () => { try { audio.unlock(); } catch (error) { logEvent('audio', `unavailable: ${String(error)}`); } };
+    window.addEventListener('pointerdown', unlockAudio);
+    window.addEventListener('keydown', unlockAudio);
     this.installHooks();
   }
 
@@ -384,7 +393,7 @@ class Valley {
     }, (ok, reason) => {
       logEvent('save', `${reason}: ${ok ? 'saved' : 'failed'}`);
       if (!ok && !this.saveFailed) this.showLine("Couldn't save. Your progress is safe for now, but don't close the page. Copy a debug report from the pause menu.", 10);
-      if (ok) this.showLine('Saved.', 2);
+      if (ok && reason !== 'capture') this.showLine('Saved.', 2);
       this.saveFailed = !ok;
     });
   }
@@ -655,6 +664,7 @@ class Valley {
     // Q and crouch are read before takeInput, which clears the edge flags.
     const squadPressed = this.input.takeActionPressed('squadOrder');
     const crouchPressed = this.input.takeActionPressed('crouch');
+    const interactPressed = this.input.takeActionPressed('interact');
     const raw = this.input.takeInput();
     if (this.picture) return; // the figure stays where the picture put it
     if (squadPressed) this.onSquadOrderKey();
@@ -676,6 +686,20 @@ class Valley {
       ? { hour: this.game.timeOfDay, place: mill, movement: this.heroMovement } : undefined);
     this.game.hero.position = { x: this.hero.x, z: this.hero.z };
     this.groundY = this.hero.y;
+    if (live && interactPressed) this.interactLantern();
+  }
+
+  private interactLantern(): boolean {
+    if (this.titleActive || this.paused || this.picture || !this.hero.alive) return false;
+    this.syncSaveHero();
+    if (!lightLantern(this.game, 'mill', this.hero, MILL_LANTERN)) return false;
+    logEvent('capture', 'mill lantern lit');
+    // A visible caption also covers mute/unavailable samples. It never claims a sound was heard.
+    this.showLine(LANTERN_WORDS.freed, 7);
+    if (this.persistent && !this.tour) this.autosave.advance(this.game, 0);
+    this.lanternCue = 'loading';
+    void this.audio.playLantern().then(played => { this.lanternCue = played ? 'harp' : 'caption'; });
+    return true;
   }
 
   /** Bram's step: walks to his spot beside the hero on follow, and stands still on hold. */
@@ -734,7 +758,7 @@ class Valley {
     this.sky.update(L, this.hero.x, this.hero.z);
     this.waterSeconds += dt;
     if (this.scene.activeCamera) this.water?.update(L, this.waterSeconds, this.scene.activeCamera.globalPosition, FOG_START, FOG_END);
-    this.wick?.light(L, this.game.timeOfDay);
+    this.wick?.light(L, this.game.timeOfDay, this.game.places.some(p => p.id === 'mill' && p.timesFreed > 0));
     for (const p of this.game.places) {
       if (p.id === 'mill' || p.id === 'forge' || p.id === 'watch_house')
         this.landmarks?.setPlace(p.id, p.status === 'freed' ? 'freed' : 'held');
@@ -779,6 +803,12 @@ class Valley {
     this.captionTime = this.paused ? this.captionTime : Math.max(0, this.captionTime - dt);
     this.captionEl.hidden = !(this.captionTime > 0 && !this.picture && !this.paused && !this.chromeHidden && !this.titleActive);
 
+    if (!this.titleActive && !this.paused && !this.picture && this.captionTime <= 0
+      && canLightLantern(this.game, 'mill', this.hero, MILL_LANTERN)) {
+      const prompt = fillPrompt('{interact}', currentSettings().bindings, 'keyboard');
+      this.captionEl.textContent = prompt ? `${prompt} ${LANTERN_WORDS.prompt}` : LANTERN_WORDS.prompt;
+      this.captionEl.hidden = this.chromeHidden;
+    }
     this.updateHud(dt);
   }
 
@@ -919,6 +949,11 @@ class Valley {
         return { x: v.x, y: v.y, w: e.getRenderWidth(), h: e.getRenderHeight() };
       },
       state: () => this.snapshot(),
+      lanternState: () => ({ position: MILL_LANTERN, available: canLightLantern(this.game, 'mill', this.hero, MILL_LANTERN),
+        windowHouse: MILL_WINDOW_HOUSE, windowOn: millWindowOn(this.game),
+        windowRendered: this.scene.getMeshByName(`${MILL_WINDOW_HOUSE}_recovery_window`)?.isEnabled() ?? false,
+        lanternIntensity: this.scene.getLightByName('mill_lantern')?.intensity ?? 0, cue: this.lanternCue }),
+      interactLantern: () => this.interactLantern(),
       savedState: () => { this.syncSaveHero(); return structuredClone(this.game); },
       saveNow: (reason = 'interval') => this.autosave.save(reason),
       millState: () => this.fight.mill.snapshot(),

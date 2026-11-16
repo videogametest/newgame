@@ -6,7 +6,7 @@ export interface SoundSettings {
   master: number;
   /** 0..1, scales sound effects. */
   effects: number;
-  /** 0..1, scales music. Music is not in the build yet; the value is kept so the setting survives. */
+  /** 0..1, scales music. Used by the lantern melody. */
   music: number;
   muted: boolean;
 }

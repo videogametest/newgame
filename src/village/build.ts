@@ -8,6 +8,7 @@ import {
 import { assetUrl } from '../render/assets';
 import type { Lighting } from '../render/lighting';
 import { bearingVector, chance, SCARECROW, WICK_GATES, WICK_LANES, WICK_THINGS, wickHouses, type House } from './plan';
+import { MILL_WINDOW_HOUSE } from '../data/mill_lantern';
 import { withRetry } from '../render/load_retry';
 
 const HEX = 'assets/kaykit_medieval_hexagon/';
@@ -41,7 +42,7 @@ export interface Wick {
   root: TransformNode;
   houses: readonly House[];
   /** Call when the light changes. Hesper's lamp is lit from late afternoon until the small hours. */
-  light(l: Lighting, tod: number): void;
+  light(l: Lighting, tod: number, millRecovered?: boolean): void;
   /** Hesper's lamp, for anything that wants to know where the one light is. */
   lamp: PointLight;
   dispose(): void;
@@ -127,6 +128,9 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
   glow.specularColor = Color3.Black();
   glow.disableLighting = true;
   let chimney = new Vector3(0, 0, 0);
+  let millPane: Mesh | null = null;
+  const millBoards: Mesh[] = [];
+  const recoveryGlow = glow.clone('wick_mill_window_glow');
   for (const h of houses) {
     const half = 4.5;
     const corners = [[-half, -half], [half, -half], [-half, half], [half, half], [0, 0]].map(([dx, dz]) => ground(h.x + dx, h.z + dz));
@@ -140,6 +144,13 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     const right = { x: -front.z, z: front.x };
     const yaw = yawFor(h.facing);
     const at = (u: number, out: number) => ({ x: h.x + right.x * u + front.x * out, z: h.z + right.z * u + front.z * out });
+    if (h.id === MILL_WINDOW_HOUSE) {
+      const wv = bearingVector(h.window), wr = { x: -wv.z, z: wv.x };
+      const p = { x: h.x + wv.x * (open.window.out + 0.06) + wr.x * open.window.u, z: h.z + wv.z * (open.window.out + 0.06) + wr.z * open.window.u };
+      millPane = MeshBuilder.CreatePlane(`${h.id}_recovery_window`, { width: open.window.w, height: open.window.h, sideOrientation: Mesh.DOUBLESIDE }, scene);
+      millPane.position.set(p.x, base + open.window.y, p.z); millPane.rotation.y = yawFor(h.window);
+      millPane.material = recoveryGlow; millPane.parent = root; millPane.setEnabled(false);
+    }
     if (h.state === 'boarded') {
       // Planks across the door, nailed up in a hurry: two crossed and one level, none of them straight.
       const d = at(open.door.u, open.door.out + 0.08);
@@ -151,6 +162,10 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
       const wn = at(open.window.u, open.window.out + 0.1);
       box(`${h.id}_plank_w`, greyWood, wn.x, wn.z, open.window.w * 1.9, 0.16, 0.05, yaw, base + open.window.y - 0.08, 0, 0.25 + lean('w'));
       box(`${h.id}_plank_w2`, greyWood, wn.x, wn.z, open.window.w * 1.9, 0.16, 0.05, yaw, base + open.window.y - 0.08, 0, -0.3 + lean('w2'));
+    }
+    if (h.id === MILL_WINDOW_HOUSE && h.state === 'boarded') {
+      const boards = loose.filter(m => m.name === `${h.id}_plank_w` || m.name === `${h.id}_plank_w2`);
+      for (const b of boards) { loose.splice(loose.indexOf(b), 1); millBoards.push(b); }
     }
     if (h.state === 'lit') {
       // Hesper's window: a pane that glows, and the lamp behind it.
@@ -452,7 +467,11 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
 
   return {
     root, houses, lamp,
-    light(l, tod) {
+    light(l, tod, millRecovered = false) {
+      const recovered = millRecovered;
+      millPane?.setEnabled(recovered && (tod >= 19 || tod < 1));
+      for (const b of millBoards) b.setEnabled(!recovered);
+      recoveryGlow.emissiveColor = new Color3(1, 0.72, 0.36).scale(0.9 + 0.5 * l.nightness);
       const on = tod >= 17 || tod < 1;
       // Brightest once the daylight has gone; present, but not shouting, in the gold hour before.
       lamp.intensity = on ? 2 + 3 * l.nightness : 0;

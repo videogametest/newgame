@@ -77,7 +77,7 @@ const DISPLAY_ROWS: Row[] = [
 
 const SOUND_ROWS: Row[] = [
   { kind: 'slider', path: 'sound.master', label: 'Master', range: SOUND_RANGE },
-  { kind: 'slider', path: 'sound.music', label: 'Music', range: SOUND_RANGE, notYet: true },
+  { kind: 'slider', path: 'sound.music', label: 'Music', range: SOUND_RANGE },
   { kind: 'slider', path: 'sound.effects', label: 'Effects', range: SOUND_RANGE },
   { kind: 'switch', path: 'sound.muted', label: 'Mute all sound' },
 ];

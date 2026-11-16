@@ -6,6 +6,12 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 10:55 UTC Queue item 28 deployed (Viktor)
+
+- PR #109 regular-merged as `d2697f9`; required videogametest noreply author/committer verified, merge tree identical to the gated branch. Pages `43847407535` succeeded on that commit.
+- Live `scripts/smoke.mjs https://everylitwindow.com/` passed. Image-free live `scripts/item28_capture.mjs` passed all 26 checks, no failures/fallbacks or extra screenshots. Settled medium live calls noon 146, dusk-well 620, night 373 (dusk and night over 300; no same-view baseline/causal claim). Raw: `docs/pr-media/item28-wick-people/live/`.
+- Fixtures as in the entry below (synthetic saves, set clock, placed camera); not a played household return. Item 18 conflict unchanged. Every-20-minute continuation remains active; next run rechecks guards, item 18, then 29.
+
 ## 2026-11-16 Queue item 28: people in Wick (Viktor, PR #109)
 
 - Branch `feat/item28-wick-people` from `ead39f7`. Guards checked by the parent at activation 09:25:12 UTC. Item 18 untouched (recorded conflict).

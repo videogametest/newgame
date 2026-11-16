@@ -1,0 +1,503 @@
+{
+  "fixtures": [
+    "Save \"lantern\": page's own new game with tutorial step done and gate lantern lit (phase done), via sessionStorage.",
+    "Save \"village\": lantern save plus Mill held with timesFreed 1 (freed, then retaken) and Forge freed, via sessionStorage."
+  ],
+  "notes": [],
+  "checks": [
+    {
+      "passed": true,
+      "message": "New game: only Hesper home (hesper)"
+    },
+    {
+      "passed": true,
+      "message": "New game noon: Old Maren the only villager, drawn (maren:0)"
+    },
+    {
+      "passed": true,
+      "message": "Noon: no window lit or rendered, boards up ()"
+    },
+    {
+      "passed": true,
+      "message": "New game 22:00: Hesper's window only, Old Maren in the dark (hesper)"
+    },
+    {
+      "passed": true,
+      "message": "Night: Old Maren indoors, not drawn"
+    },
+    {
+      "passed": true,
+      "message": "03:00: Hesper's lamp burns until dawn (hesper)"
+    },
+    {
+      "passed": true,
+      "message": "First lantern: Old Maren home, her window lit at 22:00 (hesper,old_maren)"
+    },
+    {
+      "passed": true,
+      "message": "Lantern save noon: Old Maren at her door, windows dark by day"
+    },
+    {
+      "passed": true,
+      "message": "Triggers: Marrins (Mill once freed, now retaken), Sedges and Brands (Forge), then Kettles (3) and Oona (6) by count (hesper,maren,marrins,sedges,kettles,brands,oona)"
+    },
+    {
+      "passed": true,
+      "message": "Noon: every present villager drawn (9: maren:0,marrins:0,marrins:1,sedges:0,sedges:1,kettles:0,kettles:1,brands:0,oona:0)"
+    },
+    {
+      "passed": true,
+      "message": "Noon: all but Old Maren at work"
+    },
+    {
+      "passed": true,
+      "message": "Hesper is not duplicated: she stays the talking actor"
+    },
+    {
+      "passed": true,
+      "message": "Bracken the sheepdog is not drawn as a person"
+    },
+    {
+      "passed": true,
+      "message": "noon: chunks 76, draw calls 146 positive, settled"
+    },
+    {
+      "passed": true,
+      "message": "06:03 to 06:09: villagers walk to work (sedges:0,sedges:1,kettles:0,kettles:1,brands:0,oona:0)"
+    },
+    {
+      "passed": true,
+      "message": "Running clock (6.070 h): 6 villagers moved"
+    },
+    {
+      "passed": true,
+      "message": "Dusk 18:15: all but Old Maren gathered within 5 m of the well (8)"
+    },
+    {
+      "passed": true,
+      "message": "Dusk: only Hesper's lamp before 19:00 (hesper)"
+    },
+    {
+      "passed": true,
+      "message": "dusk-well: chunks 109, draw calls 620 positive, settled"
+    },
+    {
+      "passed": true,
+      "message": "Night 22:00: everyone indoors, nobody drawn"
+    },
+    {
+      "passed": true,
+      "message": "22:00: lit and rendered windows are exactly the home households' (brand,hesper,kettle,marrin,old_maren,oona,sedge)"
+    },
+    {
+      "passed": true,
+      "message": "Households not home stay dark; Fairlow dark"
+    },
+    {
+      "passed": true,
+      "message": "night: chunks 109, draw calls 373 positive, settled"
+    },
+    {
+      "passed": true,
+      "message": "02:00: the others dark in the small hours, Hesper lit (hesper)"
+    },
+    {
+      "passed": true,
+      "message": "Exit save holds the households home (hesper,maren,marrins,sedges,kettles,brands,oona)"
+    },
+    {
+      "passed": true,
+      "message": "Continue: same households home, same villagers out at noon"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [],
+  "snapshots": [
+    {
+      "name": "noon",
+      "drawCalls": 146,
+      "chunks": 76,
+      "fps": 11,
+      "people": {
+        "hour": 12,
+        "home": [
+          "hesper",
+          "maren",
+          "marrins",
+          "sedges",
+          "kettles",
+          "brands",
+          "oona"
+        ],
+        "villagers": [
+          {
+            "id": "maren:0",
+            "household": "maren",
+            "name": "Old Maren",
+            "x": 55.5,
+            "z": 93.5,
+            "yaw": 2.9253221772804254,
+            "activity": "standing",
+            "visible": true
+          },
+          {
+            "id": "marrins:0",
+            "household": "marrins",
+            "name": "Ansa Marrin",
+            "x": 39.5,
+            "z": 95.5,
+            "yaw": -2.985868729759735,
+            "activity": "working",
+            "visible": true
+          },
+          {
+            "id": "marrins:1",
+            "household": "marrins",
+            "name": "Corin",
+            "x": 41.5,
+            "z": 95.5,
+            "yaw": -2.985868729759735,
+            "activity": "working",
+            "visible": true
+          },
+          {
+            "id": "sedges:0",
+            "household": "sedges",
+            "name": "Hale Sedge",
+            "x": 78.5,
+            "z": 52.5,
+            "yaw": 0.1596960608359956,
+            "activity": "working",
+            "visible": true
+          },
+          {
+            "id": "sedges:1",
+            "household": "sedges",
+            "name": "Tamsin",
+            "x": 79.5,
+            "z": 52.5,
+            "yaw": 0.1596960608359956,
+            "activity": "working",
+            "visible": true
+          },
+          {
+            "id": "kettles:0",
+            "household": "kettles",
+            "name": "Wat Kettle",
+            "x": 84.5,
+            "z": 80.5,
+            "yaw": -0.03346590196919731,
+            "activity": "working",
+            "visible": true
+          },
+          {
+            "id": "kettles:1",
+            "household": "kettles",
+            "name": "Nan",
+            "x": 85.5,
+            "z": 80.5,
+            "yaw": -0.03346590196919731,
+            "activity": "working",
+            "visible": true
+          },
+          {
+            "id": "brands:0",
+            "household": "brands",
+            "name": "Old Tam Brand",
+            "x": 44.5,
+            "z": 122.5,
+            "yaw": 2.4661370932232787,
+            "activity": "working",
+            "visible": true
+          },
+          {
+            "id": "oona:0",
+            "household": "oona",
+            "name": "Oona",
+            "x": 160.5,
+            "z": 122.5,
+            "yaw": -2.3358063821589266,
+            "activity": "working",
+            "visible": true
+          }
+        ],
+        "drawn": [
+          "maren:0",
+          "marrins:0",
+          "marrins:1",
+          "sedges:0",
+          "sedges:1",
+          "kettles:0",
+          "kettles:1",
+          "brands:0",
+          "oona:0"
+        ],
+        "lit": [],
+        "rendered": [],
+        "boards": true,
+        "hesperLamp": 0
+      }
+    },
+    {
+      "name": "dusk-well",
+      "drawCalls": 620,
+      "chunks": 109,
+      "fps": 10,
+      "people": {
+        "hour": 18.25,
+        "home": [
+          "hesper",
+          "maren",
+          "marrins",
+          "sedges",
+          "kettles",
+          "brands",
+          "oona"
+        ],
+        "villagers": [
+          {
+            "id": "maren:0",
+            "household": "maren",
+            "name": "Old Maren",
+            "x": 55.5,
+            "z": 93.5,
+            "yaw": 2.9253221772804254,
+            "activity": "standing",
+            "visible": true
+          },
+          {
+            "id": "marrins:0",
+            "household": "marrins",
+            "name": "Ansa Marrin",
+            "x": 78.5,
+            "z": 74.5,
+            "yaw": -0.7853981633974483,
+            "activity": "gathering",
+            "visible": true
+          },
+          {
+            "id": "marrins:1",
+            "household": "marrins",
+            "name": "Corin",
+            "x": 74.5,
+            "z": 76.5,
+            "yaw": 1.7681918866447774,
+            "activity": "gathering",
+            "visible": true
+          },
+          {
+            "id": "sedges:0",
+            "household": "sedges",
+            "name": "Hale Sedge",
+            "x": 75.5,
+            "z": 78.5,
+            "yaw": 2.601173153319209,
+            "activity": "gathering",
+            "visible": true
+          },
+          {
+            "id": "sedges:1",
+            "household": "sedges",
+            "name": "Tamsin",
+            "x": 79.5,
+            "z": 75.5,
+            "yaw": -1.373400766945016,
+            "activity": "gathering",
+            "visible": true
+          },
+          {
+            "id": "kettles:0",
+            "household": "kettles",
+            "name": "Wat Kettle",
+            "x": 75.5,
+            "z": 73.5,
+            "yaw": 0.5404195002705842,
+            "activity": "gathering",
+            "visible": true
+          },
+          {
+            "id": "kettles:1",
+            "household": "kettles",
+            "name": "Nan",
+            "x": 76.5,
+            "z": 78.5,
+            "yaw": 2.9441970937399127,
+            "activity": "gathering",
+            "visible": true
+          },
+          {
+            "id": "brands:0",
+            "household": "brands",
+            "name": "Old Tam Brand",
+            "x": 79.5,
+            "z": 74.5,
+            "yaw": -1.0303768265243125,
+            "activity": "gathering",
+            "visible": true
+          },
+          {
+            "id": "oona:0",
+            "household": "oona",
+            "name": "Oona",
+            "x": 74.5,
+            "z": 75.5,
+            "yaw": 1.373400766945016,
+            "activity": "gathering",
+            "visible": true
+          }
+        ],
+        "drawn": [
+          "maren:0",
+          "marrins:0",
+          "marrins:1",
+          "sedges:0",
+          "sedges:1",
+          "kettles:0",
+          "kettles:1",
+          "brands:0",
+          "oona:0"
+        ],
+        "lit": [
+          "hesper"
+        ],
+        "rendered": [
+          "hesper"
+        ],
+        "boards": true,
+        "hesperLamp": 2
+      }
+    },
+    {
+      "name": "night",
+      "drawCalls": 373,
+      "chunks": 109,
+      "fps": 10,
+      "people": {
+        "hour": 22,
+        "home": [
+          "hesper",
+          "maren",
+          "marrins",
+          "sedges",
+          "kettles",
+          "brands",
+          "oona"
+        ],
+        "villagers": [
+          {
+            "id": "maren:0",
+            "household": "maren",
+            "name": "Old Maren",
+            "x": 55.5,
+            "z": 93.5,
+            "yaw": 2.9253221772804254,
+            "activity": "indoors",
+            "visible": false
+          },
+          {
+            "id": "marrins:0",
+            "household": "marrins",
+            "name": "Ansa Marrin",
+            "x": 40.5,
+            "z": 96.5,
+            "yaw": -2.985868729759735,
+            "activity": "indoors",
+            "visible": false
+          },
+          {
+            "id": "marrins:1",
+            "household": "marrins",
+            "name": "Corin",
+            "x": 40.5,
+            "z": 96.5,
+            "yaw": -2.985868729759735,
+            "activity": "indoors",
+            "visible": false
+          },
+          {
+            "id": "sedges:0",
+            "household": "sedges",
+            "name": "Hale Sedge",
+            "x": 123.5,
+            "z": 57.5,
+            "yaw": 0.1596960608359956,
+            "activity": "indoors",
+            "visible": false
+          },
+          {
+            "id": "sedges:1",
+            "household": "sedges",
+            "name": "Tamsin",
+            "x": 123.5,
+            "z": 57.5,
+            "yaw": 0.1596960608359956,
+            "activity": "indoors",
+            "visible": false
+          },
+          {
+            "id": "kettles:0",
+            "household": "kettles",
+            "name": "Wat Kettle",
+            "x": 123.5,
+            "z": 79.5,
+            "yaw": -0.03346590196919731,
+            "activity": "indoors",
+            "visible": false
+          },
+          {
+            "id": "kettles:1",
+            "household": "kettles",
+            "name": "Nan",
+            "x": 123.5,
+            "z": 79.5,
+            "yaw": -0.03346590196919731,
+            "activity": "indoors",
+            "visible": false
+          },
+          {
+            "id": "brands:0",
+            "household": "brands",
+            "name": "Old Tam Brand",
+            "x": 53.5,
+            "z": 111.5,
+            "yaw": 2.4661370932232787,
+            "activity": "indoors",
+            "visible": false
+          },
+          {
+            "id": "oona:0",
+            "household": "oona",
+            "name": "Oona",
+            "x": 148.5,
+            "z": 113.5,
+            "yaw": -2.3358063821589266,
+            "activity": "indoors",
+            "visible": false
+          }
+        ],
+        "drawn": [],
+        "lit": [
+          "brand",
+          "hesper",
+          "kettle",
+          "marrin",
+          "old_maren",
+          "oona",
+          "sedge"
+        ],
+        "rendered": [
+          "brand",
+          "hesper",
+          "kettle",
+          "marrin",
+          "old_maren",
+          "oona",
+          "sedge"
+        ],
+        "boards": true,
+        "hesperLamp": 5
+      }
+    }
+  ]
+}

@@ -6,7 +6,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
-## 2026-11-15 Queue item 21: versioned browser saves (Viktor)
+## 2026-11-15 Queue item 21: versioned browser saves (Viktor, PR #102)
 
 - Implemented `src/core/saves/codec.ts`, `src/render/game_store.ts`, and `src/core/saves/autosave.ts`. Own `everylitwindow.save` key; version 3 uses the existing GameState and v1/v2 migrations. Runtime validation checks every top-level field and nested shape before accepting JSON; invalid/future saves start a new game with one plain line. Unavailable storage/quota errors do not crash play or overwrite the last good save, and display the interface writing's failure line.
 - The actual valley auto-resumes the saved hero position/HP, day/time and complete serializable GameState until item 22 supplies Continue/New Game. Fresh games keep the existing spawn and battle health. Landmark banners/lanterns read saved freed state; named Mill outcomes are projected back to the encounter, so saved dead defenders do not revive. Notes and speech from item 17 now survive browser reload. Settings remain in their own key and are not serialized into the game save. Tour captures neither load nor overwrite personal progress.

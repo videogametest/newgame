@@ -54,6 +54,7 @@ import { updateHouseholds } from '../core/people/households';
 import { litWindows, openHouses, wickVillagers, type Villager } from '../core/people/daily';
 import { WICK_DAYS } from '../data/wick_days';
 import { withinShadowRange } from './shadow_range';
+import { SAVE_NOTICE_SECONDS, SaveNotice } from './save_notice';
 import { buildFarLand } from './valley_far';
 import { buildRoads } from './valley_roads';
 import { buildLandmarks, type Landmarks } from '../landmarks/build';
@@ -94,6 +95,8 @@ const WALK_RULES: WalkRules = {
   blocked: blocksHero,
   inside: insideValley,
 };
+/** Not in docs/writing (checked): kept as written in the code. */
+const SAVE_NOTICE_TEXT = "Your saved game couldn't be read. A new game has started.";
 const FOG_START = 240;
 const FOG_END = 1100; // the far rim and the castle are meant to be seen across the whole valley
 const SUN_RANGE = 90;
@@ -316,6 +319,8 @@ class Valley {
   private titleSeconds = 0;
   private titleBaseYaw = 0;
   private saveFailed = false;
+  /** The damaged-save line: the valley's first words after a save could not be read. */
+  private readonly saveNotice = new SaveNotice();
   private lanternCue = 'none';
   private readonly conversation: Conversation;
   private readonly conversationBox: ConversationBox;
@@ -478,6 +483,7 @@ class Valley {
     if (this.titleActive) this.openTitle(audio);
     window.addEventListener('keydown', e => {
       if (this.titleActive && !this.picture && e.code === 'Escape') this.titleScreen?.back();
+      if (this.saveNotice.keyPressed(e.timeStamp)) this.captionTime = 0;
     });
     // Web Audio must be unlocked in a real gesture, not a later fixed simulation step.
     const unlockAudio = () => { try { audio.unlock(); } catch (error) { logEvent('audio', `unavailable: ${String(error)}`); } };
@@ -535,7 +541,7 @@ class Valley {
     this.syncSaveHero(); this.autosave = this.makeAutosave();
     // A confirmed New game replaces the old save only now, after the playable world has loaded.
     this.autosave.save('interval');
-    if (previousStatus === 'damaged') this.notice("Your saved game couldn't be read. A new game has started.");
+    if (previousStatus === 'damaged') this.showSaveNotice();
     if (!currentSettings().display.brightnessSet) this.startBrightnessCheck(() => this.resume());
     else this.resume();
   }
@@ -726,6 +732,13 @@ class Valley {
   }
 
   notice(line: string): void { this.showLine(line, 10); }
+
+  /** Shows the damaged-save line alone: it holds the caption and the first-evening words until it ends. */
+  private showSaveNotice(): void {
+    this.saveNotice.start(performance.now());
+    this.captionEl.textContent = SAVE_NOTICE_TEXT;
+    this.captionTime = SAVE_NOTICE_SECONDS;
+  }
 
   private drawCallCount(): number {
     const counters = this.engine as unknown as { _drawCalls?: { current?: number } };
@@ -1070,7 +1083,8 @@ class Valley {
 
   /** The opening line once, then the road prompts until each control is used. All text from docs/writing. */
   private updateEvening(dt: number, allowed: boolean): void {
-    const playing = allowed && !this.tour && this.input.isLocked;
+    if (allowed) this.saveNotice.tick(dt);
+    const playing = allowed && !this.tour && this.input.isLocked && !this.saveNotice.active;
     if (playing && !this.game.tutorial.opened) {
       this.game.tutorial = advanceEvening(this.game.tutorial, { type: 'opened' });
       this.openingTime = T.tutorial.openSeconds;
@@ -1078,10 +1092,10 @@ class Valley {
     }
     if (allowed) this.openingTime = Math.max(0, this.openingTime - dt);
     this.openingEl.textContent = EVENING_OPEN;
-    this.openingEl.hidden = !(this.openingTime > 0 && allowed && !this.chromeHidden);
+    this.openingEl.hidden = !(this.openingTime > 0 && allowed && !this.chromeHidden && !this.saveNotice.active);
     const lines = this.eveningPrompts();
     this.promptEl.textContent = lines.join('\n');
-    this.promptEl.hidden = !(playing && lines.length && !this.conversation.current && !this.chromeHidden);
+    this.promptEl.hidden = !(playing && lines.length && !this.conversation.current && !this.chromeHidden && !this.saveNotice.active);
   }
   private eveningPrompts(): string[] {
     if (this.tour) return [];
@@ -1180,6 +1194,7 @@ class Valley {
 
   /** Shows a line in the caption for the given seconds. The valley's one text line: Bram's words, fight status. */
   private showLine(text: string, seconds: number): void {
+    if (this.saveNotice.active) return; // the damaged-save line goes first and alone
     this.captionEl.textContent = text;
     this.captionTime = seconds;
   }

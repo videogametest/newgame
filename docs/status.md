@@ -6,6 +6,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 03:02 UTC Queue item 24 deployed (Viktor)
+
+- PR #105 regular-merged as `670a3ee`; required videogametest noreply author and committer verified on both branch commits and merge. Merge tree identical to the gated branch. Pages `43795040613` succeeded on that exact commit, tests/build/built-page smoke/deploy green. First watch hit the tool limit while CI continued; direct final state and second watch confirmed success.
+- Live `scripts/smoke.mjs https://everylitwindow.com/` passed; all 16 image-free live speech assertions passed. Real rebound J input, clock/pointer capture continuation, pause/resume, held-input protection, Notes/speech persistence and Continue to the next unheard line. No page/console/request/HTTP errors, fallback or extra screenshots. Raw live report and exact Pages evidence committed under `docs/pr-media/item24-talking/live/`.
+- Settled medium live calls match local: dusk 418, noon 416, midnight 420 at 109 stable chunks. Over 300, recorded for critique; no same-view baseline/causal claim. Three local frames remain the only new images, not visually judged. Synthetic doorstep save only, not a walked tutorial; optional answers tested in pure cursor, not used by this arrival.
+- Every-20-minute continuation stays active. Next activation rechecks item 18/current queue and takes 25 after quiet/ownership guards. No next implementation begins inside this deployment's quiet window.
+
 ## 2026-11-16 Queue item 24: Hesper and talking (Viktor, PR #105)
 
 - Implementation `d2ede7d`, branch `feat/item24-talking`, fresh base `127e1a3`, design v38 and newest review 036. At activation 02:41:38 UTC, main thread idle, no other queue run; newest repository push 02:08:21 UTC, 33m17s earlier. No existing item-24 PR/branch. Item 18 remains its recorded design conflict, skipped under the queue rule; ritual behaviour unchanged.

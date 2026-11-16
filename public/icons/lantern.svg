@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Every Lit Window: a simple lantern in the game's own colours (#0b1016 night, #d9a441 gold, #f4f1e8 light). -->
+  <rect width="512" height="512" rx="96" fill="#0b1016"/>
+  <circle cx="256" cy="290" r="150" fill="#d9a441" opacity="0.16"/>
+  <path d="M206 112 Q256 62 306 112" fill="none" stroke="#d9a441" stroke-width="18" stroke-linecap="round"/>
+  <rect x="186" y="120" width="140" height="34" rx="10" fill="#d9a441"/>
+  <path d="M196 154 H316 L336 360 H176 Z" fill="#26303b" stroke="#d9a441" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M256 196 C228 236 222 270 256 312 C290 270 284 236 256 196 Z" fill="#ffe27a"/>
+  <path d="M256 232 C244 252 242 270 256 290 C270 270 268 252 256 232 Z" fill="#f4f1e8"/>
+  <rect x="166" y="360" width="180" height="34" rx="10" fill="#d9a441"/>
+</svg>

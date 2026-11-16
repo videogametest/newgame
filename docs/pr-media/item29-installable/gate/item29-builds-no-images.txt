@@ -1,0 +1,42 @@
+ok   build-a: worker registered and controls the first-visit page
+ok   build-a: manifest linked, standalone, 192 and 512 icons
+ok   build-a: icon /icons/icon-192.png loads
+ok   build-a: icon /icons/icon-512.png loads
+ok   build-a: icon /icons/icon-maskable-512.png loads
+ok   build-a: icon /icons/lantern.svg loads
+ok   build-a online first visit: title offers Continue for the saved game
+ok   build-a online first visit: held W walks the hero 3.16 m (frames 31->48)
+ok   build-a: save and settings unchanged across the offline reload
+ok   build-a: seeded settings intact
+ok   build-a offline after reload: title offers Continue for the saved game
+ok   build-a offline after reload: held W walks the hero 1.65 m (frames 18->35)
+ok   build-a: no request failed offline (116 same-origin files served by the worker)
+ok   build-a: no file was asked of the cut server offline (worker update checks to /sw.js: 1)
+worker started: http://localhost:4229/sw.js
+ok   tab1 playing A: title offers Continue for the saved game
+ok   tab1 playing A: held W walks the hero 2.30 m (frames 19->34)
+ok   The two builds have different pages (different script hashes)
+worker started: http://localhost:4229/sw.js
+ok   While tab1 plays, both tabs stay on version A (e4612a092809)
+ok   tab2 opened before B finished installing: no takeover
+ok   tab2 title shows the one update line: "An update is ready. It will be used the next time you start."
+ok   tab1 (playing) still gets build A's page from its cache
+ok   tab1 is still in its game
+ok   tab1 still playing A after B waits: held W walks the hero 3.27 m (frames 143->159)
+ok   tab1 resumed and walked on A after B was fetched
+ok   tab2 restarted while tab1 plays: B still waits, A kept
+ok   tab2 title still shows the update line
+ok   B is installed and waiting, not active
+ok   Next start adopted B (e4612a092809 -> 9f396623ebca)
+ok   The page now is build B's
+ok   No update line once B is in use
+ok   Save byte-identical across the update (as on disk right before the next start)
+ok   Settings byte-identical across the update (still the seeded settings)
+ok   Unrelated cache kept
+ok   Only B's game cache remains
+ok   B after update: title offers Continue for the saved game
+ok   B after update: held W walks the hero 1.75 m (frames 18->34)
+ok   B offline after update: title offers Continue for the saved game
+ok   B offline after update: held W walks the hero 1.90 m (frames 18->35)
+ok   B offline: no failed request, no file asked of the cut server (sw.js checks 2)
+39/39 checks, 0 failures, 0 fallbacks, 0 shots

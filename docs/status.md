@@ -6,6 +6,16 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 Queue item 29: installable (Viktor, PR pending; not deployed)
+
+- Branch `feat/item29-installable` from `70472dd`. Guards checked by the parent at activation 11:06:54 UTC. Item 18 untouched (recorded conflict).
+- Built: `public/manifest.webmanifest` (standalone, night background/theme `#0b1016`) and an original lantern icon (SVG + 192/512/maskable PNGs); a service worker generated at build (`vite.config.ts` → `dist/sw.js`) with one cache per build version; offline play after the first visit for every file that visit fetched plus all code; a new version installs quietly beside the old one, is used from the next start, never mid-session, and the title shows one line while it waits. Saves/settings (localStorage) are never touched; only this game's old version caches are deleted. Exact semantics and limits in the queue's "Decisions taken".
+- Gates (raw `docs/pr-media/item29-installable/gate/`): 1212 tests (15 new in `src/offline/offline.test.ts`), typecheck clean, build passed (existing chunk warning), walk gap PASS 97.0 m, built smoke on 4193 passed.
+- Browser (`scripts/item29_capture.mjs`, real Chromium, real clicks and held W): two-build run (`--builds`, the script's own server; B = the same tree with one changed number, so every code chunk differs) 39/39 both image-free and with frames: first visit online, network cut (server drops every connection and the browser is offline), reload, Continue, walk; B deployed while tab1 plays: B waits, both tabs stay on A, tab2's title shows the line, tab1 still gets A's page; restart with tab1 open keeps A; tab1 closed, next start adopts B, no line, save and settings byte-identical, unrelated cache kept, only B's cache left; B offline: Continue and walk, no failed request. URL mode on the built preview: 13/13. Fixtures: synthetic save from `scripts/item21_fixture.ts`, seeded settings. Headless limitation: tab1 is paused (Esc) while B is fetched (see critique).
+- Regressions: item22 and item21 captures both flake at the damaged-save recovery line ("Your saved game couldn't be read..."), on `main` as well as this branch. Parent reran item22 no-image on the built previews: `main` 70472dd failed 2 of 3 runs, this branch failed 3 of 4 (24 earlier checks passed each time). A direct repro on both builds showed the tutorial prompt "One window is lit. Walk to it." in the caption place of the 10 s recovery line, so this is an existing race between `notice()` and the first-evening line (items 25/27), not item 29. Item21 baseline on main: `gate/item21-main-baseline.txt`. Not fixed here (one item per PR); see Questions.
+- Questions: should the damaged-save recovery line outrank the first-evening prompt? It is currently overwritten in most headless runs.
+- Not verified: the browser's Install prompt and own-window launch on a desktop, the live site (pending deploy), behaviour in Safari/Firefox.
+
 ## 2026-11-16 10:55 UTC Queue item 28 deployed (Viktor)
 
 - PR #109 regular-merged as `d2697f9`; required videogametest noreply author/committer verified, merge tree identical to the gated branch. Pages `43847407535` succeeded on that commit.

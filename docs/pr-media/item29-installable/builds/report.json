@@ -1,0 +1,190 @@
+{
+  "url": "http://localhost:4229/",
+  "mode": "two local builds, own server",
+  "images": true,
+  "fixtures": [
+    "save: scripts/item21_fixture.ts populatedGame() (synthetic)",
+    "settings: seeded {brightnessSet, quality medium, master 0.37}"
+  ],
+  "checks": [
+    {
+      "passed": true,
+      "message": "build-a: worker registered and controls the first-visit page"
+    },
+    {
+      "passed": true,
+      "message": "build-a: manifest linked, standalone, 192 and 512 icons"
+    },
+    {
+      "passed": true,
+      "message": "build-a: icon /icons/icon-192.png loads"
+    },
+    {
+      "passed": true,
+      "message": "build-a: icon /icons/icon-512.png loads"
+    },
+    {
+      "passed": true,
+      "message": "build-a: icon /icons/icon-maskable-512.png loads"
+    },
+    {
+      "passed": true,
+      "message": "build-a: icon /icons/lantern.svg loads"
+    },
+    {
+      "passed": true,
+      "message": "build-a online first visit: title offers Continue for the saved game"
+    },
+    {
+      "passed": true,
+      "message": "build-a online first visit: held W walks the hero 2.30 m (frames 11->29)"
+    },
+    {
+      "passed": true,
+      "message": "build-a: save and settings unchanged across the offline reload"
+    },
+    {
+      "passed": true,
+      "message": "build-a: seeded settings intact"
+    },
+    {
+      "passed": true,
+      "message": "build-a offline after reload: title offers Continue for the saved game"
+    },
+    {
+      "passed": true,
+      "message": "build-a offline after reload: held W walks the hero 2.88 m (frames 32->49)"
+    },
+    {
+      "passed": true,
+      "message": "build-a: no request failed offline (116 same-origin files served by the worker)"
+    },
+    {
+      "passed": true,
+      "message": "build-a: no file was asked of the cut server offline (worker update checks to /sw.js: 2)"
+    },
+    {
+      "passed": true,
+      "message": "tab1 playing A: title offers Continue for the saved game"
+    },
+    {
+      "passed": true,
+      "message": "tab1 playing A: held W walks the hero 2.15 m (frames 18->34)"
+    },
+    {
+      "passed": true,
+      "message": "The two builds have different pages (different script hashes)"
+    },
+    {
+      "passed": true,
+      "message": "While tab1 plays, both tabs stay on version A (e4612a092809)"
+    },
+    {
+      "passed": true,
+      "message": "tab2 opened before B finished installing: no takeover"
+    },
+    {
+      "passed": true,
+      "message": "tab2 title shows the one update line: \"An update is ready. It will be used the next time you start.\""
+    },
+    {
+      "passed": true,
+      "message": "tab1 (playing) still gets build A's page from its cache"
+    },
+    {
+      "passed": true,
+      "message": "tab1 is still in its game"
+    },
+    {
+      "passed": true,
+      "message": "tab1 still playing A after B waits: held W walks the hero 3.52 m (frames 154->170)"
+    },
+    {
+      "passed": true,
+      "message": "tab1 resumed and walked on A after B was fetched"
+    },
+    {
+      "passed": true,
+      "message": "tab2 restarted while tab1 plays: B still waits, A kept"
+    },
+    {
+      "passed": true,
+      "message": "tab2 title still shows the update line"
+    },
+    {
+      "passed": true,
+      "message": "B is installed and waiting, not active"
+    },
+    {
+      "passed": true,
+      "message": "Next start adopted B (e4612a092809 -> 9f396623ebca)"
+    },
+    {
+      "passed": true,
+      "message": "The page now is build B's"
+    },
+    {
+      "passed": true,
+      "message": "No update line once B is in use"
+    },
+    {
+      "passed": true,
+      "message": "Save byte-identical across the update (as on disk right before the next start)"
+    },
+    {
+      "passed": true,
+      "message": "Settings byte-identical across the update (still the seeded settings)"
+    },
+    {
+      "passed": true,
+      "message": "Unrelated cache kept"
+    },
+    {
+      "passed": true,
+      "message": "Only B's game cache remains"
+    },
+    {
+      "passed": true,
+      "message": "B after update: title offers Continue for the saved game"
+    },
+    {
+      "passed": true,
+      "message": "B after update: held W walks the hero 2.59 m (frames 33->48)"
+    },
+    {
+      "passed": true,
+      "message": "B offline after update: title offers Continue for the saved game"
+    },
+    {
+      "passed": true,
+      "message": "B offline after update: held W walks the hero 1.75 m (frames 18->34)"
+    },
+    {
+      "passed": true,
+      "message": "B offline: no failed request, no file asked of the cut server (sw.js checks 1)"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [
+    "docs/pr-media/item29-installable/builds/build-a-offline-title.png",
+    "docs/pr-media/item29-installable/builds/build-a-offline-game.png",
+    "docs/pr-media/item29-installable/builds/update-ready-title.png",
+    "docs/pr-media/item29-installable/builds/after-update-title.png",
+    "docs/pr-media/item29-installable/builds/after-update-offline-game.png"
+  ],
+  "requestFailures": [],
+  "notes": [
+    "build-a: first visit offline state {\"supported\":true,\"registered\":true,\"controlled\":true,\"updateReady\":false,\"start\":\"none\",\"kept\":19,\"error\":null,\"lastAsk\":null}, explicit keep call kept 0 more",
+    "build-a: first visit loaded 121 same-origin files; caches {\"everylitwindow-e4612a092809\":186}",
+    "build-a: online walk 2.30 m; offline load needed 116 files",
+    "tab1 paused mid-game (Esc) while B was fetched: a headless capture limitation, not a game rule",
+    "deployed B: the server now serves the second build",
+    "save changed by tab1 play after first read: true",
+    "windows before next start: \"B waiting\"",
+    "caches after update: {\"unrelated-test\":1,\"everylitwindow-9f396623ebca\":186}"
+  ],
+  "server": {
+    "build-a-offline-hits": 2
+  }
+}

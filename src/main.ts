@@ -12,6 +12,7 @@ import { parseShowcaseTime } from './render/showcase_clips';
 import { GAME_TITLE } from './data/title';
 import { LoadFailedError } from './render/load_retry';
 import { describeError, logEvent } from './render/debug_log';
+import { keepFetched, prepareOffline } from './render/offline';
 
 document.title = GAME_TITLE;
 
@@ -37,7 +38,11 @@ if (params.has('styletest')) {
     console.error(err);
   });
 } else {
-  startValley(canvas, ui, window.location.search).catch((err: unknown) => {
-    console.error(err);
+  // Item 29: a waiting update is taken here, before the title, or not at all this session.
+  prepareOffline().catch((err: unknown) => { logEvent('offline', `failed: ${String(err)}`); return false; }).then(reloading => {
+    if (reloading) return;
+    startValley(canvas, ui, window.location.search).then(() => keepFetched()).catch((err: unknown) => {
+      console.error(err);
+    });
   });
 }

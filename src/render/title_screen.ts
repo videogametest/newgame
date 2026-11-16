@@ -12,6 +12,7 @@ export class TitleScreen {
   private readonly main = document.createElement('div');
   private readonly actions = document.createElement('div');
   private readonly confirm = document.createElement('div');
+  private readonly notice = document.createElement('p');
   private readonly settings: SettingsPages;
   private readonly controls: ControlsPage;
   private page: 'main' | 'confirm' | 'settings' | 'controls' = 'main';
@@ -32,12 +33,16 @@ export class TitleScreen {
     const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:12px;justify-content:center;flex-wrap:wrap;';
     row.append(button(words.replace, () => this.choose('new')), button(words.keep, () => this.showMain()));
     this.confirm.append(question, row); this.confirm.hidden = true;
-    this.main.append(heading, this.actions, this.confirm);
+    this.notice.dataset.notice = 'update'; this.notice.hidden = true;
+    this.notice.style.cssText = 'margin:18px 0 0;font-size:13px;opacity:.75;';
+    this.main.append(heading, this.actions, this.confirm, this.notice);
     this.settings = new SettingsPages({ ...deps, onControls: () => this.showControls(), onBack: () => this.showMain() });
     this.controls = new ControlsPage(onBindings, () => this.showSettings());
     this.el.append(this.main, this.settings.el, this.controls.el); root.append(this.el);
     this.focusFirst();
   }
+  /** One small line under the buttons (item 29's update notice); null hides it. */
+  setNotice(text: string | null): void { this.notice.textContent = text ?? ''; this.notice.hidden = text === null; }
   get visible(): boolean { return !this.el.hidden; }
   hide(): void { this.el.hidden = true; this.controls.close(); this.settings.close(); }
   show(): void { this.el.hidden = false; this.showMain(); }

@@ -6,7 +6,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
-## 2026-11-16 Queue item 28: people in Wick (Viktor, PR pending)
+## 2026-11-16 Queue item 28: people in Wick (Viktor, PR #109)
 
 - Branch `feat/item28-wick-people` from `ead39f7`. Guards checked by the parent at activation 09:25:12 UTC. Item 18 untouched (recorded conflict).
 - Built: existing `src/core/people/households.ts` stays the one owner of the sixteen households; `houseId` now joins each to its building in the seeded Wick plan (plural household ids, singular plan ids). Old Maren's trigger is the writing's "The first lantern is lit" (the first-evening gate lantern, or any place's lantern); a place freed once still counts after it is retaken. New pure `src/core/people/daily.ts` (plan in `src/data/wick_days.ts`, numbers in `TUNING.wickPeople`): wake at 6 and walk to work, work 8 to 17, walk to the well, gather 18 to 18:30, walk home, indoors 19 to 6. Walks use grid A* on a 1 m Wick grid over the hero's walkable ground (round houses, the well, water). A window is lit only when its household is home, one of them is indoors and the clock allows (19 to 1; Hesper's lamp keeps its existing 17:00 start and now burns to dawn). Window boards come down for households home. Villagers drawn by `src/render/wick_people.ts` with the loaded CC0 Barbarian, unarmed, homespun tint; nobody drawn indoors. Item 23's Marrin pane generalised to every house.

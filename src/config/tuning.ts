@@ -27,6 +27,10 @@ const DEFAULTS = {
 
   /** Item 21: three active minutes between browser saves (untuned). */
   saves: { intervalSeconds: 180 },
+  /** Item 24 placeholders: metres, radians/second and revealed characters/second. */
+  talking: { reach: 3, leaveReach: 6, doorOffset: 5.4, cameraRate: 2.5,
+    slow: 24, medium: 42, fast: 72 },
+
 
   camera: {
     fov: 0.9,

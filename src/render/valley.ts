@@ -1,5 +1,10 @@
 import { canLightLantern, lightLantern, millWindowOn } from '../core/places/lantern';
 import { LANTERN_WORDS, MILL_LANTERN, MILL_WINDOW_HOUSE } from '../data/mill_lantern';
+import { Conversation } from '../core/speech/conversation';
+import { HESPER, conversationPages } from '../data/talking';
+import { addNote } from '../core/notes/notes';
+import { gameHour, nextLine } from '../core/speech/said';
+import { ConversationBox } from './conversation_box';
 import type { Awareness } from '../core/stealth';
 // The valley: open-world slice, step 1. Terrain, sky, water, one hero walking under the day-night clock.
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
@@ -117,6 +122,8 @@ export interface ValleyHooks {
   exposure(): { exposure: number; ambient: number };
   lanternState(): { position: { x: number; z: number }; available: boolean; windowHouse: string; windowOn: boolean; windowRendered: boolean; lanternIntensity: number; cue: string };
   interactLantern(): boolean;
+  talkingState(): { position: { x: number; z: number }; available: boolean; line: string | null; text: string | null };
+
 }
 /** Meshes that make up the sky. A pick that passes through these is sky. */
 const SKY_MESHES = new Set(['valley_sky', 'valley_stars', 'valley_sun', 'valley_moon']);
@@ -270,6 +277,11 @@ class Valley {
   private titleBaseYaw = 0;
   private saveFailed = false;
   private lanternCue = 'none';
+  private readonly conversation: Conversation;
+  private readonly conversationBox: ConversationBox;
+  private readonly hesper: Fighter;
+  private readonly hesperView: CharacterView;
+
 
   constructor(
     private readonly engine: Engine,
@@ -338,6 +350,19 @@ class Valley {
     this.bramView = new CharacterView(scene, assets, this.bram, this.shadow, 'bram');
     this.bramView.asDesigned(scene, PROPORTIONS);
     this.snapBram();
+    this.hesper = makeFighter(bramBattle, { unitId: 'hesper', kind: 'soldier', team: 'player',
+      x: HESPER.x, z: HESPER.z, yaw: HESPER.yaw });
+    this.hesper.y = walkSurfaceAt(HESPER.x, HESPER.z);
+    this.hesperView = new CharacterView(scene, assets, this.hesper, this.shadow, 'hesper');
+    this.hesperView.asDesigned(scene, PROPORTIONS);
+    this.conversation = new Conversation(line => {
+      const said = nextLine(this.game.speech, { speaker: line.speaker, group: line.id, count: 1,
+        now: gameHour(this.game.day, this.game.timeOfDay), urgent: true });
+      if (said) this.game.speech = said.log;
+      this.game.notes = addNote(this.game.notes, { lineId: line.id, kind: 'said',
+        speakers: [line.speaker], place: 'wick', day: this.game.day });
+    });
+    this.conversationBox = new ConversationBox(uiRoot);
     hud.onRestart = () => this.restartFight();
 
     this.uiRoot = uiRoot;
@@ -417,6 +442,7 @@ class Valley {
     const next = choice === 'continue' ? structuredClone(this.titleSave.state) : newGameState(VALLEY_SEED);
     Object.assign(this.game, next);
     this.input.reset();
+    this.conversation.stop();
     this.fight.restart(); // reconstructs named outcomes and speech from the selected GameState
     this.heroView.dispose();
     this.heroView = new CharacterView(this.scene, this.assets, this.hero, this.shadow, 'hero');
@@ -665,6 +691,8 @@ class Valley {
     const squadPressed = this.input.takeActionPressed('squadOrder');
     const crouchPressed = this.input.takeActionPressed('crouch');
     const interactPressed = this.input.takeActionPressed('interact');
+    const previousAnswer = this.conversation.current && this.input.takeActionPressed('moveLeft');
+    const nextAnswer = this.conversation.current && this.input.takeActionPressed('moveRight');
     const raw = this.input.takeInput();
     if (this.picture) return; // the figure stays where the picture put it
     if (squadPressed) this.onSquadOrderKey();
@@ -674,7 +702,7 @@ class Valley {
       this.crouched = this.input.isDown('crouch');
     }
     const live = this.input.isLocked && this.input.isWindowFocused;
-    const intent: BattleInput = live
+    const intent: BattleInput = live && !this.conversation.current
       ? raw
       : { ...raw, moveX: 0, moveZ: 0, sprint: false, attackPressed: false, attackHeld: false, attackReleased: false, dodgePressed: false };
     const moving = live && Math.hypot(intent.moveX, intent.moveZ) > 0.01;
@@ -686,11 +714,29 @@ class Valley {
       ? { hour: this.game.timeOfDay, place: mill, movement: this.heroMovement } : undefined);
     this.game.hero.position = { x: this.hero.x, z: this.hero.z };
     this.groundY = this.hero.y;
-    if (live && interactPressed) this.interactLantern();
+    if (live && previousAnswer) this.conversation.select(-1);
+    if (live && nextAnswer) this.conversation.select(1);
+    if (live && interactPressed) {
+      if (this.conversation.current) this.conversation.interact();
+      else if (!this.startTalking()) this.interactLantern();
+    }
+  }
+
+  private canTalk(): boolean {
+    return !this.titleActive && !this.paused && !this.picture && this.hero.alive && !this.conversation.current
+      && Math.hypot(this.hero.x - HESPER.x, this.hero.z - HESPER.z) <= T.talking.reach
+      && conversationPages({ source: 'hesper', group: HESPER.group }, HESPER.id, HESPER.name)
+        .some(l => this.game.speech.lines[`${l.id}#0`] === undefined);
+  }
+  private startTalking(): boolean {
+    if (!this.canTalk()) return false;
+    const pages = conversationPages({ source: 'hesper', group: HESPER.group }, HESPER.id, HESPER.name)
+      .filter(l => this.game.speech.lines[`${l.id}#0`] === undefined);
+    return this.conversation.start(pages);
   }
 
   private interactLantern(): boolean {
-    if (this.titleActive || this.paused || this.picture || !this.hero.alive) return false;
+    if (this.titleActive || this.paused || this.picture || this.conversation.current || !this.hero.alive) return false;
     this.syncSaveHero();
     if (!lightLantern(this.game, 'mill', this.hero, MILL_LANTERN)) return false;
     logEvent('capture', 'mill lantern lit');
@@ -744,6 +790,15 @@ class Valley {
   }
 
   private updateView(dt: number): void {
+    if (!this.hero.alive || Math.hypot(this.hero.x - HESPER.x, this.hero.z - HESPER.z) > T.talking.leaveReach)
+      this.conversation.stop();
+    const talkAllowed = !this.picture && !this.paused && !this.titleActive;
+    const text = currentSettings().play;
+    if (talkAllowed) this.conversation.reveal(dt, text.textSpeed === 'instant' ? Infinity : T.talking[text.textSpeed]);
+    this.conversationBox.update(this.conversation, talkAllowed && !this.chromeHidden,
+      fillPrompt('{interact}', currentSettings().bindings, 'keyboard'), text.textSize);
+    this.hesperView.setShown(!this.picture && !this.titleActive);
+    this.hesperView.update(this.hesper, this.hesper.y);
     const L = lightingAt(this.game.timeOfDay);
     this.hemi.diffuse = L.hemiColor;
     this.hemi.intensity = L.hemiIntensity;
@@ -787,6 +842,11 @@ class Valley {
       this.input.aimPitch = 0;
       this.heroView.setShown(false); this.bramView.setShown(false);
     }
+    if (this.conversation.current && talkAllowed) {
+      const target = Math.atan2(HESPER.x - this.hero.x, HESPER.z - this.hero.z);
+      const delta = Math.atan2(Math.sin(target - this.input.camYaw), Math.cos(target - this.input.camYaw));
+      this.input.camYaw += delta * (1 - Math.exp(-T.talking.cameraRate * dt));
+    }
     const pose = valleyCameraPose(
       { x: this.hero.x, y: this.groundY, z: this.hero.z },
       this.input.camYaw,
@@ -801,12 +861,16 @@ class Valley {
     // The fade rule for fighters between the lens and the hero, or too near the lens.
     this.bramView.fade(blocksView(pose.position, this.hero, this.bram), dt);
     this.captionTime = this.paused ? this.captionTime : Math.max(0, this.captionTime - dt);
-    this.captionEl.hidden = !(this.captionTime > 0 && !this.picture && !this.paused && !this.chromeHidden && !this.titleActive);
+    this.captionEl.hidden = !(this.captionTime > 0 && !this.conversation.current && !this.picture && !this.paused && !this.chromeHidden && !this.titleActive);
 
-    if (!this.titleActive && !this.paused && !this.picture && this.captionTime <= 0
+    if (!this.titleActive && !this.paused && !this.picture && !this.conversation.current && this.captionTime <= 0
       && canLightLantern(this.game, 'mill', this.hero, MILL_LANTERN)) {
       const prompt = fillPrompt('{interact}', currentSettings().bindings, 'keyboard');
       this.captionEl.textContent = prompt ? `${prompt} ${LANTERN_WORDS.prompt}` : LANTERN_WORDS.prompt;
+      this.captionEl.hidden = this.chromeHidden;
+    }
+    if (this.canTalk() && this.captionTime <= 0) {
+      this.captionEl.textContent = fillPrompt('{interact} to talk', currentSettings().bindings, 'keyboard');
       this.captionEl.hidden = this.chromeHidden;
     }
     this.updateHud(dt);
@@ -954,6 +1018,8 @@ class Valley {
         windowRendered: this.scene.getMeshByName(`${MILL_WINDOW_HOUSE}_recovery_window`)?.isEnabled() ?? false,
         lanternIntensity: this.scene.getLightByName('mill_lantern')?.intensity ?? 0, cue: this.lanternCue }),
       interactLantern: () => this.interactLantern(),
+      talkingState: () => ({ position: { x: HESPER.x, z: HESPER.z }, available: this.canTalk(),
+        line: this.conversation.current?.id ?? null, text: this.conversation.current?.text ?? null }),
       savedState: () => { this.syncSaveHero(); return structuredClone(this.game); },
       saveNow: (reason = 'interval') => this.autosave.save(reason),
       millState: () => this.fight.mill.snapshot(),

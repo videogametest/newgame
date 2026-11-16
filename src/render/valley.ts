@@ -795,6 +795,7 @@ class Valley {
     this.watchYardArrows();
     if (this.fight.status === 'fighting') this.fight.advance(intent, mill
       ? { hour: this.game.timeOfDay, place: mill, movement: this.heroMovement } : undefined);
+    this.fight.settleBandits();
     this.yardArrowsLanded();
     if (live && !this.conversation.current && (arrowNext || arrowPrev)) this.yardEvent({ type: 'arrowChanged', delta: arrowNext ? 1 : -1 });
     this.game.hero.position = { x: this.hero.x, z: this.hero.z };

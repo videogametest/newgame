@@ -6,6 +6,15 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 Queue item 25: first evening, road and door (Viktor, PR #106)
+
+- Implementation `925a651`, branch `feat/item25-first-evening`, fresh base `355bdab`, design v38 and newest review 036. At activation 03:41:38 UTC: main thread idle, no other queue run; newest repository push 03:03:20 UTC, 38m18s earlier. No existing item-25 PR/branch. Item 18 remains its recorded design conflict and was not implemented.
+- Pure tutorial state: road, door and the one evening choice. Show me routes to the yard (step 3, pending item 26); the prior-bow answer speaks `evening.skip` and routes to the lantern (step 6, pending item 27). Opening and choice happen once and survive Continue. New saves are version 4; older saves keep progress, skip the road and still get the door choice.
+- Writing is read by id: `evening.open`, `hesper.arrival`, `hesper.arrival.bram`, `evening.choice`, `evening.skip`. Move/look/sprint prompts are filled from the actual keyboard bindings and disappear once used. Look is mouse wording from interface writing. Controller prompt wording and later lesson content are not claimed.
+- Gate: 1121 tests / 105 files, typecheck clean, production build passed (existing large-chunk warning), walk gap PASS 97.0 m, local built-page smoke on 4193 passed. Raw logs: `docs/pr-media/item25-first-evening/gate/`.
+- Browser: all 37 checks passed, no failures/fallbacks. Rebound O/L/J were used and old W/Shift/E refused; a 179 m real held-key road walk reached her door; clock stayed live during talking; pause/resume, both actual answer selections, saved v4 state and no repeats after Continue were checked. The skip path used synthetic door placement after a fresh New game.
+- Four full-page frames captured once, not visually judged, no retake/fallback/errors. Settled medium calls 414/480/460/420 exceed 300; no same-view baseline/causal claim. Merge, Pages and live checks follow.
+
 ## 2026-11-16 03:02 UTC Queue item 24 deployed (Viktor)
 
 - PR #105 regular-merged as `670a3ee`; required videogametest noreply author and committer verified on both branch commits and merge. Merge tree identical to the gated branch. Pages `43795040613` succeeded on that exact commit, tests/build/built-page smoke/deploy green. First watch hit the tool limit while CI continued; direct final state and second watch confirmed success.

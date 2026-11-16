@@ -8,6 +8,7 @@ import type { InventoryState } from '../items/types';
 import type { Quiver, RecoverableArrow } from '../combat/quiver';
 import type { Stories } from '../stories/stories';
 import type { Taking } from '../valley/learns';
+import type { TutorialState } from '../tutorial/lesson';
 import type { WatchState } from '../valley/watch';
 import type { Note } from '../notes/notes';
 import type { SpeechLog } from '../speech/said';
@@ -166,7 +167,7 @@ export interface HeroState {
 }
 
 /** Save format version. Bump with a migration when the shape changes (design section 7). */
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 /**
  * The single serialisable game state (design section 7). Terrain and scenery are NOT stored: they come from the seed.
@@ -214,6 +215,8 @@ export interface GameState {
   lessonsTaken: string[];
   /** Standing watch after the finale: the only thing that ever brings a raid (src/core/valley/watch). Added in save version 3. */
   watch: WatchState;
+  /** The first evening (task 010, src/core/tutorial). Added in save version 4. */
+  tutorial: TutorialState;
   /** Knocked-out bandits the hero has bound. Added in save version 3. */
   boundBandits: string[];
   places: PlaceState[];

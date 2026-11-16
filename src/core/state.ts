@@ -8,6 +8,7 @@ import { createProgression } from './progression/skills';
 import { newStories } from './stories/stories';
 import { emptySpeechLog } from './speech/said';
 import { newWatch } from './valley/watch';
+import { migratedTutorial, newTutorial } from './tutorial/lesson';
 import { SAVE_VERSION, type GameState } from './types';
 
 /** The valley as the hero first walks into it, at dusk: every place held, one window lit. */
@@ -48,6 +49,7 @@ export function newGameState(seed: number): GameState {
     boundBandits: [],
     lessonsTaken: [],
     watch: newWatch(),
+    tutorial: newTutorial(),
   };
 }
 
@@ -73,5 +75,7 @@ export function migrateSave(raw: unknown): GameState | null {
     next.company = fresh.company;
     delete next.squad;
   }
+  // Version 4 added the first evening. A saved game is past the road; nothing it had is reset.
+  if (old.version < 4) next.tutorial = migratedTutorial();
   return next;
 }

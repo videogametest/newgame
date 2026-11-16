@@ -1,0 +1,1107 @@
+{
+  "notes": [
+    "Skip path: hero placed at her door with placeAt (synthetic placement; the road was walked in the first path)."
+  ],
+  "checks": [
+    {
+      "passed": true,
+      "message": "Fresh profile: no Continue"
+    },
+    {
+      "passed": true,
+      "message": "Opening line on screen: One window is lit. Walk to it."
+    },
+    {
+      "passed": true,
+      "message": "New game starts on step 1 with the opening recorded"
+    },
+    {
+      "passed": true,
+      "message": "Move/look prompts show rebound keys: [\"O A S D to walk.\",\"Move the mouse to look.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Sprint prompt waits for walking"
+    },
+    {
+      "passed": true,
+      "message": "Old W key neither moves nor clears the walk prompt"
+    },
+    {
+      "passed": true,
+      "message": "Rebound O walks (2.10 m) and the walk prompt is gone"
+    },
+    {
+      "passed": true,
+      "message": "Real mouse movement clears the look prompt"
+    },
+    {
+      "passed": true,
+      "message": "Look prompt gone once used"
+    },
+    {
+      "passed": true,
+      "message": "Sprint prompt after a few seconds walking, rebound: [\"Hold L to run.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Old Shift does not count as sprint"
+    },
+    {
+      "passed": true,
+      "message": "Rebound L sprint clears the last road prompt"
+    },
+    {
+      "passed": true,
+      "message": "Pause hides evening text"
+    },
+    {
+      "passed": true,
+      "message": "Resume keeps the evening state"
+    },
+    {
+      "passed": true,
+      "message": "Walked the road to her door with held rebound keys (camera steered by lookAt hook)"
+    },
+    {
+      "passed": true,
+      "message": "Reaching her door is step 2"
+    },
+    {
+      "passed": true,
+      "message": "Door talk is offered"
+    },
+    {
+      "passed": true,
+      "message": "Old E binding does not start the door talk"
+    },
+    {
+      "passed": true,
+      "message": "No road prompt shows during the talk"
+    },
+    {
+      "passed": true,
+      "message": "Clock runs during the door talk (nonmodal)"
+    },
+    {
+      "passed": true,
+      "message": "Choice answers hang on hesper.arrival.bram (authored ids)"
+    },
+    {
+      "passed": true,
+      "message": "Answer rows show authored words: [\"▸ Show me.\",\"I've held a bow before.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Show me routes to step 3, pending: step 3 (the yard) is queue item 26; not built"
+    },
+    {
+      "passed": true,
+      "message": "No repeat talk after the choice"
+    },
+    {
+      "passed": true,
+      "message": "Continue: no opening, no prompts, choice kept"
+    },
+    {
+      "passed": true,
+      "message": "Continue: door talk not offered again"
+    },
+    {
+      "passed": true,
+      "message": "New game: fresh evening with opening and prompts"
+    },
+    {
+      "passed": true,
+      "message": "Old E binding does not start the door talk"
+    },
+    {
+      "passed": true,
+      "message": "No road prompt shows during the talk"
+    },
+    {
+      "passed": true,
+      "message": "Clock runs during the door talk (nonmodal)"
+    },
+    {
+      "passed": true,
+      "message": "Choice answers hang on hesper.arrival.bram (authored ids)"
+    },
+    {
+      "passed": true,
+      "message": "Answer rows show authored words: [\"▸ Show me.\",\"I've held a bow before.\"]"
+    },
+    {
+      "passed": true,
+      "message": "D (move right) selects the second answer"
+    },
+    {
+      "passed": true,
+      "message": "Skip answer gets evening.skip from Hesper"
+    },
+    {
+      "passed": true,
+      "message": "Skip routes to step 6, pending: step 6 (the lantern) is queue item 27; not built"
+    },
+    {
+      "passed": true,
+      "message": "Saved game (v4) carries the evening"
+    },
+    {
+      "passed": true,
+      "message": "Continue after skip: no opening, no second choice"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [
+    "docs/pr-media/item25-first-evening/road-opening.png",
+    "docs/pr-media/item25-first-evening/road-sprint-prompt.png",
+    "docs/pr-media/item25-first-evening/door-choice.png",
+    "docs/pr-media/item25-first-evening/door-skip.png"
+  ],
+  "snapshots": [
+    {
+      "name": "road-opening",
+      "drawCalls": 414,
+      "chunks": 76,
+      "world": {
+        "x": 226,
+        "z": 238,
+        "groundY": 33.96983801789676,
+        "yaw": -2.356194490192345,
+        "tod": 18.057275999999984,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 50,
+        "pausedFrame": null,
+        "chunks": 76,
+        "chunkBuilds": 76,
+        "fps": 14,
+        "drawCalls": 414,
+        "activeMeshes": 326,
+        "bram": {
+          "x": 224.9393398282202,
+          "z": 240.47487373415294,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 226,
+            "z": 238,
+            "groundY": 33.96983801789676,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "road",
+          "opened": true,
+          "used": {
+            "move": false,
+            "look": false,
+            "sprint": false
+          },
+          "walked": 0,
+          "choice": null
+        },
+        "stepNumber": 1,
+        "pending": null,
+        "opening": "One window is lit. Walk to it.",
+        "prompts": [
+          "O A S D to walk.",
+          "Move the mouse to look."
+        ],
+        "choiceOpen": true
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": null,
+        "text": null,
+        "answers": [],
+        "selected": 0
+      }
+    },
+    {
+      "name": "road-sprint-prompt",
+      "drawCalls": 480,
+      "chunks": 78,
+      "world": {
+        "x": 217.26723125234747,
+        "z": 229.26723125234747,
+        "groundY": 31.689709248249088,
+        "yaw": -2.356194490192345,
+        "tod": 18.309283999999856,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 183,
+        "pausedFrame": null,
+        "chunks": 78,
+        "chunkBuilds": 78,
+        "fps": 10,
+        "drawCalls": 480,
+        "activeMeshes": 346,
+        "bram": {
+          "x": 216.5389112677253,
+          "z": 232.07444517365803,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 217.26723125234747,
+            "z": 229.26723125234747,
+            "groundY": 31.689709248249088,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -167.1,
+            "z": 70,
+            "groundY": 7.1312302302255235,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "road",
+          "opened": true,
+          "used": {
+            "move": true,
+            "look": true,
+            "sprint": false
+          },
+          "walked": 4.116666666666657,
+          "choice": null
+        },
+        "stepNumber": 1,
+        "pending": null,
+        "opening": null,
+        "prompts": [
+          "Hold L to run."
+        ],
+        "choiceOpen": true
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": null,
+        "text": null,
+        "answers": [],
+        "selected": 0
+      }
+    },
+    {
+      "name": "door-choice",
+      "drawCalls": 460,
+      "chunks": 109,
+      "world": {
+        "x": 91.5577876930166,
+        "z": 103.55778769301678,
+        "groundY": 5.001453698490906,
+        "yaw": -2.356194490192393,
+        "tod": 19.136047999999423,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 640,
+        "pausedFrame": 220,
+        "chunks": 109,
+        "chunkBuilds": 112,
+        "fps": 10,
+        "drawCalls": 460,
+        "activeMeshes": 325,
+        "bram": {
+          "x": 90.79131775165756,
+          "z": 106.32685165759055,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91.5577876930166,
+            "z": 103.55778769301678,
+            "groundY": 5.001453698490906,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -163.59176349071697,
+            "z": 62.80208662405529,
+            "groundY": 6.213381140389413,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.36219720313787,
+            "z": 73.36501370698664,
+            "groundY": 7.773920639421,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -185.14479066723732,
+            "z": 47.28038722716204,
+            "groundY": 3.6934681365026867,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -186.88873179291798,
+            "z": 46.858028875271074,
+            "groundY": 3.836666204321774,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "door",
+          "opened": true,
+          "used": {
+            "move": true,
+            "look": true,
+            "sprint": true
+          },
+          "walked": 37.2833333333325,
+          "choice": null
+        },
+        "stepNumber": 2,
+        "pending": null,
+        "opening": null,
+        "prompts": [],
+        "choiceOpen": true
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": "hesper.arrival.bram.0",
+        "text": "And you're the loud one. Good. Somebody should be.",
+        "answers": [
+          "evening.choice.0",
+          "evening.choice.1"
+        ],
+        "selected": 0
+      }
+    },
+    {
+      "name": "door-skip",
+      "drawCalls": 420,
+      "chunks": 109,
+      "world": {
+        "x": 91.81837661840736,
+        "z": 102.81837661840736,
+        "groundY": 4.995579930208058,
+        "yaw": -2.0344439357957027,
+        "tod": 18.131769999999918,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 86,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 111,
+        "fps": 10,
+        "drawCalls": 420,
+        "activeMeshes": 267,
+        "bram": {
+          "x": 91.19438538008839,
+          "z": 105.40197129143662,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91.81837661840736,
+            "z": 102.81837661840736,
+            "groundY": 4.995579930208058,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "lantern",
+          "opened": true,
+          "used": {
+            "move": false,
+            "look": false,
+            "sprint": false
+          },
+          "walked": 0,
+          "choice": "skip"
+        },
+        "stepNumber": 6,
+        "pending": "step 6 (the lantern) is queue item 27; not built",
+        "opening": null,
+        "prompts": [],
+        "choiceOpen": false
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": "evening.skip.0",
+        "text": "Have you. Then I'll save my breath. Take it. The lantern, and then we'll see what you've held.",
+        "answers": [],
+        "selected": 0
+      }
+    }
+  ],
+  "walkedBeforeSprintPrompt": 4.116666666666657,
+  "walkTrace": [
+    {
+      "ms": 0,
+      "metres": 176.42989873223578
+    },
+    {
+      "ms": 5826,
+      "metres": 171.20989873223658,
+      "fps": 17
+    },
+    {
+      "ms": 11510,
+      "metres": 164.63989873223758,
+      "fps": 10
+    },
+    {
+      "ms": 16879,
+      "metres": 159.77989873223834,
+      "fps": 10
+    },
+    {
+      "ms": 21947,
+      "metres": 153.83989873223925,
+      "fps": 10
+    },
+    {
+      "ms": 27059,
+      "metres": 148.52989873224004,
+      "fps": 14
+    },
+    {
+      "ms": 32894,
+      "metres": 142.58989873224095,
+      "fps": 10
+    },
+    {
+      "ms": 37902,
+      "metres": 138.26989873224161,
+      "fps": 10
+    },
+    {
+      "ms": 42994,
+      "metres": 132.4198987322425,
+      "fps": 14
+    },
+    {
+      "ms": 48219,
+      "metres": 127.55989873224324,
+      "fps": 10
+    },
+    {
+      "ms": 53581,
+      "metres": 121.07989873224423,
+      "fps": 10
+    },
+    {
+      "ms": 59126,
+      "metres": 114.59989873224522,
+      "fps": 10
+    },
+    {
+      "ms": 64334,
+      "metres": 108.02989873224622,
+      "fps": 10
+    },
+    {
+      "ms": 70091,
+      "metres": 102.08989873224714,
+      "fps": 10
+    },
+    {
+      "ms": 75479,
+      "metres": 97.7698987322478,
+      "fps": 10
+    },
+    {
+      "ms": 80662,
+      "metres": 93.26989873224848,
+      "fps": 21
+    },
+    {
+      "ms": 86510,
+      "metres": 88.04989873224928,
+      "fps": 11
+    },
+    {
+      "ms": 91657,
+      "metres": 82.64989873225011,
+      "fps": 10
+    },
+    {
+      "ms": 96663,
+      "metres": 76.25989873225107,
+      "fps": 15
+    },
+    {
+      "ms": 101831,
+      "metres": 70.31989873225199,
+      "fps": 10
+    },
+    {
+      "ms": 107069,
+      "metres": 64.82989873225281,
+      "fps": 10
+    },
+    {
+      "ms": 112081,
+      "metres": 60.779898732253436,
+      "fps": 12
+    },
+    {
+      "ms": 117426,
+      "metres": 56.459898732254096,
+      "fps": 10
+    },
+    {
+      "ms": 122639,
+      "metres": 51.599898732254566,
+      "fps": 10
+    },
+    {
+      "ms": 128188,
+      "metres": 44.93989873225484,
+      "fps": 10
+    },
+    {
+      "ms": 133257,
+      "metres": 38.45989873225517,
+      "fps": 10
+    },
+    {
+      "ms": 138312,
+      "metres": 33.4198987322554,
+      "fps": 11
+    },
+    {
+      "ms": 143582,
+      "metres": 27.29989873225527,
+      "fps": 10
+    },
+    {
+      "ms": 148954,
+      "metres": 21.89989873225507,
+      "fps": 10
+    },
+    {
+      "ms": 154361,
+      "metres": 14.78989873225488,
+      "fps": 12
+    },
+    {
+      "ms": 159781,
+      "metres": 10.469898732254757,
+      "fps": 10
+    },
+    {
+      "ms": 165029,
+      "metres": 4.079898732254536,
+      "fps": 10
+    }
+  ],
+  "walk": {
+    "remainingMetres": 2.4598987322544823,
+    "walked": true
+  }
+}

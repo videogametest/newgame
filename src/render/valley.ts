@@ -1,10 +1,12 @@
 import { canLightLantern, lightLantern, millWindowOn } from '../core/places/lantern';
 import { LANTERN_WORDS, MILL_LANTERN, MILL_WINDOW_HOUSE } from '../data/mill_lantern';
-import { Conversation } from '../core/speech/conversation';
+import { Conversation, type ConversationPage } from '../core/speech/conversation';
 import { HESPER, conversationPages } from '../data/talking';
 import { addNote } from '../core/notes/notes';
 import { gameHour, nextLine } from '../core/speech/said';
 import { ConversationBox } from './conversation_box';
+import { advance as advanceEvening, choiceFromAnswer, choiceOpen, roadPrompts, PENDING, STEP_NUMBER, type TutorialEvent } from '../core/tutorial/lesson';
+import { EVENING_CHOICE, EVENING_OPEN, ROAD_PROMPTS, eveningSkipPages, roadPrompt } from '../data/evening';
 import type { Awareness } from '../core/stealth';
 // The valley: open-world slice, step 1. Terrain, sky, water, one hero walking under the day-night clock.
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
@@ -122,7 +124,10 @@ export interface ValleyHooks {
   exposure(): { exposure: number; ambient: number };
   lanternState(): { position: { x: number; z: number }; available: boolean; windowHouse: string; windowOn: boolean; windowRendered: boolean; lanternIntensity: number; cue: string };
   interactLantern(): boolean;
-  talkingState(): { position: { x: number; z: number }; available: boolean; line: string | null; text: string | null };
+  talkingState(): { position: { x: number; z: number }; available: boolean; line: string | null; text: string | null;
+    answers: string[]; selected: number };
+  tutorialState(): { tutorial: GameState['tutorial']; stepNumber: number; pending: string | null; opening: string | null;
+    prompts: string[]; choiceOpen: boolean };
 
 }
 /** Meshes that make up the sky. A pick that passes through these is sky. */
@@ -281,6 +286,9 @@ class Valley {
   private readonly conversationBox: ConversationBox;
   private readonly hesper: Fighter;
   private readonly hesperView: CharacterView;
+  private readonly openingEl: HTMLElement;
+  private readonly promptEl: HTMLElement;
+  private openingTime = 0;
 
 
   constructor(
@@ -386,6 +394,14 @@ class Valley {
     this.captionEl.hidden = true;
     this.captionEl.style.cssText = 'position:absolute;left:50%;bottom:16%;transform:translateX(-50%);font:600 18px/1.3 system-ui,sans-serif;color:#f4ead2;text-shadow:0 1px 3px #000;pointer-events:none;';
     uiRoot.appendChild(this.captionEl);
+    // Item 25: the opening line (upper screen) and the road-in prompts (above the caption). Not speech: no speaker.
+    this.openingEl = document.createElement('div');
+    this.openingEl.className = 'evening-open'; this.openingEl.hidden = true;
+    this.openingEl.style.cssText = 'position:absolute;left:50%;top:18%;transform:translateX(-50%);font:500 24px/1.3 Georgia,serif;color:#f4ead2;text-shadow:0 1px 4px #000;pointer-events:none;text-align:center;';
+    this.promptEl = document.createElement('div');
+    this.promptEl.className = 'evening-prompts'; this.promptEl.hidden = true;
+    this.promptEl.style.cssText = 'position:absolute;left:50%;bottom:24%;transform:translateX(-50%);font:600 17px/1.5 system-ui,sans-serif;color:#ffd98a;text-shadow:0 1px 3px #000;pointer-events:none;text-align:center;white-space:pre-line;';
+    uiRoot.append(this.openingEl, this.promptEl);
     this.installHud(uiRoot);
     canvas.addEventListener('pointerdown', () => {
       if (!this.titleActive && !this.picture && !this.input.isLocked && this.fight.status === 'fighting') this.input.requestLock();
@@ -442,7 +458,8 @@ class Valley {
     const next = choice === 'continue' ? structuredClone(this.titleSave.state) : newGameState(VALLEY_SEED);
     Object.assign(this.game, next);
     this.input.reset();
-    this.conversation.stop();
+    this.conversation.stop(); this.openingTime = 0;
+    this.input.takeLooked();
     this.fight.restart(); // reconstructs named outcomes and speech from the selected GameState
     this.heroView.dispose();
     this.heroView = new CharacterView(this.scene, this.assets, this.hero, this.shadow, 'hero');
@@ -714,25 +731,79 @@ class Valley {
       ? { hour: this.game.timeOfDay, place: mill, movement: this.heroMovement } : undefined);
     this.game.hero.position = { x: this.hero.x, z: this.hero.z };
     this.groundY = this.hero.y;
+    this.stepEvening(live, moving);
     if (live && previousAnswer) this.conversation.select(-1);
     if (live && nextAnswer) this.conversation.select(1);
     if (live && interactPressed) {
-      if (this.conversation.current) this.conversation.interact();
+      if (this.conversation.current) this.onAnswer(this.conversation.interact());
       else if (!this.startTalking()) this.interactLantern();
     }
   }
 
+  /** Item 25: road-in events from what the player actually did this step. */
+  private stepEvening(live: boolean, moving: boolean): void {
+    const looked = this.input.takeLooked();
+    if (this.tour || this.titleActive || this.paused || !live || this.conversation.current) return;
+    const events: TutorialEvent[] = [];
+    if (moving) events.push({ type: 'walked', seconds: T.fixedDt });
+    if (moving && this.heroMovement === 'sprinting') events.push({ type: 'sprinted' });
+    if (looked >= T.tutorial.lookPixels) events.push({ type: 'looked' });
+    if (Math.hypot(this.hero.x - HESPER.x, this.hero.z - HESPER.z) <= T.talking.reach) events.push({ type: 'reachedDoor' });
+    for (const e of events) this.game.tutorial = advanceEvening(this.game.tutorial, e);
+  }
+
+  /** An answer chosen in the box. Only the authored evening choice routes anywhere. */
+  private onAnswer(id: string | null): void {
+    const choice = choiceFromAnswer(id);
+    if (!choice || !choiceOpen(this.game.tutorial)) return;
+    this.game.tutorial = advanceEvening(this.game.tutorial, { type: 'reachedDoor' });
+    this.game.tutorial = advanceEvening(this.game.tutorial, { type: 'chose', choice });
+    logEvent('tutorial', `evening choice ${choice}; step ${STEP_NUMBER[this.game.tutorial.step]} pending`);
+    if (choice === 'skip') this.conversation.start(eveningSkipPages());
+    if (this.persistent && !this.tour) this.autosave.save('interval');
+  }
+
+  /** Her door: hesper.arrival, then hesper.arrival.bram, the unheard lines only; the evening choice hangs on the last. */
+  private doorPages(): ConversationPage[] {
+    const all = [HESPER.group, `${HESPER.group}.bram`].flatMap(group =>
+      conversationPages({ source: 'hesper', group }, HESPER.id, HESPER.name));
+    const unheard = all.filter(l => this.game.speech.lines[`${l.id}#0`] === undefined);
+    if (!choiceOpen(this.game.tutorial) || this.tour) return unheard;
+    // Everything heard but the choice unanswered (left mid-talk, or an older save): her last line asks again.
+    const pages = unheard.length ? unheard : all.slice(-1);
+    return pages.map((p, i) => i === pages.length - 1 ? { ...p, answers: EVENING_CHOICE } : p);
+  }
   private canTalk(): boolean {
     return !this.titleActive && !this.paused && !this.picture && this.hero.alive && !this.conversation.current
       && Math.hypot(this.hero.x - HESPER.x, this.hero.z - HESPER.z) <= T.talking.reach
-      && conversationPages({ source: 'hesper', group: HESPER.group }, HESPER.id, HESPER.name)
-        .some(l => this.game.speech.lines[`${l.id}#0`] === undefined);
+      && this.doorPages().length > 0;
   }
   private startTalking(): boolean {
     if (!this.canTalk()) return false;
-    const pages = conversationPages({ source: 'hesper', group: HESPER.group }, HESPER.id, HESPER.name)
-      .filter(l => this.game.speech.lines[`${l.id}#0`] === undefined);
-    return this.conversation.start(pages);
+    return this.conversation.start(this.doorPages());
+  }
+
+  /** The opening line once, then the road prompts until each control is used. All text from docs/writing. */
+  private updateEvening(dt: number, allowed: boolean): void {
+    const playing = allowed && !this.tour && this.input.isLocked;
+    if (playing && !this.game.tutorial.opened) {
+      this.game.tutorial = advanceEvening(this.game.tutorial, { type: 'opened' });
+      this.openingTime = T.tutorial.openSeconds;
+      if (this.persistent) this.autosave.save('interval');
+    }
+    if (allowed) this.openingTime = Math.max(0, this.openingTime - dt);
+    this.openingEl.textContent = EVENING_OPEN;
+    this.openingEl.hidden = !(this.openingTime > 0 && allowed && !this.chromeHidden);
+    const lines = this.eveningPrompts();
+    this.promptEl.textContent = lines.join('\n');
+    this.promptEl.hidden = !(playing && lines.length && !this.conversation.current && !this.chromeHidden);
+  }
+  private eveningPrompts(): string[] {
+    if (this.tour) return [];
+    const b = currentSettings().bindings;
+    return roadPrompts(this.game.tutorial, T.tutorial.sprintAfter)
+      .map(k => k === 'look' ? ROAD_PROMPTS.look : roadPrompt(k, b, 'keyboard'))
+      .filter((l): l is string => !!l);
   }
 
   private interactLantern(): boolean {
@@ -798,6 +869,7 @@ class Valley {
     this.conversationBox.update(this.conversation, talkAllowed && !this.chromeHidden,
       fillPrompt('{interact}', currentSettings().bindings, 'keyboard'), text.textSize);
     this.hesperView.setShown(!this.picture && !this.titleActive);
+    this.updateEvening(dt, talkAllowed);
     this.hesperView.update(this.hesper, this.hesper.y);
     const L = lightingAt(this.game.timeOfDay);
     this.hemi.diffuse = L.hemiColor;
@@ -1019,7 +1091,11 @@ class Valley {
         lanternIntensity: this.scene.getLightByName('mill_lantern')?.intensity ?? 0, cue: this.lanternCue }),
       interactLantern: () => this.interactLantern(),
       talkingState: () => ({ position: { x: HESPER.x, z: HESPER.z }, available: this.canTalk(),
-        line: this.conversation.current?.id ?? null, text: this.conversation.current?.text ?? null }),
+        line: this.conversation.current?.id ?? null, text: this.conversation.current?.text ?? null,
+        answers: (this.conversation.current?.answers ?? []).map(a => a.id), selected: this.conversation.selected }),
+      tutorialState: () => ({ tutorial: structuredClone(this.game.tutorial), stepNumber: STEP_NUMBER[this.game.tutorial.step],
+        pending: PENDING[this.game.tutorial.step] ?? null, opening: this.openingEl.hidden ? null : this.openingEl.textContent,
+        prompts: this.promptEl.hidden ? [] : this.eveningPrompts(), choiceOpen: choiceOpen(this.game.tutorial) }),
       savedState: () => { this.syncSaveHero(); return structuredClone(this.game); },
       saveNow: (reason = 'interval') => this.autosave.save(reason),
       millState: () => this.fight.mill.snapshot(),

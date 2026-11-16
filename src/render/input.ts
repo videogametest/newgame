@@ -11,6 +11,8 @@ import { currentSettings } from './settings_store';
 
 export class PlayerInput {
   camYaw = 0;
+  /** Pixels of look movement since last read (item 25: the look prompt goes once the player has looked). */
+  private looked = 0;
   aimPitch = 0;
   weapon: WeaponId = 'sword';
   private readonly actions = new ActionState(currentSettings().bindings);
@@ -112,6 +114,9 @@ export class PlayerInput {
     return input;
   }
 
+  /** Look movement since the last call, then cleared. */
+  takeLooked(): number { const l = this.looked; this.looked = 0; return l; }
+
   /** Drops any queued edges, e.g. while the battle is over. */
   consumeEdges(): void {
     this.actions.clearEdges();
@@ -176,6 +181,7 @@ export class PlayerInput {
     if (!this.locked) return;
     const s = TUNING.camera.mouseSensitivity;
     this.camYaw += e.movementX * s;
+    this.looked += Math.abs(e.movementX) + Math.abs(e.movementY);
     this.aimPitch = clamp(this.aimPitch - e.movementY * s, TUNING.camera.pitchMin, TUNING.camera.pitchMax);
   }
 

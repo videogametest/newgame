@@ -46,6 +46,17 @@ describe('versioned save boundary', () => {
     const g: any = populatedGame(); g.tutorial = { ...g.tutorial, choice: 'skip', step: 'lantern', opened: true };
     expect(decodeSave(encodeSave(g), 9).state.tutorial).toEqual(g.tutorial);
   });
+  it('version 4 saves gain an unstarted yard and keep their step; a yard mid-lesson round-trips (item 26)', () => {
+    const v4: any = populatedGame(); v4.version = 4; v4.tutorial = { ...v4.tutorial, step: 'yard', choice: 'show', opened: true };
+    delete v4.tutorial.yard;
+    const d = decodeSave(JSON.stringify(v4), 9); expect(d.status).toBe('loaded');
+    expect(d.state.tutorial).toMatchObject({ step: 'yard', choice: 'show', yard: { phase: 'intro', struck: [], misses: 0, arrow: 'standard' } });
+    const g: any = populatedGame(); g.tutorial = { ...g.tutorial, step: 'yard', choice: 'show', yard: { phase: 'far', struck: ['straw.0', 'straw.1', 'straw.2'], misses: 2, arrow: 'standard' } };
+    expect(decodeSave(encodeSave(g), 9).state.tutorial).toEqual(g.tutorial);
+    const f: any = populatedGame(); f.tutorial = { ...f.tutorial, step: 'fence', yard: { phase: 'done', struck: [], misses: 0, arrow: 'blunt' } };
+    expect(decodeSave(encodeSave(f), 9).state.tutorial.step).toBe('fence');
+    const bad: any = populatedGame(); bad.tutorial.yard.phase = 'elsewhere'; expect(decodeSave(JSON.stringify(bad), 9).status).toBe('damaged');
+  });
   it('settings and generated scenery are not serialized', () => {
     const g = Object.assign(populatedGame(), { settings: { brightness: 0 }, terrain: [1, 2] });
     expect(JSON.parse(encodeSave(g))).not.toHaveProperty('settings'); expect(JSON.parse(encodeSave(g))).not.toHaveProperty('terrain');

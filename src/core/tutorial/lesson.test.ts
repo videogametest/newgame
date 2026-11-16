@@ -28,7 +28,7 @@ describe('first evening, steps 1 and 2', () => {
   it('reaching the door, then "Show me" routes to the yard (step 3, pending)', () => {
     const s = run(newTutorial(), { type: 'reachedDoor' }, { type: 'chose', choice: 'show' });
     expect(s).toMatchObject({ step: 'yard', choice: 'show' }); expect(STEP_NUMBER[s.step]).toBe(3);
-    expect(PENDING.yard).toMatch(/26/);
+    expect(PENDING.yard).toBeUndefined(); // built by item 26 (yard.test.ts)
   });
   it('"I\'ve held a bow before" skips to the lantern (step 6, pending)', () => {
     const s = run(newTutorial(), { type: 'reachedDoor' }, { type: 'chose', choice: 'skip' });

@@ -9,6 +9,7 @@ import { newStories } from './stories/stories';
 import { emptySpeechLog } from './speech/said';
 import { newWatch } from './valley/watch';
 import { migratedTutorial, newTutorial } from './tutorial/lesson';
+import { newYard } from './tutorial/yard';
 import { SAVE_VERSION, type GameState } from './types';
 
 /** The valley as the hero first walks into it, at dusk: every place held, one window lit. */
@@ -77,5 +78,7 @@ export function migrateSave(raw: unknown): GameState | null {
   }
   // Version 4 added the first evening. A saved game is past the road; nothing it had is reset.
   if (old.version < 4) next.tutorial = migratedTutorial();
+  // Version 5 added the yard (step 3). A lesson saved before it starts the yard from the beginning.
+  else if (old.version < 5) next.tutorial = { ...(next.tutorial as GameState['tutorial']), yard: newYard() };
   return next;
 }

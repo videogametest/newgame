@@ -147,15 +147,15 @@ try {
   await snap('door-choice');
   await page.keyboard.press('KeyJ'); await frames(3);
   t = await tut();
-  check(t.tutorial.choice === 'show' && t.stepNumber === 3 && /26/.test(t.pending ?? '') && !(await talk()).line, `Show me routes to step 3, pending: ${t.pending}`);
+  { const said = await talk(); check(t.tutorial.choice === 'show' && t.stepNumber === 3 && t.pending === null && said.line === 'hesper.apprentice.0', `Show me routes to step 3, the yard (item 26), opening with ${said.line}`); }
   check(!(await talk()).available, 'No repeat talk after the choice');
   // Continue does not repeat opening or choice.
   await V(() => window.__valley.saveNow());
   await page.reload({ waitUntil: 'load', timeout: 120000 }); await boot();
   await title().getByRole('button', { name: 'Continue', exact: true }).click(); await playing(); await frames(20);
   t = await tut();
-  check(t.opening === null && t.prompts.length === 0 && t.tutorial.choice === 'show' && t.stepNumber === 3, 'Continue: no opening, no prompts, choice kept');
-  check(!(await talk()).available, 'Continue: door talk not offered again');
+  check(t.opening === null && !t.prompts.some(l => /walk|look|sprint/i.test(l)) && t.tutorial.choice === 'show' && t.stepNumber === 3, 'Continue: no opening, no road prompts, choice kept');
+  { const k = await talk(); check(k.line === null && !k.text, `Continue: no arrival or choice line reopened (${k.line})`); }
   // New game starts fresh; take the skip path.
   await page.keyboard.press('Escape'); await page.waitForFunction(() => window.__valley.state().paused);
   await Promise.all([page.waitForNavigation({ waitUntil: 'load', timeout: 120000 }), page.getByRole('button', { name: 'Return to title', exact: true }).click()]);
@@ -177,7 +177,7 @@ try {
   await page.keyboard.press('KeyJ'); await page.waitForFunction(() => !window.__valley.talkingState().line);
   await V(() => window.__valley.saveNow());
   const saved = await V(() => JSON.parse(localStorage.getItem('everylitwindow.save')));
-  check(saved.version === 4 && saved.tutorial.choice === 'skip' && saved.tutorial.step === 'lantern', 'Saved game (v4) carries the evening');
+  check(saved.version === 5 && saved.tutorial.choice === 'skip' && saved.tutorial.step === 'lantern', 'Saved game (v5) carries the evening');
   await page.reload({ waitUntil: 'load', timeout: 120000 }); await boot();
   await title().getByRole('button', { name: 'Continue', exact: true }).click(); await playing(); await frames(20);
   t = await tut(); check(t.opening === null && t.tutorial.choice === 'skip' && !(await talk()).available, 'Continue after skip: no opening, no second choice');

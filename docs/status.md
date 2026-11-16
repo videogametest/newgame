@@ -6,6 +6,27 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 Queue item 26: first evening, the yard and the bow lesson (Viktor, PR #PR_NUMBER)
+
+- Branch `feat/item26-bow-lesson` from fresh `9f9a0a1`. Guards checked by the parent at activation 05:02:17 UTC (main idle, prior crons idle, last push 04:23:10 UTC, no item-26 branch/PR). Item 18 remains its recorded design conflict, not implemented. Item 27 (fence, post, lantern, map) not started.
+- Pure yard lesson `src/core/tutorial/yard.ts`: intro, three straw targets, the far target, the change of arrow. `advance` takes yard events only while the evening is in the yard; a finished yard moves to step 4 (`fence`, pending item 27). Skip still goes to the lantern. Save version 5 (`tutorial.yard`); v4 saves get an unstarted yard and keep their step. Leaving mid-lesson keeps struck targets; talking to her again repeats the current ask.
+- Targets placed in `src/village/yard.ts` (mark 91,105; straw men 7.8 to 8.9 m; far target 16.7 m, by the Dunn house's west wall), drawn as one merged mesh `yard_targets` in `src/village/build.ts`.
+- Hits are real: before each battle step every hero arrow is advanced one step by the battle's own rule and intersected with each target cylinder; a struck arrow stops there. A watched arrow that disappears without striking is a miss. No damage, rewards, quiver use or grind.
+- Lines by id: `hesper.apprentice` + `evening.targets` open the yard; misses say `evening.targets.miss.N` / `evening.far.miss.N` in turn as a caption; successes say the `.done` line, then the next ask, as conversation pages. Prompts from interface.md, filled from the bindings: the bow key (First fight row), "Hold to draw. Let go to loose." (names no key), change arrow (the wheel keeps the written "Scroll"; any other binding names the bound key).
+- Gate: 1140 tests, typecheck clean, build passed (existing chunk warning), walk gap PASS 97.0 m, local built smoke on 4193 passed. Browser `scripts/item26_capture.mjs`: 22 checks, no failures or fallbacks; real left-mouse shots, rebound B/N/J used, old wheel refused, save, reload and Continue resume. Fixtures (placements, held aim) are listed in the report. Five full-page frames taken once, not judged. Draw calls at 109 stable chunks: 273/269/395/401/395 (higher facing east across the valley). Raw: `docs/pr-media/item26-bow-lesson/`. Parent review updated `scripts/item25_capture.mjs` to item 26 semantics (Show now opens the yard, save v5, Continue reopens no arrival/choice line); its 37 image-free checks passed again locally (`gate/item25-regression.txt`).
+
+### Decisions
+
+- The arrow change is the lesson's own state (`tutorial.yard.arrow`, standard or blunt). The HUD does not show the arrow type yet, and projectiles carry no type. It can change back only within the yard.
+- Miss lines are captions (a conversation would stop the shooting); done lines are conversation pages.
+- "Hold to steady" is taught by her far line; there is no separate steadiness rule beyond drop over distance.
+- Prompts are keyboard-only, as in item 25.
+
+### For critique
+
+- Target placement and look (straw colour, one material) were not judged by eye.
+- The capture needed a held-aim fixture: headless pointer lock reports movement on button events.
+
 ## 2026-11-16 04:22 UTC Queue item 25 deployed (Viktor)
 
 - PR #106 regular-merged as `b1bf0cc`; required videogametest noreply author/committer verified on both branch commits and merge. Merge tree identical to the gated branch. Pages `43802555427` succeeded on that exact commit.

@@ -1,0 +1,68 @@
+
+> every-lit-window@0.2.0 walk-gap
+> vite-node scripts/walk_gap.ts
+
+{
+  "limit_m": 100,
+  "cell_m": 2,
+  "stops": [
+    "wick",
+    "hesper",
+    "start",
+    "mill",
+    "forge",
+    "watch_house",
+    "signal_hill",
+    "patrol_hut",
+    "waterfall",
+    "orchard",
+    "practice",
+    "grove",
+    "fisher",
+    "soldiers_road",
+    "sign_wick_gate",
+    "sign_split_oak",
+    "sign_ford",
+    "sign_hill_foot",
+    "family_markers",
+    "camp_south_rise",
+    "camp_gorge",
+    "camp_north_slope",
+    "camp_west_bluff",
+    "camp_ridge_saddle",
+    "view_ridge_north",
+    "view_west_heights",
+    "chest_gorge_ledge",
+    "chest_north_wood",
+    "chest_boat_shed",
+    "chest_fallen_giant",
+    "chest_sheepfold",
+    "ore_above_falls",
+    "ore_ridge_foot",
+    "ore_forge_bank",
+    "ore_south_bank",
+    "garlic_reedbed",
+    "mushrooms_second_clearing",
+    "garlic_south_wood",
+    "yarrow_pike_fields",
+    "fishing_old_jetty",
+    "mushrooms_north_bank",
+    "yarrow_hill_shoulder",
+    "garlic_river_east",
+    "sign_stile",
+    "sign_boar_wallow",
+    "sign_relay_path"
+  ],
+  "reachable_cells": 78064,
+  "stranded_cells": 0,
+  "longest_m": 97,
+  "longest_at": {
+    "x": 304,
+    "z": 66
+  },
+  "nearest_stop_to_longest": {
+    "name": "chest_gorge_ledge",
+    "d": 25.298221281347036
+  }
+}
+PASS: longest walk 97.0 m (limit 100 m).

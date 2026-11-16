@@ -47,6 +47,13 @@ export const UNITS: Record<string, UnitDef> = {
     tint: [0.74, 0.74, 0.8], weapons: [], hide: /RogueHooded_Mask/,
     clips: { idle: 'Idle_A', run: 'Walking_A', attack: 'Idle_A', hit: 'Hit_A', death: 'Death_A' },
   },
+  // Item 28: the people of Wick. The already-loaded CC0 Barbarian, unarmed, in a muted homespun tint: no new asset,
+  // and unlike the hero (Ranger), Hesper (grey hooded rogue) and Bram (Knight).
+  villager: {
+    kind: 'soldier', model: 'assets/kaykit_adventurers/characters/Barbarian.glb',
+    tint: [0.86, 0.76, 0.62], weapons: [],
+    clips: { idle: 'Idle_A', run: 'Walking_A', attack: 'Idle_A', hit: 'Hit_A', death: 'Death_A' },
+  },
   hero: {
     kind: 'hero',
     model: 'assets/kaykit_adventurers/characters/Ranger.glb',

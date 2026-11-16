@@ -8,7 +8,6 @@ import {
 import { assetUrl } from '../render/assets';
 import type { Lighting } from '../render/lighting';
 import { bearingVector, chance, SCARECROW, WICK_GATES, WICK_LANES, WICK_THINGS, wickHouses, type House } from './plan';
-import { MILL_WINDOW_HOUSE } from '../data/mill_lantern';
 import { FAR_TARGET, GATE_LANTERN, PRACTICE_POST, STRAW_TARGETS, YARD_MARK } from './yard';
 import { withRetry } from '../render/load_retry';
 
@@ -42,8 +41,12 @@ export interface WickOptions {
 export interface Wick {
   root: TransformNode;
   houses: readonly House[];
-  /** Call when the light changes. Hesper's lamp is lit from late afternoon until the small hours. */
-  light(l: Lighting, tod: number, millRecovered?: boolean): void;
+  /**
+   * Call when the light changes. Item 28: `windows.lit` is every plan house whose window is lit now (Hesper's
+   * included), `windows.open` every house whose household is home (its window boards come down); both from
+   * src/core/people/daily.ts. Without them Hesper's lamp keeps its old clock and every other house stays dark.
+   */
+  light(l: Lighting, tod: number, windows?: { lit: ReadonlySet<string>; open: ReadonlySet<string> }): void;
   /** Hesper's lamp, for anything that wants to know where the one light is. */
   lamp: PointLight;
   /** Item 27: the small lantern at her gate, lit by the hero on the first evening and for good after. */
@@ -131,8 +134,9 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
   glow.specularColor = Color3.Black();
   glow.disableLighting = true;
   let chimney = new Vector3(0, 0, 0);
-  let millPane: Mesh | null = null;
-  const millBoards: Mesh[] = [];
+  // Item 28: one pane per lived-in house, shown only while lit; window boards kept apart and merged per change.
+  const panes = new Map<string, Mesh>();
+  const windowBoards = new Map<string, Mesh[]>();
   const recoveryGlow = glow.clone('wick_mill_window_glow');
   for (const h of houses) {
     const half = 4.5;
@@ -147,12 +151,12 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     const right = { x: -front.z, z: front.x };
     const yaw = yawFor(h.facing);
     const at = (u: number, out: number) => ({ x: h.x + right.x * u + front.x * out, z: h.z + right.z * u + front.z * out });
-    if (h.id === MILL_WINDOW_HOUSE) {
+    if (h.id !== 'hesper' && h.id !== 'fairlow' && h.state !== 'lit') {
       const wv = bearingVector(h.window), wr = { x: -wv.z, z: wv.x };
       const p = { x: h.x + wv.x * (open.window.out + 0.06) + wr.x * open.window.u, z: h.z + wv.z * (open.window.out + 0.06) + wr.z * open.window.u };
-      millPane = MeshBuilder.CreatePlane(`${h.id}_recovery_window`, { width: open.window.w, height: open.window.h, sideOrientation: Mesh.DOUBLESIDE }, scene);
-      millPane.position.set(p.x, base + open.window.y, p.z); millPane.rotation.y = yawFor(h.window);
-      millPane.material = recoveryGlow; millPane.parent = root; millPane.setEnabled(false);
+      const pane = MeshBuilder.CreatePlane(`${h.id}_recovery_window`, { width: open.window.w, height: open.window.h, sideOrientation: Mesh.DOUBLESIDE }, scene);
+      pane.position.set(p.x, base + open.window.y, p.z); pane.rotation.y = yawFor(h.window);
+      pane.material = recoveryGlow; pane.parent = root; pane.setEnabled(false); panes.set(h.id, pane);
     }
     if (h.state === 'boarded') {
       // Planks across the door, nailed up in a hurry: two crossed and one level, none of them straight.
@@ -166,9 +170,10 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
       box(`${h.id}_plank_w`, greyWood, wn.x, wn.z, open.window.w * 1.9, 0.16, 0.05, yaw, base + open.window.y - 0.08, 0, 0.25 + lean('w'));
       box(`${h.id}_plank_w2`, greyWood, wn.x, wn.z, open.window.w * 1.9, 0.16, 0.05, yaw, base + open.window.y - 0.08, 0, -0.3 + lean('w2'));
     }
-    if (h.id === MILL_WINDOW_HOUSE && h.state === 'boarded') {
+    if (h.state === 'boarded' && h.id !== 'fairlow') {
       const boards = loose.filter(m => m.name === `${h.id}_plank_w` || m.name === `${h.id}_plank_w2`);
-      for (const b of boards) { loose.splice(loose.indexOf(b), 1); millBoards.push(b); }
+      for (const b of boards) { loose.splice(loose.indexOf(b), 1); b.setEnabled(false); }
+      windowBoards.set(h.id, boards);
     }
     if (h.state === 'lit') {
       // Hesper's window: a pane that glows, and the lamp behind it.
@@ -517,14 +522,26 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     for (const n of placed) n.dispose();
   }
 
+  // The window boards of every house still waiting for its family, as one merged mesh rebuilt only on change.
+  let boardsMesh: Mesh | null = null;
+  let boardsKey: string | null = null;
+  const showBoards = (open: ReadonlySet<string>): void => {
+    const up = [...windowBoards.keys()].filter(id => !open.has(id));
+    const key = up.join(',');
+    if (key === boardsKey) return;
+    boardsKey = key; boardsMesh?.dispose(); boardsMesh = null;
+    const copies = up.flatMap(id => windowBoards.get(id)!).map(m => { const c = m.clone(`${m.name}_copy`, root)!; c.setEnabled(true); return c; });
+    if (copies.length) { boardsMesh = Mesh.MergeMeshes(copies, true, true); if (boardsMesh) { boardsMesh.name = 'wick_window_boards'; boardsMesh.parent = root; cast(boardsMesh); } }
+  };
+  showBoards(new Set());
+
   return {
     root, houses, lamp,
-    light(l, tod, millRecovered = false) {
-      const recovered = millRecovered;
-      millPane?.setEnabled(recovered && (tod >= 19 || tod < 1));
-      for (const b of millBoards) b.setEnabled(!recovered);
+    light(l, tod, windows) {
+      showBoards(windows?.open ?? new Set());
+      for (const [id, pane] of panes) pane.setEnabled(windows?.lit.has(id) ?? false);
       recoveryGlow.emissiveColor = new Color3(1, 0.72, 0.36).scale(0.9 + 0.5 * l.nightness);
-      const on = tod >= 17 || tod < 1;
+      const on = windows ? windows.lit.has('hesper') : tod >= 17 || tod < 1;
       // Brightest once the daylight has gone; present, but not shouting, in the gold hour before.
       lamp.intensity = on ? 2 + 3 * l.nightness : 0;
       glow.emissiveColor = on ? new Color3(1, 0.72, 0.36).scale(0.9 + 0.5 * l.nightness) : new Color3(0.1, 0.1, 0.12);

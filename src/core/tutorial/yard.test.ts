@@ -72,10 +72,10 @@ describe('the yard inside the evening', () => {
     const road = newTutorial();
     expect(advance(road, hit('straw.0'))).toBe(road);
   });
-  it('finishing the yard moves the lesson to step 4, which is still pending (item 27)', () => {
+  it('finishing the yard moves the lesson to step 4, built by item 27 (fence.test.ts)', () => {
     const s = [{ type: 'yardOpened' } as const, hit('straw.0'), hit('straw.1'), hit('straw.2'), hit('far'),
       { type: 'arrowChanged', delta: 1 } as const].reduce(advance, toYard());
-    expect(s.step).toBe('fence'); expect(STEP_NUMBER[s.step]).toBe(4); expect(PENDING.fence).toMatch(/item 27/);
+    expect(s.step).toBe('fence'); expect(STEP_NUMBER[s.step]).toBe(4); expect(PENDING.fence).toBeUndefined(); expect(s.fence.phase).toBe('intro');
     expect(s.yard.arrow).toBe('blunt');
   });
   it('leaving mid-lesson keeps what was done (it is all in the saved state)', () => {

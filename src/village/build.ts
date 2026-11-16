@@ -9,7 +9,7 @@ import { assetUrl } from '../render/assets';
 import type { Lighting } from '../render/lighting';
 import { bearingVector, chance, SCARECROW, WICK_GATES, WICK_LANES, WICK_THINGS, wickHouses, type House } from './plan';
 import { MILL_WINDOW_HOUSE } from '../data/mill_lantern';
-import { FAR_TARGET, STRAW_TARGETS, YARD_MARK } from './yard';
+import { FAR_TARGET, GATE_LANTERN, PRACTICE_POST, STRAW_TARGETS, YARD_MARK } from './yard';
 import { withRetry } from '../render/load_retry';
 
 const HEX = 'assets/kaykit_medieval_hexagon/';
@@ -46,6 +46,8 @@ export interface Wick {
   light(l: Lighting, tod: number, millRecovered?: boolean): void;
   /** Hesper's lamp, for anything that wants to know where the one light is. */
   lamp: PointLight;
+  /** Item 27: the small lantern at her gate, lit by the hero on the first evening and for good after. */
+  gateLantern(lit: boolean, nightness: number): void;
   dispose(): void;
 }
 
@@ -476,9 +478,31 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
       boss.position.set(t.x, g + t.height - t.radius, t.z); boss.rotation.set(Math.PI / 2, yaw, 0); boss.material = straw;
       parts.push(boss);
     }
+    {
+      // Item 27: the practice post, a straw-bound stake, in the same merged mesh (no new draw call).
+      const p = PRACTICE_POST, g = ground(p.x, p.z);
+      const stake = MeshBuilder.CreateCylinder('practice_post', { diameter: p.radius * 2, height: p.height, tessellation: 8 }, scene);
+      stake.position.set(p.x, g + p.height / 2, p.z); parts.push(stake);
+      parts.push(box('practice_post_bar', wood, p.x, p.z, 0.7, 0.1, 0.1, face(p), g + 1.2));
+    }
     for (const m of parts) { m.material = straw; const i = loose.indexOf(m); if (i >= 0) loose.splice(i, 1); }
     const merged = Mesh.MergeMeshes(parts, true, true);
     if (merged) { merged.name = 'yard_targets'; merged.parent = root; cast(merged); }
+  }
+
+  // ---- Item 27: the small lantern at her gate. Its post merges with the timber; the lantern is one small mesh. ----
+  const gateGlow = new StandardMaterial('wick_gate_lantern_glow', scene);
+  gateGlow.diffuseColor = Color3.Black(); gateGlow.specularColor = Color3.Black(); gateGlow.disableLighting = true;
+  gateGlow.emissiveColor = new Color3(0.08, 0.07, 0.06);
+  {
+    const { x, z, height } = GATE_LANTERN, g = ground(x, z);
+    const timber = [box('gate_lantern_post', wood, x, z, 0.1, height, 0.1, 0, g),
+      box('gate_lantern_arm', wood, x + 0.18, z, 0.4, 0.06, 0.06, 0, g + height - 0.06)];
+    for (const m of timber) { const i = loose.indexOf(m); if (i >= 0) loose.splice(i, 1); }
+    const post = Mesh.MergeMeshes(timber, true, true);
+    if (post) { post.name = 'gate_lantern_post'; post.parent = root; cast(post); }
+    const lantern = MeshBuilder.CreateBox('gate_lantern', { width: 0.18, height: 0.26, depth: 0.18 }, scene);
+    lantern.position.set(x + 0.34, g + height - 0.25, z); lantern.material = gateGlow; lantern.parent = root;
   }
 
   // The houses and props share one atlas: merged, the whole village's models are a draw call or two, not one per part.
@@ -504,6 +528,9 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
       // Brightest once the daylight has gone; present, but not shouting, in the gold hour before.
       lamp.intensity = on ? 2 + 3 * l.nightness : 0;
       glow.emissiveColor = on ? new Color3(1, 0.72, 0.36).scale(0.9 + 0.5 * l.nightness) : new Color3(0.1, 0.1, 0.12);
+    },
+    gateLantern(lit, nightness) {
+      gateGlow.emissiveColor = lit ? new Color3(1, 0.72, 0.36).scale(0.9 + 0.5 * nightness) : new Color3(0.08, 0.07, 0.06);
     },
     dispose() { smoke.dispose(); dot.dispose(); root.dispose(false, true); },
   };

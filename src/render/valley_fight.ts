@@ -57,6 +57,8 @@ export class ValleyFight {
   private chromeShown = false;
   /** Sim time at which the hero was first seen down, or null while he is up. */
   private downedAt: number | null = null;
+  /** The battle's events from the last step, for readers outside the fight (item 27: the hero's blade on the post). */
+  lastEvents: BattleEvent[] = [];
 
   constructor(
     private readonly scene: Scene,
@@ -107,6 +109,7 @@ export class ValleyFight {
     const fromX = hero.x;
     const fromZ = hero.z;
     const events = step(this.battle, intent);
+    this.lastEvents = events;
     const ok = (x: number, z: number): boolean => insideValley(x, z) && !blocksHero(x, z);
     if (!ok(hero.x, hero.z)) {
       // Slide along the blocking axis, as walkStep does for the valley walk; otherwise stop.

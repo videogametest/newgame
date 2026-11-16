@@ -30,10 +30,10 @@ describe('first evening, steps 1 and 2', () => {
     expect(s).toMatchObject({ step: 'yard', choice: 'show' }); expect(STEP_NUMBER[s.step]).toBe(3);
     expect(PENDING.yard).toBeUndefined(); // built by item 26 (yard.test.ts)
   });
-  it('"I\'ve held a bow before" skips to the lantern (step 6, pending)', () => {
+  it('"I\'ve held a bow before" skips straight to the lantern (step 6, built by item 27)', () => {
     const s = run(newTutorial(), { type: 'reachedDoor' }, { type: 'chose', choice: 'skip' });
     expect(s).toMatchObject({ step: 'lantern', choice: 'skip' }); expect(STEP_NUMBER[s.step]).toBe(6);
-    expect(PENDING.lantern).toMatch(/27/);
+    expect(PENDING.lantern).toBeUndefined(); expect(s.lantern.phase).toBe('intro'); expect(s.fence.phase).toBe('intro');
   });
   it('the choice is made once', () => {
     const s = run(newTutorial(), { type: 'reachedDoor' }, { type: 'chose', choice: 'skip' });

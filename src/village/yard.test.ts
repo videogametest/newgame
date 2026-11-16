@@ -29,3 +29,20 @@ describe("Hesper's yard targets (item 26)", () => {
     expect(arrowStrikes(a, b, STRAW_TARGETS.map(t => ({ ...t, base: 0 })), 0.05)).toBeNull();
   });
 });
+
+describe('item 27: the post, the gate lantern and the yard bounds', () => {
+  it('the post and gate lantern stand clear of houses, targets, the scarecrow and her door, on walkable ground', async () => {
+    const { PRACTICE_POST, GATE_LANTERN, YARD_MIDDLE } = await import('./yard');
+    const { blocksHero } = await import('../core/world/valley');
+    for (const p of [PRACTICE_POST, GATE_LANTERN]) {
+      for (const h of wickHouses(VALLEY_SEED)) expect(d(p, h)).toBeGreaterThan(4.5);
+      for (const t of YARD_TARGETS) expect(d(p, t)).toBeGreaterThan(3);
+      expect(d(p, SCARECROW)).toBeGreaterThan(3); expect(d(p, HESPER)).toBeGreaterThan(3);
+      for (const [dx, dz] of [[1.2, 0], [-1.2, 0], [0, 1.2], [0, -1.2]]) expect(blocksHero(p.x + dx, p.z + dz)).toBe(false);
+    }
+    // Her turnips reach the post from her door; the whole lesson lies inside the yard bounds.
+    expect(d(PRACTICE_POST, HESPER)).toBeLessThan(7);
+    for (const p of [PRACTICE_POST, GATE_LANTERN, SCARECROW, YARD_MARK, HESPER, ...YARD_TARGETS])
+      expect(d(p, YARD_MIDDLE)).toBeLessThan(TUNING.tutorial.yardRadius - 6);
+  });
+});

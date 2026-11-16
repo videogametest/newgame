@@ -8,7 +8,7 @@ import { createProgression } from './progression/skills';
 import { newStories } from './stories/stories';
 import { emptySpeechLog } from './speech/said';
 import { newWatch } from './valley/watch';
-import { migratedTutorial, newTutorial } from './tutorial/lesson';
+import { migratedTutorial, newLaterSteps, newTutorial } from './tutorial/lesson';
 import { newYard } from './tutorial/yard';
 import { SAVE_VERSION, type GameState } from './types';
 
@@ -79,6 +79,8 @@ export function migrateSave(raw: unknown): GameState | null {
   // Version 4 added the first evening. A saved game is past the road; nothing it had is reset.
   if (old.version < 4) next.tutorial = migratedTutorial();
   // Version 5 added the yard (step 3). A lesson saved before it starts the yard from the beginning.
-  else if (old.version < 5) next.tutorial = { ...(next.tutorial as GameState['tutorial']), yard: newYard() };
+  else if (old.version < 5) next.tutorial = { ...(next.tutorial as GameState['tutorial']), ...newLaterSteps(), yard: newYard() };
+  // Version 6 added steps 4 to 6 and walking away. A lesson saved at step 4 (the yard finished) begins the fence there.
+  else if (old.version < 6) next.tutorial = { ...newLaterSteps(), ...(next.tutorial as GameState['tutorial']), away: false, backs: 0 };
   return next;
 }

@@ -1,0 +1,1920 @@
+{
+  "fixtures": [
+    "Aim held during each shot by re-applying aimBowAt after every mousemove (headless pointer lock reports movement on button events)",
+    "Settings seeded: interact=J, weaponBow=B, arrowNext=N (keyboard); text speed instant; brightness set.",
+    "placeAt her door (synthetic placement; the road is item 25)",
+    "placeAt yard mark (synthetic placement)",
+    "placeAt her door after Continue (synthetic placement; the mark is outside talking reach)",
+    "placeAt yard mark (synthetic placement)"
+  ],
+  "notes": [
+    "Hero hp at end: 140"
+  ],
+  "checks": [
+    {
+      "passed": true,
+      "message": "Show me opens the yard: hesper.apprentice, step 3, no pending note"
+    },
+    {
+      "passed": true,
+      "message": "evening.targets.0 verbatim"
+    },
+    {
+      "passed": true,
+      "message": "Three straw targets and one far target"
+    },
+    {
+      "passed": true,
+      "message": "Bow prompt shows the rebound key: [\"B for the bow.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Old default 2 pressed (recorded)"
+    },
+    {
+      "passed": true,
+      "message": "Draw prompt once the bow is out: [\"Hold to draw. Let go to loose.\"]"
+    },
+    {
+      "passed": true,
+      "message": "A real arrow was loosed by the left mouse button"
+    },
+    {
+      "passed": true,
+      "message": "Miss: arrow came down elsewhere, her line evening.targets.miss.0: [\"evening.targets.miss.0\"] Hesper: \"Again.\""
+    },
+    {
+      "passed": true,
+      "message": "straw.0 struck by an arrow's flight (straw.0)"
+    },
+    {
+      "passed": true,
+      "message": "straw.1 struck by an arrow's flight (straw.0, straw.1)"
+    },
+    {
+      "passed": true,
+      "message": "Saved (v6) mid-lesson: {\"phase\":\"targets\",\"struck\":[\"straw.0\",\"straw.1\"],\"misses\":1,\"arrow\":\"standard\"}"
+    },
+    {
+      "passed": true,
+      "message": "Continue resumes the yard with two struck"
+    },
+    {
+      "passed": true,
+      "message": "Talking to her again repeats the current ask: evening.targets.0"
+    },
+    {
+      "passed": true,
+      "message": "straw.2 struck by an arrow's flight (straw.0, straw.1, straw.2)"
+    },
+    {
+      "passed": true,
+      "message": "Third straw: evening.targets.done then evening.far: evening.targets.done.0"
+    },
+    {
+      "passed": true,
+      "message": "Far miss line by id: [\"evening.far.miss.1\"] Hesper: \"Again. Hold longer than you want to.\""
+    },
+    {
+      "passed": true,
+      "message": "Far target struck"
+    },
+    {
+      "passed": true,
+      "message": "evening.far.done said"
+    },
+    {
+      "passed": true,
+      "message": "Arrow prompt shows the rebound key: [\"N to change arrows.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Old wheel binding does not change the arrow"
+    },
+    {
+      "passed": true,
+      "message": "N changes to blunt; lesson moves to step 4, the fence (built by item 27): null"
+    },
+    {
+      "passed": true,
+      "message": "evening.arrows.done said"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [],
+  "snapshots": [
+    {
+      "name": "yard-targets",
+      "drawCalls": 278,
+      "chunks": 109,
+      "fps": 10,
+      "world": {
+        "x": 91,
+        "z": 105,
+        "groundY": 5.012871845541403,
+        "yaw": 1.037088135155634,
+        "tod": 18.101041999999982,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 67,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 278,
+        "activeMeshes": 95,
+        "bram": {
+          "x": 91.35998177137881,
+          "z": 102.76780353093889,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91,
+            "z": 105,
+            "groundY": 5.012871845541403,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "yard",
+          "opened": true,
+          "used": {
+            "move": false,
+            "look": false,
+            "sprint": false
+          },
+          "walked": 0,
+          "choice": "show",
+          "yard": {
+            "phase": "targets",
+            "struck": [],
+            "misses": 0,
+            "arrow": "standard"
+          },
+          "fence": {
+            "phase": "intro",
+            "seen": 0,
+            "restart": false,
+            "notice": 0,
+            "clock": 0,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "intro",
+            "strikes": 0,
+            "dodged": 0,
+            "hits": 0
+          },
+          "lantern": {
+            "phase": "intro"
+          },
+          "away": false,
+          "backs": 0
+        },
+        "stepNumber": 3,
+        "pending": null,
+        "opening": "One window is lit. Walk to it.",
+        "prompts": [
+          "B for the bow."
+        ],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": null,
+          "lastLines": [],
+          "arrow": "standard"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": false,
+          "movement": "still",
+          "weapon": "sword",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [],
+          "queued": [],
+          "caption": null,
+          "gateLanternLit": false,
+          "gateLanternGlow": 0.21000000000000002,
+          "cue": "none",
+          "heroHp": 140
+        }
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": null,
+        "text": null,
+        "answers": [],
+        "selected": 0
+      },
+      "caption": "Saved."
+    },
+    {
+      "name": "yard-miss-line",
+      "drawCalls": 274,
+      "chunks": 109,
+      "fps": 10,
+      "world": {
+        "x": 91,
+        "z": 105,
+        "groundY": 5.012871845541403,
+        "yaw": 1.037088135155634,
+        "tod": 18.22925799999991,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 134,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 274,
+        "activeMeshes": 91,
+        "bram": {
+          "x": 91.35998177137881,
+          "z": 102.76780353093889,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91,
+            "z": 105,
+            "groundY": 5.012871845541403,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -167.1,
+            "z": 70,
+            "groundY": 7.1312302302255235,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "yard",
+          "opened": true,
+          "used": {
+            "move": false,
+            "look": true,
+            "sprint": false
+          },
+          "walked": 0,
+          "choice": "show",
+          "yard": {
+            "phase": "targets",
+            "struck": [],
+            "misses": 1,
+            "arrow": "standard"
+          },
+          "fence": {
+            "phase": "intro",
+            "seen": 0,
+            "restart": false,
+            "notice": 0,
+            "clock": 0,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "intro",
+            "strikes": 0,
+            "dodged": 0,
+            "hits": 0
+          },
+          "lantern": {
+            "phase": "intro"
+          },
+          "away": false,
+          "backs": 0
+        },
+        "stepNumber": 3,
+        "pending": null,
+        "opening": null,
+        "prompts": [
+          "Hold to draw. Let go to loose."
+        ],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": {
+            "x": 152.33321109261223,
+            "y": 9.170280982596193,
+            "z": 141.24235200927
+          },
+          "lastLines": [
+            "evening.targets.miss.0"
+          ],
+          "arrow": "standard"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": false,
+          "movement": "still",
+          "weapon": "bow",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [],
+          "queued": [],
+          "caption": "Hesper: \"Again.\"",
+          "gateLanternLit": false,
+          "gateLanternGlow": 0.21000000000000002,
+          "cue": "none",
+          "heroHp": 140
+        }
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": null,
+        "text": null,
+        "answers": [],
+        "selected": 0
+      },
+      "caption": "Hesper: \"Again.\""
+    },
+    {
+      "name": "yard-far-ask",
+      "drawCalls": 402,
+      "chunks": 109,
+      "fps": 10,
+      "world": {
+        "x": 91,
+        "z": 105,
+        "groundY": 5.012871845541403,
+        "yaw": 3.4901351554640843,
+        "tod": 18.4358959999998,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 88,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 402,
+        "activeMeshes": 244,
+        "bram": {
+          "x": 88.77048666754297,
+          "z": 106.3822360586394,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91,
+            "z": 105,
+            "groundY": 5.012871845541403,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -185.1,
+            "z": 47,
+            "groundY": 3.6916871627411068,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "yard",
+          "opened": true,
+          "used": {
+            "move": false,
+            "look": true,
+            "sprint": false
+          },
+          "walked": 0,
+          "choice": "show",
+          "yard": {
+            "phase": "far",
+            "struck": [
+              "straw.0",
+              "straw.1",
+              "straw.2"
+            ],
+            "misses": 1,
+            "arrow": "standard"
+          },
+          "fence": {
+            "phase": "intro",
+            "seen": 0,
+            "restart": false,
+            "notice": 0,
+            "clock": 0,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "intro",
+            "strikes": 0,
+            "dodged": 0,
+            "hits": 0
+          },
+          "lantern": {
+            "phase": "intro"
+          },
+          "away": false,
+          "backs": 0
+        },
+        "stepNumber": 3,
+        "pending": null,
+        "opening": null,
+        "prompts": [],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": null,
+          "lastLines": [
+            "evening.targets.done.0",
+            "evening.far.0"
+          ],
+          "arrow": "standard"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": false,
+          "movement": "still",
+          "weapon": "bow",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [],
+          "queued": [],
+          "caption": null,
+          "gateLanternLit": false,
+          "gateLanternGlow": 0.21000000000000002,
+          "cue": "none",
+          "heroHp": 140
+        }
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": "evening.far.0",
+        "text": "Now the one by the wall. Draw and hold. Wait for your hands to stop arguing.",
+        "answers": [],
+        "selected": 0
+      },
+      "caption": "Saved."
+    },
+    {
+      "name": "yard-arrow-prompt",
+      "drawCalls": 404,
+      "chunks": 109,
+      "fps": 10,
+      "world": {
+        "x": 91,
+        "z": 105,
+        "groundY": 5.012871845541403,
+        "yaw": 3.289901540834669,
+        "tod": 18.543711999999758,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 151,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 404,
+        "activeMeshes": 245,
+        "bram": {
+          "x": 88.55975193043408,
+          "z": 105.96054975896939,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91,
+            "z": 105,
+            "groundY": 5.012871845541403,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "yard",
+          "opened": true,
+          "used": {
+            "move": false,
+            "look": true,
+            "sprint": false
+          },
+          "walked": 0,
+          "choice": "show",
+          "yard": {
+            "phase": "arrows",
+            "struck": [
+              "straw.0",
+              "straw.1",
+              "straw.2"
+            ],
+            "misses": 2,
+            "arrow": "standard"
+          },
+          "fence": {
+            "phase": "intro",
+            "seen": 0,
+            "restart": false,
+            "notice": 0,
+            "clock": 0,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "intro",
+            "strikes": 0,
+            "dodged": 0,
+            "hits": 0
+          },
+          "lantern": {
+            "phase": "intro"
+          },
+          "away": false,
+          "backs": 0
+        },
+        "stepNumber": 3,
+        "pending": null,
+        "opening": null,
+        "prompts": [
+          "N to change arrows."
+        ],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": {
+            "x": 95.64019528513074,
+            "y": 5.121885036312085,
+            "z": 104.29694010831349
+          },
+          "lastLines": [
+            "evening.far.done.0",
+            "evening.arrows.0"
+          ],
+          "arrow": "standard"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": false,
+          "movement": "still",
+          "weapon": "bow",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [],
+          "queued": [],
+          "caption": null,
+          "gateLanternLit": false,
+          "gateLanternGlow": 0.21000000000000002,
+          "cue": "none",
+          "heroHp": 140
+        }
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": null,
+        "text": null,
+        "answers": [],
+        "selected": 0
+      },
+      "caption": "Saved."
+    },
+    {
+      "name": "yard-done",
+      "drawCalls": 400,
+      "chunks": 109,
+      "fps": 14,
+      "world": {
+        "x": 91,
+        "z": 105,
+        "groundY": 5.012871845541403,
+        "yaw": 3.4907781452966216,
+        "tod": 18.583895999999744,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 174,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 14,
+        "drawCalls": 400,
+        "activeMeshes": 243,
+        "bram": {
+          "x": 88.74421287451536,
+          "z": 106.37028847742073,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91,
+            "z": 105,
+            "groundY": 5.012871845541403,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "step": "fence",
+          "opened": true,
+          "used": {
+            "move": false,
+            "look": true,
+            "sprint": false
+          },
+          "walked": 0,
+          "choice": "show",
+          "yard": {
+            "phase": "done",
+            "struck": [
+              "straw.0",
+              "straw.1",
+              "straw.2"
+            ],
+            "misses": 2,
+            "arrow": "blunt"
+          },
+          "fence": {
+            "phase": "intro",
+            "seen": 0,
+            "restart": false,
+            "notice": 0,
+            "clock": 0,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "intro",
+            "strikes": 0,
+            "dodged": 0,
+            "hits": 0
+          },
+          "lantern": {
+            "phase": "intro"
+          },
+          "away": false,
+          "backs": 0
+        },
+        "stepNumber": 4,
+        "pending": null,
+        "opening": null,
+        "prompts": [],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": {
+            "x": 95.64019528513074,
+            "y": 5.121885036312085,
+            "z": 104.29694010831349
+          },
+          "lastLines": [
+            "evening.arrows.done.0"
+          ],
+          "arrow": "blunt"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": false,
+          "movement": "still",
+          "weapon": "bow",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [],
+          "queued": [],
+          "caption": null,
+          "gateLanternLit": false,
+          "gateLanternGlow": 0.21000000000000002,
+          "cue": "none",
+          "heroHp": 140
+        }
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": "evening.arrows.done.0",
+        "text": "Good. Know what's on the string before you draw it.",
+        "answers": [],
+        "selected": 0
+      },
+      "caption": "Saved."
+    }
+  ],
+  "arrows": [
+    {
+      "label": "miss high",
+      "at": {
+        "x": 97.6,
+        "y": 11.094628381369361,
+        "z": 108.9
+      },
+      "fired": true,
+      "before": {
+        "phase": "targets",
+        "struck": [],
+        "misses": 0,
+        "arrow": "standard"
+      },
+      "after": {
+        "phase": "targets",
+        "struck": [],
+        "misses": 1,
+        "arrow": "standard"
+      },
+      "lastLines": [
+        "evening.targets.miss.0"
+      ],
+      "lastMiss": {
+        "x": 152.33321109261223,
+        "y": 9.170280982596193,
+        "z": 141.24235200927
+      },
+      "hero": {
+        "x": 91,
+        "z": 105,
+        "y": 5.012871845541403,
+        "yaw": 1.037088135155634
+      },
+      "talking": null,
+      "caption": "Hesper: \"Again.\""
+    },
+    {
+      "label": "at straw.0",
+      "at": {
+        "x": 96.2,
+        "y": 6.323023397381723,
+        "z": 110.2
+      },
+      "fired": true,
+      "before": {
+        "phase": "targets",
+        "struck": [],
+        "misses": 1,
+        "arrow": "standard"
+      },
+      "after": {
+        "phase": "targets",
+        "struck": [
+          "straw.0"
+        ],
+        "misses": 1,
+        "arrow": "standard"
+      },
+      "lastLines": [
+        "evening.targets.miss.0"
+      ],
+      "lastMiss": {
+        "x": 152.33321109261223,
+        "y": 9.170280982596193,
+        "z": 141.24235200927
+      },
+      "hero": {
+        "x": 91,
+        "z": 105,
+        "y": 5.012871845541403,
+        "yaw": 0.7853981633974483
+      },
+      "talking": null,
+      "caption": "Hesper: \"Again.\""
+    },
+    {
+      "label": "at straw.1",
+      "at": {
+        "x": 97.6,
+        "y": 6.336829770258252,
+        "z": 108.9
+      },
+      "fired": true,
+      "before": {
+        "phase": "targets",
+        "struck": [
+          "straw.0"
+        ],
+        "misses": 1,
+        "arrow": "standard"
+      },
+      "after": {
+        "phase": "targets",
+        "struck": [
+          "straw.0",
+          "straw.1"
+        ],
+        "misses": 1,
+        "arrow": "standard"
+      },
+      "lastLines": [
+        "evening.targets.miss.0"
+      ],
+      "lastMiss": {
+        "x": 152.33321109261223,
+        "y": 9.170280982596193,
+        "z": 141.24235200927
+      },
+      "hero": {
+        "x": 91,
+        "z": 105,
+        "y": 5.012871845541403,
+        "yaw": 1.037088135155634
+      },
+      "talking": null,
+      "caption": "Hesper: \"Again.\""
+    },
+    {
+      "label": "at straw.2",
+      "at": {
+        "x": 98.6,
+        "y": 6.344113582543298,
+        "z": 107.3
+      },
+      "fired": true,
+      "before": {
+        "phase": "targets",
+        "struck": [
+          "straw.0",
+          "straw.1"
+        ],
+        "misses": 1,
+        "arrow": "standard"
+      },
+      "after": {
+        "phase": "far",
+        "struck": [
+          "straw.0",
+          "straw.1",
+          "straw.2"
+        ],
+        "misses": 1,
+        "arrow": "standard"
+      },
+      "lastLines": [
+        "evening.targets.done.0",
+        "evening.far.0"
+      ],
+      "lastMiss": null,
+      "hero": {
+        "x": 91,
+        "z": 105,
+        "y": 5.012871845541403,
+        "yaw": 3.284919619983582
+      },
+      "talking": "evening.targets.done.0",
+      "caption": "Saved."
+    },
+    {
+      "label": "far short",
+      "at": {
+        "x": 107.5,
+        "y": 2.111793072687563,
+        "z": 102.5
+      },
+      "fired": true,
+      "before": {
+        "phase": "far",
+        "struck": [
+          "straw.0",
+          "straw.1",
+          "straw.2"
+        ],
+        "misses": 1,
+        "arrow": "standard"
+      },
+      "after": {
+        "phase": "far",
+        "struck": [
+          "straw.0",
+          "straw.1",
+          "straw.2"
+        ],
+        "misses": 2,
+        "arrow": "standard"
+      },
+      "lastLines": [
+        "evening.far.miss.1"
+      ],
+      "lastMiss": {
+        "x": 95.64019528513074,
+        "y": 5.121885036312085,
+        "z": 104.29694010831349
+      },
+      "hero": {
+        "x": 91,
+        "z": 105,
+        "y": 5.012871845541403,
+        "yaw": 1.7211677548020312
+      },
+      "talking": null,
+      "caption": "Hesper: \"Again. Hold longer than you want to.\""
+    },
+    {
+      "label": "at far",
+      "at": {
+        "x": 107.5,
+        "y": 7.244763751699909,
+        "z": 102.5
+      },
+      "fired": true,
+      "before": {
+        "phase": "far",
+        "struck": [
+          "straw.0",
+          "straw.1",
+          "straw.2"
+        ],
+        "misses": 2,
+        "arrow": "standard"
+      },
+      "after": {
+        "phase": "arrows",
+        "struck": [
+          "straw.0",
+          "straw.1",
+          "straw.2"
+        ],
+        "misses": 2,
+        "arrow": "standard"
+      },
+      "lastLines": [
+        "evening.far.done.0",
+        "evening.arrows.0"
+      ],
+      "lastMiss": {
+        "x": 95.64019528513074,
+        "y": 5.121885036312085,
+        "z": 104.29694010831349
+      },
+      "hero": {
+        "x": 91,
+        "z": 105,
+        "y": 5.012871845541403,
+        "yaw": 3.1554260476322225
+      },
+      "talking": "evening.far.done.0",
+      "caption": "Saved."
+    }
+  ]
+}

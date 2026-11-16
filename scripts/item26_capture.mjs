@@ -138,7 +138,7 @@ try {
       // Leave and come back: save, reload, Continue.
       await V(() => window.__valley.saveNow());
       const saved = await V(() => JSON.parse(localStorage.getItem('everylitwindow.save')));
-      check(saved.version === 5 && saved.tutorial.yard.struck.length === 2, `Saved (v5) mid-lesson: ${JSON.stringify(saved.tutorial.yard)}`);
+      check(saved.version === 6 && saved.tutorial.yard.struck.length === 2, `Saved (v6) mid-lesson: ${JSON.stringify(saved.tutorial.yard)}`);
       await page.reload({ waitUntil: 'load', timeout: 120000 }); await boot();
       await title().getByRole('button', { name: 'Continue', exact: true }).click(); await playing(); await frames(10);
       t = await tut();
@@ -171,7 +171,7 @@ try {
   check((await tut()).tutorial.yard.arrow === 'standard', 'Old wheel binding does not change the arrow');
   await page.keyboard.press('KeyN'); await frames(4);
   t = await tut();
-  check(t.tutorial.yard.arrow === 'blunt' && t.tutorial.step === 'fence' && t.stepNumber === 4 && /27/.test(t.pending ?? ''), `N changes to blunt; lesson moves to step 4 (pending item 27): ${t.pending}`);
+  check(t.tutorial.yard.arrow === 'blunt' && t.tutorial.step === 'fence' && t.stepNumber === 4 && t.pending === null && t.tutorial.fence.phase === 'intro', `N changes to blunt; lesson moves to step 4, the fence (built by item 27): ${t.pending}`);
   check((await talk()).line === 'evening.arrows.done.0', 'evening.arrows.done said');
   await snap('yard-done');
   const hp = await V(() => window.__valley.savedState().hero.hp);

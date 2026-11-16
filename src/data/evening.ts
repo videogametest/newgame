@@ -81,3 +81,35 @@ function filledPrompt(template: string, b: Bindings, device: Device): string | n
   return template.replace(/\{(\w+)\} ?/g, (_w, _a) => { const l = labels[i++]; return l ? `${l} ` : ''; })
     .replace(/\s+/g, ' ').trim();
 }
+
+// Item 27: steps 4 to 6, and walking away and back. Her lines by id through yardPage (any evening or hesper group);
+// prompts from interface.md's first-time rows, filled from the actual bindings.
+export const eveningPage = yardPage;
+export const LESSON_LINE_COUNTS = {
+  fenceSeen: lines('evening.fence.seen').length,
+  postHit: lines('evening.post.hit').length,
+  back: lines('evening.back').length,
+  lanternFirst: lines('hesper.lantern.first', 'hesper').length,
+};
+/** Bram, from the fence: one line at most per step, only on a success (first-evening.md). Step order picks the line. */
+export function bramEveningLine(step: 'fence' | 'post'): string {
+  const all = lines('bram.evening');
+  const page = all[step === 'fence' ? 1 : 2] ?? all[all.length - 1];
+  return page.text;
+}
+/** "Hold the right mouse button" names no key in backticks: it is the default for the look-closer (aim) action. */
+const MARK_ROW = interfaceRow('First time an enemy is in view while the bow is out');
+const MARK_DEFAULT = 'the right mouse button';
+export const LESSON_PROMPTS = {
+  crouch: toActionTemplate(interfaceRow('First approach to an enemy place')),
+  mark: MARK_ROW.replace(MARK_DEFAULT, '{aim}'),
+  blade: `${toActionTemplate(interfaceRow('First fight')).split(', ')[0]}.`,
+  dodge: toActionTemplate(interfaceRow('First enemy wind-up')),
+  lock: toActionTemplate(interfaceRow('First fight with more than one enemy close')),
+  map: toActionTemplate(interfaceRow('First place discovered')),
+} as const;
+/** Steps 4 to 6 prompts. The mark row keeps its written words while look-closer is on the right mouse button. */
+export function lessonPrompt(kind: keyof typeof LESSON_PROMPTS, b: Bindings, device: Device): string | null {
+  if (kind === 'mark' && device === 'keyboard' && b.keyboard.aim[0] === 'Mouse:2') return MARK_ROW;
+  return filledPrompt(LESSON_PROMPTS[kind], b, device);
+}

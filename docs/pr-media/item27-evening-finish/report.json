@@ -1,0 +1,2099 @@
+{
+  "fixtures": [
+    "Settings seeded (keyboard): {\"interact\":\"KeyJ\",\"weaponBow\":\"KeyB\",\"weaponBlade\":\"KeyU\",\"crouch\":\"KeyZ\",\"dodge\":\"KeyG\",\"lockOn\":\"KeyL\",\"map\":\"KeyP\",\"aim\":\"KeyO\"}; text speed instant; brightness set.",
+    "Version 5 save written from this page's own new game: step \"fence\", yard finished, choice \"show\", hero at the yard mark (steps 1-3 are items 25/26).",
+    "placeAt (98.0, 101.4): fence start (outside the crossing)",
+    "placeAt (98.0, 101.4): back to the fence start after being seen (the restart)",
+    "placeAt (93.1, 101.3): beside the practice post",
+    "placeAt (93.1, 101.3): back beside the post after the rolls",
+    "placeAt (123.0, 104.0): walked out of the yard (outside its radius)",
+    "placeAt (93.0, 104.0): walked back into the yard",
+    "placeAt (90.4, 108.1): beside the gate lantern",
+    "Skip path: hero placed at her door with placeAt (the road is item 25's capture).",
+    "placeAt (90.4, 108.1): beside the gate lantern (skip)"
+  ],
+  "notes": [],
+  "checks": [
+    {
+      "passed": true,
+      "message": "v5 save migrated, Continue at step 4: fence"
+    },
+    {
+      "passed": true,
+      "message": "evening.fence.0 said as a non-modal line, verbatim"
+    },
+    {
+      "passed": true,
+      "message": "No conversation box: the fence lines do not hold the hero"
+    },
+    {
+      "passed": true,
+      "message": "Crouch prompt from the rebound key: [\"Z to crouch. Crouched and still, you are hard to see.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Hero not hurt (fence start): hp 140"
+    },
+    {
+      "passed": true,
+      "message": "Walking upright is heard: seen line evening.fence.seen.0"
+    },
+    {
+      "passed": true,
+      "message": "Old C does not crouch"
+    },
+    {
+      "passed": true,
+      "message": "Rebound Z crouches"
+    },
+    {
+      "passed": true,
+      "message": "Crouch prompt gone while crouched"
+    },
+    {
+      "passed": true,
+      "message": "Back outside the crossing: the restart is cleared"
+    },
+    {
+      "passed": true,
+      "message": "Crouched crossing reaches the scarecrow unseen: {\"phase\":\"mark\",\"seen\":1,\"restart\":false,\"notice\":0,\"clock\":16.266666666667025,\"markHeld\":0}"
+    },
+    {
+      "passed": true,
+      "message": "The hero really walked to the scarecrow"
+    },
+    {
+      "passed": true,
+      "message": "At the scarecrow: bow prompt [\"B for the bow.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Mark prompt from rebound O: [\"Hold O to look closer. Keep it on someone to mark them.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Look closer held with the aim on the scarecrow"
+    },
+    {
+      "passed": true,
+      "message": "Held O marks the scarecrow; step 5: post"
+    },
+    {
+      "passed": true,
+      "message": "Done line: [[\"evening.post.0\"],[\"evening.fence.done.0\",\"bram.evening\",\"evening.post.0\"]]"
+    },
+    {
+      "passed": true,
+      "message": "Hero not hurt (fence done): hp 140"
+    },
+    {
+      "passed": true,
+      "message": "Blade prompt from rebound U: [\"U for the blade.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Old 1 does not draw the blade"
+    },
+    {
+      "passed": true,
+      "message": "Rebound U: blade out, prompt gone"
+    },
+    {
+      "passed": true,
+      "message": "Three real blade strikes on the post: {\"phase\":\"dodge\",\"strikes\":3,\"dodged\":0,\"hits\":0}"
+    },
+    {
+      "passed": true,
+      "message": "Dodge prompt from rebound G: [\"G to dodge.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Standing still: struck by a turnip, her line evening.post.hit.0"
+    },
+    {
+      "passed": true,
+      "message": "Hero not hurt (turnip hit): hp 140"
+    },
+    {
+      "passed": true,
+      "message": "Old Space does not dodge (hits 2)"
+    },
+    {
+      "passed": true,
+      "message": "Rebound G rolls clear of three turnips: {\"phase\":\"lock\",\"strikes\":3,\"dodged\":3,\"hits\":2} thrown 5"
+    },
+    {
+      "passed": true,
+      "message": "Hero not hurt (turnips): hp 140"
+    },
+    {
+      "passed": true,
+      "message": "Lock prompt from rebound L: [\"L to keep your eyes on one of them.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Old Tab does not lock on"
+    },
+    {
+      "passed": true,
+      "message": "Rebound L locks on: turned to the post (off by 0.00 rad)"
+    },
+    {
+      "passed": true,
+      "message": "A locked strike ends the post; step 6: lantern"
+    },
+    {
+      "passed": true,
+      "message": "Hero not hurt (post done): hp 140"
+    },
+    {
+      "passed": true,
+      "message": "Leaving mid-lesson: she calls once (evening.left.0)"
+    },
+    {
+      "passed": true,
+      "message": "Saved (v6) away mid-lesson at step 6"
+    },
+    {
+      "passed": true,
+      "message": "Continue: lesson reconstructed at step 6, still away"
+    },
+    {
+      "passed": true,
+      "message": "Back: welcome and the current ask (evening.back.0,evening.lantern.0)"
+    },
+    {
+      "passed": true,
+      "message": "Lantern prompt from rebound J: [\"J Light the lantern.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Gate lantern dark before"
+    },
+    {
+      "passed": true,
+      "message": "Old E does not light it"
+    },
+    {
+      "passed": true,
+      "message": "Rebound J lights the gate lantern (glow 2.91), cue harp"
+    },
+    {
+      "passed": true,
+      "message": "Lit: hesper.lantern.first then evening.map (hesper.lantern.first.0,hesper.lantern.first.1,hesper.lantern.first.2,evening.map.0)"
+    },
+    {
+      "passed": true,
+      "message": "She opens the map pointing at the Mill; only Wick and the Mill drawn: [\"wick\",\"mill\"]"
+    },
+    {
+      "passed": true,
+      "message": "No undiscovered place on the map"
+    },
+    {
+      "passed": true,
+      "message": "The evening is done"
+    },
+    {
+      "passed": true,
+      "message": "Map prompt from rebound P: [\"P for the map.\"]"
+    },
+    {
+      "passed": true,
+      "message": "Old M does not close the map"
+    },
+    {
+      "passed": true,
+      "message": "Rebound P closes the map"
+    },
+    {
+      "passed": true,
+      "message": "Rebound P opens it again"
+    },
+    {
+      "passed": true,
+      "message": "Saved: the Mill discovered, the evening done"
+    },
+    {
+      "passed": true,
+      "message": "Hero not hurt (end of path A): hp 140"
+    },
+    {
+      "passed": true,
+      "message": "Skip: straight to step 6"
+    },
+    {
+      "passed": true,
+      "message": "Skip lights the lantern without fence or post (18414 ms wall)"
+    },
+    {
+      "passed": true,
+      "message": "Skip path: map points at the Mill; evening done"
+    },
+    {
+      "passed": true,
+      "message": "Hero not hurt (skip): hp 140"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [
+    "docs/pr-media/item27-evening-finish/fence-seen.png",
+    "docs/pr-media/item27-evening-finish/fence-scarecrow.png",
+    "docs/pr-media/item27-evening-finish/post-turnip.png",
+    "docs/pr-media/item27-evening-finish/lantern-lit.png",
+    "docs/pr-media/item27-evening-finish/map-pointing.png"
+  ],
+  "snapshots": [
+    {
+      "name": "fence-seen",
+      "drawCalls": 464,
+      "chunks": 109,
+      "fps": 10,
+      "world": {
+        "x": 96.79210187522692,
+        "z": 100.2564562502063,
+        "groundY": 5.005309967259536,
+        "yaw": -2.3086113869153615,
+        "tod": 18.238539999999848,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 136,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 464,
+        "activeMeshes": 326,
+        "bram": {
+          "x": 96.2702483590836,
+          "z": 102.79157953877902,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 96.79210187522692,
+            "z": 100.2564562502063,
+            "groundY": 5.005309967259536,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -167.1,
+            "z": 70,
+            "groundY": 7.1312302302255235,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "yard": {
+            "phase": "done",
+            "struck": [
+              "straw.0",
+              "straw.1",
+              "straw.2"
+            ],
+            "misses": 0,
+            "arrow": "blunt"
+          },
+          "fence": {
+            "phase": "cross",
+            "seen": 1,
+            "restart": true,
+            "notice": 0,
+            "clock": 10.983333333333459,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "intro",
+            "strikes": 0,
+            "dodged": 0,
+            "hits": 0
+          },
+          "lantern": {
+            "phase": "intro"
+          },
+          "away": false,
+          "backs": 0,
+          "step": "fence",
+          "opened": true,
+          "used": {
+            "move": true,
+            "look": true,
+            "sprint": true
+          },
+          "walked": 0.5666666666666668,
+          "choice": "show"
+        },
+        "stepNumber": 4,
+        "pending": null,
+        "opening": null,
+        "prompts": [
+          "Z to crouch. Crouched and still, you are hard to see."
+        ],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": null,
+          "lastLines": [],
+          "arrow": "blunt"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 5.1879122146488506,
+            "glancing": false
+          },
+          "crouched": false,
+          "movement": "still",
+          "weapon": "sword",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [
+            "evening.fence.seen.0"
+          ],
+          "queued": [],
+          "caption": "Hesper: \"I heard that from here. So would they. Again.\"",
+          "gateLanternLit": false,
+          "gateLanternGlow": 0.21000000000000002,
+          "cue": "none",
+          "heroHp": 140
+        }
+      },
+      "map": {
+        "open": false,
+        "view": {
+          "hero": {
+            "x": 96.79210187522692,
+            "z": 100.2564562502063
+          },
+          "entries": [
+            {
+              "id": "wick",
+              "name": "Wick",
+              "x": 64,
+              "z": 72,
+              "kind": "village",
+              "status": "home"
+            }
+          ],
+          "pointed": null,
+          "extent": 400
+        },
+        "drawnSites": [],
+        "drawnPoint": null
+      }
+    },
+    {
+      "name": "fence-scarecrow",
+      "drawCalls": 450,
+      "chunks": 109,
+      "fps": 10,
+      "world": {
+        "x": 93.68435356696402,
+        "z": 97.43123051542184,
+        "groundY": 4.955572567936047,
+        "yaw": -2.3086113869153615,
+        "tod": 18.412615999999772,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 229,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 450,
+        "activeMeshes": 321,
+        "bram": {
+          "x": 93.11258169206715,
+          "z": 100.29008988990617,
+          "order": "follow",
+          "crouched": true
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 93.68435356696402,
+            "z": 97.43123051542184,
+            "groundY": 4.955572567936047,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -185.1,
+            "z": 47,
+            "groundY": 3.6916871627411068,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "yard": {
+            "phase": "done",
+            "struck": [
+              "straw.0",
+              "straw.1",
+              "straw.2"
+            ],
+            "misses": 0,
+            "arrow": "blunt"
+          },
+          "fence": {
+            "phase": "mark",
+            "seen": 1,
+            "restart": false,
+            "notice": 0,
+            "clock": 16.266666666667025,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "intro",
+            "strikes": 0,
+            "dodged": 0,
+            "hits": 0
+          },
+          "lantern": {
+            "phase": "intro"
+          },
+          "away": false,
+          "backs": 0,
+          "step": "fence",
+          "opened": true,
+          "used": {
+            "move": true,
+            "look": true,
+            "sprint": true
+          },
+          "walked": 2.533333333333329,
+          "choice": "show"
+        },
+        "stepNumber": 4,
+        "pending": null,
+        "opening": null,
+        "prompts": [
+          "B for the bow."
+        ],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": null,
+          "lastLines": [],
+          "arrow": "blunt"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": true,
+          "movement": "crouchedStill",
+          "weapon": "sword",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [
+            "evening.fence.mark.0"
+          ],
+          "queued": [],
+          "caption": "Hesper: \"Before you touch anyone, mark them. Him. Now you know where he is when he isn't where you left him.\"",
+          "gateLanternLit": false,
+          "gateLanternGlow": 0.21000000000000002,
+          "cue": "none",
+          "heroHp": 140
+        }
+      },
+      "map": {
+        "open": false,
+        "view": {
+          "hero": {
+            "x": 93.68435356696402,
+            "z": 97.43123051542184
+          },
+          "entries": [
+            {
+              "id": "wick",
+              "name": "Wick",
+              "x": 64,
+              "z": 72,
+              "kind": "village",
+              "status": "home"
+            }
+          ],
+          "pointed": null,
+          "extent": 400
+        },
+        "drawnSites": [],
+        "drawnPoint": null
+      }
+    },
+    {
+      "name": "post-turnip",
+      "drawCalls": 270,
+      "chunks": 109,
+      "fps": 10,
+      "world": {
+        "x": 93.1,
+        "z": 101.3,
+        "groundY": 4.988853908077792,
+        "yaw": 1.4288992721907312,
+        "tod": 18.84933199999954,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 459,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 270,
+        "activeMeshes": 93,
+        "bram": {
+          "x": 92.43585155982137,
+          "z": 99.15076293820486,
+          "order": "follow",
+          "crouched": true
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 93.1,
+            "z": 101.3,
+            "groundY": 4.988853908077792,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -186,
+            "z": 49.115600001176794,
+            "groundY": 3.7339684402802065,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "yard": {
+            "phase": "done",
+            "struck": [
+              "straw.0",
+              "straw.1",
+              "straw.2"
+            ],
+            "misses": 0,
+            "arrow": "blunt"
+          },
+          "fence": {
+            "phase": "done",
+            "seen": 1,
+            "restart": false,
+            "notice": 0,
+            "clock": 16.266666666667025,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "dodge",
+            "strikes": 3,
+            "dodged": 0,
+            "hits": 1
+          },
+          "lantern": {
+            "phase": "intro"
+          },
+          "away": false,
+          "backs": 0,
+          "step": "post",
+          "opened": true,
+          "used": {
+            "move": true,
+            "look": true,
+            "sprint": true
+          },
+          "walked": 2.533333333333329,
+          "choice": "show"
+        },
+        "stepNumber": 5,
+        "pending": null,
+        "opening": null,
+        "prompts": [
+          "G to dodge."
+        ],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": null,
+          "lastLines": [],
+          "arrow": "blunt"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": true,
+          "movement": "crouchedStill",
+          "weapon": "sword",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 1,
+          "lastLines": [
+            "evening.post.hit.0"
+          ],
+          "queued": [],
+          "caption": "Hesper: \"That was a turnip. The next one won't be. Again.\"",
+          "gateLanternLit": false,
+          "gateLanternGlow": 0.21000000000000002,
+          "cue": "none",
+          "heroHp": 140
+        }
+      },
+      "map": {
+        "open": false,
+        "view": {
+          "hero": {
+            "x": 93.1,
+            "z": 101.3
+          },
+          "entries": [
+            {
+              "id": "wick",
+              "name": "Wick",
+              "x": 64,
+              "z": 72,
+              "kind": "village",
+              "status": "home"
+            }
+          ],
+          "pointed": null,
+          "extent": 400
+        },
+        "drawnSites": [],
+        "drawnPoint": null
+      }
+    },
+    {
+      "name": "lantern-lit",
+      "drawCalls": 252,
+      "chunks": 107,
+      "fps": 13,
+      "world": {
+        "x": 90.39999999999999,
+        "z": 108.1,
+        "groundY": 5.041909002970879,
+        "yaw": 1.176005207095136,
+        "tod": 19.685663999999072,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 83,
+        "pausedFrame": null,
+        "chunks": 107,
+        "chunkBuilds": 107,
+        "fps": 13,
+        "drawCalls": 252,
+        "activeMeshes": 89,
+        "bram": {
+          "x": 90.82341435101758,
+          "z": 105.67234736632463,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 90.39999999999999,
+            "z": 108.1,
+            "groundY": 5.041909002970879,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -167.1,
+            "z": 70,
+            "groundY": 7.1312302302255235,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -163.59176349071697,
+            "z": 62.80208662405529,
+            "groundY": 6.213381140389413,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -164.52965100552981,
+            "z": 62.72764676343763,
+            "groundY": 6.206672059437783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -186.88873179291798,
+            "z": 46.858028875271074,
+            "groundY": 3.836666204321774,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.36219720313787,
+            "z": 73.36501370698664,
+            "groundY": 7.773920639421,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -185.14479066723732,
+            "z": 47.28038722716204,
+            "groundY": 3.6934681365026867,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "yard": {
+            "phase": "done",
+            "struck": [
+              "straw.0",
+              "straw.1",
+              "straw.2"
+            ],
+            "misses": 0,
+            "arrow": "blunt"
+          },
+          "fence": {
+            "phase": "done",
+            "seen": 1,
+            "restart": false,
+            "notice": 0,
+            "clock": 16.266666666667025,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "done",
+            "strikes": 3,
+            "dodged": 3,
+            "hits": 2
+          },
+          "lantern": {
+            "phase": "lit"
+          },
+          "away": false,
+          "backs": 1,
+          "step": "lantern",
+          "opened": true,
+          "used": {
+            "move": true,
+            "look": true,
+            "sprint": true
+          },
+          "walked": 2.533333333333329,
+          "choice": "show"
+        },
+        "stepNumber": 6,
+        "pending": null,
+        "opening": null,
+        "prompts": [],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": null,
+          "lastLines": [],
+          "arrow": "blunt"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": false,
+          "movement": "still",
+          "weapon": "sword",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [
+            "hesper.lantern.first.0",
+            "hesper.lantern.first.1",
+            "hesper.lantern.first.2",
+            "evening.map.0"
+          ],
+          "queued": [
+            "evening.lantern.0",
+            "hesper.lantern.first.0",
+            "hesper.lantern.first.1",
+            "hesper.lantern.first.2",
+            "evening.map.0"
+          ],
+          "caption": "Saved.",
+          "gateLanternLit": true,
+          "gateLanternGlow": 2.912,
+          "cue": "harp",
+          "heroHp": 140
+        }
+      },
+      "map": {
+        "open": false,
+        "view": {
+          "hero": {
+            "x": 90.39999999999999,
+            "z": 108.1
+          },
+          "entries": [
+            {
+              "id": "wick",
+              "name": "Wick",
+              "x": 64,
+              "z": 72,
+              "kind": "village",
+              "status": "home"
+            }
+          ],
+          "pointed": null,
+          "extent": 400
+        },
+        "drawnSites": [],
+        "drawnPoint": null
+      }
+    },
+    {
+      "name": "map-pointing",
+      "drawCalls": 252,
+      "chunks": 107,
+      "fps": 10,
+      "world": {
+        "x": 90.39999999999999,
+        "z": 108.1,
+        "groundY": 5.041909002970879,
+        "yaw": 1.176005207095136,
+        "tod": 20.085993999998838,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 291,
+        "pausedFrame": null,
+        "chunks": 107,
+        "chunkBuilds": 107,
+        "fps": 10,
+        "drawCalls": 252,
+        "activeMeshes": 89,
+        "bram": {
+          "x": 90.82341435101758,
+          "z": 105.67234736632463,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 90.39999999999999,
+            "z": 108.1,
+            "groundY": 5.041909002970879,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -163.59176349071697,
+            "z": 62.80208662405529,
+            "groundY": 6.213381140389413,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -186.88873179291798,
+            "z": 46.858028875271074,
+            "groundY": 3.836666204321774,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.36219720313787,
+            "z": 73.36501370698664,
+            "groundY": 7.773920639421,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -185.14479066723732,
+            "z": 47.28038722716204,
+            "groundY": 3.6934681365026867,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "tutorial": {
+        "tutorial": {
+          "yard": {
+            "phase": "done",
+            "struck": [
+              "straw.0",
+              "straw.1",
+              "straw.2"
+            ],
+            "misses": 0,
+            "arrow": "blunt"
+          },
+          "fence": {
+            "phase": "done",
+            "seen": 1,
+            "restart": false,
+            "notice": 0,
+            "clock": 16.266666666667025,
+            "markHeld": 0
+          },
+          "post": {
+            "phase": "done",
+            "strikes": 3,
+            "dodged": 3,
+            "hits": 2
+          },
+          "lantern": {
+            "phase": "done"
+          },
+          "away": false,
+          "backs": 1,
+          "step": "done",
+          "opened": true,
+          "used": {
+            "move": true,
+            "look": true,
+            "sprint": true
+          },
+          "walked": 2.533333333333329,
+          "choice": "show"
+        },
+        "stepNumber": 7,
+        "pending": null,
+        "opening": null,
+        "prompts": [
+          "P for the map."
+        ],
+        "choiceOpen": false,
+        "yard": {
+          "mark": {
+            "x": 91,
+            "z": 105
+          },
+          "targets": [
+            {
+              "id": "straw.0",
+              "x": 96.2,
+              "z": 110.2,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.098554261579253
+            },
+            {
+              "id": "straw.1",
+              "x": 97.6,
+              "z": 108.9,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.094628381369362
+            },
+            {
+              "id": "straw.2",
+              "x": 98.6,
+              "z": 107.3,
+              "radius": 0.35,
+              "height": 1.7,
+              "base": 5.085730094888978
+            },
+            {
+              "id": "far",
+              "x": 107.5,
+              "z": 102.5,
+              "radius": 0.45,
+              "height": 1.8,
+              "base": 5.111793072687563
+            }
+          ],
+          "watching": 0,
+          "lastMiss": null,
+          "lastLines": [],
+          "arrow": "blunt"
+        },
+        "lesson": {
+          "scarecrow": {
+            "x": 92.55,
+            "z": 96.4
+          },
+          "post": {
+            "x": 94.5,
+            "z": 101.5,
+            "radius": 0.15
+          },
+          "gateLantern": {
+            "x": 91.6,
+            "z": 108.6
+          },
+          "yardMiddle": {
+            "x": 93,
+            "z": 104
+          },
+          "yardRadius": 24,
+          "hesper": {
+            "x": 89.81837661840736,
+            "z": 101.81837661840736,
+            "yaw": 0.7853981633974484,
+            "glancing": false
+          },
+          "crouched": false,
+          "movement": "still",
+          "weapon": "sword",
+          "zooming": false,
+          "aimOnScarecrow": false,
+          "locked": false,
+          "turnip": null,
+          "turnipsThrown": 0,
+          "lastLines": [
+            "hesper.lantern.first.0",
+            "hesper.lantern.first.1",
+            "hesper.lantern.first.2",
+            "evening.map.0"
+          ],
+          "queued": [],
+          "caption": "Saved.",
+          "gateLanternLit": true,
+          "gateLanternGlow": 2.912,
+          "cue": "harp",
+          "heroHp": 140
+        }
+      },
+      "map": {
+        "open": true,
+        "view": {
+          "hero": {
+            "x": 90.39999999999999,
+            "z": 108.1
+          },
+          "entries": [
+            {
+              "id": "wick",
+              "name": "Wick",
+              "x": 64,
+              "z": 72,
+              "kind": "village",
+              "status": "home"
+            },
+            {
+              "id": "mill",
+              "name": "The Mill",
+              "x": -176,
+              "z": 50,
+              "kind": "camp",
+              "status": "held"
+            }
+          ],
+          "pointed": "mill",
+          "extent": 400
+        },
+        "drawnSites": [
+          "wick",
+          "mill"
+        ],
+        "drawnPoint": "mill"
+      }
+    }
+  ],
+  "timeline": [
+    {
+      "at": "seen",
+      "hero": {
+        "x": 96.79210187522692,
+        "z": 100.2564562502063,
+        "groundY": 5.005309967259536,
+        "yaw": -2.3086113869153615,
+        "tod": 18.216073999999864,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 123,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 464,
+        "activeMeshes": 326,
+        "bram": {
+          "x": 96.2702483590836,
+          "z": 102.79157953877902,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 96.79210187522692,
+            "z": 100.2564562502063,
+            "groundY": 5.005309967259536,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -167.1,
+            "z": 70,
+            "groundY": 7.1312302302255235,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "movement": "still"
+    },
+    {
+      "at": "crossed",
+      "ms": 10756,
+      "fence": {
+        "phase": "mark",
+        "seen": 1,
+        "restart": false,
+        "notice": 0,
+        "clock": 16.266666666667025,
+        "markHeld": 0
+      }
+    }
+  ],
+  "map": {
+    "open": true,
+    "view": {
+      "hero": {
+        "x": 90.39999999999999,
+        "z": 108.1
+      },
+      "entries": [
+        {
+          "id": "wick",
+          "name": "Wick",
+          "x": 64,
+          "z": 72,
+          "kind": "village",
+          "status": "home"
+        },
+        {
+          "id": "mill",
+          "name": "The Mill",
+          "x": -176,
+          "z": 50,
+          "kind": "camp",
+          "status": "held"
+        }
+      ],
+      "pointed": "mill",
+      "extent": 400
+    },
+    "drawnSites": [
+      "wick",
+      "mill"
+    ],
+    "drawnPoint": "mill"
+  },
+  "skip": {
+    "wallMs": 18414,
+    "gameSecondsByClock": 245.39039999995964
+  }
+}

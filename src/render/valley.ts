@@ -6,7 +6,9 @@ import { addNote } from '../core/notes/notes';
 import { gameHour, nextLine } from '../core/speech/said';
 import { ConversationBox } from './conversation_box';
 import { advance as advanceEvening, choiceFromAnswer, choiceOpen, roadPrompts, PENDING, STEP_NUMBER, type TutorialEvent } from '../core/tutorial/lesson';
-import { EVENING_CHOICE, EVENING_OPEN, ROAD_PROMPTS, eveningSkipPages, roadPrompt } from '../data/evening';
+import { EVENING_CHOICE, EVENING_OPEN, ROAD_PROMPTS, eveningSkipPages, roadPrompt, YARD_MISS_COUNTS, yardIntroPages, yardPage, yardPrompt as yardPromptText } from '../data/evening';
+import { arrowStrikes, flightStep, PHASE_LINE, yardPrompt, yardSays, type YardEvent, type YardTarget } from '../core/tutorial/yard';
+import { YARD_MARK, YARD_TARGETS } from '../village/yard';
 import type { Awareness } from '../core/stealth';
 // The valley: open-world slice, step 1. Terrain, sky, water, one hero walking under the day-night clock.
 // The walking rules and camera geometry are pure (src/core/world); this file only draws them.
@@ -127,7 +129,11 @@ export interface ValleyHooks {
   talkingState(): { position: { x: number; z: number }; available: boolean; line: string | null; text: string | null;
     answers: string[]; selected: number };
   tutorialState(): { tutorial: GameState['tutorial']; stepNumber: number; pending: string | null; opening: string | null;
-    prompts: string[]; choiceOpen: boolean };
+    prompts: string[]; choiceOpen: boolean;
+    /** Item 26: the yard's targets as the hit test sees them, the arrows being watched, and the last line she said. */
+    yard: { mark: { x: number; z: number }; targets: YardTarget[]; watching: number; lastMiss: { x: number; y: number; z: number } | null; lastLines: string[]; arrow: string } };
+  /** Capture only: turn the camera and the bow's aim to a point (pitch from height), as moving the mouse would. */
+  aimBowAt(x: number, y: number, z: number): void;
 
 }
 /** Meshes that make up the sky. A pick that passes through these is sky. */
@@ -289,6 +295,12 @@ class Valley {
   private readonly openingEl: HTMLElement;
   private readonly promptEl: HTMLElement;
   private openingTime = 0;
+  /** Item 26: the yard targets, standing on the ground, and the hero's arrows in flight while the lesson watches. */
+  private readonly yardTargets: YardTarget[] = YARD_TARGETS.map(t => ({ ...t, base: valleyHeightAt(t.x, t.z) }));
+  private readonly yardArrows = new Map<number, { x: number; y: number; z: number }>();
+  /** Where the last watched arrow was last seen before it came down (evidence for a miss). */
+  private yardLastMiss: { x: number; y: number; z: number } | null = null;
+  private yardLastLines: string[] = [];
 
 
   constructor(
@@ -391,7 +403,7 @@ class Valley {
     this.figuresText = document.createElement('div');
     this.tourText = document.createElement('div');
     this.captionEl = document.createElement('div');
-    this.captionEl.hidden = true;
+    this.captionEl.className = 'valley-caption'; this.captionEl.hidden = true;
     this.captionEl.style.cssText = 'position:absolute;left:50%;bottom:16%;transform:translateX(-50%);font:600 18px/1.3 system-ui,sans-serif;color:#f4ead2;text-shadow:0 1px 3px #000;pointer-events:none;';
     uiRoot.appendChild(this.captionEl);
     // Item 25: the opening line (upper screen) and the road-in prompts (above the caption). Not speech: no speaker.
@@ -708,6 +720,8 @@ class Valley {
     const squadPressed = this.input.takeActionPressed('squadOrder');
     const crouchPressed = this.input.takeActionPressed('crouch');
     const interactPressed = this.input.takeActionPressed('interact');
+    const arrowNext = this.input.takeActionPressed('arrowNext');
+    const arrowPrev = this.input.takeActionPressed('arrowPrev');
     const previousAnswer = this.conversation.current && this.input.takeActionPressed('moveLeft');
     const nextAnswer = this.conversation.current && this.input.takeActionPressed('moveRight');
     const raw = this.input.takeInput();
@@ -727,8 +741,11 @@ class Valley {
       ? (moving ? 'crouched' : 'crouchedStill')
       : moving ? (intent.sprint ? 'sprinting' : 'walking') : 'still';
     const mill = this.game.places.find(p => p.id === 'mill');
+    this.watchYardArrows();
     if (this.fight.status === 'fighting') this.fight.advance(intent, mill
       ? { hour: this.game.timeOfDay, place: mill, movement: this.heroMovement } : undefined);
+    this.yardArrowsLanded();
+    if (live && !this.conversation.current && (arrowNext || arrowPrev)) this.yardEvent({ type: 'arrowChanged', delta: arrowNext ? 1 : -1 });
     this.game.hero.position = { x: this.hero.x, z: this.hero.z };
     this.groundY = this.hero.y;
     this.stepEvening(live, moving);
@@ -760,6 +777,7 @@ class Valley {
     this.game.tutorial = advanceEvening(this.game.tutorial, { type: 'chose', choice });
     logEvent('tutorial', `evening choice ${choice}; step ${STEP_NUMBER[this.game.tutorial.step]} pending`);
     if (choice === 'skip') this.conversation.start(eveningSkipPages());
+    if (choice === 'show') this.openYard();
     if (this.persistent && !this.tour) this.autosave.save('interval');
   }
 
@@ -768,6 +786,7 @@ class Valley {
     const all = [HESPER.group, `${HESPER.group}.bram`].flatMap(group =>
       conversationPages({ source: 'hesper', group }, HESPER.id, HESPER.name));
     const unheard = all.filter(l => this.game.speech.lines[`${l.id}#0`] === undefined);
+    if (!choiceOpen(this.game.tutorial) && this.game.tutorial.step === 'yard' && !this.tour) return this.yardPages();
     if (!choiceOpen(this.game.tutorial) || this.tour) return unheard;
     // Everything heard but the choice unanswered (left mid-talk, or an older save): her last line asks again.
     const pages = unheard.length ? unheard : all.slice(-1);
@@ -780,7 +799,66 @@ class Valley {
   }
   private startTalking(): boolean {
     if (!this.canTalk()) return false;
-    return this.conversation.start(this.doorPages());
+    const yard = this.game.tutorial.step === 'yard' && this.game.tutorial.yard.phase === 'intro';
+    if (!this.conversation.start(this.doorPages())) return false;
+    if (yard) this.yardEvent({ type: 'yardOpened' });
+    return true;
+  }
+
+  // ---------- item 26: the yard ----------
+  /** In the yard she opens with hesper.apprentice and the first ask; coming back, she repeats what she is asking for. */
+  private yardPages(): ConversationPage[] {
+    const y = this.game.tutorial.yard;
+    if (y.phase === 'intro') return yardIntroPages();
+    if (y.phase === 'done') return [];
+    return [yardPage(PHASE_LINE[y.phase], 0)];
+  }
+  private openYard(): void {
+    if (this.game.tutorial.step !== 'yard' || this.game.tutorial.yard.phase !== 'intro') return;
+    if (this.conversation.start(this.yardPages())) this.yardEvent({ type: 'yardOpened' });
+  }
+  /** One lesson event: the state moves, and she says what the writing gives her for it. */
+  private yardEvent(e: YardEvent): void {
+    const before = this.game.tutorial;
+    const after = advanceEvening(before, e);
+    if (after === before) return;
+    this.game.tutorial = after;
+    const says = yardSays(before.yard, after.yard, YARD_MISS_COUNTS);
+    if (says.length) {
+      const pages = says.map(l => yardPage(l.group, l.index));
+      this.yardLastLines = pages.map(p => p.id);
+      logEvent('tutorial', `yard ${e.type}${'target' in e ? ` ${e.target}` : ''}: ${this.yardLastLines.join(', ')}`);
+      // A miss is one dry line over her head and another go; a success is a page she says to the hero's face.
+      if (pages.length === 1 && /\.miss$/.test(says[0].group)) this.showLine(`Hesper: "${pages[0].text}"`, 3);
+      else if (!this.conversation.start(pages)) this.showLine(`Hesper: "${pages[pages.length - 1].text}"`, 5);
+    }
+    if (before.yard.phase !== after.yard.phase && this.persistent && !this.tour) this.autosave.save('interval');
+  }
+  /**
+   * Before the fight steps: each of the hero's arrows is moved one step by the battle's own rule, and if that step
+   * passes through a target the arrow stops there. Arrows that strike nothing are watched until they come down.
+   */
+  private watchYardArrows(): void {
+    const y = this.game.tutorial;
+    const watching = y.step === 'yard' && (y.yard.phase === 'targets' || y.yard.phase === 'far');
+    for (const p of this.fight.battle.projectiles) {
+      if (!p.alive || p.ownerId !== this.hero.id) continue;
+      const hit = arrowStrikes(p, flightStep(p, T.fixedDt, T.gravity), this.yardTargets, T.arrow.radius);
+      if (hit) {
+        p.alive = false; // the battle drops it on this step; it stops in the straw
+        this.yardArrows.delete(p.id);
+        this.yardEvent({ type: 'arrowHit', target: hit });
+      } else if (watching) this.yardArrows.set(p.id, { x: p.x, y: p.y, z: p.z });
+    }
+  }
+  /** After the step: a watched arrow that is gone without striking a target came down somewhere else. A miss. */
+  private yardArrowsLanded(): void {
+    for (const [id, last] of [...this.yardArrows]) {
+      if (this.fight.battle.projectiles.some(p => p.id === id && p.alive)) continue;
+      this.yardArrows.delete(id);
+      this.yardLastMiss = last;
+      this.yardEvent({ type: 'arrowMissed' });
+    }
   }
 
   /** The opening line once, then the road prompts until each control is used. All text from docs/writing. */
@@ -801,6 +879,11 @@ class Valley {
   private eveningPrompts(): string[] {
     if (this.tour) return [];
     const b = currentSettings().bindings;
+    if (this.game.tutorial.step === 'yard') {
+      const kind = yardPrompt(this.game.tutorial.yard, this.hero.weapon === 'bow');
+      const line = kind && yardPromptText(kind, b, 'keyboard');
+      return line ? [line] : [];
+    }
     return roadPrompts(this.game.tutorial, T.tutorial.sprintAfter)
       .map(k => k === 'look' ? ROAD_PROMPTS.look : roadPrompt(k, b, 'keyboard'))
       .filter((l): l is string => !!l);
@@ -1095,7 +1178,14 @@ class Valley {
         answers: (this.conversation.current?.answers ?? []).map(a => a.id), selected: this.conversation.selected }),
       tutorialState: () => ({ tutorial: structuredClone(this.game.tutorial), stepNumber: STEP_NUMBER[this.game.tutorial.step],
         pending: PENDING[this.game.tutorial.step] ?? null, opening: this.openingEl.hidden ? null : this.openingEl.textContent,
-        prompts: this.promptEl.hidden ? [] : this.eveningPrompts(), choiceOpen: choiceOpen(this.game.tutorial) }),
+        prompts: this.promptEl.hidden ? [] : this.eveningPrompts(), choiceOpen: choiceOpen(this.game.tutorial),
+        yard: { mark: { ...YARD_MARK }, targets: this.yardTargets.map(t => ({ ...t })), watching: this.yardArrows.size, lastMiss: this.yardLastMiss,
+          lastLines: [...this.yardLastLines], arrow: this.game.tutorial.yard.arrow } }),
+      aimBowAt: (x, y, z) => {
+        const hp = this.hero;
+        const a = aimAngles({ x: x - hp.x, y: y - (hp.y + T.bow.muzzleHeight), z: z - hp.z });
+        this.input.camYaw = a.yaw; this.input.aimPitch = a.pitch; this.hero.yaw = a.yaw;
+      },
       savedState: () => { this.syncSaveHero(); return structuredClone(this.game); },
       saveNow: (reason = 'interval') => this.autosave.save(reason),
       millState: () => this.fight.mill.snapshot(),

@@ -9,6 +9,7 @@ import { assetUrl } from '../render/assets';
 import type { Lighting } from '../render/lighting';
 import { bearingVector, chance, SCARECROW, WICK_GATES, WICK_LANES, WICK_THINGS, wickHouses, type House } from './plan';
 import { MILL_WINDOW_HOUSE } from '../data/mill_lantern';
+import { FAR_TARGET, STRAW_TARGETS, YARD_MARK } from './yard';
 import { withRetry } from '../render/load_retry';
 
 const HEX = 'assets/kaykit_medieval_hexagon/';
@@ -451,6 +452,33 @@ export async function buildWick(scene: Scene, o: WickOptions): Promise<Wick> {
     box('scarecrow_head', dark, x, z, 0.3, 0.32, 0.28, yaw, g + 1.46);
     box('scarecrow_hat', dark, x, z, 0.52, 0.06, 0.5, yaw, g + 1.78);
     box('scarecrow_crown', dark, x, z, 0.26, 0.14, 0.26, yaw, g + 1.84, 0, 0.1);
+  }
+
+  // ---- Item 26: three straw men and the far target, for the bow lesson. One merged mesh: one draw call. ----
+  {
+    const straw = pbr('wick_straw', new Color3(0.62, 0.5, 0.26));
+    const parts: Mesh[] = [];
+    const face = (t: { x: number; z: number }) => Math.atan2(YARD_MARK.x - t.x, YARD_MARK.z - t.z);
+    for (const t of STRAW_TARGETS) {
+      const g = ground(t.x, t.z), yaw = face(t);
+      parts.push(box(`${t.id}_post`, wood, t.x, t.z, 0.08, 1.9, 0.08, yaw, g));
+      const body = MeshBuilder.CreateCylinder(`${t.id}_body`, { diameter: t.radius * 2, height: 1.05, tessellation: 10 }, scene);
+      body.position.set(t.x, g + 0.45 + 0.525, t.z); body.material = straw; parts.push(body);
+      const head = MeshBuilder.CreateSphere(`${t.id}_head`, { diameter: 0.4, segments: 6 }, scene);
+      head.position.set(t.x, g + 1.5, t.z); head.material = straw; parts.push(head);
+      parts.push(box(`${t.id}_arms`, straw, t.x, t.z, 1.0, 0.14, 0.14, yaw, g + 1.15));
+    }
+    {
+      const t = FAR_TARGET, g = ground(t.x, t.z), yaw = face(t);
+      parts.push(box('far_legs', wood, t.x, t.z, 0.9, 0.1, 0.1, yaw, g + 0.2));
+      parts.push(box('far_post', wood, t.x, t.z, 0.1, 1.2, 0.1, yaw, g));
+      const boss = MeshBuilder.CreateCylinder('far_boss', { diameter: t.radius * 2, height: 0.22, tessellation: 18 }, scene);
+      boss.position.set(t.x, g + t.height - t.radius, t.z); boss.rotation.set(Math.PI / 2, yaw, 0); boss.material = straw;
+      parts.push(boss);
+    }
+    for (const m of parts) { m.material = straw; const i = loose.indexOf(m); if (i >= 0) loose.splice(i, 1); }
+    const merged = Mesh.MergeMeshes(parts, true, true);
+    if (merged) { merged.name = 'yard_targets'; merged.parent = root; cast(merged); }
   }
 
   // The houses and props share one atlas: merged, the whole village's models are a draw call or two, not one per part.

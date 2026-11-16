@@ -6,7 +6,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
-## 2026-11-16 Queue item 29: installable (Viktor, PR pending; not deployed)
+## 2026-11-16 Queue item 29: installable (Viktor, PR #110; merge and deploy recorded above when done)
 
 - Branch `feat/item29-installable` from `70472dd`. Guards checked by the parent at activation 11:06:54 UTC. Item 18 untouched (recorded conflict).
 - Built: `public/manifest.webmanifest` (standalone, night background/theme `#0b1016`) and an original lantern icon (SVG + 192/512/maskable PNGs); a service worker generated at build (`vite.config.ts` → `dist/sw.js`) with one cache per build version; offline play after the first visit for every file that visit fetched plus all code; a new version installs quietly beside the old one, is used from the next start, never mid-session, and the title shows one line while it waits. Saves/settings (localStorage) are never touched; only this game's old version caches are deleted. Exact semantics and limits in the queue's "Decisions taken".

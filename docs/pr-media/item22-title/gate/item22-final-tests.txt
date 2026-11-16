@@ -151,4 +151,3 @@ BJS - [00:55:30]: Babylon.js v9.35.0 - Null engine
       Tests  1077 passed (1077)
    Start at  00:55:26
    Duration  7.89s (transform 4.77s, setup 0ms, collect 26.83s, tests 26.38s, environment 13ms, prepare 5.30s)
-

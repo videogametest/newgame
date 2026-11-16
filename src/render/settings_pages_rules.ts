@@ -118,11 +118,11 @@ const PLAY_ROWS: Row[] = [
   },
   { kind: 'switch', path: 'play.characterTones', label: 'Character tones', notYet: true },
   {
-    kind: 'choice', path: 'play.textSize', label: 'Size', group: 'Text', notYet: true,
+    kind: 'choice', path: 'play.textSize', label: 'Size', group: 'Text',
     options: [{ label: 'Small', value: 'small' }, { label: 'Medium', value: 'medium' }, { label: 'Large', value: 'large' }],
   },
   {
-    kind: 'choice', path: 'play.textSpeed', label: 'Speed', notYet: true,
+    kind: 'choice', path: 'play.textSpeed', label: 'Speed',
     options: [{ label: 'Slow', value: 'slow' }, { label: 'Medium', value: 'medium' }, { label: 'Fast', value: 'fast' }, { label: 'Instant', value: 'instant' }],
   },
 ];

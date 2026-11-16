@@ -1,3 +1,4 @@
+import evening from '../../../docs/writing/first-evening.md?raw';
 import households from '../../../docs/writing/households.md?raw';
 import companions from '../../../docs/writing/companions.md?raw';
 import hesper from '../../../docs/writing/hesper.md?raw';
@@ -8,7 +9,7 @@ import { meetsTrigger, type PeopleWorld, type Trigger } from './households';
 import { bondStage, type CompanionState } from './companions';
 
 /** Source documents are imported as data, never copied or rewritten. No IO at runtime. */
-export const WRITING = { households, companions, hesper, stane, bram, interface: screen };
+export const WRITING = { evening, households, companions, hesper, stane, bram, interface: screen };
 export type WritingSource = keyof typeof WRITING;
 export interface SpokenLine { text: string; speaker?: string; label?: string }
 export interface DialogueRef { source: WritingSource; group: string }

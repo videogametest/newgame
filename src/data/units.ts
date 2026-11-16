@@ -41,6 +41,12 @@ export interface UnitDef {
 }
 
 export const UNITS: Record<string, UnitDef> = {
+  // Hesper follows the accepted room standard: hooded rogue, mask off, grey, no weapon.
+  hesper: {
+    kind: 'soldier', model: 'assets/kaykit_adventurers/characters/Rogue_Hooded.glb',
+    tint: [0.74, 0.74, 0.8], weapons: [], hide: /RogueHooded_Mask/,
+    clips: { idle: 'Idle_A', run: 'Walking_A', attack: 'Idle_A', hit: 'Hit_A', death: 'Death_A' },
+  },
   hero: {
     kind: 'hero',
     model: 'assets/kaykit_adventurers/characters/Ranger.glb',

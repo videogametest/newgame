@@ -48,7 +48,7 @@ describe('settings page rows', () => {
   it('marks every row nothing reads yet, and only those', () => {
     const d = defaultSettings();
     // These rows are read by the game now; every other settings row is still marked soon.
-    const readNow = new Set<string>(['display.brightness', 'display.quality', 'sound.master', 'sound.music', 'sound.effects', 'sound.muted', 'play.awarenessMarkers']);
+    const readNow = new Set<string>(['display.brightness', 'display.quality', 'sound.master', 'sound.music', 'sound.effects', 'sound.muted', 'play.awarenessMarkers', 'play.textSize', 'play.textSpeed']);
     for (const page of PAGE_IDS) {
       for (const row of rowsFor(page)) {
         expect(Boolean(row.notYet), row.path).toBe(!readNow.has(row.path));

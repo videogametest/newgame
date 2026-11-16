@@ -1,0 +1,14 @@
+ok   url: worker registered and controls the first-visit page
+ok   url: manifest linked, standalone, 192 and 512 icons
+ok   url: icon /icons/icon-192.png loads
+ok   url: icon /icons/icon-512.png loads
+ok   url: icon /icons/icon-maskable-512.png loads
+ok   url: icon /icons/lantern.svg loads
+ok   url online first visit: title offers Continue for the saved game
+ok   url online first visit: held W walks the hero 4.01 m (frames 31->47)
+ok   url: save and settings unchanged across the offline reload
+ok   url: seeded settings intact
+ok   url offline after reload: title offers Continue for the saved game
+ok   url offline after reload: held W walks the hero 1.85 m (frames 18->35)
+ok   url: no request failed offline (116 same-origin files served by the worker)
+13/13 checks, 0 failures, 0 fallbacks, 0 shots

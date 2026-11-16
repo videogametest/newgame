@@ -33,6 +33,8 @@ import { Autosave, type SaveReason } from '../core/saves/autosave';
 import { readGame, writeGame } from './game_store';
 import type { SaveRead } from '../core/saves/codec';
 import { TitleScreen } from './title_screen';
+import { onUpdateReady } from './offline';
+import { UPDATE_READY_LINE } from '../data/title_screen';
 import { titleYaw, type TitleChoice } from './title_rules';
 import type { GameState } from '../core/types';
 import { blocksHero, insideValley, valleyHeightAt, walkSurfaceAt, VALLEY_PLACES, VALLEY_SEED } from '../core/world/valley';
@@ -508,6 +510,7 @@ class Valley {
         this.startBrightnessCheck(() => { this.titleScreen?.show(); this.titleScreen?.showSettings(); });
       },
     }, b => { saveSettings({ ...currentSettings(), bindings: b }); this.input.setBindings(b); });
+    onUpdateReady(() => this.titleScreen?.setNotice(UPDATE_READY_LINE));
   }
 
   private beginGame(choice: TitleChoice): void {

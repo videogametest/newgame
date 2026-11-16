@@ -14,5 +14,10 @@ export const TITLE_WORDS = {
   continue: exact('Continue'), newGame: exact('New game'), settings: exact('Settings'),
   question: question[1], replace: question[2], keep: question[3],
 };
+/**
+ * Item 29's one line under the title buttons when a new version is waiting. Placeholder: docs/writing/interface.md
+ * has no line for it yet; replace with the writing's words when they exist.
+ */
+export const UPDATE_READY_LINE = 'An update is ready. It will be used the next time you start.';
 // Untuned title-camera motion, radians and seconds. Bounded, so the view never turns away from Wick.
 export const TITLE_MOTION = { amplitude: 0.045, period: 90 } as const;

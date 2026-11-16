@@ -1,0 +1,44 @@
+{
+  "checks": [
+    {
+      "passed": true,
+      "message": "damaged-save line is the caption first (got \"Your saved game couldn't be read. A new game has started.\")"
+    },
+    {
+      "passed": true,
+      "message": "first-evening opening is hidden while the damaged-save line runs"
+    },
+    {
+      "passed": true,
+      "message": "road prompts are hidden while the damaged-save line runs"
+    },
+    {
+      "passed": true,
+      "message": "the line still holds at 1.5 s and is not replaced by \"Saved.\" (got \"Your saved game couldn't be read. A new game has started.\")"
+    },
+    {
+      "passed": true,
+      "message": "opening still hidden at 1.5 s"
+    },
+    {
+      "passed": true,
+      "message": "the line ends by its six seconds of play (ended after 38.5 s wall time)"
+    },
+    {
+      "passed": true,
+      "message": "second run: the damaged-save line shows first"
+    },
+    {
+      "passed": true,
+      "message": "a key press clears the damaged-save line (caption now \"Saved.\")"
+    },
+    {
+      "passed": true,
+      "message": "the first-evening opening starts only after the line ends"
+    }
+  ],
+  "failures": [],
+  "timings": {
+    "timeoutWallSeconds": 38.503
+  }
+}

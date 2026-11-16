@@ -1,0 +1,681 @@
+{
+  "checks": [
+    {
+      "passed": true,
+      "message": "Fresh profile opens the title"
+    },
+    {
+      "passed": true,
+      "message": "No Continue without a valid save"
+    },
+    {
+      "passed": true,
+      "message": "Untimed duration promise is absent"
+    },
+    {
+      "passed": true,
+      "message": "Movement and Esc do not step the preview game or clock"
+    },
+    {
+      "passed": true,
+      "message": "Title and page exit create no save"
+    },
+    {
+      "passed": true,
+      "message": "Fresh New game opens existing first-start brightness picture"
+    },
+    {
+      "passed": true,
+      "message": "Fresh New game creates the new save"
+    },
+    {
+      "passed": true,
+      "message": "Valid save offers Continue"
+    },
+    {
+      "passed": true,
+      "message": "Title preview and exit leave a personal save byte-identical"
+    },
+    {
+      "passed": true,
+      "message": "Settings works from title"
+    },
+    {
+      "passed": true,
+      "message": "Esc backs from title Controls through Settings without starting play"
+    },
+    {
+      "passed": true,
+      "message": "New game with save asks the written confirmation"
+    },
+    {
+      "passed": true,
+      "message": "Cancellation, not destruction, has default focus"
+    },
+    {
+      "passed": true,
+      "message": "Keep my game preserves save byte-identically"
+    },
+    {
+      "passed": true,
+      "message": "Continue restores actual hero and day rather than title preview state"
+    },
+    {
+      "passed": true,
+      "message": "Continue restores inventory, progression and Notes"
+    },
+    {
+      "passed": true,
+      "message": "Continue preserves separate settings"
+    },
+    {
+      "passed": true,
+      "message": "Pause Return to title saves and returns to title"
+    },
+    {
+      "passed": true,
+      "message": "Explicit Start again replaces progress with a fresh game"
+    },
+    {
+      "passed": true,
+      "message": "New game keeps separate settings"
+    },
+    {
+      "passed": true,
+      "message": "Failed exit save retains the live session instead of reloading"
+    },
+    {
+      "passed": true,
+      "message": "Failed exit save has a visible notice"
+    },
+    {
+      "passed": true,
+      "message": "Damaged save is not offered as Continue"
+    },
+    {
+      "passed": true,
+      "message": "Damaged save is not overwritten on the title"
+    },
+    {
+      "passed": true,
+      "message": "Starting after damaged save displays recovery line"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [],
+  "samples": [
+    {
+      "name": "new-player-title",
+      "state": {
+        "x": 226,
+        "z": 238,
+        "groundY": 33.96983801789676,
+        "yaw": -2.356194490192345,
+        "tod": 18,
+        "day": 1,
+        "locked": false,
+        "title": true,
+        "paused": false,
+        "frame": 50,
+        "pausedFrame": null,
+        "chunks": 76,
+        "chunkBuilds": 76,
+        "fps": 10,
+        "drawCalls": 357,
+        "activeMeshes": 308,
+        "bram": {
+          "x": 224.9393398282202,
+          "z": 240.47487373415294,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 226,
+            "z": 238,
+            "groundY": 33.96983801789676,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      }
+    },
+    {
+      "name": "returning-player-title",
+      "state": {
+        "x": 226,
+        "z": 238,
+        "groundY": 33.96983801789676,
+        "yaw": -2.356194490192345,
+        "tod": 18,
+        "day": 1,
+        "locked": false,
+        "title": true,
+        "paused": false,
+        "frame": 50,
+        "pausedFrame": null,
+        "chunks": 76,
+        "chunkBuilds": 76,
+        "fps": 12,
+        "drawCalls": 357,
+        "activeMeshes": 308,
+        "bram": {
+          "x": 224.9393398282202,
+          "z": 240.47487373415294,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 226,
+            "z": 238,
+            "groundY": 33.96983801789676,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      }
+    },
+    {
+      "name": "replace-confirmation",
+      "state": {
+        "x": 226,
+        "z": 238,
+        "groundY": 33.96983801789676,
+        "yaw": -2.356194490192345,
+        "tod": 18,
+        "day": 1,
+        "locked": false,
+        "title": true,
+        "paused": false,
+        "frame": 68,
+        "pausedFrame": null,
+        "chunks": 76,
+        "chunkBuilds": 76,
+        "fps": 12,
+        "drawCalls": 357,
+        "activeMeshes": 308,
+        "bram": {
+          "x": 224.9393398282202,
+          "z": 240.47487373415294,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 226,
+            "z": 238,
+            "groundY": 33.96983801789676,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 140,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      }
+    },
+    {
+      "name": "continued-game",
+      "state": {
+        "x": 120,
+        "z": -2,
+        "groundY": 2.819058818630549,
+        "yaw": 0,
+        "tod": 22.25,
+        "day": 7,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 109,
+        "pausedFrame": null,
+        "chunks": 111,
+        "chunkBuilds": 126,
+        "fps": 10,
+        "drawCalls": 272,
+        "activeMeshes": 156,
+        "bram": {
+          "x": 122.5,
+          "z": -3,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 120,
+            "z": -2,
+            "groundY": 2.819058818630549,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 61,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.59176349071697,
+            "z": 76.80208662405529,
+            "groundY": 9.80959145870862,
+            "bodyHeight": 1.8,
+            "alive": false,
+            "hp": 0,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -148.52965100552981,
+            "z": 76.72764676343763,
+            "groundY": 9.781778973077296,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -183.88873179291798,
+            "z": 66.85802887527107,
+            "groundY": 8.681328153146163,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.36219720313787,
+            "z": 75.36501370698664,
+            "groundY": 9.805788972085237,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.14479066723732,
+            "z": 76.28038722716204,
+            "groundY": 9.818753652215783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          }
+        ]
+      }
+    }
+  ]
+}

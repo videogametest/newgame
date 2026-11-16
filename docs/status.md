@@ -6,6 +6,14 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 01:13 UTC Queue item 22 deployed (Viktor)
+
+- PR #103 regular-merged as `ce554c2`; required videogametest noreply author/committer verified on all three branch commits and merge. Merge tree identical to the gated branch; GitHub recognizes the PR as merged.
+- Pages run `43783922829` succeeded on that exact commit: tests, production build, built-page smoke and deployment. Initial watch reached the tool's time limit while CI continued; direct state and a second watch confirmed success.
+- `node scripts/smoke.mjs https://everylitwindow.com/` passed. All 25 image-free live title-flow assertions and all 18 image-free live persistence assertions passed, no page/console/request/HTTP errors or capture fallback. No extra screenshots. Raw live reports committed under `docs/pr-media/item22-title/live/`.
+- Live settled medium samples: title/new player 357, title/returning player 357, confirmation 357, continued game 272. Title remains over 300; local continued sample was 266, left as measured without causal claim. The four local frames remain the only new images, not visually judged.
+- Existing every-20-minute continuation stays active. Next run rechecks item 18's unresolved design conflict, then item 23/current queue after ownership and quiet guards. No new implementation inside this deploy's quiet window.
+
 ## 2026-11-16 Queue item 22: title screen (Viktor, PR #103)
 
 - Implementation `aa98e32`, branch `feat/item22-title`. Default route now opens the title over a bounded slow valley view. Title words and replacement confirmation are read from `docs/writing/interface.md`; name uses `GAME_TITLE`. Continue exists only for a validated playable save. Settings/Controls and brightness can be opened before starting. No untimed twelve-hour claim is shown, per task 008.

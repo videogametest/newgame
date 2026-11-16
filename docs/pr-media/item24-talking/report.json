@@ -1,0 +1,750 @@
+{
+  "fixture": "Synthetic doorstep save; actual keyboard interactions. No walked tutorial.",
+  "checks": [
+    {
+      "passed": true,
+      "message": "Actual doorstep offers the arrival conversation"
+    },
+    {
+      "passed": true,
+      "message": "Old E binding does not start speech after rebinding"
+    },
+    {
+      "passed": true,
+      "message": "Speaker name comes from cottage data"
+    },
+    {
+      "passed": true,
+      "message": "Speech box stays at the foot inside 1280x720"
+    },
+    {
+      "passed": true,
+      "message": "Arrival has no invented hero dialogue choices"
+    },
+    {
+      "passed": true,
+      "message": "Advance prompt displays the rebound action"
+    },
+    {
+      "passed": true,
+      "message": "Saved large text setting is applied"
+    },
+    {
+      "passed": true,
+      "message": "World clock and pointer capture continue during conversation"
+    },
+    {
+      "passed": true,
+      "message": "Held/repeated interact advances only one line"
+    },
+    {
+      "passed": true,
+      "message": "Pause menu hides speech without discarding the cursor"
+    },
+    {
+      "passed": true,
+      "message": "Resume preserves the current speech line"
+    },
+    {
+      "passed": true,
+      "message": "Continue restores progress but not an active conversation"
+    },
+    {
+      "passed": true,
+      "message": "Saved speech resumes with the next unheard arrival line"
+    },
+    {
+      "passed": true,
+      "message": "All and only displayed arrival lines persist in speech and Notes"
+    },
+    {
+      "passed": true,
+      "message": "Exhausted arrival does not repeat"
+    },
+    {
+      "passed": true,
+      "message": "Distant interaction cannot start Hesper speech"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [
+    "docs/pr-media/item24-talking/door-dusk.png",
+    "docs/pr-media/item24-talking/door-noon.png",
+    "docs/pr-media/item24-talking/door-night.png"
+  ],
+  "snapshots": [
+    {
+      "name": "door-dusk",
+      "world": {
+        "x": 91.81837661840736,
+        "z": 102.81837661840736,
+        "groundY": 4.995579930208058,
+        "yaw": -2.0344439357957027,
+        "tod": 18.155031999999924,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 94,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 418,
+        "activeMeshes": 266,
+        "bram": {
+          "x": 91.85690726709251,
+          "z": 105.14715546845706,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91.81837661840736,
+            "z": 102.81837661840736,
+            "groundY": 4.995579930208058,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 100,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": "hesper.arrival.0",
+        "text": "You walk like someone who wants to be heard. Come in before the wolves agree."
+      }
+    },
+    {
+      "name": "door-noon",
+      "world": {
+        "x": 91.81837661840736,
+        "z": 102.81837661840736,
+        "groundY": 4.995579930208058,
+        "yaw": -2.0344439357957027,
+        "tod": 12.024286000000007,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 128,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 416,
+        "activeMeshes": 265,
+        "bram": {
+          "x": 91.85690726709251,
+          "z": 105.14715546845706,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91.81837661840736,
+            "z": 102.81837661840736,
+            "groundY": 4.995579930208058,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 100,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.59176349071697,
+            "z": 64.80208662405529,
+            "groundY": 8.947474825792233,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -190.52965100552981,
+            "z": 40.72764676343763,
+            "groundY": 2.340685485788139,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.36219720313787,
+            "z": 63.365013706986645,
+            "groundY": 8.775717261915783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -151.14479066723732,
+            "z": 64.28038722716204,
+            "groundY": 8.99581871170229,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -152.88873179291798,
+            "z": 63.858028875271074,
+            "groundY": 8.53395978089424,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": "hesper.arrival.0",
+        "text": "You walk like someone who wants to be heard. Come in before the wolves agree."
+      }
+    },
+    {
+      "name": "door-night",
+      "world": {
+        "x": 91.81837661840736,
+        "z": 102.81837661840736,
+        "groundY": 4.995579930208058,
+        "yaw": -2.0344439357957027,
+        "tod": 0.023713999999999076,
+        "day": 1,
+        "locked": true,
+        "title": false,
+        "paused": false,
+        "frame": 158,
+        "pausedFrame": null,
+        "chunks": 109,
+        "chunkBuilds": 109,
+        "fps": 10,
+        "drawCalls": 420,
+        "activeMeshes": 267,
+        "bram": {
+          "x": 91.85690726709251,
+          "z": 105.14715546845706,
+          "order": "follow",
+          "crouched": false
+        },
+        "fighters": [
+          {
+            "id": 1,
+            "kind": "hero",
+            "team": "player",
+            "x": 91.81837661840736,
+            "z": 102.81837661840736,
+            "groundY": 4.995579930208058,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 100,
+            "awareness": null
+          },
+          {
+            "id": 2,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 311,
+            "z": -99,
+            "groundY": 11.129504548603357,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 3,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": 313,
+            "z": -95,
+            "groundY": 9.879847598804993,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 4,
+            "kind": "archer",
+            "team": "enemy",
+            "x": 314,
+            "z": -108,
+            "groundY": 13.151949010239786,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 5,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -177.1,
+            "z": 74,
+            "groundY": 7.76268226067945,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 6,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.59176349071697,
+            "z": 76.80208662405529,
+            "groundY": 9.80959145870862,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 7,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -148.52965100552981,
+            "z": 76.72764676343763,
+            "groundY": 9.781778973077296,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          },
+          {
+            "id": 10,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.36219720313787,
+            "z": 75.36501370698664,
+            "groundY": 9.805788972085237,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 11,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -147.14479066723732,
+            "z": 76.28038722716204,
+            "groundY": 9.818753652215783,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 8,
+            "kind": "soldier",
+            "team": "enemy",
+            "x": -183.88873179291798,
+            "z": 66.85802887527107,
+            "groundY": 8.681328153146163,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 70,
+            "awareness": "unaware"
+          },
+          {
+            "id": 9,
+            "kind": "archer",
+            "team": "enemy",
+            "x": -168.27659958298057,
+            "z": 69.14355813349944,
+            "groundY": 6.9548840274336055,
+            "bodyHeight": 1.8,
+            "alive": true,
+            "hp": 50,
+            "awareness": "unaware"
+          }
+        ]
+      },
+      "talking": {
+        "position": {
+          "x": 89.81837661840736,
+          "z": 101.81837661840736
+        },
+        "available": false,
+        "line": "hesper.arrival.0",
+        "text": "You walk like someone who wants to be heard. Come in before the wolves agree."
+      }
+    }
+  ],
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "last": {
+    "x": 91.81837661840736,
+    "z": 102.81837661840736,
+    "groundY": 4.995579930208058,
+    "yaw": -2.0344439357957027,
+    "tod": 0.1891119999999997,
+    "day": 1,
+    "locked": true,
+    "title": false,
+    "paused": false,
+    "frame": 74,
+    "pausedFrame": null,
+    "chunks": 109,
+    "chunkBuilds": 109,
+    "fps": 14,
+    "drawCalls": 422,
+    "activeMeshes": 268,
+    "bram": {
+      "x": 91.85690726709251,
+      "z": 105.14715546845706,
+      "order": "follow",
+      "crouched": false
+    },
+    "fighters": [
+      {
+        "id": 1,
+        "kind": "hero",
+        "team": "player",
+        "x": 91.81837661840736,
+        "z": 102.81837661840736,
+        "groundY": 4.995579930208058,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 100,
+        "awareness": null
+      },
+      {
+        "id": 2,
+        "kind": "soldier",
+        "team": "enemy",
+        "x": 311,
+        "z": -99,
+        "groundY": 11.129504548603357,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 70,
+        "awareness": "unaware"
+      },
+      {
+        "id": 3,
+        "kind": "soldier",
+        "team": "enemy",
+        "x": 313,
+        "z": -95,
+        "groundY": 9.879847598804993,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 70,
+        "awareness": "unaware"
+      },
+      {
+        "id": 4,
+        "kind": "archer",
+        "team": "enemy",
+        "x": 314,
+        "z": -108,
+        "groundY": 13.151949010239786,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 50,
+        "awareness": "unaware"
+      },
+      {
+        "id": 5,
+        "kind": "soldier",
+        "team": "enemy",
+        "x": -177.1,
+        "z": 74,
+        "groundY": 7.76268226067945,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 70,
+        "awareness": "unaware"
+      },
+      {
+        "id": 6,
+        "kind": "soldier",
+        "team": "enemy",
+        "x": -147.59176349071697,
+        "z": 76.80208662405529,
+        "groundY": 9.80959145870862,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 70,
+        "awareness": "unaware"
+      },
+      {
+        "id": 7,
+        "kind": "archer",
+        "team": "enemy",
+        "x": -148.52965100552981,
+        "z": 76.72764676343763,
+        "groundY": 9.781778973077296,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 50,
+        "awareness": "unaware"
+      },
+      {
+        "id": 8,
+        "kind": "soldier",
+        "team": "enemy",
+        "x": -183.88873179291798,
+        "z": 66.85802887527107,
+        "groundY": 8.681328153146163,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 70,
+        "awareness": "unaware"
+      },
+      {
+        "id": 9,
+        "kind": "archer",
+        "team": "enemy",
+        "x": -168.27659958298057,
+        "z": 69.14355813349944,
+        "groundY": 6.9548840274336055,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 50,
+        "awareness": "unaware"
+      },
+      {
+        "id": 10,
+        "kind": "soldier",
+        "team": "enemy",
+        "x": -147.36219720313787,
+        "z": 75.36501370698664,
+        "groundY": 9.805788972085237,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 70,
+        "awareness": "unaware"
+      },
+      {
+        "id": 11,
+        "kind": "soldier",
+        "team": "enemy",
+        "x": -147.14479066723732,
+        "z": 76.28038722716204,
+        "groundY": 9.818753652215783,
+        "bodyHeight": 1.8,
+        "alive": true,
+        "hp": 70,
+        "awareness": "unaware"
+      }
+    ]
+  }
+}

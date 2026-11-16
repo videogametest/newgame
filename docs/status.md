@@ -6,6 +6,13 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
+## 2026-11-16 14:15 UTC Queue item 29 deployed (Viktor)
+
+- PR #110 regular-merged as `616077c`. Author and committer are the required videogametest noreply; the merge tree is identical to the gated branch `76e9fee`. Pages `43881863270` succeeded on that commit.
+- Live: `/sw.js` and `/manifest.webmanifest` return 200. `node scripts/smoke.mjs https://everylitwindow.com/` passed. `scripts/item29_capture.mjs https://everylitwindow.com/ … --no-images` passed 13/13: an online first visit, then the browser goes offline, reload, Continue and walking (2.00 m) with no failed request. The save and settings were unchanged. Raw output is in `docs/pr-media/item29-installable/live/`. Fixtures: synthetic save, seeded settings.
+- Not verified live: the quiet update across two real deploys (verified locally with two builds only), the browser Install prompt and own-window launch, Safari and Firefox.
+- Questions: the damaged-save recovery line race (see the entry below). Item 18 is still blocked on the recorded cleared/freed conflict. Next: item 30.
+
 ## 2026-11-16 Queue item 29: installable (Viktor, PR #110; merge and deploy recorded above when done)
 
 - Branch `feat/item29-installable` from `70472dd`. Guards checked by the parent at activation 11:06:54 UTC. Item 18 untouched (recorded conflict).

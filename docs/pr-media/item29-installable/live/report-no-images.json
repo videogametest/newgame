@@ -1,0 +1,75 @@
+{
+  "url": "https://everylitwindow.com/",
+  "mode": "given URL, browser offline",
+  "images": false,
+  "fixtures": [
+    "save: scripts/item21_fixture.ts populatedGame() (synthetic)",
+    "settings: seeded {brightnessSet, quality medium, master 0.37}"
+  ],
+  "checks": [
+    {
+      "passed": true,
+      "message": "url: worker registered and controls the first-visit page"
+    },
+    {
+      "passed": true,
+      "message": "url: manifest linked, standalone, 192 and 512 icons"
+    },
+    {
+      "passed": true,
+      "message": "url: icon /icons/icon-192.png loads"
+    },
+    {
+      "passed": true,
+      "message": "url: icon /icons/icon-512.png loads"
+    },
+    {
+      "passed": true,
+      "message": "url: icon /icons/icon-maskable-512.png loads"
+    },
+    {
+      "passed": true,
+      "message": "url: icon /icons/lantern.svg loads"
+    },
+    {
+      "passed": true,
+      "message": "url online first visit: title offers Continue for the saved game"
+    },
+    {
+      "passed": true,
+      "message": "url online first visit: held W walks the hero 2.10 m (frames 18->35)"
+    },
+    {
+      "passed": true,
+      "message": "url: save and settings unchanged across the offline reload"
+    },
+    {
+      "passed": true,
+      "message": "url: seeded settings intact"
+    },
+    {
+      "passed": true,
+      "message": "url offline after reload: title offers Continue for the saved game"
+    },
+    {
+      "passed": true,
+      "message": "url offline after reload: held W walks the hero 2.00 m (frames 18->34)"
+    },
+    {
+      "passed": true,
+      "message": "url: no request failed offline (116 same-origin files served by the worker)"
+    }
+  ],
+  "failures": [],
+  "fallbacks": [],
+  "shots": [],
+  "requestFailures": [],
+  "notes": [
+    "url: first visit offline state {\"supported\":true,\"registered\":true,\"controlled\":true,\"updateReady\":false,\"start\":\"none\",\"kept\":19,\"error\":null,\"lastAsk\":null}, explicit keep call kept 0 more",
+    "url: first visit loaded 121 same-origin files; caches {\"everylitwindow-e4612a092809\":186}",
+    "url: online walk 2.10 m; offline load needed 116 files"
+  ],
+  "server": {
+    "url-offline-hits": "n/a (browser offline)"
+  }
+}

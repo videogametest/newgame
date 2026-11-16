@@ -45,6 +45,8 @@ const checks: Record<keyof GameState, Check> = {
   lastThread: nullable(str), notes: array(shape({ lineId: str, kind: one('overheard', 'said', 'thread', 'trace', 'yield'), speakers: strings, place: str, day: integer })),
   speech: shape({ lines: record(nonnegative), speakers: record(nonnegative), last: nullable(nonnegative) }),
   watch: shape({ won: integer, lastDay: nullable(integer), tonight: nullable(str) }),
+  tutorial: shape({ step: one('road', 'door', 'yard', 'lantern'), opened: bool, used: shape({ move: bool, look: bool, sprint: bool }),
+    walked: nonnegative, choice: one(null, 'show', 'skip') }),
   openedChests: strings, discoveredPlaces: strings, fragmentsFound: strings, lostPeople: strings, trialsPassed: strings,
   stolenGoodsReturned: strings, projectsBuilt: strings, campfiresFound: strings, storyMoments: strings, boundBandits: strings, lessonsTaken: strings,
 };

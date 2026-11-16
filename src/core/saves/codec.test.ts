@@ -37,6 +37,15 @@ describe('versioned save boundary', () => {
     const b = decodeSave(JSON.stringify(v2), 9); expect(b.status).toBe('loaded'); expect(b.state.version).toBe(SAVE_VERSION);
     expect(b.state.notes).toEqual([]); expect(b.state.inventory).toEqual(v2.inventory);
   });
+  it('version 3 saves gain a finished road and an open choice, keeping their progress (item 25)', () => {
+    const v3: any = populatedGame(); v3.version = 3; delete v3.tutorial;
+    const c = decodeSave(JSON.stringify(v3), 9); expect(c.status).toBe('loaded');
+    expect(c.state.tutorial).toMatchObject({ step: 'door', opened: true, choice: null, used: { move: true, look: true, sprint: true } });
+    expect(c.state.hero).toEqual(v3.hero); expect(c.state.speech).toEqual(v3.speech); expect(c.state.places).toEqual(v3.places);
+    const bad: any = populatedGame(); bad.tutorial.step = 'nowhere'; expect(decodeSave(JSON.stringify(bad), 9).status).toBe('damaged');
+    const g: any = populatedGame(); g.tutorial = { ...g.tutorial, choice: 'skip', step: 'lantern', opened: true };
+    expect(decodeSave(encodeSave(g), 9).state.tutorial).toEqual(g.tutorial);
+  });
   it('settings and generated scenery are not serialized', () => {
     const g = Object.assign(populatedGame(), { settings: { brightness: 0 }, terrain: [1, 2] });
     expect(JSON.parse(encodeSave(g))).not.toHaveProperty('settings'); expect(JSON.parse(encodeSave(g))).not.toHaveProperty('terrain');

@@ -27,6 +27,8 @@ const DEFAULTS = {
 
   /** Item 21: three active minutes between browser saves (untuned). */
   saves: { intervalSeconds: 180 },
+  /** Item 25 placeholders: opening line seconds on screen, seconds walked before the sprint prompt, look pixels that count. */
+  tutorial: { openSeconds: 6, sprintAfter: 4, lookPixels: 40 },
   /** Item 24 placeholders: metres, radians/second and revealed characters/second. */
   talking: { reach: 3, leaveReach: 6, doorOffset: 5.4, cameraRate: 2.5,
     slow: 24, medium: 42, fast: 72 },

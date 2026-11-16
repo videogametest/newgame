@@ -1,0 +1,83 @@
+
+> every-lit-window@0.2.0 build
+> tsc --noEmit && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 3505 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                      4.48 kB │ gzip:     1.46 kB
+dist/assets/abstractAudioBus-C449wZCU.js                             0.11 kB │ gzip:     0.12 kB
+dist/assets/tgaTextureLoader-DNOEFt4g.js                             0.31 kB │ gzip:     0.26 kB
+dist/assets/oitFinalSimpleBlend.fragment-D6EOoUNu.js                 0.38 kB │ gzip:     0.26 kB
+dist/assets/flowGraphGLTFDataProvider-DVoM81a_.js                    0.42 kB │ gzip:     0.27 kB
+dist/assets/oitFinalSimpleBlend.fragment-D0It23n1.js                 0.45 kB │ gzip:     0.29 kB
+dist/assets/flowGraphCodeExecutionBlock-DqgNjQI6.js                  0.47 kB │ gzip:     0.27 kB
+dist/assets/flowGraphObjectReferenceBlock-DRoNsDLZ.js                0.53 kB │ gzip:     0.33 kB
+dist/assets/hdrTextureLoader--nUi-n5B.js                             0.54 kB │ gzip:     0.39 kB
+dist/assets/envTextureLoader-CIz0zV2N.js                             0.57 kB │ gzip:     0.37 kB
+dist/assets/volumetricLightingRenderVolume.vertex-Cb0kwRIv.js        0.58 kB │ gzip:     0.34 kB
+dist/assets/volumetricLightingRenderVolume.vertex-DVkYvmpK.js        0.67 kB │ gzip:     0.37 kB
+dist/assets/flowGraphDelayReferenceBlock-C7dJzEzW.js                 0.71 kB │ gzip:     0.45 kB
+dist/assets/volumetricLightingBlendVolume.fragment-B8tIkWvK.js       0.81 kB │ gzip:     0.46 kB
+dist/assets/gsSortScanSums.compute-CxmrCMn2.js                       0.83 kB │ gzip:     0.47 kB
+dist/assets/iblCopyVoxelBufferToGrid.compute-Ni_smflX.js             0.84 kB │ gzip:     0.50 kB
+dist/assets/lod3D.fragment-CJP2CujE.js                               0.87 kB │ gzip:     0.48 kB
+dist/assets/webAudioMainBus-CRdkvfok.js                              0.91 kB │ gzip:     0.42 kB
+dist/assets/gsSortOutput.compute-Cf4DyUXy.js                         0.92 kB │ gzip:     0.50 kB
+dist/assets/flowGraphPointerUpEventBlock.pure-CoUheNMk.js            0.93 kB │ gzip:     0.45 kB
+dist/assets/flowGraphPointerDownEventBlock.pure-DByLyXKP.js          0.94 kB │ gzip:     0.45 kB
+dist/assets/flowGraphPointerMoveEventBlock.pure-DVlZW6sa.js          0.96 kB │ gzip:     0.46 kB
+dist/assets/mesh.vertexData.functions-ayNlGC5K.js                    0.96 kB │ gzip:     0.49 kB
+dist/assets/gsSortCount.compute-CILOQkLJ.js                          1.01 kB │ gzip:     0.55 kB
+dist/assets/volumetricLightingBlendVolume.fragment-3J816Og8.js       1.01 kB │ gzip:     0.52 kB
+dist/assets/selection.fragment-B91CPPUh.js                           1.02 kB │ gzip:     0.50 kB
+dist/assets/lod3D.fragment-CViASc5n.js                               1.08 kB │ gzip:     0.53 kB
+dist/assets/flowGraphUnsupportedInteractivityBlock-BKHrZzEP.js       1.14 kB │ gzip:     0.48 kB
+dist/assets/basisTextureLoader-DPrDoFAf.js                           1.19 kB │ gzip:     0.57 kB
+dist/assets/selection.fragment-D-46k6Dg.js                           1.24 kB │ gzip:     0.56 kB
+dist/assets/noise.fragment-E0tKjg2P.js                               1.25 kB │ gzip:     0.65 kB
+dist/assets/gsSortScanLocal.compute-DboW1zMg.js                      1.26 kB │ gzip:     0.62 kB
+dist/assets/ddsTextureLoader-C_XIUz7Z.js                             1.27 kB │ gzip:     0.62 kB
+dist/assets/noise.fragment-C4AZtWDR.js                               1.41 kB │ gzip:     0.71 kB
+dist/assets/gaussianSplattingVoxel.fragment-DpszeEZJ.js              1.43 kB │ gzip:     0.69 kB
+dist/assets/flowGraphDebugBlock.pure-E0-1baDR.js                     1.45 kB │ gzip:     0.63 kB
+dist/assets/screenSpaceCurvature.fragment-DiYZzScb.js                1.60 kB │ gzip:     0.65 kB
+dist/assets/volumetricLightingRenderVolume.fragment-CEk2rYqy.js      1.63 kB │ gzip:     0.78 kB
+dist/assets/gaussianSplattingVoxel.vertex-BQXF3G1S.js                1.76 kB │ gzip:     0.71 kB
+dist/assets/gaussianSplattingVoxel.fragment-bFvVbvUT.js              1.76 kB │ gzip:     0.59 kB
+dist/assets/volumetricLightingRenderVolume.fragment-C86QnZA_.js      1.87 kB │ gzip:     0.86 kB
+dist/assets/selection.vertex-x0ZAgIRs.js                             2.12 kB │ gzip:     0.81 kB
+dist/assets/gsSortKeys.compute-C68qHjST.js                           2.15 kB │ gzip:     0.97 kB
+dist/assets/flowGraphEventReferenceBlock-CIA5Ki4m.js                 2.25 kB │ gzip:     0.75 kB
+dist/assets/webAudioBus-D1Y9lLHT.js                                  2.29 kB │ gzip:     0.75 kB
+dist/assets/selection.vertex-CaF2HScJ.js                             2.46 kB │ gzip:     0.88 kB
+dist/assets/gaussianSplattingVoxel.vertex-shWsPQPD.js                2.48 kB │ gzip:     0.89 kB
+dist/assets/gsSortScatter.compute-eugumN4j.js                        2.52 kB │ gzip:     1.09 kB
+dist/assets/gpuRenderParticles.fragment-CG5IWvQe.js                  2.59 kB │ gzip:     0.94 kB
+dist/assets/gaussianSplatting.fragment-C6MM_iT3.js                   2.91 kB │ gzip:     0.96 kB
+dist/assets/gaussianSplatting.fragment-BVBLMAaW.js                   3.04 kB │ gzip:     0.97 kB
+dist/assets/selectionOutline.fragment-B4F3nBYA.js                    4.99 kB │ gzip:     1.05 kB
+dist/assets/textureProcessor.fragment-CGdUNdEp.js                    5.01 kB │ gzip:     1.48 kB
+dist/assets/subSurfaceScattering.fragment-KVi9rkH0.js                5.39 kB │ gzip:     2.03 kB
+dist/assets/subSurfaceScattering.fragment-Dh8ZW_Ur.js                6.01 kB │ gzip:     2.13 kB
+dist/assets/textureProcessor.fragment-hPTYw_mK.js                    6.03 kB │ gzip:     1.67 kB
+dist/assets/selectionOutline.fragment-BKTFpVbI.js                    6.27 kB │ gzip:     1.16 kB
+dist/assets/gaussianSplatting.vertex-DY9G1VSN.js                     6.83 kB │ gzip:     1.86 kB
+dist/assets/dds.pure-gUGEotDq.js                                     7.00 kB │ gzip:     2.46 kB
+dist/assets/gaussianSplatting.vertex-bd8Jfq8P.js                     8.13 kB │ gzip:     2.04 kB
+dist/assets/textureProcessor-VmvP-BvG.js                             8.79 kB │ gzip:     3.27 kB
+dist/assets/gpuRenderParticles.vertex-BPy4s2bx.js                    9.76 kB │ gzip:     2.12 kB
+dist/assets/ktxTextureLoader-B18giwPD.js                            14.87 kB │ gzip:     4.31 kB
+dist/assets/pbrMaterialLoadingAdapter-uSgwuSeM.js                   16.51 kB │ gzip:     3.22 kB
+dist/assets/openpbrMaterialLoadingAdapter-C8a-wTCU.js               19.16 kB │ gzip:     3.54 kB
+dist/assets/meshBlending.fragment-EDEwUhIg.js                       39.46 kB │ gzip:     8.27 kB
+dist/assets/meshBlending.fragment-DrSYy45g.js                       42.59 kB │ gzip:     8.62 kB
+dist/assets/index-BTrLQOA3.js                                    7,970.17 kB │ gzip: 1,828.01 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1m 3s

@@ -36,12 +36,12 @@ describe('notes: what was said and who said it', () => {
     expect(showCatchUp(0, 99 * day, [])).toBe(false);
   });
   it('is in the save from version 3, and an older save gains it empty', () => {
-    expect(SAVE_VERSION).toBe(3);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(3);
     const fresh = newGameState(1);
     expect(fresh).toMatchObject({ notes: [], boundBandits: [], speech: { lines: {}, speakers: {}, last: null } });
     const { notes: _n, speech: _s, boundBandits: _b, ...v2 } = { ...fresh, version: 2, heardLines: ['overheard.mill.5'] };
     const up = migrateSave(v2)!;
-    expect(up).toMatchObject({ version: 3, notes: [], heardLines: ['overheard.mill.5'] });
+    expect(up).toMatchObject({ version: SAVE_VERSION, notes: [], heardLines: ['overheard.mill.5'] });
     expect(up.speech.last).toBeNull();
   });
 });

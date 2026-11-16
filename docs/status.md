@@ -6,7 +6,7 @@ Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for wh
 
 Viktor updates this file. Newest entry at the top. See `docs/WORKFLOW.md` for what each entry should contain.
 
-## 2026-11-16 Queue item 26: first evening, the yard and the bow lesson (Viktor, PR #PR_NUMBER)
+## 2026-11-16 Queue item 26: first evening, the yard and the bow lesson (Viktor, PR #107)
 
 - Branch `feat/item26-bow-lesson` from fresh `9f9a0a1`. Guards checked by the parent at activation 05:02:17 UTC (main idle, prior crons idle, last push 04:23:10 UTC, no item-26 branch/PR). Item 18 remains its recorded design conflict, not implemented. Item 27 (fence, post, lantern, map) not started.
 - Pure yard lesson `src/core/tutorial/yard.ts`: intro, three straw targets, the far target, the change of arrow. `advance` takes yard events only while the evening is in the yard; a finished yard moves to step 4 (`fence`, pending item 27). Skip still goes to the lantern. Save version 5 (`tutorial.yard`); v4 saves get an unstarted yard and keep their step. Leaving mid-lesson keeps struck targets; talking to her again repeats the current ask.

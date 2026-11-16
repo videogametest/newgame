@@ -9,6 +9,8 @@ const DEFAULTS = {
   /** Mill integration placeholders, not balanced. */
   mill: {
     bellReach: 1.4,
+    /** Placeholder interaction reach, metres (item 23). */
+    lanternReach: 2.5,
     alertRadius: 18,
     activationRadius: 70,
     runnerSpeed: 5,

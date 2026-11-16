@@ -48,7 +48,7 @@ describe('settings page rows', () => {
   it('marks every row nothing reads yet, and only those', () => {
     const d = defaultSettings();
     // These rows are read by the game now; every other settings row is still marked soon.
-    const readNow = new Set<string>(['display.brightness', 'display.quality', 'sound.master', 'sound.effects', 'sound.muted', 'play.awarenessMarkers']);
+    const readNow = new Set<string>(['display.brightness', 'display.quality', 'sound.master', 'sound.music', 'sound.effects', 'sound.muted', 'play.awarenessMarkers']);
     for (const page of PAGE_IDS) {
       for (const row of rowsFor(page)) {
         expect(Boolean(row.notYet), row.path).toBe(!readNow.has(row.path));
@@ -59,8 +59,8 @@ describe('settings page rows', () => {
 });
 
 describe('the soon mark', () => {
-  it('the Sound page has a soon row (Music), so it shows the foot line; Display has one too', () => {
-    expect(pageHasSoon('sound')).toBe(true);
+  it('Sound has no soon rows now the lantern plays music; Display still does', () => {
+    expect(pageHasSoon('sound')).toBe(false);
     expect(pageHasSoon('display')).toBe(true);
   });
 

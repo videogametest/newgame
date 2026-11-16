@@ -2,6 +2,7 @@
 // Starts on the first click or key press (browsers block audio before a user gesture), and only
 // then fetches and decodes the files. Volume and mute come from the saved sound settings.
 
+import { MusicPlayer, melody, sampleFor } from '../audio/music';
 import { SOUNDS } from '../data/sounds';
 import type { SoundId } from '../core/sound_map';
 import {
@@ -17,6 +18,8 @@ export class AudioBank {
   private effectsGain: GainNode | null = null;
   private readonly buffers = new Map<string, AudioBuffer>();
   private loading: Promise<void> | null = null;
+  private music: MusicPlayer | null = null;
+  private readonly musicBuffers = new Map<string, Promise<AudioBuffer>>();
 
   constructor(private readonly storage: Storage | null = safeStorage()) {
     this.settings = parseSoundSettings(this.storage?.getItem(SOUND_STORAGE_KEY) ?? null);
@@ -50,10 +53,39 @@ export class AudioBank {
       this.effectsGain = this.ctx.createGain();
       this.effectsGain.connect(this.masterGain);
       this.masterGain.connect(this.ctx.destination);
+      this.music = new MusicPlayer(this.ctx, this.masterGain, file => this.loadMusic(file));
       this.applyGains();
     }
     if (this.ctx.state === 'suspended') void this.ctx.resume();
     if (!this.loading) this.loading = this.loadAll().catch((err: unknown) => console.warn('Sound load failed', err));
+  }
+
+  /** First lantern: the written tune on the existing CC0 concert harp, or an explicit silent fallback. */
+  async playLantern(): Promise<boolean> {
+    const ctx = this.ctx, music = this.music;
+    if (!ctx || !music || this.settings.muted || this.settings.master <= 0 || this.settings.music <= 0) return false;
+    try {
+      await ctx.resume();
+      if (ctx.state !== 'running') return false;
+      const piece = melody(1);
+      // Preload the whole instrument phrase before scheduling: failed loads cannot leave half a tune playing.
+      await Promise.all([...new Set(piece.events.map(e => sampleFor(e.instrument, e.midi).file))].map(f => this.loadMusic(f)));
+      if (this.settings.muted || this.settings.master <= 0 || this.settings.music <= 0) return false;
+      await music.play(piece);
+      return true;
+    } catch (error) { console.warn('Lantern melody unavailable; showing the caption instead', error); return false; }
+  }
+
+  private loadMusic(file: string): Promise<AudioBuffer> {
+    let pending = this.musicBuffers.get(file);
+    if (!pending) {
+      const ctx = this.ctx;
+      if (!ctx) return Promise.reject(new Error('Audio is not unlocked'));
+      pending = fetchBytesWithRetry(assetUrl(`assets/${file}`)).then(bytes => ctx.decodeAudioData(bytes));
+      this.musicBuffers.set(file, pending);
+      void pending.catch(() => this.musicBuffers.delete(file));
+    }
+    return pending;
   }
 
   /** Original synthesized bell, through the same effects/master volume controls. */
@@ -92,6 +124,7 @@ export class AudioBank {
     const t = this.ctx.currentTime;
     this.masterGain.gain.setTargetAtTime(s.muted ? 0 : s.master, t, 0.02);
     this.effectsGain.gain.setTargetAtTime(s.effects, t, 0.02);
+    this.music?.setVolume(s.music);
   }
 
   private async loadAll(): Promise<void> {
